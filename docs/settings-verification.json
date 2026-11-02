@@ -1,0 +1,10 @@
+{
+  "version": "0.10.0",
+  "checks": [
+    "System-default language, live English and Chinese, and dedicated shortcuts for all actions",
+    "One model per provider, duplicate credentials and settings, and bidirectional feature assignments",
+    "Real text, detection and image HTTP requests use each provider's model, scoped key, headers and temperature",
+    "Model search and discovery, export-safe credentials, and language persistence"
+  ],
+  "scope": "Isolated Electron profile, real renderer and loopback Chat Completions fixture"
+}

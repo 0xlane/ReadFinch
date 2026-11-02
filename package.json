@@ -1,0 +1,147 @@
+{
+  "name": "texthop",
+  "productName": "TextHop",
+  "version": "0.10.0",
+  "description": "A thoughtful desktop companion for text, translation and offline OCR",
+  "author": "TextHop contributors",
+  "license": "GPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.cjs",
+  "desktopName": "app.texthop.TextHop.desktop",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/start.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:desktop": "node scripts/smoke.mjs",
+    "test:commands": "node scripts/action-schema-smoke.mjs",
+    "test:suggestions": "node scripts/suggestion-smoke.mjs",
+    "test:input": "node scripts/input-flow.mjs",
+    "test:shortcuts": "node scripts/shortcut-smoke.mjs",
+    "test:toolbar": "node scripts/toolbar-smoke.mjs",
+    "test:speech": "node scripts/speech-smoke.mjs",
+    "test:startup": "node scripts/startup-smoke.mjs",
+    "test:settings": "node scripts/settings-smoke.mjs",
+    "test:upgrade": "node scripts/upgrade-smoke.mjs",
+    "test:ocr": "node --require ./scripts/block-network.cjs --import tsx scripts/verify-ocr.ts",
+    "test:native": "node scripts/native-smoke.mjs",
+    "test:packaged": "node scripts/packaged-smoke.mjs",
+    "assets:ocr": "node scripts/download-ocr.mjs",
+    "native:build": "node scripts/build-native.mjs",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "format": "prettier --write src scripts tests vite.config.ts package.json tsconfig.json",
+    "fixtures": "node scripts/fixtures-server.mjs",
+    "schema": "tsx scripts/schema.ts"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.4",
+    "@codemirror/lang-liquid": "^6.3.3",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "codemirror": "^6.0.2",
+    "diff": "^8.0.2",
+    "dompurify": "^3.4.17",
+    "franc": "6.2.0",
+    "liquidjs": "^10.30.1",
+    "lucide-react": "^0.468.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tesseract.js": "7.0.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0",
+    "esbuild": "^0.27.0",
+    "playwright": "^1.56.0",
+    "prettier": "^3.9.10",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "8.3.5"
+  },
+  "build": {
+    "appId": "app.texthop.TextHop",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/tesseract.js/**",
+      "node_modules/tesseract.js-core/**"
+    ],
+    "extraResources": [
+      {
+        "from": "native",
+        "to": "native",
+        "filter": [
+          "**/*",
+          "!**/*.pdb"
+        ]
+      },
+      {
+        "from": "assets/ocr",
+        "to": "ocr"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE"
+      },
+      {
+        "from": "THIRD_PARTY_NOTICES.md",
+        "to": "THIRD_PARTY_NOTICES.md"
+      }
+    ],
+    "win": {
+      "icon": "src/renderer/public/icon.ico",
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "extendInfo": {
+        "NSScreenCaptureUsageDescription": "TextHop captures only the region you choose for OCR.",
+        "NSAppleEventsUsageDescription": "TextHop reads selections after you enable accessibility."
+      }
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "executableName": "texthop",
+      "desktop": {
+        "entry": {
+          "Name": "TextHop",
+          "StartupWMClass": "app.texthop.TextHop"
+        }
+      },
+      "syncDesktopName": true
+    },
+    "icon": "src/renderer/public/icon.png"
+  }
+}

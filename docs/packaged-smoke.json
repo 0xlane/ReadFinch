@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-02T17:05:15.902Z",
+  "platform": "win32",
+  "executable": "C:\\Users\\reinject\\Documents\\project\\TextHop\\release\\win-unpacked\\TextHop.exe",
+  "packaged": true,
+  "version": "0.10.0",
+  "resources": "C:\\Users\\reinject\\Documents\\project\\TextHop\\release\\win-unpacked\\resources",
+  "developmentSelectionHook": false,
+  "actionShortcutsRegistered": true,
+  "isolatedShortcuts": true,
+  "providerModelAndPurposeAssignment": true,
+  "offlineCommandIconSheets": true,
+  "localNoteLibrary": true,
+  "ocrReady": true,
+  "nativeStatus": "Windows UI Automation 已连接",
+  "ocrMilliseconds": 2067,
+  "text": "TextHop“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\n\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
+  "confidence": 93,
+  "rendererErrors": [],
+  "nativeIcons": [
+    {
+      "file": "tray.ico",
+      "empty": false
+    },
+    {
+      "file": "tray-paused.ico",
+      "empty": false
+    },
+    {
+      "file": "trayTemplate.png",
+      "empty": false
+    }
+  ],
+  "referenceIcons": [
+    {
+      "name": "streamline-dictionary-language-book-flat",
+      "loaded": true
+    },
+    {
+      "name": "streamline-ai-edit-spark-flat",
+      "loaded": true
+    },
+    {
+      "name": "ri-translate",
+      "loaded": true
+    },
+    {
+      "name": "tabler-pin",
+      "loaded": true
+    },
+    {
+      "name": "tabler-refresh",
+      "loaded": true
+    }
+  ],
+  "note": "Packaged startup and real bundled OCR; not foreground selection or screen-capture acceptance."
+}

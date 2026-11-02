@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "Hover opens the menu once and crossing into the rows keeps the native frame and toolbar stationary",
+    "More opens in the selection toolbar, preserves the selection, and pins and ordering update the strip",
+    "New action editor, per-app and global disable, and a one-hour pause that survives restart and can be resumed from Settings"
+  ],
+  "scope": "Real Electron windows with development selection events and an isolated profile"
+}

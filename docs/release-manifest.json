@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-02T17:07:25.062Z",
+  "version": "0.10.0",
+  "platform": "Windows x64",
+  "signed": false,
+  "artifacts": [
+    {
+      "path": "release/TextHop 0.10.0.exe",
+      "bytes": 123823950,
+      "sha256": "9ec4443b4ac3839ad414d48b9beec6bf279184cff6a7f8c0d682a6273784a311"
+    },
+    {
+      "path": "release/TextHop Setup 0.10.0.exe",
+      "bytes": 144764941,
+      "sha256": "f66880b094e41ecd14c4ee3d139390678c7cf974b3b5fb2a78b6b536de5539db"
+    },
+    {
+      "path": "release/win-unpacked/TextHop.exe",
+      "bytes": 249799680,
+      "sha256": "9cebead7875fb46f310c04d781aaf3ac5caf85d0078d3dec0a8cfb249c88c6cc"
+    },
+    {
+      "path": "release/win-unpacked/resources/app.asar",
+      "bytes": 61085082,
+      "sha256": "1eece7462d868d049af44efe97e6caf7c0e57375b4bed182342db5fc7aae3857"
+    }
+  ],
+  "verification": "Windows packaged checks use an isolated profile and local fixtures. Installer and uninstaller UI were not exercised."
+}

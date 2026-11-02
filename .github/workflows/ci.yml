@@ -1,0 +1,27 @@
+name: Build and core tests
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run assets:ocr
+      - run: npm run build
+      - run: npm run test:ocr
+      - uses: actions/upload-artifact@v4
+        with:
+          name: built-${{ matrix.os }}
+          path: |
+            dist
+            native/bin
+            docs/offline-ocr-verification.json

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+release/
+.reference/
+.local/
+assets/ocr/*.traineddata
+native/bin/
+*.log

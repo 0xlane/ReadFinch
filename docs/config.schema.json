@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 11
+    },
+    "tts": {
+      "type": "object",
+      "properties": {
+        "onlineProviderId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "customVoices": {
+          "maxItems": 48,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^[^\\p{Cc}\\p{Zl}\\p{Zp}]+$"
+          }
+        },
+        "defaultVoice": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "languageVoices": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "maxLength": 48,
+            "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "rate": {
+          "type": "integer",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "pitch": {
+          "type": "integer",
+          "minimum": -100,
+          "maximum": 100
+        },
+        "volume": {
+          "type": "integer",
+          "minimum": -100,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "onlineProviderId",
+        "customVoices",
+        "defaultVoice",
+        "languageVoices",
+        "rate",
+        "pitch",
+        "volume"
+      ],
+      "additionalProperties": false
+    },
+    "localNotebases": {
+      "maxItems": 1000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 640,
+            "pattern": "^[\\w-]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "columns": {
+            "minItems": 1,
+            "maxItems": 6400,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "^[\\w-]+$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "type"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "columns"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "noteSuggestion": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "actionId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "providerId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "enabled",
+        "actionId",
+        "providerId"
+      ],
+      "additionalProperties": false
+    },
+    "cache": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        }
+      },
+      "required": [
+        "enabled",
+        "minutes"
+      ],
+      "additionalProperties": false
+    },
+    "languageDetection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "basic"
+            }
+          },
+          "required": [
+            "mode"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "llm"
+            },
+            "providerId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            }
+          },
+          "required": [
+            "mode",
+            "providerId"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "providers": {
+      "minItems": 1,
+      "maxItems": 10000,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "preset": {
+            "default": "custom",
+            "type": "string",
+            "enum": [
+              "openai",
+              "deepseek",
+              "qwen",
+              "siliconflow",
+              "gemini",
+              "openrouter",
+              "custom"
+            ]
+          },
+          "description": {
+            "default": "",
+            "type": "string",
+            "maxLength": 500
+          },
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          },
+          "endpoint": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "instruction": {
+            "default": "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.",
+            "type": "string",
+            "maxLength": 12000
+          },
+          "requiresKey": {
+            "type": "boolean"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 600000
+          },
+          "stream": {
+            "type": "boolean"
+          },
+          "customModel": {
+            "default": false,
+            "type": "boolean"
+          },
+          "temperature": {
+            "default": null,
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 2
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reasoningEffort": {
+            "type": "string",
+            "enum": [
+              "none",
+              "minimal",
+              "low",
+              "medium",
+              "high",
+              "xhigh"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "preset",
+          "description",
+          "enabled",
+          "endpoint",
+          "model",
+          "instruction",
+          "requiresKey",
+          "timeoutMs",
+          "stream",
+          "customModel",
+          "temperature"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "actions": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "languages",
+                  "book",
+                  "pen",
+                  "sparkles",
+                  "align",
+                  "code",
+                  "lightbulb",
+                  "scan"
+                ]
+              },
+              {
+                "type": "string",
+                "maxLength": 140,
+                "pattern": "^(tabler|ri|streamline-color):[a-z0-9-]+$"
+              }
+            ]
+          },
+          "system": {
+            "type": "string",
+            "maxLength": 16000
+          },
+          "prompt": {
+            "type": "string",
+            "maxLength": 16000
+          },
+          "notebook": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "noteConnection": {
+            "type": "object",
+            "properties": {
+              "providerId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "notebaseId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 640,
+                "pattern": "^[\\w-]+$"
+              },
+              "mappings": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "^[\\w-]+$"
+                },
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100,
+                      "pattern": "^[\\w-]+$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "providerId",
+              "notebaseId",
+              "mappings"
+            ],
+            "additionalProperties": false
+          },
+          "providerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "pattern": "^[a-zA-Z0-9_-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "shortcut": {
+            "default": "",
+            "type": "string",
+            "maxLength": 100
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "dictionary",
+              "writing"
+            ]
+          },
+          "outputSchema": {
+            "minItems": 1,
+            "maxItems": 64,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "^[\\w-]+$"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "string",
+                    "number"
+                  ]
+                },
+                "source": {
+                  "type": "string",
+                  "enum": [
+                    "model",
+                    "selection"
+                  ]
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "type",
+                "source",
+                "description"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "layout": {
+            "type": "string",
+            "maxLength": 32768
+          },
+          "sample": {
+            "type": "object",
+            "properties": {
+              "selection": {
+                "type": "string",
+                "maxLength": 6000
+              },
+              "targetLanguage": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "values": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "pattern": "^[\\w-]+$"
+                },
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 6000
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "required": [
+              "selection",
+              "targetLanguage",
+              "values"
+            ],
+            "additionalProperties": false
+          },
+          "noteTitleField": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "legacyEditable": {
+            "type": "boolean",
+            "const": true
+          },
+          "noteLabels": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "system",
+          "prompt",
+          "providerId",
+          "enabled",
+          "pinned",
+          "shortcut",
+          "format"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "textProfileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "ocrProfileId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "sourceLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "targetLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "explanationLanguage": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      },
+      "required": [
+        "textProfileId",
+        "ocrProfileId",
+        "sourceLanguage",
+        "targetLanguage",
+        "explanationLanguage"
+      ],
+      "additionalProperties": false
+    },
+    "appearance": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
+        },
+        "language": {
+          "default": "system",
+          "type": "string",
+          "enum": [
+            "system",
+            "zh-CN",
+            "en"
+          ]
+        },
+        "fontSize": {
+          "type": "integer",
+          "minimum": 12,
+          "maximum": 22
+        }
+      },
+      "required": [
+        "theme",
+        "language",
+        "fontSize"
+      ],
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "automatic": {
+          "type": "boolean"
+        },
+        "excludedApps": {
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "disabledToolbarApps": {
+          "default": [],
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "speechPinned": {
+          "default": true,
+          "type": "boolean"
+        },
+        "speechIndex": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "automatic",
+        "excludedApps",
+        "disabledToolbarApps",
+        "speechPinned",
+        "speechIndex"
+      ],
+      "additionalProperties": false
+    },
+    "shortcuts": {
+      "type": "object",
+      "properties": {
+        "selection": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "capture": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "clipboard": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "selection",
+        "capture",
+        "clipboard"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "tts",
+    "localNotebases",
+    "noteSuggestion",
+    "cache",
+    "languageDetection",
+    "providers",
+    "actions",
+    "defaults",
+    "appearance",
+    "selection",
+    "shortcuts"
+  ],
+  "additionalProperties": false,
+  "$id": "https://texthop.local/schema/config-v11.json",
+  "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
+}

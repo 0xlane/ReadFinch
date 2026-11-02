@@ -1,0 +1,26 @@
+{
+  "version": "0.10.0",
+  "date": "2026-11-02T16:59:26.510Z",
+  "checks": [
+    "main window contains settings only",
+    "theme applies immediately and preserves unsaved fields",
+    "invalid partial addresses remain drafts; action edits persist on immediate close",
+    "system preference and nativeTheme updates propagate without changing OS settings",
+    "selection fixture opens a distinct popup; no request until configured action",
+    "A dictionary definition is painted before the SSE stream finishes and partial answers cannot be bookmarked",
+    "Completed results save to local notebooks, link back to structured cards, and filter by notebook and content",
+    "Matching requests reuse cached output, explicit regeneration and clear fetch fresh answers, and clearing retains notes",
+    "Waiting time is visible and hiding writing answers survives the rest of a live stream",
+    "translation, dictionary, writing, all-window dark theme and unavailable replacement",
+    "cancel and next interaction discard the previous response",
+    "provider errors and retry stay in popup",
+    "pinned popup stays; ordinary blur hides it",
+    "explicit image acquisition starts real local bilingual OCR automatically; text stays editable",
+    "Offline glyph library shows the 30 Read Frog favorites, searches the color collection, accepts Iconify IDs, and uses the saved icon in the list, toolbar and result",
+    "all eight pages, no horizontal overflow"
+  ],
+  "requests": 15,
+  "rendererErrors": [],
+  "ocrText": "TextHop“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\n\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
+  "scope": "Real Electron windows and bundled OCR. Selection events/model replies are development fixtures; native OS selection is tested separately."
+}

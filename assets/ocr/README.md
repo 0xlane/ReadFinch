@@ -1,0 +1,1 @@
+Offline assets: eng.traineddata and chi_sim.traineddata from tesseract-ocr/tessdata_fast (Apache-2.0). Run `npm run assets:ocr` or import a directory containing these files in Settings → OCR. These assets are never included in portable settings.

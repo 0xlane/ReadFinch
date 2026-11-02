@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-02T17:04:23.657Z",
+  "packaged": false,
+  "systemVoices": [
+    {
+      "name": "Microsoft David - English (United States)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Microsoft Mark - English (United States)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Microsoft Zira - English (United States)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Microsoft Huihui - Chinese (Simplified, PRC)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Microsoft Kangkang - Chinese (Simplified, PRC)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+      "lang": "zh-CN"
+    }
+  ],
+  "checks": [
+    "System preview used the selected Windows voice and prosody, emitted start and end, and made zero network requests",
+    "Online preview and autosave used the selected speech provider and custom voice; Chromium decoded audio and applied pitch, speed and volume",
+    "Fallback preview plays the selected Chinese system voice while English is mapped online",
+    "Stop aborts an in-flight speech request before audio arrives",
+    "Selection toolbar detects English locally and plays the actual selected text using its online mapping",
+    "The translation result uses its target language with the saved voice and keeps the speech model separate from the text model",
+    "Starting a system preview stops the online request in a different pinned result window",
+    "The assigned provider's connection test uses the audio endpoint; there were no renderer errors",
+    "Removing a custom voice clears only its assignments"
+  ]
+}

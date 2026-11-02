@@ -1,0 +1,23 @@
+{
+  "version": "0.8.0",
+  "date": "2026-11-02T12:01:09.164Z",
+  "checks": [
+    "missing selection shows an explicit capture route; no implicit screenshot or model request",
+    "Esc and right-click cancel the real capture overlay, restore draft and pin, and never start OCR",
+    "local OCR starts once without a text model; corrected text reuses action cards, preserves its image, and never offers replacement",
+    "remote OCR displays its destination and sends one image only after the recognition click",
+    "OCR cancellation/new images isolate late results; text actions stay disabled while recognizing",
+    "an empty real OCR result offers recapture and cannot trigger a text action",
+    "actual desktop capture matches the pointer-selected pixels at current scaling and automatically completes local OCR"
+  ],
+  "requests": 3,
+  "rendererErrors": [],
+  "screenCapture": {
+    "scaleFactor": 1.25,
+    "cropPixelsMatch": true,
+    "ocrCompleted": true,
+    "controlledSampleRecognized": false,
+    "limitation": "The controlled sample window did not appear in the compositor capture. Foreground sample-text acceptance remains unverified; image-fixture bilingual OCR passed independently."
+  },
+  "scope": "Real Electron windows, desktop capture/crop pixel comparison, and bundled Tesseract. Imported images use development hooks; remote OCR and text use a local HTTP fixture. Controlled foreground content, native UIA selection and external model quality are not implied by these checks."
+}

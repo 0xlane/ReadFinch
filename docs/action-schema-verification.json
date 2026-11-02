@@ -1,0 +1,13 @@
+{
+  "packaged": false,
+  "checks": [
+    "The three built-ins are read-only; Customize creates an editable independent dictionary with nine fields.",
+    "Fields add, reorder and rename. Duplicate and reserved names are rejected and Liquid references follow renames.",
+    "The same renderer previews sample numbers, light/dark, replay, sanitized HTML and a fallback for invalid Liquid.",
+    "A real streamed command supplies local original text, displays the first field early, and saves a typed notebook snapshot.",
+    "Wrong model types cannot be saved. Retrying works; the saved layout and note still render after deleting the command."
+  ],
+  "requests": 3,
+  "rendererErrors": [],
+  "date": "2026-11-02T16:29:44.289Z"
+}

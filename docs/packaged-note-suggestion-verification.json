@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-02T16:32:03.570Z",
+  "version": "0.9.0",
+  "packaged": true,
+  "checks": [
+    "An explicit translation starts two independently routed requests; recommendations appear only after the translation, without writing any notes.",
+    "Saving only the checked term opens its structured local note with the exact passage, source app and recommendation model.",
+    "Identical runs reuse the cache; changing the target refreshes the card and a new selection cancels the previous response.",
+    "The card switch stops future recommendation requests; re-enabling with a custom command saves Markdown to its own notebook.",
+    "Empty and failed recommendations leave the translation usable; a failed translation never offers to save suggestions."
+  ],
+  "rendererErrors": [],
+  "fixture": "Packaged executable, text entered in the result window, loopback SSE provider and isolated SQLite"
+}

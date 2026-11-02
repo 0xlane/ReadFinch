@@ -1,0 +1,30 @@
+{
+  "version": "0.8.0",
+  "date": "2026-11-02T11:58:30.196Z",
+  "checks": [
+    "All six isolated bindings are registered with the actual Electron OS API; installed app keeps its default keys",
+    "Direct translation and dictionary use a fresh key-press selection even with automatic toolbar disabled (selection/keypress callbacks are fixtures)",
+    "Missing fresh selection cannot submit cached text or start OCR",
+    "Selection menu stays manual; action shortcuts do not run from settings inputs",
+    "Recorder suspends OS shortcuts, Esc preserves the binding, and changes autosave and replace the old OS registration",
+    "Duplicate combinations keep the last valid binding; clearing an action or OCR entry shortcut unregisters it after autosave",
+    "Shortcut settings render in light and dark themes without horizontal overflow",
+    "Duplicating an action clears its shortcut; custom bindings autosave and unregister when disabled",
+    "In the OCR popup, an action shortcut uses the currently corrected text (real bundled OCR, fixture model reply)",
+    "Repeated held-key callbacks are suppressed; late reads cannot override a newer shortcut or reopen a dismissed popup",
+    "The running Windows helper answers refresh IPC without returning an injected old cache; external foreground text remains unverified"
+  ],
+  "registration": {
+    "Control+Alt+Shift+F5": true,
+    "Control+Alt+Shift+F6": true,
+    "Control+Alt+Shift+F7": true,
+    "Control+Alt+Shift+F8": true,
+    "Control+Alt+Shift+F11": true,
+    "Control+Alt+Shift+F12": true
+  },
+  "isolatedShortcuts": true,
+  "requests": 6,
+  "rendererErrors": [],
+  "nativeReadMilliseconds": 90,
+  "scope": "Actual Electron global registration, recorder UI and native refresh IPC. Selection values and global callback invocation are development fixtures; physical OS key presses with real external foreground selection require interactive acceptance. Local OCR is real; model replies are localhost fixtures."
+}

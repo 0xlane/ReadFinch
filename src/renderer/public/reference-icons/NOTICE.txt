@@ -1,0 +1,36 @@
+These UI icon assets are bundled locally from the following public Iconify sets.
+The same three icon sets also supply the complete offline command-icon sheets in ../command-icons. TextHop arranges their glyphs in a grid and namespaces internal SVG IDs. The SVG paths are unmodified. Titles and layout are implemented by TextHop.
+
+Streamline color, by Streamline (Webalys), CC BY 4.0:
+https://github.com/webalys-hq/streamline-vectors
+https://creativecommons.org/licenses/by/4.0/
+Source package: @iconify-json/streamline-color 1.2.2
+Files: streamline-dictionary-language-book-flat.svg, streamline-ai-edit-spark-flat.svg
+
+Remix Icon, by Remix Design, Apache-2.0:
+https://github.com/Remix-Design/RemixIcon
+https://github.com/cyberalien/RemixIcon/blob/master/License
+Source package: @iconify-json/ri 1.2.10
+File: ri-translate.svg
+
+Tabler Icons, copyright (c) 2020-2026 Paweł Kuna, MIT:
+https://github.com/tabler/tabler-icons
+https://github.com/tabler/tabler-icons/blob/master/LICENSE
+Source package: @iconify-json/tabler 1.2.43
+Files: tabler-*.svg
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to
+do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,70 @@
+{
+  "testedAt": "2026-11-02T12:22:43.471Z",
+  "version": "0.8.1",
+  "platform": "Windows x64",
+  "client": "packaged Electron, isolated profile",
+  "model": "glm-5.3-flash",
+  "reasoningEffort": "xhigh",
+  "catalogReturnedModel": true,
+  "vision": {
+    "expected": "Maple 024FC3\n春雨过后，竹林更绿了。",
+    "recognized": "Maple 024FC3\n春雨过后，竹林更绿了。",
+    "elapsedMs": 448,
+    "bilingualSettingsCheck": true
+  },
+  "actions": {
+    "translate": {
+      "status": "done",
+      "firstContentMs": 1511,
+      "elapsedMs": 1573,
+      "updates": 2,
+      "waitIndicatorShown": true
+    },
+    "dictionary": {
+      "status": "done",
+      "firstContentMs": 3669,
+      "elapsedMs": 4351,
+      "updates": 19,
+      "waitIndicatorShown": true
+    },
+    "sentence": {
+      "status": "done",
+      "firstContentMs": 12183,
+      "elapsedMs": 13445,
+      "updates": 30,
+      "waitIndicatorShown": true
+    },
+    "polish": {
+      "status": "done",
+      "firstContentMs": 7516,
+      "elapsedMs": 8383,
+      "updates": 22,
+      "waitIndicatorShown": true
+    },
+    "inventory-test": {
+      "status": "done",
+      "firstContentMs": 660,
+      "elapsedMs": 707,
+      "updates": 2,
+      "waitIndicatorShown": true
+    }
+  },
+  "sentenceAnnotationsVisited": 8,
+  "writingAnswersHiddenAndRevealed": true,
+  "suggestionsSaved": 2,
+  "totalLocalNotesAfterDictionarySave": 3,
+  "customSchema": {
+    "source": "There are three red pencils on the desk.",
+    "modelValues": {
+      "物品": "red pencils",
+      "件数": 3
+    },
+    "typedFieldsAndLayoutChecked": true
+  },
+  "repeatedDictionary": {
+    "status": "done",
+    "ms": 2,
+    "updates": 1
+  },
+  "temporaryCredentialCleared": true
+}

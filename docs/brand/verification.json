@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-31T05:42:40.019Z",
+  "version": "0.1.1",
+  "rendererErrors": [],
+  "statusToggle": true,
+  "statusNavigation": true,
+  "statusbarNoHorizontalOverflow": {
+    "width": 800,
+    "scroll": 800,
+    "bottom": 651.2000122070312,
+    "window": 651
+  },
+  "iconResources": [
+    {
+      "file": "tray.ico",
+      "empty": false
+    },
+    {
+      "file": "tray-paused.ico",
+      "empty": false
+    },
+    {
+      "file": "trayTemplate.png",
+      "empty": false
+    }
+  ],
+  "note": "App UI and icon resources verified; OS tray interaction and macOS template rendering require native desktop verification."
+}
