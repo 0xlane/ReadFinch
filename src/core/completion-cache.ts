@@ -1,10 +1,19 @@
 import { complete } from "./providers";
 import { digest } from "./store";
 import type { Config } from "../shared/config";
+import type { CompletionUpdate, ThinkingSnapshot } from "../shared/completion";
+
+type CachedCompletion = {
+  text: string;
+  thinking?: ThinkingSnapshot;
+  created: number;
+};
+const bytes = (entry: Pick<CachedCompletion, "text" | "thinking">) =>
+  (entry.text.length + (entry.thinking?.text.length ?? 0)) * 2;
 
 // Only full successful answers enter this process-local cache. Keys never retain input or credentials.
 export class CompletionCache {
-  private entries = new Map<string, { text: string; created: number }>();
+  private entries = new Map<string, CachedCompletion>();
   private size = 0;
   private generation = 0;
   private policy: Config["cache"] = { enabled: true, minutes: 30 };
@@ -24,7 +33,7 @@ export class CompletionCache {
   }
   private remove(key: string) {
     const removed = this.entries.get(key);
-    if (removed) this.size -= removed.text.length * 2;
+    if (removed) this.size -= bytes(removed);
     this.entries.delete(key);
   }
   private prune() {
@@ -65,21 +74,31 @@ export class CompletionCache {
     const found = this.entries.get(id);
     if (found && !refresh) {
       validate?.(found.text);
-      onText(found.text);
+      onText(found.text, found.thinking && { ...found.thinking });
       return found.text;
     }
     const generation = this.generation;
-    const result = await complete(profile, messages, key, signal, onText);
+    let thinking: ThinkingSnapshot | undefined;
+    const update: CompletionUpdate = (text, snapshot) => {
+      thinking = snapshot && { ...snapshot };
+      onText(text, snapshot);
+    };
+    const result = await complete(profile, messages, key, signal, update);
     validate?.(result);
+    const entry: CachedCompletion = {
+      text: result,
+      thinking: thinking && { ...thinking, status: "complete" },
+      created: this.now(),
+    };
     if (
       generation === this.generation &&
       !signal.aborted &&
       result.trim() &&
-      result.length * 2 <= this.capacity
+      bytes(entry) <= this.capacity
     ) {
       this.remove(id);
-      this.entries.set(id, { text: result, created: this.now() });
-      this.size += result.length * 2;
+      this.entries.set(id, entry);
+      this.size += bytes(entry);
       while (this.size > this.capacity || this.entries.size > 256)
         this.remove(this.entries.keys().next().value!);
     }

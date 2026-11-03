@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-03T10:14:21.568Z",
+  "version": "0.15.2",
+  "packaged": false,
+  "checks": [
+    "Waiting and reasoning match the reference: animated Thinking, collapsed by default, bounded auto-scroll that respects manual scrolling, then Thinking complete on the first answer token. Light/dark and reduced motion verified.",
+    "Expanding and streaming reasoning keeps the popup origin fixed; copy and local notes contain only the answer.",
+    "Cache hits replay the completed answer and original reasoning without starting another request.",
+    "Cancellation and stream failure settle the indicator; partial reasoning is retained on failure, and switching requests clears old reasoning. Models with no reasoning get no expand control.",
+    "Non-streaming replies and structured custom commands preserve reasoning separately without breaking schema rendering.",
+    "English labels use Thinking / Thinking complete / Expand thinking / Collapse thinking, matching the reference.",
+    "Pure translation providers keep the reference's compact spinner instead of an AI thinking indicator."
+  ],
+  "rendererErrors": [],
+  "scope": "Isolated desktop profile, controlled HTTP fixtures and normal command trials. No user credentials or notes modified."
+}

@@ -1,6 +1,6 @@
 # Third-party notices
 
-ReadFinch is distributed under GPL-3.0-only. See LICENSE. Its TypeScript, C#, Swift and Python application code is an independent desktop implementation.
+ReadFinch is distributed under GPL-3.0-only. See LICENSE. Its desktop application code is developed independently except for the explicitly attributed adaptations below.
 
 ## Read Frog reference
 
@@ -9,6 +9,8 @@ Read Frog, copyright its respective contributors, GPL-3.0. Inspected version 1.5
 Source: https://github.com/mengxi-ream/read-frog
 
 The provider defaults and ordered text-model lists in `src/shared/provider-catalog.json` are extracted from Read Frog commit `96083134b111e56762f578b143bcd48e85058ba3` (GPL-3.0), with local provider ID aliases. `scripts/sync-provider-catalog.mjs` records and reproduces this data snapshot. Desktop speech models and capability metadata are maintained separately.
+
+The morphing thinking-icon paths in `src/renderer/Thinking.tsx` are adapted from `src/components/icons/thinking-icon.tsx` in that Read Frog commit, copyright the Read Frog contributors, GPL-3.0. ReadFinch implements the animation with the Web Animations API and follows the reference thinking panel's labels, collapsed default, and scroll behavior.
 
 Read Frog's interface screenshots, GPL selection components and custom-action prompts were studied to reproduce its selection toolbar and action-card behavior. ReadFinch implements these desktop components independently and uses the same publicly available icon sets listed below. No Read Frog brand logo, extension packaging or content scripts are included. The separately licensed proprietary `@read-frog/layout-engine` is not used or bundled. The local `.reference/` research directory is excluded from packaging and version control. The GPL license text is retained in LICENSE.
 

@@ -352,11 +352,11 @@ try {
   await panel.getByRole("button", { name: "取消置顶" }).click();
   await injectSelection("serendipity");
   await pill.getByRole("button", { name: "词典", exact: true }).click();
-  await panel.getByText("等待模型响应", { exact: true }).waitFor();
-  await panel
-    .locator(".result-pending small")
-    .filter({ hasText: /已等待 \d+ 秒/ })
-    .waitFor();
+  await panel.getByText("思考中", { exact: true }).waitFor();
+  assert.equal(
+    await panel.getByRole("button", { name: "展开思考", exact: true }).count(),
+    0,
+  );
   assert.ok(await panel.getByRole("button", { name: "停止" }).isVisible());
   startDictionary.resolve();
   await panel
@@ -481,7 +481,7 @@ try {
   assert.equal(await analysis.evaluate((d) => d.open), false);
   await analysis.locator("summary").click();
   checks.push(
-    "Waiting time is visible and hiding writing answers survives the rest of a live stream",
+    "The Thinking state is visible while waiting, and hiding writing answers survives the rest of a live stream",
   );
   await panel
     .getByText("Small steps can make a meaningful difference.", { exact: true })

@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-03T10:21:03.117Z",
+  "version": "0.15.2",
+  "started": 1793701262194,
+  "thinkingUpdates": 20,
+  "firstThinkingMs": 234,
+  "firstAnswerMs": 878,
+  "status": "done",
+  "thinkingChars": 506,
+  "answerChars": 15,
+  "scope": "One translation using the currently configured provider in an isolated copy of the profile; credentials and generated reasoning are not recorded. Original settings and notes are unchanged."
+}

@@ -1080,22 +1080,6 @@ details {
   padding: 4px 8px;
   min-height: 28px;
 }
-.result-pending {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
-  color: var(--muted);
-  min-height: 48px;
-}
-.result-pending small {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
-}
-.result-pending [role="status"] {
-  color: var(--text);
-}
 .panel-error {
   color: var(--error);
   background: var(--error-bg);
@@ -1854,9 +1838,6 @@ details {
   color: var(--muted);
   font-size: 12px;
   margin: 12px 0 0;
-}
-.rf-result .result-pending {
-  min-height: 24px;
 }
 .reference-icon {
   display: inline-block;

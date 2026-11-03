@@ -14,6 +14,8 @@ import type {
 import type { TextProfile } from "../shared/config";
 import { providerProtocol } from "../shared/provider-presets";
 import { t } from "../shared/i18n";
+import type { CompletionUpdate } from "../shared/completion";
+import { CompletionProgress } from "./completion-progress";
 import {
   request,
   providerAuth,
@@ -188,24 +190,39 @@ export async function completeNative(
   messages: unknown[],
   key: string | undefined,
   signal: AbortSignal,
-  onText: (text: string) => void,
+  onText: CompletionUpdate,
 ): Promise<string> {
   const deadline = AbortSignal.any([
     signal,
     AbortSignal.timeout(profile.timeoutMs),
   ]);
   let emitted = false;
-  const emit = (text: string) => {
+  const emit: CompletionUpdate = (text, thinking) => {
     emitted = true;
-    onText(text);
+    onText(text, thinking);
   };
   try {
     const model = modelFor(profile, key, deadline);
+    const protocol = providerProtocol(profile);
     const options: LanguageModelV4CallOptions = {
       prompt: promptFor(messages),
       abortSignal: deadline,
       temperature: profile.temperature ?? undefined,
       reasoning: profile.reasoningEffort,
+      ...(protocol === "gemini" &&
+      profile.reasoningEffort !== "none" &&
+      (profile.reasoningEffort ||
+        /^gemini-(?:2\.5|[3-9](?:[.-]|$))/.test(profile.model))
+        ? {
+            providerOptions: {
+              google: { thinkingConfig: { includeThoughts: true } },
+            },
+          }
+        : protocol === "responses" &&
+            profile.reasoningEffort &&
+            profile.reasoningEffort !== "none"
+          ? { providerOptions: { readfinch: { reasoningSummary: "auto" } } }
+          : {}),
       ...(profile.preset === "anthropic" ? { maxOutputTokens: 8192 } : {}),
       ...(profile.outputContract
         ? {
@@ -218,39 +235,36 @@ export async function completeNative(
         : {}),
     };
     const run = async (options: LanguageModelV4CallOptions) => {
+      const progress = new CompletionProgress(emit);
       if (!profile.stream) {
         const result = await model.doGenerate(options);
-        const text = result.content
-          .filter((p) => p.type === "text")
-          .map((p) => p.text)
-          .join("");
-        if (text.length > 1_000_000)
-          throw new ProviderError("limit", t("结果过长，已停止接收"));
-        if (text) emit(text);
+        for (const part of result.content) {
+          if (part.type === "reasoning") progress.appendReasoning(part.text);
+          if (part.type === "text") progress.appendText(part.text);
+        }
         checkedFinish(result.finishReason.unified);
-        if (!text.trim())
+        if (!progress.text.trim())
           throw new ProviderError(
             "empty",
             t("模型返回空结果，请检查输入和模型"),
           );
-        return text;
+        progress.endThinking();
+        return progress.text;
       }
       const response = await model.doStream(options);
       const reader = response.stream.getReader();
-      let text = "",
-        finished = false;
+      let finished = false;
       try {
         while (true) {
           const { value, done } = await reader.read();
           if (done) break;
           deadline.throwIfAborted();
           if (value.type === "error") throw value.error;
-          if (value.type === "text-delta") {
-            text += value.delta;
-            if (text.length > 1_000_000)
-              throw new ProviderError("limit", t("结果过长，已停止接收"));
-            emit(text);
-          }
+          if (value.type === "text-delta") progress.appendText(value.delta);
+          if (value.type === "reasoning-start") progress.startThinking();
+          if (value.type === "reasoning-delta")
+            progress.appendReasoning(value.delta);
+          if (value.type === "reasoning-end") progress.endThinking();
           if (value.type === "finish") {
             checkedFinish(value.finishReason.unified);
             finished = true;
@@ -266,9 +280,10 @@ export async function completeNative(
           "interrupted",
           t("连接中断，已保留收到的部分结果；可重试"),
         );
-      if (!text.trim())
+      if (!progress.text.trim())
         throw new ProviderError("empty", t("模型返回空结果，请检查输入和模型"));
-      return text;
+      progress.endThinking();
+      return progress.text;
     };
     try {
       return await run(options);

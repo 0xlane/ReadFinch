@@ -28,6 +28,8 @@ import { t } from "../shared/i18n";
 import type { TextProfile, OcrProfile, Action } from "../shared/config";
 import { promptVariables } from "../shared/config";
 import { jsonContract } from "../shared/action-output";
+import type { CompletionUpdate } from "../shared/completion";
+import { CompletionProgress, chatReasoning } from "./completion-progress";
 
 export { listModels } from "./provider-discovery";
 export async function synthesizeSpeech(
@@ -122,7 +124,7 @@ export async function complete(
   messages: unknown[],
   key: string | undefined,
   signal: AbortSignal,
-  onText: (text: string) => void,
+  onText: CompletionUpdate,
 ): Promise<string> {
   if (isTranslationOnly(profile)) {
     if (!profile.translation)
@@ -133,7 +135,9 @@ export async function complete(
     throw new ProviderError("model", t("尚未填写模型 ID，请先配置文字服务"));
   const protocol = providerProtocol(profile);
   if (protocol === "replicate")
-    return completeReplicate(profile, messages, key, signal, onText);
+    return completeReplicate(profile, messages, key, signal, (text) =>
+      onText(text, { status: "complete", text: "" }),
+    );
   if (protocol !== "chat")
     return completeNative(profile, messages, key, signal, onText);
   const deadline = AbortSignal.any([
@@ -187,19 +191,20 @@ export async function complete(
     )
       res = await send(false);
     if (!res.ok) throw httpError(res.status);
-    let result = "";
+    const progress = new CompletionProgress(onText);
     if (
       !profile.stream ||
       !res.headers.get("content-type")?.includes("text/event-stream")
     ) {
       const data = await res.json();
-      result = contentText(data.choices?.[0]?.message?.content);
+      const result = contentText(data.choices?.[0]?.message?.content);
+      progress.appendReasoning(chatReasoning(data.choices?.[0]?.message));
       if (!result)
         throw new ProviderError(
           "protocol",
           t("服务未返回文字结果，请检查模型是否兼容 Chat Completions"),
         );
-      onText(result);
+      progress.appendText(result);
       if (
         ["length", "content_filter"].includes(data.choices?.[0]?.finish_reason)
       )
@@ -240,13 +245,9 @@ export async function complete(
           t("服务在生成中返回错误，请稍后重试"),
         );
       if (chunk.choices?.[0]?.finish_reason) finished = true;
+      progress.appendReasoning(chatReasoning(chunk.choices?.[0]?.delta));
       const delta = contentText(chunk.choices?.[0]?.delta?.content);
-      if (delta) {
-        result += delta;
-        if (result.length > 1_000_000)
-          throw new ProviderError("limit", t("结果过长，已停止接收"));
-        onText(result);
-      }
+      progress.appendText(delta);
       if (
         ["length", "content_filter"].includes(chunk.choices?.[0]?.finish_reason)
       )
@@ -284,9 +285,10 @@ export async function complete(
         "interrupted",
         t("连接中断，已保留收到的部分结果；可重试"),
       );
-    if (!result.trim())
+    if (!progress.text.trim())
       throw new ProviderError("empty", t("模型返回空结果，请检查输入和模型"));
-    return result;
+    progress.endThinking();
+    return progress.text;
   } catch (e) {
     if (signal.aborted) throw new ProviderError("cancelled", t("请求已取消"));
     if (deadline.aborted)

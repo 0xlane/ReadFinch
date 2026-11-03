@@ -1,0 +1,100 @@
+.thinking-card {
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--muted) 4%, transparent);
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+.thinking-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 12px;
+  border-radius: inherit;
+}
+.thinking-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.thinking-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.thinking-label {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.is-thinking .thinking-label {
+  background: linear-gradient(
+    100deg,
+    var(--muted) 35%,
+    var(--text) 50%,
+    var(--muted) 65%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: thinking-shimmer 1.5s linear infinite;
+}
+.thinking-trigger > svg {
+  transition: transform 0.2s;
+}
+.thinking-trigger > svg.is-open {
+  transform: rotate(180deg);
+}
+.thinking-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+.thinking-reveal[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.thinking-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+.thinking-content {
+  max-height: 128px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 12px 10px;
+}
+.thinking-content p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.translation-loading {
+  display: block;
+  margin: 4px 0;
+}
+@keyframes thinking-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thinking-reveal,
+  .thinking-trigger > svg {
+    transition: none;
+  }
+  .is-thinking .thinking-label {
+    animation: none;
+    background: none;
+    color: var(--muted);
+  }
+}

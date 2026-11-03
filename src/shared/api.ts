@@ -1,4 +1,5 @@
 import type { SpeechConfig } from "./tts";
+import type { ThinkingSnapshot } from "./completion";
 import type {
   LocalNote,
   NoteInput,
@@ -21,6 +22,7 @@ export type JobEvent = {
   kind: "text" | "ocr";
   status: "streaming" | "done" | "error" | "cancelled" | "progress";
   text?: string;
+  thinking?: ThinkingSnapshot;
   message?: string;
   progress?: number;
   confidence?: number;

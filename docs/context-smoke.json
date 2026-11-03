@@ -1,6 +1,6 @@
 {
-  "version": "0.14.0",
-  "date": "2026-11-03T07:33:18.729Z",
+  "version": "0.15.2",
+  "date": "2026-11-03T10:15:59.424Z",
   "checks": [
     "main window contains settings only",
     "theme applies immediately and preserves unsaved fields",
@@ -10,7 +10,7 @@
     "A dictionary definition is painted before the SSE stream finishes and partial answers cannot be bookmarked",
     "Completed results save to local notebooks, link back to structured cards, and filter by notebook and content",
     "Matching requests reuse cached output, explicit regeneration and clear fetch fresh answers, and clearing retains notes",
-    "Waiting time is visible and hiding writing answers survives the rest of a live stream",
+    "The Thinking state is visible while waiting, and hiding writing answers survives the rest of a live stream",
     "translation, dictionary, writing, all-window dark theme and unavailable replacement",
     "cancel and next interaction discard the previous response",
     "provider errors and retry stay in popup",

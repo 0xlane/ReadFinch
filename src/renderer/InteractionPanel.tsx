@@ -42,31 +42,8 @@ import { NoteSuggestionCard } from "./NoteSuggestionCard";
 import { Result, Speak, copyableResult } from "./Result";
 import { snapshotOutput, streamingValues } from "../shared/action-output";
 import { connectedBook } from "../shared/notebases";
-
-function WaitingForModel({ model }: { model?: string }) {
-  const [seconds, setSeconds] = useState(0);
-  useEffect(() => {
-    const start = performance.now();
-    const timer = window.setInterval(
-      () => setSeconds(Math.floor((performance.now() - start) / 1000)),
-      1000,
-    );
-    return () => window.clearInterval(timer);
-  }, []);
-  return (
-    <div className="result-pending">
-      <LoaderCircle size={16} className="spin" aria-hidden="true" />
-      <div>
-        <span role="status">{t("等待模型响应")}</span>
-        <small>
-          {[model, seconds >= 2 && t("已等待 {0} 秒", String(seconds))]
-            .filter(Boolean)
-            .join(" · ")}
-        </small>
-      </div>
-    </div>
-  );
-}
+import { Thinking } from "./Thinking";
+import type { ThinkingSnapshot } from "../shared/completion";
 
 export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const [session, setSession] = useState<Interaction | null>(null);
@@ -86,6 +63,8 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   );
   const [activeAction, setActiveAction] = useState<Action | null>(null);
   const [result, setResult] = useState("");
+  const [thinking, setThinking] = useState<ThinkingSnapshot | null>(null);
+  const [thinkingRun, setThinkingRun] = useState("");
   const [resultSource, setResultSource] = useState("");
   const [phase, setPhase] = useState<
     "idle" | "running" | "done" | "cancelled" | "error"
@@ -149,6 +128,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     currentJob.current = "";
     resultRun.current = "";
     setSuggestions(null);
+    setThinking((value) =>
+      value?.text ? { ...value, status: "complete" } : null,
+    );
     setPhase((value) => (value === "running" ? "cancelled" : value));
   }
   useEffect(() => {
@@ -161,6 +143,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       setImage(value.capture ?? null);
       setContext("");
       setResult("");
+      setThinking(null);
       setResultSource("");
       setPhase("idle");
       setKind(value.capture ? "ocr" : "text");
@@ -199,6 +182,8 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       }),
       window.readfinch.on("job", (event) => {
         if (event.id !== currentJob.current) return;
+        if (event.kind === "text" && event.thinking)
+          setThinking(event.thinking);
         if (event.text !== undefined) {
           if (event.kind === "ocr") {
             setText(event.text);
@@ -213,6 +198,12 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           event.status === "cancelled"
         ) {
           setPhase(event.status);
+          const completed = event.status === "done";
+          setThinking((value) =>
+            value && (completed || value.text)
+              ? { ...value, status: "complete" }
+              : null,
+          );
           setError(
             event.status === "error" ? (event.message ?? t("请求失败")) : "",
           );
@@ -322,6 +313,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     stop();
     setActiveAction(action);
     setResult("");
+    setThinking(null);
     setResultSource(text);
     setSavedNote("");
     setConfirmBook(false);
@@ -381,6 +373,12 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     const id = crypto.randomUUID();
     currentJob.current = id;
     resultRun.current = id;
+    setThinkingRun(id);
+    setThinking(
+      selected && isTranslationOnly(selected)
+        ? null
+        : { status: "thinking", text: "" },
+    );
     setPhase("running");
     try {
       await window.readfinch.call("runAction", {
@@ -397,6 +395,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       if (currentJob.current === id) {
         currentJob.current = "";
         setPhase("error");
+        setThinking((value) =>
+          value?.text ? { ...value, status: "complete" } : null,
+        );
         setError((error as Error).message);
       }
     }
@@ -876,8 +877,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   disabled={!text.trim() || ocrBusy}
                   onClick={() => void run(testAction)}
                 >
-                  {t("测试「")}
-                  {actionLabel(testAction)}」
+                  {t("测试「{0}」", actionLabel(testAction))}
                 </button>
               )}
               {!image && !text && (
@@ -923,16 +923,21 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           )}
           {working && (
             <section className="rf-result" aria-label={t("处理结果")}>
-              {waitingForContent ? (
-                <WaitingForModel
-                  key={currentJob.current}
-                  model={noteDraft.current?.model}
+              {thinking && <Thinking key={thinkingRun} value={thinking} />}
+              {running && !thinking && !result && (
+                <LoaderCircle
+                  size={16}
+                  strokeWidth={1.6}
+                  className="spin translation-loading"
+                  role="status"
+                  aria-label={t("正在翻译")}
                 />
-              ) : result ? (
+              )}
+              {result || (running && activeAction.outputSchema) ? (
                 activeAction.id === "translate" ? (
                   <p className="rf-translation">
                     {result}
-                    {running && <span className="stream-caret" />}
+                    {running && !thinking && " ●"}
                   </p>
                 ) : (
                   <Result

@@ -1575,7 +1575,7 @@ async function handle(
           actionMessages(action, variables),
           key,
           signal,
-          (text) => emit({ text }),
+          (text, thinking) => emit({ text, thinking }),
           input.refresh,
           action.outputSchema
             ? (raw) => {
