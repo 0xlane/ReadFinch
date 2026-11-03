@@ -91,7 +91,7 @@ Las traducciones del README coinciden con los ocho idiomas de destino predefinid
 
 Descarga el paquete para tu sistema desde GitHub Releases. En Windows, elige setup.exe para instalar la aplicación o portable.exe para usarla sin instalación. En macOS, elige arm64 para Apple Silicon o x64 para Intel.
 
-Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página correspondiente. Si GitHub no responde, se utiliza gh-proxy.
+Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página Acerca de. Si GitHub no responde, se utiliza gh-proxy.
 
 ### Compilar desde el código fuente
 

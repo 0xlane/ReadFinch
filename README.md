@@ -91,7 +91,7 @@ The **application interface currently supports English and Simplified Chinese**,
 
 Download a package for your operating system from GitHub Releases. On Windows, choose setup.exe for installation or portable.exe to run without installing. On macOS, choose arm64 for Apple silicon or x64 for Intel.
 
-Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use Software updates to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.
+Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use About to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.
 
 ### Build from source
 

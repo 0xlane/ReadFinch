@@ -49,11 +49,9 @@ try {
     true,
   );
   await language(page, "en");
+  await page.getByRole("button", { name: "About", exact: true }).click();
   await page
-    .getByRole("button", { name: "Software updates", exact: true })
-    .click();
-  await page
-    .getByRole("heading", { name: "Software updates", exact: true })
+    .getByRole("heading", { name: "About ReadFinch", exact: true })
     .waitFor();
   assert.equal(
     await page
@@ -126,6 +124,15 @@ try {
     }
   });
   assert.ok(blocked);
+  await state({
+    status: "latest",
+    installMode: "automatic",
+    automatic: true,
+    checkedAt: new Date().toISOString(),
+  });
+  await page.getByRole("heading", { name: "You are up to date" }).waitFor();
+  await page.mouse.move(20, 20);
+  await page.locator("main").evaluate((element) => element.scrollTo(0, 0));
   await page.screenshot({ path: output + "/about-light.png" });
   await page.evaluate(() =>
     window.readfinch.call("setTheme", { theme: "dark" }),
@@ -133,14 +140,19 @@ try {
   await page.waitForFunction(
     () => document.documentElement.dataset.theme === "dark",
   );
+  await state({
+    status: "latest",
+    installMode: "automatic",
+    automatic: true,
+    checkedAt: new Date().toISOString(),
+  });
+  await page.getByRole("heading", { name: "You are up to date" }).waitFor();
   await page.screenshot({ path: output + "/about-dark.png" });
   checks.push(
     "About shows the brand, version, source, feedback and licenses; only fixed project links can open",
   );
 
-  await page
-    .getByRole("button", { name: "Software updates", exact: true })
-    .click();
+  await page.getByRole("button", { name: "About", exact: true }).click();
   await state({
     status: "latest",
     installMode: "automatic",
@@ -153,6 +165,8 @@ try {
   );
   await state({
     status: "downloading",
+    automatic: true,
+    checkedAt: new Date().toISOString(),
     installMode: "automatic",
     availableVersion: "1.1.0",
     source: "gh-proxy",
@@ -171,6 +185,19 @@ try {
     true,
   );
   await page.screenshot({ path: output + "/updates-downloading.png" });
+  assert.ok(
+    !/github|gh-proxy/i.test(await page.locator(".about-updates").innerText()),
+  );
+  assert.equal(
+    await page
+      .getByRole("navigation")
+      .getByRole("button", { name: "Software updates", exact: true })
+      .count(),
+    0,
+  );
+  checks.push(
+    "Updates share the About page; download routes switch internally and never appear in the update card",
+  );
   await state({
     status: "downloaded",
     installMode: "automatic",
@@ -200,6 +227,7 @@ try {
   await language(page, "zh-CN");
   await state({
     status: "latest",
+    automatic: true,
     installMode: "automatic",
     checkedAt: new Date().toISOString(),
   });

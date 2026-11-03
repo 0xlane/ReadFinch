@@ -2,13 +2,13 @@
 
 ReadFinch checks for stable releases from `https://github.com/0xlane/ReadFinch/releases/latest/download/readfinch-update.json`. Checks start 20 seconds after launch and repeat every four hours when automatic updates are enabled. The device preference is saved separately in `device-updates.json`; configuration import and WebDAV do not change it.
 
-The Software updates page can check, download, and install on demand. Windows NSIS installations and Linux AppImages use `electron-updater` to stage updates, install on quit, or restart immediately. Windows portable packages, ad-hoc signed macOS bundles, and Linux DEB installations download the correct package and reveal it for manual installation. Development builds never contact the update service.
+The About page can check, download, and install on demand. Windows NSIS installations and Linux AppImages use `electron-updater` to stage updates, install on quit, or restart immediately. Windows portable packages, ad-hoc signed macOS bundles, and Linux DEB installations download the correct package and reveal it for manual installation. Development builds never contact the update service.
 
 ## Download and verification
 
 Both metadata requests and package downloads try GitHub first. Transport failures fall back to the same public release URL prefixed with `https://gh-proxy.com/`. No provider credentials, API headers, or GitHub authentication tokens are sent. Requests use the system proxy in dedicated Electron sessions.
 
-`readfinch-update.json.sig` is a detached Ed25519 signature over the exact manifest bytes. The public key is embedded in the application. An invalid signature stops the check without a proxy retry. File names, platform, architecture, version, size, and SHA-512 digests come from the verified manifest. Downloads are checked before installation; partial or invalid files cannot be installed. Only newer stable versions are accepted. The UI displays progress and which source is in use.
+`readfinch-update.json.sig` is a detached Ed25519 signature over the exact manifest bytes. The public key is embedded in the application. An invalid signature stops the check without a proxy retry. File names, platform, architecture, version, size, and SHA-512 digests come from the verified manifest. Downloads are checked before installation; partial or invalid files cannot be installed. Only newer stable versions are accepted. The About page displays progress; transport selection stays internal.
 
 ## Publishing
 

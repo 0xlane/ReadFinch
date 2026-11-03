@@ -91,7 +91,7 @@ README 與應用程式預設的 8 種目標語言一致：
 
 從 GitHub Releases 下載適合目前系統的安裝套件。Windows 建議使用 setup.exe 安裝版，也可選擇免安裝的 portable.exe。macOS 請依晶片選擇 arm64（Apple 晶片）或 x64（Intel）。
 
-預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在軟體更新頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。
+預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在「關於」頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。
 
 ### 從原始碼建置
 

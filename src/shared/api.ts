@@ -64,8 +64,7 @@ export type SettingsTab =
   | "shortcuts"
   | "config"
   | "notes"
-  | "about"
-  | "updates";
+  | "about";
 export type SettingsLocation = {
   tab: SettingsTab;
   request: number;

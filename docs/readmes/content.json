@@ -114,7 +114,7 @@
     "top": "Back to top",
     "downloadLabel": "Download latest",
     "downloadIntro": "Download a package for your operating system from GitHub Releases. On Windows, choose setup.exe for installation or portable.exe to run without installing. On macOS, choose arm64 for Apple silicon or x64 for Intel.",
-    "updatesInfo": "Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use Software updates to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.",
+    "updatesInfo": "Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use About to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.",
     "buildTitle": "Build from source"
   },
   "zh-CN": {
@@ -232,7 +232,7 @@
     "top": "返回顶部",
     "downloadLabel": "下载最新版",
     "downloadIntro": "从 GitHub Releases 下载适合当前系统的安装包。Windows 推荐 setup.exe 安装版，也可选择无需安装的 portable.exe。macOS 请根据芯片选择 arm64（Apple 芯片）或 x64（Intel）。",
-    "updatesInfo": "默认开启自动更新。Windows 安装版和 Linux AppImage 在后台下载、退出时安装；其他安装方式提供校验后的下载包，由用户手动安装。可在“软件更新”页关闭自动更新或手动检查。下载优先使用 GitHub，失败时回退到 gh-proxy。",
+    "updatesInfo": "默认开启自动更新。Windows 安装版和 Linux AppImage 在后台下载、退出时安装；其他安装方式提供校验后的下载包，由用户手动安装。可在“关于”页关闭自动更新或手动检查。下载优先使用 GitHub，失败时回退到 gh-proxy。",
     "buildTitle": "从源码构建"
   },
   "zh-TW": {
@@ -350,7 +350,7 @@
     "top": "回到頂端",
     "downloadLabel": "下載最新版",
     "downloadIntro": "從 GitHub Releases 下載適合目前系統的安裝套件。Windows 建議使用 setup.exe 安裝版，也可選擇免安裝的 portable.exe。macOS 請依晶片選擇 arm64（Apple 晶片）或 x64（Intel）。",
-    "updatesInfo": "預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在軟體更新頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。",
+    "updatesInfo": "預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在「關於」頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。",
     "buildTitle": "從原始碼建置"
   },
   "ja": {
@@ -468,7 +468,7 @@
     "top": "先頭へ",
     "downloadLabel": "最新版をダウンロード",
     "downloadIntro": "GitHub Releases からお使いの OS 向けパッケージをダウンロードしてください。Windows は setup.exe、インストール不要なら portable.exe を選びます。macOS は Apple シリコン用の arm64 または Intel 用の x64 を選択してください。",
-    "updatesInfo": "自動更新は初期設定で有効です。Windows インストール版と Linux AppImage はバックグラウンドでダウンロードし、終了時に更新します。その他のパッケージは検証済みファイルを手動でインストールします。ソフトウェア更新ページで設定変更や手動確認ができます。GitHub に接続できない場合は gh-proxy を試します。",
+    "updatesInfo": "自動更新は初期設定で有効です。Windows インストール版と Linux AppImage はバックグラウンドでダウンロードし、終了時に更新します。その他のパッケージは検証済みファイルを手動でインストールします。「このアプリについて」ページで設定変更や手動確認ができます。GitHub に接続できない場合は gh-proxy を試します。",
     "buildTitle": "ソースからビルド"
   },
   "ko": {
@@ -586,7 +586,7 @@
     "top": "맨 위로",
     "downloadLabel": "최신 버전 다운로드",
     "downloadIntro": "GitHub Releases에서 운영체제에 맞는 패키지를 다운로드하세요. Windows에서는 설치용 setup.exe 또는 무설치용 portable.exe를 선택하세요. macOS에서는 Apple Silicon용 arm64 또는 Intel용 x64를 선택하세요.",
-    "updatesInfo": "자동 업데이트는 기본으로 켜져 있습니다. Windows 설치 버전과 Linux AppImage는 백그라운드에서 다운로드하고 종료할 때 설치합니다. 다른 패키지는 검증된 파일을 직접 설치합니다. 소프트웨어 업데이트 페이지에서 설정을 변경하거나 수동으로 확인할 수 있습니다. GitHub 연결에 실패하면 gh-proxy를 사용합니다.",
+    "updatesInfo": "자동 업데이트는 기본으로 켜져 있습니다. Windows 설치 버전과 Linux AppImage는 백그라운드에서 다운로드하고 종료할 때 설치합니다. 다른 패키지는 검증된 파일을 직접 설치합니다. 정보 페이지에서 설정을 변경하거나 수동으로 확인할 수 있습니다. GitHub 연결에 실패하면 gh-proxy를 사용합니다.",
     "buildTitle": "소스에서 빌드"
   },
   "fr": {
@@ -704,7 +704,7 @@
     "top": "Retour en haut",
     "downloadLabel": "Télécharger la dernière version",
     "downloadIntro": "Téléchargez le paquet adapté à votre système depuis GitHub Releases. Sous Windows, choisissez setup.exe pour installer l’application ou portable.exe pour une utilisation sans installation. Sous macOS, choisissez arm64 pour Apple Silicon ou x64 pour Intel.",
-    "updatesInfo": "Les mises à jour automatiques sont activées par défaut. Les installations Windows et les AppImages Linux téléchargent les mises à jour en arrière-plan et les installent à la fermeture. Les autres paquets proposent un téléchargement vérifié à installer manuellement. La page de mise à jour permet de modifier ce réglage ou de lancer une vérification. En cas d’échec de GitHub, le téléchargement passe par gh-proxy.",
+    "updatesInfo": "Les mises à jour automatiques sont activées par défaut. Les installations Windows et les AppImages Linux téléchargent les mises à jour en arrière-plan et les installent à la fermeture. Les autres paquets proposent un téléchargement vérifié à installer manuellement. La page À propos permet de modifier ce réglage ou de lancer une vérification. En cas d’échec de GitHub, le téléchargement passe par gh-proxy.",
     "buildTitle": "Compiler depuis les sources"
   },
   "de": {
@@ -822,7 +822,7 @@
     "top": "Nach oben",
     "downloadLabel": "Neueste Version herunterladen",
     "downloadIntro": "Laden Sie das Paket für Ihr Betriebssystem von GitHub Releases herunter. Unter Windows wählen Sie setup.exe zur Installation oder portable.exe für die portable Version. Für macOS wählen Sie arm64 für Apple Silicon oder x64 für Intel.",
-    "updatesInfo": "Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Update-Seite können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.",
+    "updatesInfo": "Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Seite Über können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.",
     "buildTitle": "Aus dem Quellcode erstellen"
   },
   "es": {
@@ -940,7 +940,7 @@
     "top": "Volver arriba",
     "downloadLabel": "Descargar la última versión",
     "downloadIntro": "Descarga el paquete para tu sistema desde GitHub Releases. En Windows, elige setup.exe para instalar la aplicación o portable.exe para usarla sin instalación. En macOS, elige arm64 para Apple Silicon o x64 para Intel.",
-    "updatesInfo": "Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página correspondiente. Si GitHub no responde, se utiliza gh-proxy.",
+    "updatesInfo": "Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página Acerca de. Si GitHub no responde, se utiliza gh-proxy.",
     "buildTitle": "Compilar desde el código fuente"
   }
 }

@@ -5,14 +5,11 @@ import {
   Check,
   CircleAlert,
   Code2,
-  FileText,
   Github,
-  Heart,
   LoaderCircle,
   MessageSquare,
   RefreshCw,
   RotateCw,
-  ShieldCheck,
 } from "lucide-react";
 import { t } from "../shared/i18n";
 import { type ProjectLink, type UpdateState } from "../shared/updates";
@@ -37,29 +34,20 @@ function ProjectButton({
     </button>
   );
 }
-export function About({
-  version,
-  platform,
-  arch,
-}: {
-  version: string;
-  platform: string;
-  arch: string;
-}) {
+export function About({ state }: { state: UpdateState }) {
   return (
     <div className="page about-page">
       <header className="page-heading">
         <div>
           <h1>{t("关于伴读雀")}</h1>
-          <p>{t("随选随用的桌面阅读与写作助手。")}</p>
         </div>
       </header>
       <section className="about-identity">
         <img
           className="about-icon"
           src="icon.png"
-          width="84"
-          height="84"
+          width="72"
+          height="72"
           alt=""
         />
         <div>
@@ -69,23 +57,22 @@ export function About({
           </h2>
           <p>{t("陪你读懂，也帮你写好。")}</p>
           <div className="about-version">
-            <span>v{version}</span>
+            <span>v{state.currentVersion}</span>
             <span>
-              {platform === "win32"
+              {state.platform === "win32"
                 ? "Windows"
-                : platform === "darwin"
+                : state.platform === "darwin"
                   ? "macOS"
                   : "Linux"}{" "}
-              · {arch}
+              · {state.arch}
             </span>
+            <ProjectButton link="releases">
+              {t("版本记录")} <ArrowUpRight size={13} />
+            </ProjectButton>
           </div>
         </div>
       </section>
-      <p className="about-intro">
-        {t(
-          "在正在使用的应用里选中文字，即可翻译、查词、分析长句或改进写作。把有用的内容存进本地笔记库，让每一次阅读都有收获。",
-        )}
-      </p>
+      <UpdateSettings state={state} />
       <section className="about-links" aria-label={t("项目与支持")}>
         <ProjectButton link="repository" className="about-link">
           <Github size={21} />
@@ -100,14 +87,6 @@ export function About({
           <span>
             <strong>{t("反馈与建议")}</strong>
             <small>{t("报告问题，或告诉我们你希望加入的功能。")}</small>
-          </span>
-          <ArrowUpRight size={17} />
-        </ProjectButton>
-        <ProjectButton link="releases" className="about-link">
-          <FileText size={21} />
-          <span>
-            <strong>{t("版本记录")}</strong>
-            <small>{t("了解每个版本的改进与修复。")}</small>
           </span>
           <ArrowUpRight size={17} />
         </ProjectButton>
@@ -133,10 +112,6 @@ export function About({
           </div>
         </div>
       </section>
-      <footer className="about-footer">
-        <Heart size={13} />
-        {t("让理解更轻松，让知识留在身边。")}
-      </footer>
     </div>
   );
 }
@@ -151,7 +126,7 @@ const statusTitles: Record<UpdateState["status"], string> = {
   error: "暂时无法完成更新",
 };
 const megabytes = (bytes: number) => (bytes / 1024 / 1024).toFixed(1) + " MB";
-export function UpdateSettings({ state }: { state: UpdateState }) {
+function UpdateSettings({ state }: { state: UpdateState }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const busy = ["checking", "downloading", "installing"].includes(state.status);
@@ -185,13 +160,7 @@ export function UpdateSettings({ state }: { state: UpdateState }) {
       })
     : "";
   return (
-    <div className="page about-page updates-page">
-      <header className="page-heading">
-        <div>
-          <h1>{t("软件更新")}</h1>
-          <p>{t("获取伴读雀的新功能、体验改进与问题修复。")}</p>
-        </div>
-      </header>
+    <section className="about-updates" aria-label={t("软件更新")}>
       <section className="update-card" aria-live="polite" aria-busy={busy}>
         <div className={"update-symbol " + state.status}>
           {busy ? (
@@ -285,11 +254,6 @@ export function UpdateSettings({ state }: { state: UpdateState }) {
         )}
         <div className="update-card-meta">
           <span>{date ? t("上次检查：{0}", date) : t("尚未检查更新")}</span>
-          <span>
-            {state.source === "gh-proxy"
-              ? t("已切换至 gh-proxy 加速")
-              : "GitHub Releases"}
-          </span>
         </div>
       </section>
       {(error || state.error) && (
@@ -318,17 +282,6 @@ export function UpdateSettings({ state }: { state: UpdateState }) {
             onChange={(value) => void automatic(value)}
           />
         </div>
-        <div className="update-preference-row">
-          <div>
-            <h3>{t("下载来源")}</h3>
-            <p>
-              {t("优先从 GitHub 下载；连接失败时，自动尝试 gh-proxy 加速。")}
-            </p>
-          </div>
-          <span className="update-source-label">
-            GitHub <span>→</span> gh-proxy
-          </span>
-        </div>
       </section>
       {state.installMode === "manual" && (
         <p className="update-platform-note">
@@ -347,25 +300,17 @@ export function UpdateSettings({ state }: { state: UpdateState }) {
         </p>
       )}
       {state.notes && (
-        <section className="update-release-notes">
+        <details className="update-release-notes">
+          <summary>{t("此版本更新内容")}</summary>
           <div>
-            <h3>{t("此版本更新内容")}</h3>
             <ProjectButton link="releases">
               {t("完整版本记录")}
               <ArrowUpRight size={13} />
             </ProjectButton>
           </div>
           <p>{state.notes}</p>
-        </section>
+        </details>
       )}
-      <footer className="update-assurance">
-        <ShieldCheck size={15} />
-        <span>
-          {t(
-            "安装前验证发布签名与文件完整性。更新不会更改你的配置和本地笔记。",
-          )}
-        </span>
-      </footer>
-    </div>
+    </section>
   );
 }

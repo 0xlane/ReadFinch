@@ -91,7 +91,7 @@ Die README-Übersetzungen entsprechen den acht voreingestellten Zielsprachen der
 
 Laden Sie das Paket für Ihr Betriebssystem von GitHub Releases herunter. Unter Windows wählen Sie setup.exe zur Installation oder portable.exe für die portable Version. Für macOS wählen Sie arm64 für Apple Silicon oder x64 für Intel.
 
-Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Update-Seite können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.
+Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Seite Über können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.
 
 ### Aus dem Quellcode erstellen
 

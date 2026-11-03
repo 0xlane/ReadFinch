@@ -3,16 +3,16 @@
   padding: 32px 38px;
 }
 .about-page .page-heading {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .about-identity {
   display: flex;
   gap: 24px;
   align-items: center;
-  padding: 6px 0 24px;
+  padding: 2px 0 26px;
 }
 .about-icon {
-  border-radius: 22px;
+  border-radius: 18px;
   flex: 0 0 auto;
 }
 .about-identity h2 {
@@ -44,6 +44,13 @@
   gap: 14px;
   color: var(--muted);
   font-size: 12px;
+  flex-wrap: wrap;
+}
+.about-version button {
+  color: var(--accent);
+  font-size: 12px;
+  padding: 0;
+  gap: 4px;
 }
 .about-version > :first-child {
   background: var(--hover);
@@ -57,6 +64,8 @@
   margin: 0 0 30px;
 }
 .about-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
@@ -67,12 +76,12 @@
   display: flex;
   border-radius: 0;
   gap: 16px;
-  padding: 20px 22px;
+  padding: 20px;
   text-align: left;
   justify-content: flex-start;
 }
 .about-link + .about-link {
-  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
 }
 .about-link:hover {
   background: var(--hover);
@@ -127,35 +136,33 @@
 }
 .about-open-source button,
 .update-release-notes button,
-.updates-page .alert button {
+.about-updates .alert button {
   padding: 2px 0;
   color: var(--accent);
   gap: 5px;
   font-size: 12px;
 }
-.about-footer {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 36px;
-  color: var(--faint);
-  font-size: 11px;
-}
-.update-card {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 20px;
-  padding: 26px;
+.about-updates {
+  margin-bottom: 24px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 14px;
+  overflow: hidden;
+}
+.update-card {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  column-gap: 14px;
+  row-gap: 14px;
+  padding: 22px 20px 18px;
+  align-items: center;
 }
 .update-symbol {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 8%, var(--surface));
 }
@@ -164,13 +171,13 @@
   background: var(--hover);
 }
 .update-summary h2 {
-  font-size: 19px;
-  margin: 2px 0 8px;
+  font-size: 15px;
+  margin: 0 0 5px;
   font-weight: 600;
 }
 .update-summary p {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.7;
   margin: 0;
 }
@@ -179,7 +186,9 @@
   font-size: 12px;
 }
 .update-action {
-  grid-column: 2;
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
 }
 .update-action button {
   min-height: 35px;
@@ -187,9 +196,8 @@
   padding-inline: 14px;
 }
 .update-card-meta {
-  grid-column: 1 / -1;
-  border-top: 1px solid var(--line);
-  padding-top: 16px;
+  grid-column: 2 / -1;
+  margin-top: -5px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -223,20 +231,19 @@
   font-variant-numeric: tabular-nums;
 }
 .update-preferences {
-  margin-top: 28px;
   border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--hover) 25%, var(--surface));
 }
 .update-preference-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 15px 20px;
 }
 .update-preference-row h3 {
-  margin: 0 0 6px;
-  font-size: 14px;
+  margin: 0 0 4px;
+  font-size: 13px;
   font-weight: 500;
 }
 .update-preference-row p {
@@ -245,36 +252,25 @@
   line-height: 1.7;
   margin: 0;
 }
-.update-source-label {
-  white-space: nowrap;
-  color: var(--muted);
-  font-size: 12px;
-}
-.update-source-label span {
-  color: var(--faint);
-  padding: 0 5px;
-}
-.update-assurance {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 28px;
-  font-size: 11px;
-  color: var(--faint);
-  line-height: 1.7;
-}
-.update-assurance svg {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
 .update-platform-note {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.7;
-  margin: 18px 0 0;
+  margin: 0;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
 }
 .update-release-notes {
-  margin-top: 26px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+}
+.update-release-notes summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+}
+.update-release-notes[open] summary {
+  margin-bottom: 12px;
 }
 .update-release-notes > div {
   display: flex;
@@ -292,11 +288,11 @@
   font-size: 12px;
   overflow-wrap: anywhere;
 }
-.updates-page .alert {
-  margin-top: 16px;
+.about-updates .alert {
+  margin: 0 20px 16px;
   font-size: 12px;
 }
-.updates-page .alert button {
+.about-updates .alert button {
   display: inline-flex;
   margin-left: 12px;
 }
@@ -328,8 +324,24 @@
   .about-page {
     padding: 26px;
   }
-  .update-source-label {
-    display: none;
+}
+@media (max-width: 760px) {
+  .about-links {
+    grid-template-columns: 1fr;
+  }
+  .about-link + .about-link {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .update-card {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .update-action {
+    grid-column: 2;
+    grid-row: auto;
+  }
+  .update-card-meta {
+    grid-column: 2;
   }
 }
 @media (prefers-reduced-motion: reduce) {

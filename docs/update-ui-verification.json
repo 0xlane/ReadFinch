@@ -1,10 +1,11 @@
 {
-  "date": "2026-11-03T11:21:07.331Z",
+  "date": "2026-11-03T11:32:18.982Z",
   "version": "1.0.0",
   "checks": [
     "Automatic updates default on, save immediately, and stay separate from portable configuration",
     "Update preference survives an application restart",
     "About shows the brand, version, source, feedback and licenses; only fixed project links can open",
+    "Updates share the About page; download routes switch internally and never appear in the update card",
     "Current, download progress, proxy fallback, ready, and error views have the correct controls",
     "Chinese and English, both themes, and a compact window preserve readable navigation",
     "Floating panels cannot install updates or change update preferences"

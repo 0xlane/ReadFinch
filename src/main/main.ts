@@ -420,7 +420,13 @@ function updateTray() {
         updateTray();
       },
     },
-    { label: t("软件更新"), click: () => openSettings("updates") },
+    {
+      label: t("检查更新"),
+      click: () => {
+        openSettings("about");
+        void updates.service?.check();
+      },
+    },
     { label: t("关于伴读雀"), click: () => openSettings("about") },
     { label: `${t("伴读雀")} ${app.getVersion()}`, enabled: false },
     {
@@ -1216,7 +1222,6 @@ async function handle(
             "config",
             "notes",
             "about",
-            "updates",
           ])
           .parse(arg.tab),
         undefined,

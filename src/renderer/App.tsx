@@ -16,7 +16,6 @@ import {
   Keyboard,
   LibraryBig,
   Info,
-  RefreshCw,
 } from "lucide-react";
 import type { SettingsLocation, Snapshot } from "../shared/api";
 import { Settings } from "./Settings";
@@ -126,12 +125,7 @@ function SettingsApp({
           </nav>
         </div>
         <nav className="sidebar-system" aria-label={t("应用信息")}>
-          {(
-            [
-              ["updates", "软件更新", RefreshCw],
-              ["about", "关于", Info],
-            ] as const
-          ).map(([id, label, Icon]) => (
+          {([["about", "关于", Info]] as const).map(([id, label, Icon]) => (
             <button
               key={id}
               aria-label={t(label)}
@@ -142,10 +136,9 @@ function SettingsApp({
             >
               <Icon size={17} />
               <span>{t(label)}</span>
-              {id === "updates" &&
-                ["available", "downloaded"].includes(
-                  snapshot.updates.status,
-                ) && <span className="sidebar-update-dot" />}
+              {["available", "downloaded"].includes(
+                snapshot.updates.status,
+              ) && <span className="sidebar-update-dot" />}
             </button>
           ))}
         </nav>
