@@ -39,7 +39,7 @@ npm start
 
 ## 首次使用
 
-1. **配置文字模型。** 首次启动会打开设置。在「API 提供商」中选择 OpenAI、DeepSeek 等预设，或添加自定义 OpenAI 兼容接口。填写所需的 API Key、选择模型并测试连接。每个提供商对应一个模型，可在「功能提供商」中设为「默认动作提供商」，也可单独分配给翻译、词典等指令。
+1. **配置文字模型。** 首次启动会打开设置。在「API 提供商」中选择 OpenAI、DeepSeek 等预设，或添加自定义 OpenAI 兼容接口。填写所需的 API Key、选择模型并测试连接。每个提供商对应一个模型，可在「功能提供商」中设为「默认提供商」，也可单独分配给翻译、词典等指令。
 2. **翻译一段文字。** 返回正在阅读的应用，选中一句话，点击划词工具栏上的「翻译」。在浮窗顶部选择目标语言，点击图钉可保留译文，继续对照原文。
 3. **从图片取词。** 在系统托盘菜单中选择「框选屏幕文字（OCR）」，拖框选取区域。识别完成后可直接编辑文字并运行指令。内置 OCR 和系统朗读均可在配置 API 提供商之前使用。
 
@@ -50,7 +50,7 @@ npm start
 | 翻译选区 | `Alt + T` | `Option + T` |
 | 打开词典 | `Alt + Shift + D` | `Option + Shift + D` |
 | 改进写作 | `Alt + Shift + W` | `Option + Shift + W` |
-| 打开选区动作菜单 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
+| 打开选区指令菜单 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
 | 框选屏幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
 | 读取剪贴板文字 | `Ctrl + Shift + V` | `Command + Shift + V` |
 

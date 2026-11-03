@@ -152,7 +152,7 @@ export function ProviderModels({
                   </label>
                 );
               })}
-              <p>{t("未单独指定的动作使用默认模型。")}</p>
+              <p>{t("未单独指定的指令使用默认模型。")}</p>
             </>
           )}
         </div>

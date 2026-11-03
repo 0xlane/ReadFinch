@@ -46,18 +46,8 @@ const selection =
   "Small observations, carefully recorded, can lead to unexpected discoveries.";
 const specs: Record<TemplateId, Spec[]> = {
   dictionary: [
-    [
-      "dictionary-term",
-      "词条",
-      "选中词语在此语境中的基本形式。",
-      "serendipity",
-    ],
-    [
-      "dictionary-phonetic",
-      "音标",
-      "使用该语言的常用音标。",
-      "/ˌser.ənˈdɪp.ə.ti/",
-    ],
+    ["dictionary-term", "词条", "选中词语在此语境中的基本形式。", "blossom"],
+    ["dictionary-phonetic", "音标", "使用该语言的常用音标。", "/ˈblɒs.əm/"],
     [
       "dictionary-part-of-speech",
       "词性",
@@ -68,33 +58,33 @@ const specs: Record<TemplateId, Spec[]> = {
       "dictionary-definition",
       "释义",
       "用 {{targetLanguage}} 简明解释语境中的含义。",
-      "意外发现美好事物的机缘。",
+      "花；花朵（尤指果树的花）",
     ],
     [
       "dictionary-context",
       "句子",
       "从补充的上下文摘录含有该词的完整句；没有时给出一个简短例句。",
-      "Finding that book was pure serendipity.",
+      "The ephemeral beauty of cherry blossoms reminds us to cherish each moment.",
     ],
     [
       "dictionary-context-term",
       "句中词形",
       "句中出现的原文片段，编码成 JSON 数组字符串，每项包含 text。",
-      '[{"text":"serendipity"}]',
+      '[{"text":"blossoms"}]',
     ],
     [
       "dictionary-context-translation",
       "句子翻译",
       "用 {{targetLanguage}} 翻译这个句子。",
-      "找到那本书纯属机缘巧合。",
+      "樱花短暂的美丽提醒我们珍惜每一刻。",
     ],
     [
       "dictionary-memory-tips",
       "记忆技巧",
       "最多三条真正有帮助的记忆方法，每条单独一行。",
-      "常用搭配 · pure serendipity 表示纯属机缘巧合。",
+      "词源：和 bloom（开花）同源，bl- 开头的 bloom、blossom 都和开花有关。\n近义词：bloom 多指花开的状态，blossom 常指果树（樱桃、苹果）的花。",
     ],
-    ["dictionary-difficulty", "难度", "CEFR 难度等级，未知时为 null。", "C1"],
+    ["dictionary-difficulty", "难度", "CEFR 难度等级，未知时为 null。", "B2"],
   ],
   sentence: [
     ["sentence-analysis-sentence", "原句", "", selection, true],
@@ -177,12 +167,11 @@ export function presetLayout(kind: TemplateId, fields: OutputField[]) {
     fieldExpression(match[i]!.name) +
     ' != "" %}';
   if (kind === "dictionary")
-    return `<article class="dictionary">
-  <header><h2>${value(0)}</h2><button data-speak="${value(0)}" aria-label="${t("朗读")}">♪</button>${yes(8)}<em>${value(8)}</em>{% endif %}</header>
-  <small>${value(1)}　${value(2)}</small>
-  <p class="definition">${value(3)}</p>
-  ${yes(4)}<blockquote><span data-marks="${value(5)}">${value(4)}</span><button data-speak="${value(4)}" aria-label="${t("朗读例句")}">♪</button><small>${value(6)}</small></blockquote>{% endif %}
-  ${yes(7)}<details><summary>${t("记忆技巧")}</summary><p>${value(7)}</p></details>{% endif %}
+    return `<article class="dictionary dictionary-v2">
+  <header class="dictionary-heading"><div class="dictionary-word"><h2>${value(0)}</h2><button class="card-speak" data-speak="${value(0)}" aria-label="${t("朗读")}"></button>${yes(8)}<em>${value(8)}</em>{% endif %}</div><div class="dictionary-pronunciation"><span>${value(1)}</span> <i>${value(2)}</i></div></header>
+  ${yes(3)}<p class="definition">${value(3)}</p>{% endif %}
+  ${yes(4)}<blockquote><span data-marks="${value(5)}">${value(4)}</span><button class="card-speak" data-speak="${value(4)}" aria-label="${t("朗读例句")}"></button>${yes(6)}<small>${value(6)}</small>{% endif %}</blockquote>{% endif %}
+  ${yes(7)}<aside class="memory-tips"><span class="memory-icon"></span><p>${value(7)}</p></aside>{% endif %}
 </article>`;
   if (kind === "sentence")
     return `<article class="sentence-card">
@@ -192,6 +181,27 @@ export function presetLayout(kind: TemplateId, fields: OutputField[]) {
   return `<article data-writing data-original="${value(0)}" data-setting="${value(1)}"
   data-marks="${value(2)}" data-revision="${value(3)}" data-summary="${value(4)}"></article>`;
 }
+
+/** v0.10 built-in markup, retained only to recognize untouched settings during upgrade. */
+export function legacyDictionaryLayout(fields: OutputField[]) {
+  const match = specs.dictionary.map(([id]) => fields.find((f) => f.id === id));
+  if (match.some((f) => !f)) return undefined;
+  const value = (i: number) => "{{ " + fieldExpression(match[i]!.name) + " }}";
+  const yes = (i: number) =>
+    "{% if " +
+    fieldExpression(match[i]!.name) +
+    " != nil and " +
+    fieldExpression(match[i]!.name) +
+    ' != "" %}';
+  return `<article class="dictionary">
+  <header><h2>${value(0)}</h2><button data-speak="${value(0)}" aria-label="${t("朗读")}">♪</button>${yes(8)}<em>${value(8)}</em>{% endif %}</header>
+  <small>${value(1)}　${value(2)}</small>
+  <p class="definition">${value(3)}</p>
+  ${yes(4)}<blockquote><span data-marks="${value(5)}">${value(4)}</span><button data-speak="${value(4)}" aria-label="${t("朗读例句")}">♪</button><small>${value(6)}</small></blockquote>{% endif %}
+  ${yes(7)}<details><summary>${t("记忆技巧")}</summary><p>${value(7)}</p></details>{% endif %}
+</article>`;
+}
+
 export function definition(kind: TemplateId) {
   const outputSchema: OutputField[] = specs[kind].map(
     ([id, name, description, , isSelection]) => ({
@@ -205,7 +215,7 @@ export function definition(kind: TemplateId) {
   const sample: OutputSample = {
     selection:
       specs[kind].find((s) => s[4])?.[3] ??
-      (kind === "dictionary" ? "serendipity" : selection),
+      (kind === "dictionary" ? "blossom" : selection),
     targetLanguage: t("简体中文"),
     values: Object.fromEntries(
       specs[kind].filter((s) => !s[4]).map(([id, , , value]) => [id, value]),

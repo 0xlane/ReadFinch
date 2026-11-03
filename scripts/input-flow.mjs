@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const output = "docs/screenshots/v0.6";
+const output = "docs/screenshots/v0.11";
 await mkdir(output, { recursive: true });
 const requests = [];
 const checks = [];
@@ -26,9 +26,10 @@ const server = createServer(async (req, res) => {
       ? "OLD IMAGE RESPONSE MUST NOT APPEAR"
       : "Remote OCR fixture text."
     : JSON.stringify({
-        场合: null, 标注: null,
+        场合: null,
+        标注: null,
         改后: "Small steps make a meaningful difference.",
-        总评: "本机测试样例，检查 OCR 校对文字传给文字动作。",
+        总评: "本机测试样例，检查 OCR 校对文字传给文字指令。",
       });
   if (input.model === "ocr-delayed")
     await new Promise((resolve) => setTimeout(resolve, 900));
@@ -362,7 +363,25 @@ try {
   const viewport = await overlay.evaluate(() => ({
     width: innerWidth,
     height: innerHeight,
+    dpr: devicePixelRatio,
   }));
+  assert.deepEqual(
+    [viewport.width, viewport.height],
+    [bounds.display.width, bounds.display.height],
+    "The overlay must cover the entire display, including the taskbar, without native frame padding",
+  );
+  assert.deepEqual(
+    [
+      Math.round(viewport.width * viewport.dpr),
+      Math.round(viewport.height * viewport.dpr),
+    ],
+    [screenSource.width, screenSource.height],
+    "The frozen screenshot must display at 1:1 device pixels",
+  );
+  // A click without dragging must not leave a sticky rectangle following the cursor.
+  await overlay.mouse.click(20, 20);
+  await overlay.mouse.move(25, 25);
+  assert.equal(await overlay.locator(".crop-selection").count(), 0);
   const left = bounds.window.x - bounds.display.x + 8;
   const top = bounds.window.y - bounds.display.y + 8;
   await overlay.mouse.move(left, top);
@@ -370,6 +389,48 @@ try {
   await overlay.mouse.move(left + bounds.window.width - 16, top + 275, {
     steps: 8,
   });
+  await overlay.locator('.capture-overlay[data-selecting="true"]').waitFor();
+  assert.equal(await overlay.locator(".capture-hint").isVisible(), false);
+  const overlayPng = await overlay.screenshot();
+  const previewPixels = await app.evaluate(
+    ({ nativeImage }, { source, displayed, rect, dpr }) => {
+      const original = nativeImage.createFromDataURL(source);
+      const rendered = nativeImage.createFromBuffer(
+        Buffer.from(displayed, "base64"),
+      );
+      const roi = {
+        x: Math.round((rect.x + 12) * dpr),
+        y: Math.round((rect.y + 12) * dpr),
+        width: Math.round((rect.width - 24) * dpr),
+        height: Math.round((rect.height - 24) * dpr),
+      };
+      const a = original.crop(roi).toBitmap(),
+        b = rendered.crop(roi).toBitmap();
+      let differences = 0;
+      for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) differences++;
+      return {
+        source: original.getSize(),
+        displayed: rendered.getSize(),
+        differingChannels: differences,
+        comparedChannels: a.length,
+      };
+    },
+    {
+      source: screenSource.dataUrl,
+      displayed: overlayPng.toString("base64"),
+      rect: { x: left, y: top, width: bounds.window.width - 16, height: 275 },
+      dpr: viewport.dpr,
+    },
+  );
+  assert.deepEqual(previewPixels.displayed, previewPixels.source);
+  assert.equal(
+    previewPixels.differingChannels,
+    0,
+    "Clear selection must show the original screen pixels without resampling",
+  );
+  checks.push(
+    "The actual selection preview is pixel-identical to the native screenshot at current DPI; taskbar sizing and click-without-drag are correct",
+  );
   await overlay.mouse.up().catch((error) => {
     if (!overlay.isClosed()) throw error;
   });
@@ -444,6 +505,9 @@ try {
   screenCapture = {
     scaleFactor: bounds.scale,
     cropPixelsMatch: true,
+    previewPixelsMatch: true,
+    previewPixels,
+    viewport,
     ocrCompleted: true,
     controlledSampleRecognized: sampleVisible,
     ...(sampleVisible

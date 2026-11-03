@@ -9,7 +9,7 @@ import {
 } from "react";
 import {
   Braces,
-  Code2,
+  ChevronRight,
   Moon,
   Pencil,
   Play,
@@ -128,14 +128,6 @@ function Preview({
         </div>
         <button
           className="text-button"
-          title={t("重放流式输出")}
-          onClick={() => setReplay((n) => n + 1)}
-        >
-          <Play size={13} />
-          {t("重放")}
-        </button>
-        <button
-          className="text-button"
           onClick={() => {
             setDraft(structuredClone(sample));
             setEdit(true);
@@ -143,6 +135,14 @@ function Preview({
         >
           <Braces size={14} />
           {t("示例数据")}
+        </button>
+        <button
+          className="text-button"
+          title={t("重放流式输出")}
+          onClick={() => setReplay((n) => n + 1)}
+        >
+          <Play size={13} />
+          {t("重放")}
         </button>
       </div>
       <div className="preview-stage" data-theme={resolved}>
@@ -260,12 +260,17 @@ export function ActionLayoutEditor({
   action,
   locked,
   update,
+  customize,
+  canCustomize,
 }: {
   action: Action;
   locked: boolean;
   update: (changes: Partial<Action>) => void;
+  customize: () => void;
+  canCustomize: boolean;
 }) {
   const [open, setOpen] = useState(false),
+    [sourceOpen, setSourceOpen] = useState(false),
     [reset, setReset] = useState<TemplateId | null>(null),
     [help, setHelp] = useState(false);
   const area = useRef<LiquidHandle>(null);
@@ -289,15 +294,56 @@ export function ActionLayoutEditor({
     <section className="layout-field">
       <div className="section-line">
         <h3>{t("版式")}</h3>
-        <button className="secondary compact" onClick={() => setOpen(true)}>
-          {locked ? <Code2 size={14} /> : <Pencil size={14} />}{" "}
-          {t(locked ? "查看源码" : "编辑版式")}
-        </button>
+        {!locked && (
+          <button className="secondary compact" onClick={() => setOpen(true)}>
+            <Pencil size={14} /> {t("编辑版式")}
+          </button>
+        )}
       </div>
-      <p className="hint">
-        {t("使用 HTML + Liquid 排版，回答时字段会逐步填入。")}
-      </p>
+      {locked ? (
+        <div className="layout-built-in-hint">
+          <span>
+            {t("内置指令的版式不可编辑。点击「定制化」复制一份后再修改。")}
+          </span>
+          <button
+            className="secondary compact assist"
+            disabled={!canCustomize}
+            onClick={customize}
+          >
+            {t("定制化")}
+          </button>
+        </div>
+      ) : (
+        <p className="hint">
+          {t("使用 HTML + Liquid 排版，回答时字段会逐步填入。")}
+        </p>
+      )}
       {preview}
+      {locked && (
+        <div className="layout-source">
+          <button
+            className="text-button"
+            aria-expanded={sourceOpen}
+            onClick={() => setSourceOpen(!sourceOpen)}
+          >
+            <ChevronRight size={14} className={sourceOpen ? "expanded" : ""} />
+            {t("查看源码")}
+          </button>
+          {sourceOpen && (
+            <Suspense
+              fallback={<div className="liquid-editor" aria-busy="true" />}
+            >
+              <LiquidEditor
+                handle={area}
+                fields={fields}
+                locked
+                value={value}
+                onChange={() => {}}
+              />
+            </Suspense>
+          )}
+        </div>
+      )}
       {open && (
         <ActionDialog
           title={t(locked ? "版式源码" : "编辑版式")}

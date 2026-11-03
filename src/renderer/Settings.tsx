@@ -350,7 +350,7 @@ export function Settings({
       t("为划词工具栏配置 AI 指令，自定义提示词、输出字段和结果版式。"),
     ],
     notes: [t("本地笔记库"), ""],
-    shortcuts: [t("快捷键"), t("为取词、截图和每个动作设置全局快捷键。")],
+    shortcuts: [t("快捷键"), t("为取词、截图和每个指令设置全局快捷键。")],
     config: [t("配置管理"), t("导入、导出、恢复备份与 WebDAV 同步。")],
   };
   if (tab === "notes")
@@ -428,7 +428,7 @@ export function Settings({
             <div className="section-heading">
               <div>
                 <h3>{t("外观")}</h3>
-                <p>{t("设置、划词工具栏和动作浮窗使用同一主题。")}</p>
+                <p>{t("设置、划词工具栏和指令浮窗使用同一主题。")}</p>
               </div>
             </div>
             <div className="theme-options">
@@ -608,7 +608,7 @@ export function Settings({
             <div className="setting-row">
               <div>
                 <h3>{t("划词工具栏")}</h3>
-                <p>{t("应用提供可读取的选中文字时出现；点击动作才会处理。")}</p>
+                <p>{t("应用提供可读取的选中文字时出现；点击指令才会处理。")}</p>
               </div>
               <Toggle
                 label={t("自动显示划词工具栏")}
@@ -773,7 +773,7 @@ export function Settings({
               <div className="setting-row shortcut-row" key={key}>
                 <strong>
                   {{
-                    selection: t("选区动作菜单"),
+                    selection: t("选区指令菜单"),
                     capture: t("框选屏幕文字（OCR）"),
                     clipboard: t("读取剪贴板"),
                   }[key] ?? key}
@@ -781,7 +781,7 @@ export function Settings({
                 <ShortcutRecorder
                   label={
                     ({
-                      selection: t("选区动作菜单"),
+                      selection: t("选区指令菜单"),
                       capture: t("框选屏幕文字（OCR）"),
                       clipboard: t("读取剪贴板"),
                     }[key] ?? key) +
@@ -797,12 +797,12 @@ export function Settings({
                 />
               </div>
             ))}
-            <div className="shortcut-section-label">{t("直接执行动作")}</div>
+            <div className="shortcut-section-label">{t("直接执行指令")}</div>
             {draft.actions.map((action) => (
               <div className="setting-row shortcut-row" key={action.id}>
                 <div>
                   <strong>{actionLabel(action)}</strong>
-                  {!action.enabled && <p>{t("动作已停用，快捷键不生效")}</p>}
+                  {!action.enabled && <p>{t("指令已停用，快捷键不生效")}</p>}
                 </div>
                 <ShortcutRecorder
                   label={
@@ -906,7 +906,7 @@ export function Settings({
               <strong>{t("让配置跟随你，而内容留在本机。")}</strong>
               <p>
                 {t(
-                  "只同步服务定义、动作和偏好。API Key、图片、选中文字和模型文件不会上传。",
+                  "只同步服务定义、指令和偏好。API Key、图片、选中文字和模型文件不会上传。",
                 )}
               </p>
             </div>
@@ -1012,7 +1012,7 @@ export function Settings({
                 <div>
                   <h4>{t("这台设备")}</h4>
                   <p>
-                    {syncResult.local?.actions.length} {t("个动作 ·")}{" "}
+                    {syncResult.local?.actions.length} {t("个指令 ·")}{" "}
                     {syncResult.local?.providers.length} {t("个服务商")}
                   </p>
                   <pre>{JSON.stringify(syncResult.local, null, 2)}</pre>
@@ -1023,7 +1023,7 @@ export function Settings({
                     {syncResult.remoteDeleted
                       ? t("远程文件已删除")
                       : t(
-                          "{0} 个动作 · {1} 个服务商",
+                          "{0} 个指令 · {1} 个服务商",
                           syncResult.remote?.actions.length,
                           syncResult.remote?.providers.length,
                         )}
@@ -1067,7 +1067,7 @@ export function Settings({
         <>
           <section className="settings-card">
             <h3>{t("导入与导出")}</h3>
-            <p>{t("版本化 JSON 包含动作、提示词、模型配置、外观和快捷键。")}</p>
+            <p>{t("版本化 JSON 包含指令、提示词、模型配置、外观和快捷键。")}</p>
             <div className="transfer-grid">
               <div>
                 <Download size={25} />
@@ -1111,7 +1111,7 @@ export function Settings({
                 {imported.config.schemaVersion}
               </h3>
               <p>
-                {imported.config.actions.length} {t("个动作 ·")}{" "}
+                {imported.config.actions.length} {t("个指令 ·")}{" "}
                 {imported.config.providers.length} {t("个服务商")}
               </p>
               {imported.shortcuts.map((s) => (

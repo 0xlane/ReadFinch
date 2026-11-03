@@ -4,7 +4,7 @@
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 11
+      "const": 12
     },
     "tts": {
       "type": "object",
@@ -758,6 +758,6 @@
     "shortcuts"
   ],
   "additionalProperties": false,
-  "$id": "https://texthop.local/schema/config-v11.json",
+  "$id": "https://texthop.local/schema/config-v12.json",
   "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
 }

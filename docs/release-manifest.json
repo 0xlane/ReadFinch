@@ -1,28 +1,28 @@
 {
-  "date": "2026-11-02T17:07:25.062Z",
-  "version": "0.10.0",
+  "date": "2026-11-03T04:42:57.846Z",
+  "version": "0.11.0",
   "platform": "Windows x64",
   "signed": false,
   "artifacts": [
     {
-      "path": "release/TextHop 0.10.0.exe",
-      "bytes": 123823950,
-      "sha256": "9ec4443b4ac3839ad414d48b9beec6bf279184cff6a7f8c0d682a6273784a311"
+      "path": "release/TextHop 0.11.0.exe",
+      "bytes": 123823426,
+      "sha256": "795f2f8b423a543fd73d81a12e83e57be5a119b3620b00e4c24e68947566ac53"
     },
     {
-      "path": "release/TextHop Setup 0.10.0.exe",
-      "bytes": 144764941,
-      "sha256": "f66880b094e41ecd14c4ee3d139390678c7cf974b3b5fb2a78b6b536de5539db"
+      "path": "release/TextHop Setup 0.11.0.exe",
+      "bytes": 144773543,
+      "sha256": "47932a499fd623e95c152ef1c819339edebbd3d60bc7350f5a010fe95f170f32"
     },
     {
       "path": "release/win-unpacked/TextHop.exe",
       "bytes": 249799680,
-      "sha256": "9cebead7875fb46f310c04d781aaf3ac5caf85d0078d3dec0a8cfb249c88c6cc"
+      "sha256": "a63c0656d54c444cea5cde7e3c16b3e794144bb89e5200898e31ab2519599c15"
     },
     {
       "path": "release/win-unpacked/resources/app.asar",
-      "bytes": 61085082,
-      "sha256": "1eece7462d868d049af44efe97e6caf7c0e57375b4bed182342db5fc7aae3857"
+      "bytes": 61124655,
+      "sha256": "5a26af81b3b8916133e1c02d692ae6e3512563b377f7e339c6763afbdb35d25f"
     }
   ],
   "verification": "Windows packaged checks use an isolated profile and local fixtures. Installer and uninstaller UI were not exercised."

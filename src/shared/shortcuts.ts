@@ -193,7 +193,7 @@ export function shortcutBindings(
   return [
     {
       id: "selection",
-      label: t("选区动作菜单"),
+      label: t("选区指令菜单"),
       key: config.shortcuts.selection,
     },
     {

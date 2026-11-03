@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Check,
   Copy,
   GripVertical,
   Pencil,
@@ -8,7 +7,6 @@ import {
   Play,
   Plus,
   Settings2,
-  Sparkles,
   Table2,
   Trash2,
 } from "lucide-react";
@@ -29,6 +27,7 @@ import { ProviderSelect } from "./ProviderSelect";
 import { ProviderSwitch } from "./provider-ui";
 import { ActionDialog, ActionFields, TextTokens } from "./ActionFields";
 import { ActionLayoutEditor } from "./ActionLayoutEditor";
+import { ActionAIHelper } from "./ActionAIHelper";
 import "./commands.css";
 
 export function Actions({
@@ -48,11 +47,8 @@ export function Actions({
 }) {
   const [selected, setSelected] = useState("dictionary"),
     [tab, setTab] = useState<"config" | "notes">("config");
-  const [dialog, setDialog] = useState<
-      "templates" | "delete" | "assistant" | null
-    >(null),
-    [error, setError] = useState(""),
-    [copied, setCopied] = useState(false);
+  const [dialog, setDialog] = useState<"templates" | "delete" | null>(null),
+    [error, setError] = useState("");
   const consumed = useRef(0),
     nameInput = useRef<HTMLInputElement>(null),
     dragging = useRef(""),
@@ -71,7 +67,6 @@ export function Actions({
     setSelected(id);
     setTab("config");
     setError("");
-    setCopied(false);
     setDialog(null);
     requestAnimationFrame(() => {
       if (top.current && top.current.getBoundingClientRect().top < 50)
@@ -193,36 +188,16 @@ export function Actions({
           <ActionIcon icon={a.icon} size={20} />
           <span>{actionLabel(a)}</span>
         </button>
-        <ProviderSwitch
-          label={t("启用 ") + actionLabel(a)}
-          checked={a.enabled}
-          onChange={(enabled) => change(a.id, { enabled })}
-        />
+        {a.id !== "translate" && (
+          <ProviderSwitch
+            label={t("启用 ") + actionLabel(a)}
+            checked={a.enabled}
+            onChange={(enabled) => change(a.id, { enabled })}
+          />
+        )}
       </div>
     );
   }
-  const assistantPrompt =
-    current &&
-    [
-      t(
-        "请帮我配置一条 TextHop 自定义 AI 指令。先询问我的目标，再逐项给出名称、图标、系统提示词、用户提示词、输出字段和 HTML + Liquid 版式。",
-      ),
-      t(
-        "字段类型支持字符串、数字或选中的文字。变量有 {{selection}}、{{paragraphs}}、{{targetLanguage}} 和 {{sourceApp}}。版式通过 ctx.fields 或字段名读取结果。",
-      ),
-      JSON.stringify(
-        {
-          name: current.name,
-          icon: current.icon,
-          system: current.system,
-          prompt: current.prompt,
-          outputSchema: current.outputSchema,
-          layout: current.layout,
-        },
-        null,
-        2,
-      ),
-    ].join("\n\n");
   return (
     <>
       <div className="command-section-heading">
@@ -360,16 +335,7 @@ export function Actions({
                           {t("定制化")}
                         </button>
                       ) : (
-                        <button
-                          className="text-button assist"
-                          onClick={() => {
-                            setCopied(false);
-                            setDialog("assistant");
-                          }}
-                        >
-                          <Sparkles size={14} />
-                          {t("让 AI 帮我配置")}
-                        </button>
+                        <ActionAIHelper action={current} config={config} />
                       )}
                     </div>
                     <input
@@ -427,6 +393,8 @@ export function Actions({
                         action={current}
                         locked={locked}
                         update={update}
+                        customize={() => create("blank", current)}
+                        canCustomize={!full}
                       />
                     </>
                   ) : (
@@ -567,37 +535,6 @@ export function Actions({
                 }}
               >
                 {t("确认删除")}
-              </button>
-            </footer>
-          </ActionDialog>
-        )}
-        {dialog === "assistant" && (
-          <ActionDialog
-            title={t("让 AI 帮我配置")}
-            close={() => setDialog(null)}
-          >
-            <p className="hint">
-              {t(
-                "把提示词发给常用的 AI 助手，它会根据当前指令帮你填写各项配置。",
-              )}
-            </p>
-            <textarea
-              className="assistant-guide"
-              readOnly
-              value={assistantPrompt}
-            />
-            <footer>
-              <button
-                className="primary"
-                onClick={() =>
-                  void window.texthop
-                    .call("clipboardWrite", { text: assistantPrompt })
-                    .then(() => setCopied(true))
-                    .catch((e) => setError(e.message))
-                }
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}{" "}
-                {t(copied ? "已复制" : "复制提示词")}
               </button>
             </footer>
           </ActionDialog>

@@ -1,6 +1,6 @@
 {
-  "version": "0.8.0",
-  "date": "2026-11-02T12:01:09.164Z",
+  "version": "0.11.0",
+  "date": "2026-11-03T04:38:10.380Z",
   "checks": [
     "missing selection shows an explicit capture route; no implicit screenshot or model request",
     "Esc and right-click cancel the real capture overlay, restore draft and pin, and never start OCR",
@@ -8,6 +8,7 @@
     "remote OCR displays its destination and sends one image only after the recognition click",
     "OCR cancellation/new images isolate late results; text actions stay disabled while recognizing",
     "an empty real OCR result offers recapture and cannot trigger a text action",
+    "The actual selection preview is pixel-identical to the native screenshot at current DPI; taskbar sizing and click-without-drag are correct",
     "actual desktop capture matches the pointer-selected pixels at current scaling and automatically completes local OCR"
   ],
   "requests": 3,
@@ -15,6 +16,24 @@
   "screenCapture": {
     "scaleFactor": 1.25,
     "cropPixelsMatch": true,
+    "previewPixelsMatch": true,
+    "previewPixels": {
+      "source": {
+        "width": 2560,
+        "height": 1440
+      },
+      "displayed": {
+        "width": 2560,
+        "height": 1440
+      },
+      "differingChannels": 0,
+      "comparedChannels": 1203248
+    },
+    "viewport": {
+      "width": 2048,
+      "height": 1152,
+      "dpr": 1.25
+    },
     "ocrCompleted": true,
     "controlledSampleRecognized": false,
     "limitation": "The controlled sample window did not appear in the compositor capture. Foreground sample-text acceptance remains unverified; image-fixture bilingual OCR passed independently."

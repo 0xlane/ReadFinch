@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const packaged = process.argv.includes("--packaged");
-const out = "docs/screenshots/v0.9",
+const out = "docs/screenshots/v0.11",
   dir = path.resolve(".local/schema-" + Date.now());
 await mkdir(out, { recursive: true });
 await mkdir(dir, { recursive: true });
@@ -77,6 +77,11 @@ async function stored(fn) {
 }
 try {
   const snapshot = await api(main, "snapshot");
+  assert.equal(snapshot.config.providers.length, 1);
+  assert.deepEqual(
+    snapshot.config.actions.map((a) => a.id),
+    ["translate", "dictionary", "sentence", "polish"],
+  );
   Object.assign(snapshot.config.appearance, {
     language: "zh-CN",
     theme: "light",
@@ -104,6 +109,13 @@ try {
     .getByRole("button", { name: "自定义 AI 指令", exact: true })
     .click();
   await btn(main.locator(".command-rail"), "翻译").click();
+  assert.equal(
+    await main.getByRole("switch", { name: "启用 翻译" }).count(),
+    0,
+  );
+  log(
+    "Fresh settings contain one provider, four built-ins and no translation enable switch.",
+  );
   await main.getByLabel("翻译提供商", { exact: true }).waitFor();
   await main.getByLabel("目标语言", { exact: true }).waitFor();
   await main.screenshot({ path: out + "/translation-settings.png" });
@@ -113,8 +125,59 @@ try {
     "",
   );
   assert.equal(await main.locator(".schema-row").count(), 9);
-  await btn(main, "定制化").click();
+  const preview = main.locator(".layout-preview");
+  await preview.locator(".dictionary-v2 .memory-tips").waitFor();
+  assert.equal(await preview.locator(".dictionary-v2 details").count(), 0);
+  await preview.scrollIntoViewIfNeeded();
+  await main.screenshot({ path: out + "/dictionary-layout-light.png" });
+  await btn(preview, "深色预览").click();
+  await main.screenshot({ path: out + "/dictionary-layout-dark.png" });
+  await btn(preview, "320 px").click();
+  assert.equal(
+    await preview
+      .locator(".preview-card")
+      .evaluate((el) => el.scrollWidth <= el.clientWidth),
+    true,
+  );
+  await main.screenshot({ path: out + "/dictionary-layout-narrow.png" });
+  await btn(preview, "500 px").click();
+  await btn(preview, "浅色预览").click();
+  await btn(preview, "重放").click();
+  await main.waitForFunction(
+    () =>
+      document
+        .querySelector(".preview-card .schema-result")
+        ?.shadowRoot?.querySelector(".action-card")?.dataset.status === "done",
+  );
+  await btn(main, "查看源码").click();
+  await main
+    .getByRole("textbox", { name: "HTML + Liquid", exact: true })
+    .waitFor();
+  assert.equal(await main.getByRole("dialog", { name: "版式源码" }).count(), 0);
+  await btn(main, "查看源码").click();
+  log(
+    "Dictionary memory tips stay expanded; light/dark, narrow previews, streaming replay and inline source work.",
+  );
+  await btn(main, "定制化").first().click();
   await main.getByLabel("指令名称", { exact: true }).fill("词典测试副本");
+  await btn(main, "让 AI 帮我配置").click();
+  const helper = dialog("让 AI 帮我配置");
+  assert.equal(await helper.locator("textarea").count(), 0);
+  assert.ok((await helper.boundingBox()).width <= 322);
+  await btn(helper, "复制提示词").click();
+  const copiedPrompt = await app.evaluate(({ clipboard }) =>
+    clipboard.readText(),
+  );
+  assert.match(copiedPrompt, /词典测试副本/);
+  assert.match(copiedPrompt, /Output Schema/);
+  assert.match(copiedPrompt, /at most three questions/);
+  await btn(helper, "已复制").waitFor();
+  await main.screenshot({ path: out + "/ai-config-helper.png" });
+  await main.keyboard.press("Escape");
+  await helper.waitFor({ state: "hidden" });
+  log(
+    "Configure with AI is an anchored, dismissible popover and copies the current complete guide with feedback.",
+  );
   assert.equal(await main.locator(".schema-row").count(), 9);
   log(
     "The three built-ins are read-only; Customize creates an editable independent dictionary with nine fields.",

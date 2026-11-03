@@ -63,7 +63,7 @@ export function FeatureProviders({
                       : action.system
                     : isOcr
                       ? t("识别图片或扫描文档中的文字。")
-                      : t("未单独指定提供商的动作用这个模型。");
+                      : t("未单独指定提供商的指令用这个模型。");
             return (
               <div className="provider-config-row" key={purpose.id}>
                 <div>

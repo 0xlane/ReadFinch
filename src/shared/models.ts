@@ -62,7 +62,7 @@ export function modelPurposes(config: Config): ModelPurpose[] {
   return [
     {
       id: "default",
-      name: t("默认动作提供商"),
+      name: t("默认提供商"),
       providerId: config.defaults.textProfileId,
     },
     ...config.actions.map((a) => ({

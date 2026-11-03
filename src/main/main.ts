@@ -833,6 +833,13 @@ async function capture() {
     activeCapture = imageCapture(source.thumbnail);
     overlay = createWindow("capture", {
       ...display.bounds,
+      // Normal Windows bounds are constrained by the taskbar and thick frame.
+      // A native fullscreen surface keeps screen pixels aligned at fractional DPI.
+      fullscreen: process.platform !== "darwin",
+      enableLargerThanScreen: true,
+      thickFrame: false,
+      roundedCorners: false,
+      hasShadow: false,
       minWidth: 1,
       minHeight: 1,
       resizable: false,
@@ -840,10 +847,8 @@ async function capture() {
       alwaysOnTop: true,
       backgroundColor: "#000000",
     });
-    overlay.once("ready-to-show", () => {
-      overlay?.show();
-      overlay?.focus();
-    });
+    if (process.platform === "darwin")
+      overlay.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
     overlay.on("closed", () => {
       overlay = undefined;
       captureBusy = false;
@@ -1443,7 +1448,7 @@ async function handle(
       const action = cfg.actions.find(
         (a) => a.id === input.actionId && a.enabled,
       );
-      if (!action) throw Error(t("动作不存在或已停用"));
+      if (!action) throw Error(t("指令不存在或已停用"));
       const provider = cfg.providers.find(
         (p) =>
           p.id ===
@@ -1661,6 +1666,12 @@ async function handle(
       return capture();
     case "captureData":
       return activeCapture;
+    case "captureReady":
+      if (win !== overlay || !activeCapture) return;
+      // The renderer has decoded the frozen frame; avoid flashing an empty surface.
+      overlay.show();
+      overlay.focus();
+      return;
     case "crop": {
       if (win !== overlay || !activeCapture || !captureDisplay)
         throw Error(t("截图会话已结束"));
@@ -1918,7 +1929,9 @@ async function boot() {
         throw Error(t("划词工具栏无此权限"));
       if (
         win === overlay &&
-        !["snapshot", "captureData", "crop", "window"].includes(method)
+        !["snapshot", "captureData", "captureReady", "crop", "window"].includes(
+          method,
+        )
       )
         throw Error(t("截图窗口无此权限"));
       return { ok: true, value: await handle(win, method, arg) };

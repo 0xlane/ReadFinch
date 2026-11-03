@@ -1,0 +1,71 @@
+{
+  "version": "0.11.0",
+  "packaged": true,
+  "date": "2026-11-03T04:44:42.688Z",
+  "emptyTextDisablesCommands": true,
+  "fourCommandsWithoutEmptyMore": true,
+  "idleRetryHidden": true,
+  "sourceEditsAndCopyFeedback": true,
+  "clipboardReadbackVerified": false,
+  "clipboardLimitation": "The current test session returns empty text even from an independent Electron process immediately after writeText; visual copy feedback is checked, but system clipboard delivery is not verified.",
+  "moreToggleAndLongNames": true,
+  "keyboardActivatesCommand": true,
+  "lightDarkAndEnglish": true,
+  "dimensions": [
+    {
+      "page": false,
+      "buttons": false,
+      "viewport": [
+        500,
+        324
+      ],
+      "source": {
+        "x": 14.800000190734863,
+        "y": 46.79999923706055,
+        "width": 470.3999938964844,
+        "height": 68.5999984741211,
+        "top": 46.79999923706055,
+        "right": 485.19999408721924,
+        "bottom": 115.39999771118164,
+        "left": 14.800000190734863
+      }
+    },
+    {
+      "page": false,
+      "buttons": false,
+      "viewport": [
+        340,
+        622
+      ],
+      "source": {
+        "x": 14.800000190734863,
+        "y": 46.79999923706055,
+        "width": 310.3999938964844,
+        "height": 89.5999984741211,
+        "top": 46.79999923706055,
+        "right": 325.19999408721924,
+        "bottom": 136.39999771118164,
+        "left": 14.800000190734863
+      }
+    },
+    {
+      "page": false,
+      "buttons": false,
+      "viewport": [
+        340,
+        622
+      ],
+      "source": {
+        "x": 14.800000190734863,
+        "y": 46.79999923706055,
+        "width": 310.3999938964844,
+        "height": 89.5999984741211,
+        "top": 46.79999923706055,
+        "right": 325.19999408721924,
+        "bottom": 136.39999771118164,
+        "left": 14.800000190734863
+      }
+    }
+  ],
+  "rendererErrors": []
+}

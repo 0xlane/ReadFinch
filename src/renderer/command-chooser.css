@@ -1,0 +1,234 @@
+/* The idle panel is a compact command launcher; result cards keep their layout. */
+.command-launcher .rf-header {
+  height: 44px;
+  padding: 8px 14px;
+  border-bottom-color: transparent;
+}
+.command-launcher .rf-title {
+  gap: 7px;
+}
+.command-launcher .rf-title h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.command-launcher .rf-title .brand-mark {
+  width: 18px;
+  height: 18px;
+}
+.command-launcher .rf-body {
+  padding: 2px 14px 14px;
+}
+.command-launcher .rf-source {
+  padding: 8px 12px 11px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--subtle) 52%, var(--surface));
+}
+.command-source-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 22px;
+}
+.command-source-heading > div {
+  display: flex;
+  gap: 1px;
+}
+.command-source-heading .icon-button {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+}
+.command-launcher .rf-source .rf-source-text {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 21px;
+  -webkit-line-clamp: 2;
+}
+.command-launcher .rf-source-row.expanded .rf-source-text {
+  max-height: 168px;
+}
+.command-launcher .rf-source-row > .icon-button {
+  color: var(--muted);
+}
+.command-launcher .source-editor {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 0;
+  font-size: 14px;
+}
+.command-launcher .source-editor:focus {
+  border-color: transparent;
+  padding-bottom: 3px;
+}
+.command-launcher .rf-source:has(.source-editor:focus) {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+.command-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.command-choice {
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: left;
+  justify-content: flex-start;
+  background: var(--surface);
+  transition:
+    background 120ms,
+    border-color 120ms,
+    box-shadow 120ms;
+}
+.command-choice:not(:disabled):hover,
+.command-choice:focus-visible {
+  background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+  box-shadow: 0 2px 5px #00000006;
+}
+.command-choice:not(:disabled):active {
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+.command-choice-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--subtle) 70%, var(--surface));
+  border-radius: 9px;
+}
+.command-choice-copy {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+.command-choice-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+.command-choice-detail {
+  display: grid;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.command-choice-detail > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity 120ms;
+}
+.command-choice-detail kbd {
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.command-choice:not(:disabled):is(:hover, :focus-visible)
+  .command-choice-detail[data-shortcut="true"]
+  .command-choice-description {
+  opacity: 0;
+}
+.command-choice:not(:disabled):is(:hover, :focus-visible)
+  .command-choice-detail
+  kbd {
+  opacity: 1;
+}
+.command-choice-arrow {
+  margin-left: -5px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 120ms;
+}
+.command-choice:not(:disabled):is(:hover, :focus-visible)
+  .command-choice-arrow {
+  opacity: 1;
+}
+.command-choice-more {
+  display: flex;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 5px 8px;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  border-radius: 6px;
+}
+.command-choice-more:hover {
+  background: var(--subtle);
+  color: var(--text);
+}
+.command-choice-more > span {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.command-choice-more[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.command-choice-additional {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.command-launcher .rf-footer {
+  padding: 6px 14px;
+  background: color-mix(in srgb, var(--subtle) 28%, var(--surface));
+}
+.command-launcher .rf-footer .assignment-select {
+  max-width: calc(100% - 34px);
+  height: 28px;
+}
+.command-launcher .rf-footer .assignment-select select {
+  border-color: transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+}
+.command-launcher .rf-footer .assignment-select select:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.command-launcher .rf-footer .icon-button {
+  width: 26px;
+  height: 26px;
+}
+@media (max-width: 390px) {
+  .command-choice-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .command-choice {
+    min-height: 55px;
+    padding: 7px 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .command-chooser * {
+    transition: none;
+  }
+}

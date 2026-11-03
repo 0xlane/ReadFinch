@@ -61,8 +61,15 @@ try {
   await app.close();
   app = undefined;
   const { providers, languageDetection, cache, ...rest } = current;
-  const { description, enabled, preset, temperature, customModel, instruction, ...oldText } =
-    providers[0];
+  const {
+    description,
+    enabled,
+    preset,
+    temperature,
+    customModel,
+    instruction,
+    ...oldText
+  } = providers[0];
   const oldId = oldText.id;
   const legacy = {
     ...rest,
@@ -112,7 +119,7 @@ try {
   );
   await launch();
   let state = await call("snapshot");
-  assert.equal(state.config.schemaVersion, 11);
+  assert.equal(state.config.schemaVersion, 12);
   assert.equal(state.config.providers.length, 2);
   const textProvider = state.config.providers.find(
     (p) => p.model === "legacy-text-model",
@@ -179,7 +186,7 @@ try {
     legacy,
   );
   const saved = await readFile(path.join(dataDir, "config.json"), "utf8");
-  assert.equal(JSON.parse(saved).schemaVersion, 11);
+  assert.equal(JSON.parse(saved).schemaVersion, 12);
   assert.doesNotMatch(
     saved,
     /legacy-text-fixture|legacy-vision-fixture|ciphertext/,

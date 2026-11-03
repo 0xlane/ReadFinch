@@ -26,6 +26,7 @@ import {
 import type { Interaction, Snapshot, Capture } from "../shared/api";
 import type { Action } from "../shared/config";
 import { ProviderSelect } from "./ProviderSelect";
+import { CommandChooser } from "./CommandChooser";
 import { actionModel, type ModelRef } from "../shared/models";
 import { cleanupLines, ocrProfiles } from "../shared/config";
 import { ActionIcon, BrandMark, LanguageSelect, ReferenceIcon } from "./ui";
@@ -90,8 +91,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const [pinned, setPinned] = useState(false);
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [menu, setMenu] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [sourceOverflows, setSourceOverflows] = useState(false);
+  const sourceText = useRef<HTMLParagraphElement>(null);
   const [savedNote, setSavedNote] = useState("");
   const narration = useSpeechStatus();
   const [confirmBook, setConfirmBook] = useState(false),
@@ -120,13 +122,6 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const running = phase === "running";
   const cfg = snapshot.config;
   const enabled = cfg.actions.filter((action) => action.enabled);
-  const pinnedActions = enabled.filter((action) => action.pinned);
-  const toolbarActions = pinnedActions.length
-    ? pinnedActions
-    : enabled.slice(0, 3);
-  const moreActions = enabled.filter(
-    (action) => !toolbarActions.some((item) => item.id === action.id),
-  );
   const provider = cfg.providers.find(
     (item) => item.enabled && item.id === providerId,
   );
@@ -164,7 +159,6 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       setEditing(!value.text && value.source !== "selection-unavailable");
       setShowImage(true);
       setPinned(!!value.pinned);
-      setMenu(false);
       setCopied(false);
       setExpanded(false);
       noteDraft.current = null;
@@ -262,6 +256,22 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     if (selectedOcr && selectedOcr.kind !== "openai") void recognize();
   }, [session?.id]);
   useEffect(() => {
+    const element = sourceText.current;
+    if (!element) {
+      setSourceOverflows(false);
+      return;
+    }
+    const measure = () =>
+      setSourceOverflows(
+        element.scrollHeight >
+          Math.ceil(parseFloat(getComputedStyle(element).lineHeight) * 2),
+      );
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [text, editing, session?.id]);
+  useEffect(() => {
     if (!content.current) return;
     let frame = 0;
     const observer = new ResizeObserver(() => {
@@ -299,7 +309,6 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       return;
     }
     stop();
-    setMenu(false);
     setActiveAction(action);
     setResult("");
     setResultSource(text);
@@ -340,7 +349,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         !snapshot.credentialIds.includes("text:" + selected.id))
     ) {
       setPhase("error");
-      setError(t("先配置此动作使用的文字模型，即可开始处理。"));
+      setError(t("先配置此指令使用的文字模型，即可开始处理。"));
       return;
     }
     noteDraft.current = {
@@ -471,6 +480,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         !Object.values(streamingValues(result)).some(
           (v) => typeof v === "number" || (typeof v === "string" && v.trim()),
         )));
+  const choosing = !working;
   const ocrInput = !!image && !working;
   const ocrBusy = running && kind === "ocr";
   const missingSelection =
@@ -500,9 +510,13 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         : t("屏幕取词")
       : missingSelection
         ? t("选取文字")
-        : t("选择动作");
+        : t("选择指令");
   return (
-    <div className="interaction-shell rf-popover">
+    <div
+      className={
+        "interaction-shell rf-popover" + (choosing ? " command-launcher" : "")
+      }
+    >
       <header className="panel-titlebar rf-header">
         <GripHorizontal className="drag-grip" size={16} />
         <div className="rf-title">
@@ -605,6 +619,30 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           )}
           {!missingSelection && (
             <section className="rf-source">
+              {choosing && !image && (
+                <div className="command-source-heading">
+                  <span>{t("原文")}</span>
+                  <div>
+                    <button
+                      className="icon-button"
+                      aria-label={t("复制原文")}
+                      title={copied ? t("已复制") : t("复制原文")}
+                      disabled={!text}
+                      onClick={() => void copy(text)}
+                    >
+                      {copied ? <Check size={13} /> : <Copy size={13} />}
+                    </button>
+                    <button
+                      className="icon-button"
+                      aria-label={editing ? t("完成编辑") : t("编辑原文")}
+                      title={editing ? t("完成编辑") : t("编辑原文")}
+                      onClick={() => setEditing(!editing)}
+                    >
+                      {editing ? <Check size={13} /> : <Pencil size={13} />}
+                    </button>
+                  </div>
+                </div>
+              )}
               {image && (
                 <div className="ocr-source-info">
                   <div className="ocr-source-heading">
@@ -675,7 +713,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                       )}
                       {text.trim() && !ocrBusy && (
                         <p className="ocr-review-label">
-                          {t("识别文字 · 可直接校对，再选择下方动作")}
+                          {t("识别文字 · 可直接校对，再选择下方指令")}
                         </p>
                       )}
                     </>
@@ -708,21 +746,25 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                 <div
                   className={"rf-source-row " + (expanded ? "expanded" : "")}
                 >
-                  <p className="rf-source-text">{text}</p>
-                  <button
-                    className="icon-button"
-                    aria-label={expanded ? t("收起原文") : t("展开原文")}
-                    onClick={() => setExpanded(!expanded)}
-                  >
-                    {expanded ? (
-                      <ReferenceIcon name="tabler-chevron-up" />
-                    ) : (
-                      <ReferenceIcon name="tabler-chevron-down" />
-                    )}
-                  </button>
+                  <p className="rf-source-text" ref={sourceText}>
+                    {text}
+                  </p>
+                  {(!choosing || sourceOverflows || expanded) && (
+                    <button
+                      className="icon-button"
+                      aria-label={expanded ? t("收起原文") : t("展开原文")}
+                      onClick={() => setExpanded(!expanded)}
+                    >
+                      {expanded ? (
+                        <ReferenceIcon name="tabler-chevron-up" />
+                      ) : (
+                        <ReferenceIcon name="tabler-chevron-down" />
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
-              {expanded && (
+              {expanded && (!choosing || !!image) && (
                 <div className="rf-inline-tools">
                   <button
                     className="icon-button"
@@ -790,45 +832,12 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           )}
           {!working && !missingSelection && (
             <>
-              <div
-                className="action-toolbar"
-                role="toolbar"
-                aria-label={t("划词动作")}
-              >
-                {toolbarActions.map((action) => (
-                  <button
-                    key={action.id}
-                    disabled={!text.trim() || ocrBusy}
-                    onClick={() => void run(action)}
-                  >
-                    <ActionIcon icon={action.icon} size={16} />
-                    {actionLabel(action)}
-                  </button>
-                ))}
-                {moreActions.length > 0 && (
-                  <button
-                    aria-expanded={menu}
-                    aria-label={t("更多动作")}
-                    onClick={() => setMenu(!menu)}
-                  >
-                    <ReferenceIcon name="tabler-chevron-down" />
-                  </button>
-                )}
-              </div>
-              {menu && moreActions.length > 0 && (
-                <div className="action-menu">
-                  {moreActions.map((action) => (
-                    <button
-                      key={action.id}
-                      disabled={!text.trim() || ocrBusy}
-                      onClick={() => void run(action)}
-                    >
-                      <ActionIcon icon={action.icon} size={15} />
-                      {actionLabel(action)}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <CommandChooser
+                key={session?.id}
+                actions={enabled}
+                disabled={!text.trim() || ocrBusy}
+                onRun={(action) => void run(action)}
+              />
               {testAction && (
                 <button
                   className="test-action secondary"
@@ -1158,7 +1167,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         <button
           className="icon-button"
           aria-label={t("打开设置")}
-          title={working ? t("配置动作") : t("设置")}
+          title={working ? t("配置指令") : t("设置")}
           onClick={() =>
             void window.texthop.call("settingsOpen", {
               tab: ocrInput
@@ -1184,7 +1193,8 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             <Square size={14} />
           </button>
         ) : (
-          !missingSelection && (
+          !missingSelection &&
+          (ocrInput || working) && (
             <button
               className="icon-button"
               aria-label={ocrInput ? t("重新识别") : t("重新生成")}

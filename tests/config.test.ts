@@ -44,7 +44,7 @@ test("v0 migration adds font size, unknown fields remain rejected", () => {
   old.schemaVersion = 0;
   delete old.appearance.fontSize;
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 11);
+  assert.equal(next.schemaVersion, 12);
   assert.equal(next.appearance.fontSize, 15);
 });
 test("substitution is single-pass and preserves source tokens literally", () => {

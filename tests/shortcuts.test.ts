@@ -94,7 +94,7 @@ test("v1 upgrade preserves the old direct translation key, other preferences, an
   old.textProfiles[0].model = "personal-model";
   old.appearance.theme = "dark";
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 11);
+  assert.equal(next.schemaVersion, 12);
   assert.equal(
     next.actions.find((a) => a.id === "translate")!.shortcut,
     "Ctrl+Alt+F9",
@@ -159,8 +159,8 @@ test("registry preserves unchanged OS registrations, removes obsolete keys, and 
     (id) => invoked.push(id),
     "win32",
   );
-  const a = { id: "action:a", label: "动作 A", key: "Alt+T" };
-  const b = { id: "action:b", label: "动作 B", key: "Alt+D" };
+  const a = { id: "action:a", label: "指令 A", key: "Alt+T" };
+  const b = { id: "action:b", label: "指令 B", key: "Alt+D" };
   assert.deepEqual(registry.update([a, b]), []);
   registry.update([a, b]);
   assert.equal(registrations, 2);
@@ -172,7 +172,7 @@ test("registry preserves unchanged OS registrations, removes obsolete keys, and 
   assert.deepEqual(invoked, [a.id]);
   const errors = registry.update([{ ...a, key: "Alt+F1" }]);
   assert.equal(registered.size, 0);
-  assert.match(errors[0], /动作 A.*占用/);
+  assert.match(errors[0], /指令 A.*占用/);
   registry.triggerForTest(b.id);
   assert.deepEqual(invoked, [a.id]);
 });

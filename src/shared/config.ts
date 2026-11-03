@@ -7,7 +7,12 @@ import {
   SampleSchema,
   fieldNameError,
 } from "./action-output";
-import { builtinId, definition, presetLayout } from "./action-templates";
+import {
+  builtinId,
+  definition,
+  presetLayout,
+  legacyDictionaryLayout,
+} from "./action-templates";
 import {
   LocalNotebaseSchema,
   NoteConnectionSchema,
@@ -136,7 +141,7 @@ export const ActionSchema = z
   .strict();
 export const ConfigSchema = z
   .object({
-    schemaVersion: z.literal(11),
+    schemaVersion: z.literal(12),
     tts: SpeechConfigSchema,
     localNotebases: z.array(LocalNotebaseSchema).max(1000),
     noteSuggestion: z.strictObject({
@@ -272,7 +277,7 @@ export const ConfigSchema = z
     if (c.actions.some((a) => a.providerId && !enabled.has(a.providerId)))
       ctx.addIssue({
         code: "custom",
-        message: "动作引用了不存在或已停用的文字服务",
+        message: "指令引用了不存在或已停用的文字服务",
       });
     try {
       const conflict = shortcutConflict(c);
@@ -394,7 +399,7 @@ const retiredDefaults = [
 ];
 function baseConfig(): Config {
   return {
-    schemaVersion: 11,
+    schemaVersion: 12,
     tts: defaultSpeech(),
     localNotebases: [],
     noteSuggestion: { enabled: true, actionId: null, providerId: null },
@@ -548,7 +553,7 @@ export function upgradeProviders(raw: unknown) {
       },
       actions: old.actions?.map((a: Action) => {
         if (a.providerId && !textIds.has(a.providerId))
-          throw Error("动作引用了不存在的文字服务");
+          throw Error("指令引用了不存在的文字服务");
         return {
           ...a,
           providerId: a.providerId ? textIds.get(a.providerId) : null,
@@ -926,7 +931,7 @@ export function parseConfig(
         !action.layout
       )
         continue;
-      const next = presetLayout("dictionary", action.outputSchema);
+      const next = legacyDictionaryLayout(action.outputSchema);
       if (
         next &&
         next.replace(/<button data-speak="[^<]*>♪<\/button>(?=<small>)/, "") ===
@@ -947,6 +952,73 @@ export function parseConfig(
     candidate.schemaVersion === 10
   )
     candidate = { ...candidate, schemaVersion: 11, tts: defaultSpeech() };
+
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 11
+  ) {
+    const old = candidate as Record<string, any>;
+    const actions = z.array(ActionSchema).parse(old.actions);
+    // Only replace recognizable built-in markup; custom commands and saved notes are untouched.
+    const markup = (s: string) =>
+      s
+        .replace(/aria-label="[^"]*"/g, 'aria-label=""')
+        .replace(/<summary>[^<]*<\/summary>/g, "<summary></summary>");
+    for (const a of actions) {
+      if (
+        a.id === "dictionary" &&
+        !a.legacyEditable &&
+        a.outputSchema &&
+        a.layout
+      ) {
+        const previous = legacyDictionaryLayout(a.outputSchema);
+        if (previous && markup(previous) === markup(a.layout)) {
+          a.layout = presetLayout("dictionary", a.outputSchema);
+          a.sample = definition("dictionary").sample;
+        }
+      }
+      if (a.id === "translate" && !a.enabled) {
+        a.enabled = true;
+        // An old disabled translation may share a shortcut with another active command.
+        // Keep that existing binding and leave translation available in the toolbar.
+        if (
+          a.shortcut &&
+          [
+            ...Object.values(old.shortcuts ?? {}),
+            ...actions
+              .filter((other) => other.id !== a.id && other.enabled)
+              .map((other) => other.shortcut),
+          ].some(
+            (key) =>
+              typeof key === "string" &&
+              key &&
+              shortcutIdentity(key) === shortcutIdentity(a.shortcut),
+          )
+        )
+          a.shortcut = "";
+      }
+    }
+    candidate = { ...old, schemaVersion: 12, actions };
+  }
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 12 &&
+    "actions" in candidate &&
+    Array.isArray(candidate.actions)
+  ) {
+    candidate = {
+      ...candidate,
+      actions: candidate.actions.map((a) =>
+        a?.id === "translate" && a.enabled === false
+          ? { ...a, enabled: true }
+          : a,
+      ),
+    };
+  }
   const result = ConfigSchema.safeParse(candidate);
   if (!result.success)
     throw Error(

@@ -456,7 +456,7 @@ try {
   await panel.screenshot({ path: output + "/dictionary-dark.png" });
   await injectSelection("Small steps makes a meaningful difference.");
   await pill.screenshot({ path: output + "/trigger-dark.png" });
-  await pill.getByRole("button", { name: "更多动作", exact: true }).hover();
+  await pill.getByRole("button", { name: "更多指令", exact: true }).hover();
   const menu = pill.locator(".toolbar-menu");
   await menu.getByRole("button", { name: "写作改进", exact: true }).click();
   await panel.locator(".writing-annotation").first().waitFor();

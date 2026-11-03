@@ -10,6 +10,7 @@ export function CaptureOverlay() {
   const [error, setError] = useState("");
   const [hint, setHint] = useState(t("拖动框选无法选择的文字"));
   const submitting = useRef(false);
+  const imageReady = useRef(false);
   useEffect(() => {
     void window.texthop.call("captureData").then(setImage);
     void window.texthop.call("snapshot").then(({ config }) => {
@@ -38,11 +39,26 @@ export function CaptureOverlay() {
           height: Math.abs(start.y - end.y),
         }
       : null;
+  const physicalSize =
+    rect && image
+      ? {
+          width: Math.round((rect.width * image.width) / innerWidth),
+          height: Math.round((rect.height * image.height) / innerHeight),
+        }
+      : null;
   return (
     <div
       className="capture-overlay"
+      data-selecting={!!rect && rect.width > 0 && rect.height > 0}
       onPointerDown={(e) => {
-        if (submitting.current || !image || e.button !== 0) return;
+        if (
+          submitting.current ||
+          !imageReady.current ||
+          !image ||
+          e.button !== 0
+        )
+          return;
+        setError("");
         e.currentTarget.setPointerCapture(e.pointerId);
         setStart({ x: e.clientX, y: e.clientY });
         setEnd({ x: e.clientX, y: e.clientY });
@@ -77,7 +93,12 @@ export function CaptureOverlay() {
             .catch((e) => {
               setError(e.message);
               submitting.current = false;
+              setStart(null);
+              setEnd(null);
             });
+        } else {
+          setStart(null);
+          setEnd(null);
         }
       }}
       onPointerCancel={() => {
@@ -89,9 +110,26 @@ export function CaptureOverlay() {
         void window.texthop.call("window", { command: "dismiss" });
       }}
     >
-      {image && <img src={image.dataUrl} draggable={false} />}
-      <div className="capture-shade" />
-      {rect && (
+      {image && (
+        <img
+          src={image.dataUrl}
+          alt=""
+          draggable={false}
+          onLoad={() => {
+            imageReady.current = true;
+            requestAnimationFrame(
+              () => void window.texthop.call("captureReady"),
+            );
+          }}
+          onError={() =>
+            void window.texthop.call("window", { command: "dismiss" })
+          }
+        />
+      )}
+      {(!rect || rect.width === 0 || rect.height === 0) && (
+        <div className="capture-shade" />
+      )}
+      {rect && rect.width > 0 && rect.height > 0 && (
         <div
           className="crop-selection"
           style={{
@@ -99,13 +137,17 @@ export function CaptureOverlay() {
             top: rect.y,
             width: rect.width,
             height: rect.height,
-            backgroundImage: `url(${image?.dataUrl})`,
-            backgroundSize: `${innerWidth}px ${innerHeight}px`,
-            backgroundPosition: `-${rect.x}px -${rect.y}px`,
           }}
         >
-          <span>
-            {Math.round(rect.width)} × {Math.round(rect.height)}
+          <span
+            style={{
+              ...(rect.y + rect.height + 28 > innerHeight
+                ? { bottom: "auto", top: -28 }
+                : {}),
+              left: Math.max(-rect.x, Math.min(0, innerWidth - rect.x - 140)),
+            }}
+          >
+            {physicalSize?.width} × {physicalSize?.height}
           </span>
         </div>
       )}

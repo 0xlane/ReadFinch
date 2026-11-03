@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const output = "docs/screenshots/v0.8",
+const output = "docs/screenshots/v0.11",
   dataDir = path.resolve(".local/models-" + Date.now());
 await mkdir(output, { recursive: true });
 await mkdir(dataDir, { recursive: true });

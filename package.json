@@ -1,7 +1,7 @@
 {
   "name": "texthop",
   "productName": "TextHop",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "A thoughtful desktop companion for text, translation and offline OCR",
   "author": "TextHop contributors",
   "license": "GPL-3.0-only",

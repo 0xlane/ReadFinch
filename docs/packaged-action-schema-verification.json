@@ -1,6 +1,9 @@
 {
   "packaged": true,
   "checks": [
+    "Fresh settings contain one provider, four built-ins and no translation enable switch.",
+    "Dictionary memory tips stay expanded; light/dark, narrow previews, streaming replay and inline source work.",
+    "Configure with AI is an anchored, dismissible popover and copies the current complete guide with feedback.",
     "The three built-ins are read-only; Customize creates an editable independent dictionary with nine fields.",
     "Fields add, reorder and rename. Duplicate and reserved names are rejected and Liquid references follow renames.",
     "The same renderer previews sample numbers, light/dark, replay, sanitized HTML and a fallback for invalid Liquid.",
@@ -9,5 +12,5 @@
   ],
   "requests": 3,
   "rendererErrors": [],
-  "date": "2026-11-02T16:31:56.666Z"
+  "date": "2026-11-03T04:16:30.473Z"
 }

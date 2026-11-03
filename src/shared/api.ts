@@ -182,6 +182,7 @@ export type CallMap = {
   testVision: { arg: { id: string; profileId: string }; result: void };
   capture: { arg: void; result: void };
   captureData: { arg: void; result: Capture | null };
+  captureReady: { arg: void; result: void };
   crop: {
     arg: {
       x: number;

@@ -1,6 +1,18 @@
 # 交付与验证报告
 
-2026-11-03 · **TextHop 0.10.0**
+2026-11-03 · **TextHop 0.11.0**
+
+- 类型检查、80 项单元测试通过。新增覆盖精简默认配置、翻译始终启用及旧快捷键冲突处理、词典版式迁移与自定义副本保留、配置助手提示词与凭据隔离。
+- 实际 Electron 窗口验证词典深浅色、320/500 预览、流式重放、内联源码、AI 配置小浮层及复制当前编辑值。指令字段、笔记映射、流式请求、保存和删除后查看笔记仍通过。[指令检查](action-schema-verification.json)
+- 提供商设置回归及四项旧配置升级检查通过，覆盖一个提供商一个模型、复制凭据、功能分配、界面语言及端点请求参数。[设置检查](settings-verification.json) · [升级检查](upgrade-verification.json)
+
+- Windows 打包程序通过标准检查和 8 项指令编辑流程，覆盖新增预览、小浮层和既有笔记保存。[打包检查](packaged-smoke.json) · [打包指令检查](packaged-action-schema-verification.json)
+- OCR 输入路径通过 8 项检查。在 2560×1440、125% 缩放下，预览保持设备像素 1:1；选区内比较 1,203,248 个颜色通道，差异为 0，裁剪结果也与原图一致。固定 PNG 的中英文和数字由内置 OCR 实际识别；本轮前台控制样例未进入合成器截图，未将其计为文字识别验收。[OCR 输入检查](input-flow-verification.json)
+
+- 指令选择窗口重做为双列卡片，窄窗口改成单列；检查了中英文、深浅色、长名称、编辑原文、复制反馈、更多指令及键盘进入结果页，没有横向溢出或渲染错误。当前测试会话中，独立 Electron 进程写入后读取系统剪贴板也返回空值，因此本轮仅确认复制反馈，未将系统剪贴板写入列为通过。[窗口检查](command-chooser-verification.json) · [浅色](screenshots/v0.11/command-chooser-light.png) · [深色](screenshots/v0.11/command-chooser-dark.png)
+- 打包版本在同一台 125% 缩放的屏幕上再次验证完整屏幕尺寸和截图像素一致，覆盖单击复位、拖动时隐藏提示以及 Esc 取消。[打包截图检查](packaged-capture-clarity-verification.json)
+
+## 0.10.0
 
 - 类型检查、76 项单元测试、16 项桌面流程和 4 项旧配置升级检查通过。语音覆盖旧配置升级、按语言和地区选音色、长文本分段、音频响应校验、错误状态和请求大小上限。[核心测试](core-tests.txt) · [桌面回归](context-smoke.json)
 - Windows 上发现 6 个本机声音。实际设置窗口分别调用英文 David 和中文 Huihui，系统报告了开始和结束。在线部分使用本机兼容端点返回可解码的音频，验证自定义音色、语速与音高、音量、自动保存、停止请求和跨窗口切换。划词工具栏和译文卡片均使用保存的设置。[语音验收](speech-verification.json) · [打包版语音验收](packaged-speech-verification.json) · [浅色截图](screenshots/v0.10/tts-light.png) · [深色截图](screenshots/v0.10/tts-dark.png)
@@ -54,14 +66,14 @@
 
 ## 交付产物
 
-当前 Windows x64 安装程序 `release/TextHop Setup 0.10.0.exe` 与便携程序 `release/TextHop 0.10.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
+当前 Windows x64 安装程序 `release/TextHop Setup 0.11.0.exe` 与便携程序 `release/TextHop 0.11.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
 
 ## 未完成验收
 
 1. **真实 Windows 前台选区**。0.8.1 的 UIA helper 已连接。专用编辑器已选中 33 个字符，等待 60 秒期间前台仍属于其他窗口。Computer Use 激活测试窗口返回 `failed to activate captured window`。第三方应用中的自动划词和原位替换仍需在可交互桌面运行 `npm run test:native` 或使用 [人工清单](PLATFORMS.md)。
 2. **安装版 Read Frog 全流程比对**：受保护扩展页面无法读取；本次对照公开源码和官方截图。私有布局引擎未复用，未作像素完全一致的验收结论。
 3. **用户 WebDAV** 的同步及冲突处理已使用受控 HTTP 服务验证，用户自己的 NAS 尚待连接验收。
-4. **macOS、X11、KDE Wayland、多显示器/混合 DPI、其他系统语音引擎**：有实现或明确回退，仍需目标环境交互验证。CI 配置已写入，但本仓库未提交或触发远程 CI。
+4. **macOS、X11、KDE Wayland、多显示器/混合 DPI、其他系统语音引擎**：有实现或明确回退，仍需目标环境交互验证。0.10.0 已通过 Windows、macOS、Linux 的远程构建与核心测试；目标平台的交互体验仍需单独验证。
 5. **正式分发**：签名/公证、安装与卸载、上述 live 集成流程仍未完成。
 
 ## 画面

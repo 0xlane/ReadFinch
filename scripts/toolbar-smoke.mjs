@@ -87,7 +87,7 @@ try {
   );
   pill = app.windows().find((w) => w.url().includes("mode=pill"));
   pill.setDefaultTimeout(7000);
-  await button(pill, "更多动作").waitFor();
+  await button(pill, "更多指令").waitFor();
   await shot("toolbar-light");
   const frame = () =>
     app.evaluate(({ BrowserWindow }) =>
@@ -106,7 +106,7 @@ try {
             window.menuShows++;
     }).observe(document.body, { childList: true, subtree: true });
   });
-  await button(pill, "更多动作").hover();
+  await button(pill, "更多指令").hover();
   await pill.locator(".toolbar-menu").waitFor();
   await pill.locator(".toolbar-row").first().hover();
   await pill.waitForTimeout(350);
@@ -194,12 +194,15 @@ try {
   );
   await select();
   await shot("toolbar-dark");
-  await button(pill, "更多动作").click();
+  await button(pill, "更多指令").click();
   await button(pill, "添加自定义 AI 指令").click();
   await main
     .getByRole("heading", { name: "自定义 AI 指令", exact: true })
     .waitFor();
-  await main.getByRole("dialog",{name:"添加指令"}).getByRole("button",{name:"空白",exact:true}).click();
+  await main
+    .getByRole("dialog", { name: "添加指令" })
+    .getByRole("button", { name: "空白", exact: true })
+    .click();
   await until(
     async () => (await state()).config.actions.some((a) => a.name === "新指令"),
     "toolbar creates inline command",

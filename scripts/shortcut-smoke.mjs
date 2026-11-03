@@ -20,9 +20,14 @@ const server = createServer(async (req, res) => {
   const input = JSON.parse(raw || "{}");
   requests.push(input);
   const prompt = String(input.messages?.[0]?.content || "");
-  const result = input.response_format?.json_schema?.schema?.required?.includes("释义")
+  const result = input.response_format?.json_schema?.schema?.required?.includes(
+    "释义",
+  )
     ? JSON.stringify({
-        词条:"keyboard", 句中词形:null, 难度:null, 记忆技巧:null,
+        词条: "keyboard",
+        句中词形: null,
+        难度: null,
+        记忆技巧: null,
         释义: "键盘。测试响应。",
         音标: "/ˈkiːbɔːrd/",
         词性: "noun",
@@ -31,7 +36,8 @@ const server = createServer(async (req, res) => {
       })
     : prompt.includes("grammar")
       ? JSON.stringify({
-          场合:null,标注:null,
+          场合: null,
+          标注: null,
           改后: "Corrected text from the OCR window.",
           总评: "本机测试响应。",
         })
@@ -321,25 +327,25 @@ try {
     .getByRole("button", { name: "自定义 AI 指令", exact: true })
     .click();
   await main.getByRole("button", { name: "复制", exact: true }).click();
-  await main.getByLabel("指令名称", { exact: true }).fill("快捷键自定义动作");
+  await main.getByLabel("指令名称", { exact: true }).fill("快捷键自定义指令");
   await call(main, "settingsOpen", { tab: "shortcuts" });
   assert.equal(
     await main
-      .getByLabel("快捷键自定义动作快捷键", { exact: true })
+      .getByLabel("快捷键自定义指令快捷键", { exact: true })
       .inputValue(),
     "",
   );
-  await record("快捷键自定义动作快捷键", "Control+Alt+F10");
+  await record("快捷键自定义指令快捷键", "Control+Alt+F10");
   await waitFor(
     async () =>
       (await call(main, "snapshot")).config.actions.some(
         (a) =>
-          a.name === "快捷键自定义动作" && a.shortcut === "Control+Alt+F10",
+          a.name === "快捷键自定义指令" && a.shortcut === "Control+Alt+F10",
       ),
     "custom shortcut saved",
   );
   const custom = (await call(main, "snapshot")).config.actions.find(
-    (action) => action.name === "快捷键自定义动作",
+    (action) => action.name === "快捷键自定义指令",
   );
   assert.ok(custom);
   assert.equal(custom.shortcut, "Control+Alt+F10");

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 11,
+  "schemaVersion": 12,
   "tts": {
     "onlineProviderId": null,
     "customVoices": [],
@@ -128,20 +128,20 @@
           "source": "model"
         }
       ],
-      "layout": "<article class=\"dictionary\">\n  <header><h2>{{ [\"词条\"] }}</h2><button data-speak=\"{{ [\"词条\"] }}\" aria-label=\"朗读\">♪</button>{% if [\"难度\"] != nil and [\"难度\"] != \"\" %}<em>{{ [\"难度\"] }}</em>{% endif %}</header>\n  <small>{{ [\"音标\"] }}　{{ [\"词性\"] }}</small>\n  <p class=\"definition\">{{ [\"释义\"] }}</p>\n  {% if [\"句子\"] != nil and [\"句子\"] != \"\" %}<blockquote><span data-marks=\"{{ [\"句中词形\"] }}\">{{ [\"句子\"] }}</span><button data-speak=\"{{ [\"句子\"] }}\" aria-label=\"朗读例句\">♪</button><small>{{ [\"句子翻译\"] }}</small></blockquote>{% endif %}\n  {% if [\"记忆技巧\"] != nil and [\"记忆技巧\"] != \"\" %}<details><summary>记忆技巧</summary><p>{{ [\"记忆技巧\"] }}</p></details>{% endif %}\n</article>",
+      "layout": "<article class=\"dictionary dictionary-v2\">\n  <header class=\"dictionary-heading\"><div class=\"dictionary-word\"><h2>{{ [\"词条\"] }}</h2><button class=\"card-speak\" data-speak=\"{{ [\"词条\"] }}\" aria-label=\"朗读\"></button>{% if [\"难度\"] != nil and [\"难度\"] != \"\" %}<em>{{ [\"难度\"] }}</em>{% endif %}</div><div class=\"dictionary-pronunciation\"><span>{{ [\"音标\"] }}</span> <i>{{ [\"词性\"] }}</i></div></header>\n  {% if [\"释义\"] != nil and [\"释义\"] != \"\" %}<p class=\"definition\">{{ [\"释义\"] }}</p>{% endif %}\n  {% if [\"句子\"] != nil and [\"句子\"] != \"\" %}<blockquote><span data-marks=\"{{ [\"句中词形\"] }}\">{{ [\"句子\"] }}</span><button class=\"card-speak\" data-speak=\"{{ [\"句子\"] }}\" aria-label=\"朗读例句\"></button>{% if [\"句子翻译\"] != nil and [\"句子翻译\"] != \"\" %}<small>{{ [\"句子翻译\"] }}</small>{% endif %}</blockquote>{% endif %}\n  {% if [\"记忆技巧\"] != nil and [\"记忆技巧\"] != \"\" %}<aside class=\"memory-tips\"><span class=\"memory-icon\"></span><p>{{ [\"记忆技巧\"] }}</p></aside>{% endif %}\n</article>",
       "sample": {
-        "selection": "serendipity",
+        "selection": "blossom",
         "targetLanguage": "简体中文",
         "values": {
-          "dictionary-term": "serendipity",
-          "dictionary-phonetic": "/ˌser.ənˈdɪp.ə.ti/",
+          "dictionary-term": "blossom",
+          "dictionary-phonetic": "/ˈblɒs.əm/",
           "dictionary-part-of-speech": "noun",
-          "dictionary-definition": "意外发现美好事物的机缘。",
-          "dictionary-context": "Finding that book was pure serendipity.",
-          "dictionary-context-term": "[{\"text\":\"serendipity\"}]",
-          "dictionary-context-translation": "找到那本书纯属机缘巧合。",
-          "dictionary-memory-tips": "常用搭配 · pure serendipity 表示纯属机缘巧合。",
-          "dictionary-difficulty": "C1"
+          "dictionary-definition": "花；花朵（尤指果树的花）",
+          "dictionary-context": "The ephemeral beauty of cherry blossoms reminds us to cherish each moment.",
+          "dictionary-context-term": "[{\"text\":\"blossoms\"}]",
+          "dictionary-context-translation": "樱花短暂的美丽提醒我们珍惜每一刻。",
+          "dictionary-memory-tips": "词源：和 bloom（开花）同源，bl- 开头的 bloom、blossom 都和开花有关。\n近义词：bloom 多指花开的状态，blossom 常指果树（樱桃、苹果）的花。",
+          "dictionary-difficulty": "B2"
         }
       }
     },

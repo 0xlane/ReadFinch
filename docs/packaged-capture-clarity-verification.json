@@ -1,0 +1,41 @@
+{
+  "version": "0.11.0",
+  "packaged": true,
+  "date": "2026-11-03T04:28:23.588Z",
+  "viewport": {
+    "width": 2048,
+    "height": 1152,
+    "dpr": 1.25
+  },
+  "bounds": {
+    "content": {
+      "x": 0,
+      "y": 0,
+      "width": 2048,
+      "height": 1152
+    },
+    "display": {
+      "x": 0,
+      "y": 0,
+      "width": 2048,
+      "height": 1152
+    }
+  },
+  "pixels": {
+    "source": {
+      "width": 2560,
+      "height": 1440
+    },
+    "preview": {
+      "width": 2560,
+      "height": 1440
+    },
+    "comparedChannels": 1062600,
+    "differingChannels": 0
+  },
+  "clickWithoutDragResets": true,
+  "hintHiddenDuringDrag": true,
+  "escapeCancels": true,
+  "rendererErrors": [],
+  "scope": "Actual Electron screen capture on the current display; no synthetic screenshot or development hooks. Other DPI settings and monitors require separate runs."
+}

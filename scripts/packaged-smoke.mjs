@@ -63,7 +63,7 @@ try {
       });
     });
   const state = await page.evaluate(() => window.texthop.call("snapshot"));
-  assert.equal(state.config.schemaVersion, 11);
+  assert.equal(state.config.schemaVersion, 12);
   assert.equal(state.config.noteSuggestion.enabled, true);
   assert.deepEqual(state.shortcutErrors, []);
   assert.equal(

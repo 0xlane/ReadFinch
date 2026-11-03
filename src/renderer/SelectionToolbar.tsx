@@ -177,8 +177,8 @@ export function SelectionToolbar({ config }: { config: Config }) {
         </div>
         <button
           className="toolbar-more"
-          aria-label={t("更多动作")}
-          title={t("更多动作")}
+          aria-label={t("更多指令")}
+          title={t("更多指令")}
           aria-expanded={view.mode === "more"}
           onMouseEnter={enterMore}
           onMouseLeave={clear}
@@ -220,7 +220,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
         <div
           className="toolbar-menu"
           role="group"
-          aria-label={t("更多动作")}
+          aria-label={t("更多指令")}
           style={position(view.popup)}
           data-above={view.popup.y < view.bar.y}
           onMouseEnter={clear}

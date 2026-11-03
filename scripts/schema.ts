@@ -7,7 +7,7 @@ await writeFile(
   JSON.stringify(
     {
       ...schema,
-      $id: "https://texthop.local/schema/config-v11.json",
+      $id: "https://texthop.local/schema/config-v12.json",
       $comment:
         "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts.",
     },
