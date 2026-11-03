@@ -1,6 +1,7 @@
-import { isTranslationOnly } from "../shared/provider-presets";
+import { isTranslationOnly, requiresApiKey } from "../shared/provider-presets";
+import { modelKind } from "../shared/model-capabilities";
 import { APP_NAME, APP_ID } from "../shared/brand";
-import { OnlineVoiceIdSchema } from "../shared/tts";
+import { OnlineVoiceIdSchema, onlineVoices } from "../shared/tts";
 import {
   app,
   BrowserWindow,
@@ -1526,6 +1527,10 @@ async function handle(
           (input.providerId ?? action.providerId ?? cfg.defaults.textProfileId),
       );
       if (!provider) throw Error(t("文字服务不存在"));
+      if (modelKind(provider) === "speech")
+        throw Error(
+          t("语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。"),
+        );
       if (isTranslationOnly(provider) && action.id !== "translate")
         throw Error(t("纯翻译提供商只能用于翻译"));
       if (!provider.enabled)
@@ -1568,7 +1573,7 @@ async function handle(
           win === panel &&
           action.id === "translate" &&
           (provider.model.trim() || isTranslationOnly(provider)) &&
-          (!provider.requiresKey ||
+          (!requiresApiKey(provider) ||
             key ||
             new Headers(headers).has("Authorization"))
         )
@@ -1634,7 +1639,15 @@ async function handle(
         send(speechOwner.win, "speechStop", speechOwner.id);
       }
       speechOwner = { win, id, controller: new AbortController() };
-      return store.config.tts;
+      return {
+        ...store.config.tts,
+        onlineVoices: onlineVoices(
+          store.config.tts,
+          store.config.providers.find(
+            (p) => p.id === store.config.tts.onlineProviderId,
+          ),
+        ),
+      };
     }
     case "speechAudio": {
       const input = z
@@ -1711,16 +1724,20 @@ async function handle(
       if (!p) throw Error(t("服务不存在"));
       if (!p.enabled) throw Error(t("此 API 提供商已停用"));
       const { key, headers } = await credentials(p);
-      if (
-        store.config.tts.onlineProviderId === p.id ||
-        /^(tts-1(?:-hd)?|gpt-4o-mini-tts)$/.test(p.model)
-      ) {
+      if (modelKind(p) === "speech") {
         const settings = store.config.tts;
+        const choices = onlineVoices(
+          { ...settings, onlineProviderId: p.id },
+          p,
+        );
         const voice =
-          [settings.defaultVoice, ...Object.values(settings.languageVoices)]
-            .find((id) => id.startsWith("api:"))
+          (settings.onlineProviderId === p.id
+            ? [settings.defaultVoice, ...Object.values(settings.languageVoices)]
+            : []
+          )
+            .find((id) => choices.some((v) => v.id === id))
             ?.slice(4) ||
-          settings.customVoices[0] ||
+          choices[0]?.id.slice(4) ||
           "alloy";
         await synthesizeSpeech(
           { ...p, headers },
@@ -1911,7 +1928,7 @@ async function handle(
         shortcuts: shortcutPreview(config, process.platform),
         missing: [
           ...config.providers
-            .filter((p) => p.requiresKey)
+            .filter(requiresApiKey)
             .map((p) => p.name + t("：需要在本机配置 API Key")),
           t("API Key 和 WebDAV 凭据不随配置迁移；离线 OCR 已内置"),
         ],

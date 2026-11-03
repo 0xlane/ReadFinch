@@ -53,11 +53,18 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - uses: actions/cache@v4
+        with:
+          path: assets/ocr/*.traineddata
+          key: ${{ runner.os }}-ocr-${{ hashFiles('assets/ocr/manifest.json') }}
       - run: npm run assets:ocr
       - run: npm run build
       - run: npm run test:ocr
       - name: Build platform packages
         run: npx electron-builder ${{ matrix.command }} --publish never
+      - name: Run the Windows packaged application and bundled OCR
+        if: matrix.platform == 'windows'
+        run: node scripts/packaged-smoke.mjs release/win-unpacked/ReadFinch.exe --isolated-shortcuts
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.platform }}-${{ matrix.arch }}

@@ -15,6 +15,10 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - uses: actions/cache@v4
+        with:
+          path: assets/ocr/*.traineddata
+          key: ${{ runner.os }}-ocr-${{ hashFiles('assets/ocr/manifest.json') }}
       - run: npm run assets:ocr
       - run: npm run build
       - run: npm run test:ocr

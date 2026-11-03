@@ -1,6 +1,6 @@
 import { t } from "../shared/i18n";
 import type { TextProfile } from "../shared/config";
-import { providerProtocol } from "../shared/provider-presets";
+import { providerProtocol, requiresApiKey } from "../shared/provider-presets";
 export type TranslationInput = {
   text: string;
   sourceLanguage: string;
@@ -131,7 +131,7 @@ export function providerAuth(
   for (const [name, value] of Object.entries(profile.headers ?? {}))
     headers.set(name, value);
   if (
-    profile.requiresKey &&
+    requiresApiKey(profile) &&
     !key &&
     !["Authorization", "x-api-key", "api-key", "x-goog-api-key"].some((name) =>
       headers.has(name),

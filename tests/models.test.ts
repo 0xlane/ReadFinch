@@ -16,15 +16,31 @@ import {
   assignProvider,
   modelOptions,
   supportsImages,
+  providerCanServe,
+  updateProviderModel,
 } from "../src/shared/models";
+import { modelKind, speechProtocol } from "../src/shared/model-capabilities";
 
-test("built-in catalogs work without fetching, merge discovery and saved custom IDs without duplicates", () => {
+test("built-in catalogs are a fallback; a fetched catalog replaces all candidates, including when empty", () => {
   const config = defaultConfig(),
     p = config.providers[0];
   p.model = "private/model";
-  const options = modelOptions(config, p.id, ["gpt-4.1-mini", "remote/model"]);
+  const fallback = modelOptions(config, p.id);
+  assert.equal(fallback.find((m) => m.id === "private/model")?.source, "saved");
+  assert.ok(fallback.some((m) => m.source === "builtin"));
+  const options = modelOptions(config, p.id, [
+    "gpt-4.1-mini",
+    "remote/model",
+    "gpt-4.1-mini",
+  ]);
+  assert.deepEqual(
+    options.map((m) => m.id),
+    ["gpt-4.1-mini", "remote/model"],
+  );
   assert.equal(options.filter((m) => m.id === "gpt-4.1-mini").length, 1);
-  assert.equal(options.find((m) => m.id === "private/model")?.source, "saved");
+  assert.ok(options.every((m) => m.source === "remote"));
+  assert.equal(options.find((m) => m.id === "gpt-4.1-mini")?.vision, true);
+  assert.deepEqual(modelOptions(config, p.id, []), []);
   assert.equal(options.find((m) => m.id === "remote/model")?.vision, undefined);
   assert.equal(
     BUILTIN_MODELS.deepseek.find((m) => m.id === "deepseek-v4-pro")?.vision,
@@ -123,22 +139,27 @@ test("new provider defaults match Read Frog while custom endpoints remain user-d
   assert.equal(createProvider("custom", "private").customModel, true);
 });
 
-test("custom input preserves the chosen builtin across autosave and restart", async () => {
+test("list selections stay non-custom and survive manual input, autosave and restart", async () => {
   const { chooseProviderModel, toggleCustomModel } =
     await import("../src/shared/provider-model");
-  const c = defaultConfig();
-  let p = chooseProviderModel(c.providers[0], "gpt-4.1-mini", false);
-  p = toggleCustomModel(p, true);
-  p = chooseProviderModel(p, "private/deployed-model", true);
-  c.providers[0] = p;
-  const reopened = parseConfig(JSON.stringify(c)).providers[0];
-  assert.equal(reopened.model, "private/deployed-model");
-  assert.equal(reopened.builtinModel, "gpt-4.1-mini");
-  assert.equal(toggleCustomModel(reopened, false).model, "gpt-4.1-mini");
-  assert.equal(
-    chooseProviderModel(p, "remote/unlisted", false).customModel,
-    true,
-  );
+  for (const selected of ["gpt-4.1-mini", "remote/unlisted"]) {
+    const c = defaultConfig();
+    let p = chooseProviderModel(c.providers[0], selected, false);
+    assert.equal(p.customModel, false);
+    p = toggleCustomModel(p, true);
+    p = chooseProviderModel(p, "private/deployed-model", true);
+    c.providers[0] = p;
+    const reopened = parseConfig(JSON.stringify(c)).providers[0];
+    assert.equal(reopened.model, "private/deployed-model");
+    assert.equal(reopened.builtinModel, selected);
+    const restored = toggleCustomModel(reopened, false);
+    assert.equal(restored.model, selected);
+    assert.equal(restored.customModel, false);
+    c.providers[0] = chooseProviderModel(reopened, "another/discovered", false);
+    const saved = parseConfig(JSON.stringify(c)).providers[0];
+    assert.equal(saved.model, "another/discovered");
+    assert.equal(saved.customModel, false);
+  }
 });
 
 test("v12 refresh fills only unconfigured presets and retains chosen, retired and private IDs", () => {
@@ -167,4 +188,72 @@ test("v12 refresh fills only unconfigured presets and retains chosen, retired an
   assert.equal(c.providers[2].customModel, true);
   assert.equal(c.providers[3].model, "my/model");
   assert.deepEqual(parseConfig(JSON.stringify(c)), c);
+});
+
+test("model capabilities separate text, images and speech, including discovered models and custom deployments", () => {
+  const c = defaultConfig(),
+    p = c.providers[0];
+  assert.equal(providerCanServe(p, "tts"), false);
+  const ids = [
+    "gpt-4.1-mini",
+    "gpt-4o-mini-tts-2025-12-15",
+    "mimo-v2.5-tts",
+    "private/deployment",
+  ];
+  const entries = modelOptions(c, p.id, ids);
+  assert.deepEqual(
+    entries.map((m) => m.kind),
+    ["vision", "speech", "speech", undefined],
+  );
+  for (const id of ids.slice(1, 3)) {
+    const speech = { ...p, model: id };
+    assert.equal(providerCanServe(speech, "tts"), true);
+    assert.equal(providerCanServe(speech, "default"), false);
+    assert.equal(providerCanServe(speech, "action:translate"), false);
+    assert.equal(supportsImages(speech), false);
+  }
+  const alias = {
+    ...p,
+    model: "my-voice",
+    modelKind: "speech" as const,
+    speechProtocol: "mimo" as const,
+  };
+  assert.equal(modelKind(alias), "speech");
+  assert.equal(speechProtocol(alias), "mimo");
+  assert.equal(providerCanServe(alias, "tts"), true);
+  assert.equal(
+    speechProtocol({ ...alias, speechProtocol: "openai" }),
+    "openai",
+  );
+  assert.equal(createProvider("mimo", "mimo").model, "mimo-v2.6-flash");
+});
+
+test("changing a provider to speech removes incompatible bindings and keeps unrelated providers and secrets scoped", () => {
+  let c = defaultConfig();
+  const primary = c.providers[0];
+  c.providers.push(createProvider("openai", "fallback"));
+  c = assignProvider(c, "ocr", primary.id);
+  c = assignProvider(c, "action:dictionary", primary.id);
+  c = assignProvider(c, "languageDetection", primary.id);
+  c = updateProviderModel(c, { ...primary, model: "mimo-v2.5-tts" });
+  assert.equal(c.defaults.textProfileId, "fallback");
+  assert.equal(c.defaults.ocrProfileId, "ocr-offline");
+  assert.equal(c.actions.find((a) => a.id === "dictionary")?.providerId, null);
+  assert.equal(c.languageDetection.mode, "basic");
+  c = assignProvider(c, "tts", primary.id);
+  assert.equal(c.tts.onlineProviderId, primary.id);
+  assert.deepEqual(parseConfig(JSON.stringify(c)), c);
+  c = updateProviderModel(c, primary);
+  assert.equal(c.tts.onlineProviderId, null);
+});
+
+test("discovered IDs from a custom compatible provider also remain list selections", async () => {
+  const { chooseProviderModel, toggleCustomModel } =
+    await import("../src/shared/provider-model");
+  let p = createProvider("custom", "alias");
+  p = chooseProviderModel(p, "deployed-id", false);
+  assert.equal(p.customModel, false);
+  p = chooseProviderModel(p, "manual-id", true);
+  assert.equal(p.customModel, true);
+  assert.equal(toggleCustomModel(p, false).model, "deployed-id");
 });

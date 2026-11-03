@@ -1,5 +1,8 @@
+import { modelKind, type ModelCapabilities } from "./model-capabilities";
+
 export const PROVIDER_IDS = [
   "openai",
+  "mimo",
   "deepseek",
   "gemini",
   "anthropic",
@@ -59,6 +62,15 @@ export type ProviderDefinition = {
   requiresKey: boolean;
 };
 const definitions: Record<ProviderPreset, Omit<ProviderDefinition, "id">> = {
+  mimo: {
+    name: "Xiaomi MiMo",
+    endpoint: "https://api.xiaomimimo.com/v1",
+    protocol: "chat",
+    group: "llm",
+    description: "小米 MiMo 文本、视觉与语音模型",
+    hint: "填写小米 MiMo API Key。文本与语音模型使用不同的请求格式，应用会自动适配。",
+    requiresKey: true,
+  },
   openai: {
     name: "OpenAI",
     endpoint: "https://api.openai.com/v1",
@@ -382,8 +394,26 @@ export function providerProtocol(provider: {
     return "chat";
   return providerPreset(provider.preset).protocol;
 }
-export function supportsSpeech(provider: { preset: string; endpoint: string }) {
-  return providerProtocol(provider) === "chat" || provider.preset === "azure";
+export function supportsSpeech(
+  provider: ModelCapabilities & { endpoint: string },
+) {
+  return modelKind(provider) === "speech" && supportsSpeechConnection(provider);
+}
+export function supportsSpeechConnection(provider: {
+  preset: string;
+  endpoint: string;
+  speechProtocol?: string;
+}) {
+  return (
+    provider.speechProtocol !== undefined ||
+    ["chat", "azure", "responses"].includes(providerProtocol(provider))
+  );
+}
+export function requiresApiKey(provider: {
+  preset: string;
+  requiresKey: boolean;
+}) {
+  return provider.requiresKey && !isCustomProvider(provider.preset);
 }
 export function canDiscoverModels(provider: { preset: string }) {
   return (

@@ -1,10 +1,10 @@
 # API 提供商与功能分配
 
-伴读雀提供 **33 种连接选项**：20 种 LLM 提供商、9 种兼容 API 提供商，以及 4 种纯翻译服务。安装后只创建一个 OpenAI 示例，按需添加账户。每个 AI 提供商条目使用一个模型；同一账户需要多个模型时可点击「复制」。
+伴读雀提供 **34 种连接选项**：21 种 LLM 提供商、9 种兼容 API 提供商，以及 4 种纯翻译服务。安装后只创建一个 OpenAI 示例，按需添加账户。每个 AI 提供商条目使用一个模型；同一账户需要多个模型时可点击「复制」。
 
 ## 提供商范围
 
-- **LLM**：OpenAI、DeepSeek、Gemini、Anthropic、Grok、Azure、Amazon Bedrock、Groq、DeepInfra、Mistral AI、Together.ai、Cohere、Fireworks AI、Cerebras、Replicate、Perplexity、Ollama、阿里云百炼、Moonshot AI、Hugging Face。
+- **LLM**：OpenAI、Xiaomi MiMo、DeepSeek、Gemini、Anthropic、Grok、Azure、Amazon Bedrock、Groq、DeepInfra、Mistral AI、Together.ai、Cohere、Fireworks AI、Cerebras、Replicate、Perplexity、Ollama、阿里云百炼、Moonshot AI、Hugging Face。
 - **兼容 API**：自定义 Chat Complete、自定义 Responses、Jalapeno Cloud、Atlas Cloud、OpenRouter、MiniMax、硅基流动、Tensdaq、Volcengine。
 - **纯翻译**：DeepL、DeepLX、Google 翻译、Microsoft 翻译。它们无需模型 ID，只能分配给翻译；不显示温度、推理强度和流式输出选项。
 
@@ -71,6 +71,26 @@
 
 模型发现支持对应服务的列表格式与分页。Azure、Bedrock、Perplexity 使用内置列表或手动输入。发现失败或返回空列表不会清空所选模型；缓存按提供商、协议、地址、原生设置和代理隔离。
 
+获取成功后，候选只包含该提供商返回的模型，不再混入内置列表；返回空列表时也不会回填预设。选择列表项保持普通选择模式，只有手动输入或勾选才进入自定义模式。切回普通模式会恢复上次的列表选择。
+
+提供商列表和模型候选使用轻量标签区分「文本」「文本与图片」「语音合成」。未知部署标记为「能力待确认」，可以手动指定能力；图片指图片理解，包括 OCR。语音模型只出现在在线朗读的提供商选择中，不用于翻译、词典或 OCR。
+
+## 语音接口
+
+| 接口 | 请求与响应 | 音色 |
+| --- | --- | --- |
+| OpenAI Audio Speech | `/audio/speech`，发送 `input`、`voice`、`speed`，接收音频文件 | 按模型提供内置音色，也可添加自定义 ID |
+| Xiaomi MiMo | `/chat/completions`，原文放入 `assistant` 消息，通过 `audio` 指定音色与 WAV 格式，解码返回的 Base64 音频 | MiMo-V2.5-TTS 的中文、英文预置音色；MiMo-V2-TTS 的旧版音色 |
+| Azure OpenAI | 通过 Azure 部署对应的语音接口 | 部署支持的音色 |
+
+已知模型自动匹配语音接口；使用重命名模型或兼容网关时，可手动指定模型能力和接口协议。语音模型的连接测试会实际合成短音频。语音也使用提供商独立的代理、请求头和凭据，支持取消与音频大小限制。
+
+「朗读风格」用于支持指令的语音模型。MiMo 的语速通过模型的风格指令控制；OpenAI 使用数值语速。音高与音量在播放时调整。MiMo Voice Design 需要填写音色描述；需要参考录音的 Voice Clone 尚未接入。语音播放按段获取音频，当前不逐帧播放音频流。
+
+协议依据：[OpenAI Text to Speech](https://developers.openai.com/api/docs/guides/text-to-speech)、[MiMo 语音合成](https://mimo.mi.com/docs/en-US/quick-start/usage-guide/audio/speech-synthesis-v2.5)。MiMo 的预置文本模型参考[官方模型目录](https://mimo.mi.com/docs/en-US/quick-start/summary/model)，默认 `mimo-v2.6-flash`。
+
+密钥始终在连接区域填写；自定义兼容接口无需身份验证时可留空，不需要额外开关。文本生成默认流式输出；兼容聊天接口明确拒绝流式参数时，自动退回非流式请求，不对认证或网络错误重试。
+
 OpenAI 额外提供 `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd` 语音分组。图片能力信息独立维护，未知能力可通过样例测试确认。Replicate 当前仅接入文字预测，纯翻译服务和已知纯文本模型不出现在 OCR 选择中。
 
 通过 `npm run models:sync -- .reference/read-frog <commit>` 可重新提取目录。脚本读取静态数据，不执行参考项目代码；上游来源随快照记录。
@@ -91,10 +111,10 @@ OpenAI 额外提供 `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd` 语音分组。图�
 
 展开提供商中的「功能提供商」，或使用页面下方的功能分配区域，可为翻译、词典、写作改进、自定义指令、猜你想存、OCR、在线朗读和语言检测选择适用的提供商。两个入口即时联动，未单独指定的指令继承默认 LLM，结果窗口可临时切换。
 
-OCR 默认使用内置离线引擎；远程识别需选择支持图片的 LLM。语言检测默认在本机完成，LLM 模式最多发送 500 个字符，失败时回到本地检测。在线朗读支持 OpenAI 兼容语音接口与 Azure 语音部署，系统离线语音始终可用。
+OCR 默认使用内置离线引擎；远程识别需选择支持图片的 LLM。语言检测默认在本机完成，LLM 模式最多发送 500 个字符，失败时回到本地检测。在线朗读支持 OpenAI 兼容语音接口、MiMo 与 Azure 语音部署，系统离线语音始终可用。
 
 ## 验证范围
 
-协议测试覆盖所有 Chat Completions 预设，以及原生 JSON、流式终止与截断、图片输入、翻译语言映射、Replicate 任务处理、模型发现和错误脱敏。桌面回归检查 33 项添加、默认模型、自动保存、复制、功能分配、原生设置、深浅色图标、代理与结果显示。
+协议测试覆盖所有 Chat Completions 预设，以及原生 JSON、流式终止与截断、图片输入、翻译语言映射、Replicate 任务处理、模型发现和错误脱敏。桌面回归检查 34 项添加、默认模型、自动保存、复制、功能分配、原生设置、深浅色图标、代理与结果显示；语音测试通过本地协议服务验证音频解码、播放、取消和按模型切换音色，不代表各平台真实账户的可用性。
 
 测试使用隔离配置与本地 HTTP 服务，不代表拥有或逐一验收了所有供应商的付费账户。[桌面验证记录](provider-parity-verification.json)

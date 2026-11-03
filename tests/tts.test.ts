@@ -24,6 +24,7 @@ const voices = [
 ];
 test("migrated settings start with local speech; voice mappings survive export and remain independent of the text model", () => {
   const config = defaultConfig();
+  config.providers[0].model = "gpt-4o-mini-tts";
   const { tts, ...legacy } = config;
   const migrated = parseConfig({ ...legacy, schemaVersion: 10 });
   assert.deepEqual(migrated.tts, defaultSpeech());
@@ -77,4 +78,33 @@ test("long speech preserves characters and bounds individual requests; online pi
   assert.equal(p.volume, 0);
   assert.equal(systemProsody(cfg).pitch, 2);
   assert.equal(systemProsody(cfg).volume, 0);
+});
+
+test("online voices follow the selected protocol and model instead of always listing OpenAI voices", () => {
+  const settings = { ...defaultSpeech(), onlineProviderId: "speech" };
+  const provider = { preset: "mimo", model: "mimo-v2.5-tts" };
+  const mimo = onlineVoices(settings, provider);
+  assert.ok(mimo.some((v) => v.id === "api:冰糖"));
+  assert.ok(mimo.some((v) => v.id === "api:Mia"));
+  assert.ok(!mimo.some((v) => v.id === "api:alloy"));
+  assert.deepEqual(
+    onlineVoices(settings, { ...provider, model: "mimo-v2-tts" }).map(
+      (v) => v.name,
+    ),
+    ["mimo_default", "default_zh", "default_en"],
+  );
+  const alias = onlineVoices(settings, {
+    preset: "custom",
+    model: "deployment",
+    speechProtocol: "mimo",
+  });
+  assert.deepEqual(alias, mimo);
+  const legacy = onlineVoices(settings, { preset: "openai", model: "tts-1" });
+  assert.ok(legacy.some((v) => v.id === "api:alloy"));
+  assert.ok(!legacy.some((v) => v.id === "api:marin"));
+  assert.ok(
+    onlineVoices(settings, { preset: "openai", model: "gpt-4o-mini-tts" }).some(
+      (v) => v.id === "api:marin",
+    ),
+  );
 });

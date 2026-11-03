@@ -251,8 +251,8 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       autoRecognized.current === session.id
     )
       return;
-    // One recognition per explicit image acquisition. Changing a setting or
-    // returning to this card must not restart a cancelled job or upload an image.
+    // One recognition per explicit image acquisition. Background config updates
+    // and returning to this card must not restart a cancelled job or upload an image.
     autoRecognized.current = session.id;
     if (selectedOcr && selectedOcr.kind !== "openai") void recognize();
   }, [session?.id]);
@@ -402,7 +402,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       }
     }
   }
-  async function recognize(refresh = false) {
+  async function recognize(refresh = false, profileId = ocrProfile) {
     if (!image) return;
     stop();
     setKind("ocr");
@@ -419,7 +419,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     try {
       await window.readfinch.call("recognize", {
         id,
-        profileId: ocrProfile,
+        profileId,
         dataUrl: image.dataUrl,
         refresh,
       });
@@ -721,7 +721,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                         {selectedOcr?.kind === "offline"
                           ? t("在此设备上识别")
                           : t(
-                              "点击识别后，将原图发送到「{0}」",
+                              phase === "idle"
+                                ? "点击识别后，将原图发送到「{0}」"
+                                : "使用「{0}」识别原图",
                               selectedOcr?.name ?? "所选识别服务",
                             )}
                         {text.trim() && confidence !== undefined
@@ -1171,12 +1173,11 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             className="provider-selector"
             aria-label={t("识别方式")}
             value={ocrProfile}
-            disabled={running}
             onChange={(event) => {
-              setOcrProfile(event.target.value);
-              setPhase("idle");
-              setError("");
-              setConfidence(undefined);
+              const id = event.target.value;
+              if (id === ocrProfile) return;
+              setOcrProfile(id);
+              void recognize(false, id);
             }}
           >
             {availableOcr.map((item) => (

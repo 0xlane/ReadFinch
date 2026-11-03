@@ -28,7 +28,7 @@ import {
   PROVIDER_PRESETS,
   providerPreset,
   isTranslationOnly,
-  supportsSpeech,
+  supportsSpeechConnection,
 } from "./provider-presets";
 export const OCR_INSTRUCTION =
   "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.";
@@ -105,6 +105,9 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
   visionModel: true,
 }).extend({
   customModel: z.boolean().default(false),
+  modelKind: z.enum(["text", "vision", "speech"]).optional(),
+  speechProtocol: z.enum(["openai", "mimo"]).optional(),
+  speechInstructions: z.string().max(2000).optional(),
   builtinModel: z.string().max(200).optional(),
   temperature: z.number().min(0).max(2).nullable().default(null),
   reasoningEffort: z.enum(reasoningEfforts).optional(),
@@ -285,7 +288,7 @@ export const ConfigSchema = z
     if (
       c.tts.onlineProviderId &&
       !c.providers.some(
-        (p) => p.id === c.tts.onlineProviderId && supportsSpeech(p),
+        (p) => p.id === c.tts.onlineProviderId && supportsSpeechConnection(p),
       )
     )
       ctx.addIssue({ code: "custom", message: "此提供商不支持在线语音接口" });

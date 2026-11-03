@@ -1,4 +1,4 @@
-import type { SpeechConfig } from "./tts";
+import type { SpeechConfig, VoiceChoice } from "./tts";
 import type { ThinkingSnapshot } from "./completion";
 import type { UpdateState, ProjectLink } from "./updates";
 import type {
@@ -168,7 +168,10 @@ export type CallMap = {
     result: void;
   };
   cancel: { arg: { id: string }; result: void };
-  speechBegin: { arg: { id: string }; result: SpeechConfig };
+  speechBegin: {
+    arg: { id: string };
+    result: SpeechConfig & { onlineVoices: VoiceChoice[] };
+  };
   speechAudio: {
     arg: {
       id: string;

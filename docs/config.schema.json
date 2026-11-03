@@ -253,6 +253,7 @@
             "type": "string",
             "enum": [
               "openai",
+              "mimo",
               "deepseek",
               "gemini",
               "anthropic",
@@ -323,6 +324,25 @@
           "customModel": {
             "default": false,
             "type": "boolean"
+          },
+          "modelKind": {
+            "type": "string",
+            "enum": [
+              "text",
+              "vision",
+              "speech"
+            ]
+          },
+          "speechProtocol": {
+            "type": "string",
+            "enum": [
+              "openai",
+              "mimo"
+            ]
+          },
+          "speechInstructions": {
+            "type": "string",
+            "maxLength": 2000
           },
           "builtinModel": {
             "type": "string",

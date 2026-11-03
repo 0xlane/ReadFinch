@@ -229,7 +229,10 @@ export function SpeechSettings({
     [language, setLanguage] = useState("en"),
     [custom, setCustom] = useState(""),
     [error, setError] = useState("");
-  const voices = [...installed, ...onlineVoices(value)];
+  const provider = config.providers.find(
+    (p) => p.id === value.onlineProviderId,
+  );
+  const voices = [...installed, ...onlineVoices(value, provider)];
   const tags = [
     ...new Set([
       ...Object.keys(examples),
@@ -428,7 +431,7 @@ export function SpeechSettings({
             <h3>{t("在线朗读提供商")}</h3>
             <p>
               {t(
-                "选择支持 /audio/speech 的模型。使用在线音色时，朗读文字会发送给该提供商。",
+                "选择语音合成提供商，音色列表会随之更新。使用在线音色时，朗读文字会发送给该提供商。",
               )}
             </p>
           </div>

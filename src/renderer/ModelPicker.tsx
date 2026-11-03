@@ -1,16 +1,14 @@
 import { t } from "../shared/i18n";
 import { useEffect, useId, useRef, useState, Fragment } from "react";
-import { Check, ChevronDown, Image, RefreshCw, Volume2 } from "lucide-react";
+import { Check, ChevronDown, RefreshCw } from "lucide-react";
 import type { Config, TextProfile } from "../shared/config";
-import {
-  isCustomProvider,
-  canDiscoverModels,
-} from "../shared/provider-presets";
+import { canDiscoverModels } from "../shared/provider-presets";
 import { catalogKey, modelOptions } from "../shared/models";
 import {
   chooseProviderModel,
   toggleCustomModel,
 } from "../shared/provider-model";
+import { ModelBadge, modelKindLabel } from "./ModelCapability";
 
 export type ModelCatalogAccess = {
   catalogs?: Record<string, string[]>;
@@ -45,12 +43,13 @@ export function ModelPicker({
   const key = catalogKey(provider);
   const currentKey = useRef(key);
   currentKey.current = key;
-  const customOnly = isCustomProvider(provider.preset);
-  const custom = customOnly || provider.customModel;
-  const options = modelOptions(config, provider.id, catalogs[key] ?? []);
+  const custom = provider.customModel;
+  const options = modelOptions(config, provider.id, catalogs[key]);
   const ordered = [
-    ...options.filter((m) => m.kind !== "speech"),
+    ...options.filter((m) => m.kind === "vision"),
+    ...options.filter((m) => m.kind === "text"),
     ...options.filter((m) => m.kind === "speech"),
+    ...options.filter((m) => !m.kind),
   ];
   const choices = ordered.filter((m) =>
     m.id.toLowerCase().includes(query.trim().toLowerCase()),
@@ -63,7 +62,6 @@ export function ModelPicker({
     !choices.some((m) => m.id === manual);
   const count = choices.length + Number(canAdd);
   const active = Math.min(index, count - 1);
-  const capability = options.find((m) => m.id === provider.model)?.vision;
   function place() {
     const rect = input.current!.getBoundingClientRect();
     const top =
@@ -92,7 +90,7 @@ export function ModelPicker({
     );
   }
   function choose(model: string, manualChoice = false) {
-    onChange(chooseProviderModel(provider, model, custom || manualChoice));
+    onChange(chooseProviderModel(provider, model, manualChoice));
     close();
     setError("");
     setEmpty(false);
@@ -174,11 +172,6 @@ export function ModelPicker({
       <div className="provider-field-heading">
         <span>{label}</span>
         <div className="provider-model-tools">
-          {capability && (
-            <span>
-              <Image size={12} /> {t("图片输入")}
-            </span>
-          )}
           {fetchModels && canDiscoverModels(provider) && (
             <button
               type="button"
@@ -243,10 +236,7 @@ export function ModelPicker({
             if (e.key === "Enter" && open && active >= 0) {
               e.preventDefault();
               const option = choices[active];
-              choose(
-                option?.id ?? manual,
-                !option || option.source !== "builtin",
-              );
+              choose(option?.id ?? manual, !option);
             }
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
               e.preventDefault();
@@ -288,8 +278,10 @@ export function ModelPicker({
             <div role="listbox" id={id} aria-label={t("模型候选")}>
               {choices.map((m, i) => (
                 <Fragment key={m.id}>
-                  {m.kind === "speech" && choices[i - 1]?.kind !== "speech" && (
-                    <div className="model-group-label">{t("语音模型")}</div>
+                  {(i === 0 || choices[i - 1]?.kind !== m.kind) && (
+                    <div className="model-group-label">
+                      {m.kind ? modelKindLabel(m.kind) : t("其他模型")}
+                    </div>
                   )}
                   <button
                     type="button"
@@ -300,13 +292,10 @@ export function ModelPicker({
                     data-active={i === active}
                     onMouseDown={(e) => e.preventDefault()}
                     onMouseEnter={() => setIndex(i)}
-                    onClick={() => choose(m.id, m.source !== "builtin")}
+                    onClick={() => choose(m.id)}
                   >
                     <span>{m.id}</span>
-                    {m.vision && <Image size={13} aria-label={t("图片输入")} />}
-                    {m.kind === "speech" && (
-                      <Volume2 size={13} aria-label={t("语音模型")} />
-                    )}
+                    <ModelBadge kind={m.kind} compact />
                     {m.id === provider.model && <Check size={14} />}
                   </button>
                 </Fragment>
@@ -331,7 +320,7 @@ export function ModelPicker({
           </div>
         )}
       </div>
-      {!customOnly && (
+      {
         <label className="custom-model-check">
           <input
             type="checkbox"
@@ -345,7 +334,7 @@ export function ModelPicker({
           />
           {t("输入自定义模型 ID")}
         </label>
-      )}
+      }
       {empty && (
         <p className="model-fetch-note" role="status">
           {t("接口未返回模型，可直接输入自定义 ID。")}

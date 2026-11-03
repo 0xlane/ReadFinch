@@ -62,6 +62,7 @@ export class CompletionCache {
       profile.endpoint,
       profile.proxy,
       profile.model,
+      profile.modelKind ?? null,
       profile.temperature,
       profile.reasoningEffort ?? null,
       profile.requiresKey,

@@ -24,7 +24,9 @@ const server = createServer(async (req, res) => {
   const text = vision
     ? input.model === "ocr-delayed"
       ? "OLD IMAGE RESPONSE MUST NOT APPEAR"
-      : "Remote OCR fixture text."
+      : input.model === "ocr-alternate"
+        ? "Another provider recognized this image."
+        : "Remote OCR fixture text."
     : JSON.stringify({
         场合: null,
         标注: null,
@@ -112,7 +114,8 @@ async function useOcr(id, model = "ocr-fixture") {
 }
 async function acquiredImage(dataUrl, source = "capture") {
   await app.evaluate(
-    (_, { dataUrl, source }) => globalThis.__readfinchTest.image(dataUrl, source),
+    (_, { dataUrl, source }) =>
+      globalThis.__readfinchTest.image(dataUrl, source),
     { dataUrl, source },
   );
 }
@@ -275,6 +278,83 @@ try {
   );
   checks.push(
     "remote OCR displays its destination and sends one image only after the recognition click",
+  );
+
+  await main.evaluate(async () => {
+    const s = await window.readfinch.call("snapshot");
+    s.config.providers.push({
+      ...s.config.providers.find((provider) => provider.id === "ocr-fixture"),
+      id: "ocr-alternate",
+      name: "另一识别服务 · fixture",
+      model: "ocr-alternate",
+    });
+    await window.readfinch.call("saveConfig", {
+      config: s.config,
+      revision: s.revision,
+    });
+  });
+  const selector = panel.getByRole("combobox", {
+    name: "识别方式",
+    exact: true,
+  });
+  const beforeSwitch = requests.length;
+  await selector.selectOption("ocr-alternate");
+  await panel.waitForFunction(
+    () =>
+      document.querySelector(".source-editor")?.value ===
+      "Another provider recognized this image.",
+  );
+  assert.equal(requests.length, beforeSwitch + 1);
+  assert.equal(requests.at(-1).model, "ocr-alternate");
+  assert.equal(
+    requests
+      .at(-1)
+      .messages[0].content.find((part) => part.type === "image_url").image_url
+      .url,
+    dataUrl,
+  );
+  assert.equal(
+    await panel.getByRole("button", { name: "识别文字", exact: true }).count(),
+    0,
+  );
+  await panel
+    .getByText("使用「另一识别服务 · fixture」识别原图", { exact: true })
+    .waitFor();
+
+  await useOcr("ocr-fixture", "ocr-delayed");
+  const beforeDelayed = requests.length;
+  await selector.selectOption("ocr-fixture");
+  await panel.getByRole("button", { name: "停止", exact: true }).waitFor();
+  assert.equal(await selector.isEnabled(), true);
+  for (
+    let attempt = 0;
+    requests.length === beforeDelayed && attempt < 100;
+    attempt++
+  )
+    await panel.waitForTimeout(25);
+  assert.equal(requests.length, beforeDelayed + 1);
+  assert.equal(requests.at(-1).model, "ocr-delayed");
+  await selector.selectOption("ocr-alternate");
+  await panel.waitForFunction(
+    () =>
+      document.querySelector(".source-editor")?.value ===
+      "Another provider recognized this image.",
+  );
+  await panel.waitForTimeout(1000);
+  assert.equal(
+    await panel.getByLabel("原文", { exact: true }).inputValue(),
+    "Another provider recognized this image.",
+  );
+  await selector.selectOption("ocr-offline");
+  await panel.waitForFunction(() =>
+    document.querySelector(".source-editor")?.value.includes("你好"),
+  );
+  assert.equal(
+    await panel.getByAltText("文字来源原图").getAttribute("src"),
+    dataUrl,
+  );
+  checks.push(
+    "switching OCR providers recognizes the current image immediately, including while busy; late results from the previous provider cannot replace the new result",
   );
 
   await useOcr("ocr-fixture", "ocr-delayed");

@@ -12,6 +12,8 @@ Both metadata requests and package downloads try GitHub first. Transport failure
 
 ## Publishing
 
+Before creating a release tag, run `.github/workflows/preflight.yml` on the candidate commit. It builds the same four platform/architecture combinations, runs the core and offline OCR tests, and starts the Windows packaged application for a runtime smoke test. It only has repository read permission, always packages with `--publish never`, and uploads Actions artifacts; it cannot create a GitHub Release. Wait for both this preflight and the regular three-platform CI to pass before tagging the candidate.
+
 If packaging succeeds but publication fails, the workflow can be dispatched with `build_run_id` and `release_tag` to reuse its successful artifacts. The publishing job verifies that all four package jobs passed, that the run belongs to this repository and the exact tag commit, and that application source has not changed. Only release tooling and documentation fixes can be applied without rebuilding. Published releases are never overwritten. Debian's `amd64` and AppImage's `x86_64` filenames are normalized to Electron's `x64` architecture in the update manifest.
 
 1. Change the version in `package.json` and `package-lock.json` and add `docs/releases/vX.Y.Z.md`.

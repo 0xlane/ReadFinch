@@ -4,13 +4,18 @@ import { OFFLINE_OCR_ID } from "./config";
 import { BUILTIN_MODELS } from "./model-catalog";
 import { supportsImages } from "./model-catalog";
 import { isTranslationOnly, supportsSpeech } from "./provider-presets";
+import {
+  inferredModelKind,
+  modelKind,
+  type ModelKind,
+} from "./model-capabilities";
 export { BUILTIN_MODELS, supportsImages } from "./model-catalog";
 
 export type ModelRef = { providerId: string; model: string };
 export type ModelInfo = {
   id: string;
   vision?: boolean;
-  kind?: "speech";
+  kind?: ModelKind;
   source: "builtin" | "remote" | "saved";
 };
 export const catalogKey = (
@@ -28,17 +33,33 @@ export const catalogKey = (
 export function modelOptions(
   config: Config,
   providerId: string,
-  remote: string[] = [],
+  remote?: readonly string[],
 ): ModelInfo[] {
   const p = config.providers.find((p) => p.id === providerId);
   if (!p) return [];
+  if (remote !== undefined) {
+    const metadata = new Map(BUILTIN_MODELS[p.preset].map((m) => [m.id, m]));
+    return [...new Set(remote)].map((id) => ({
+      kind: inferredModelKind({ preset: p.preset, model: id }),
+      ...metadata.get(id),
+      ...(id === p.model && p.modelKind ? { kind: p.modelKind } : {}),
+      id,
+      source: "remote",
+    }));
+  }
   const entries = new Map<string, ModelInfo>();
   for (const m of BUILTIN_MODELS[p.preset])
-    entries.set(m.id, { ...m, source: "builtin" });
-  for (const id of remote)
-    if (!entries.has(id)) entries.set(id, { id, source: "remote" });
+    entries.set(m.id, {
+      ...m,
+      ...(m.id === p.model && p.modelKind ? { kind: p.modelKind } : {}),
+      source: "builtin",
+    });
   if (p.model && !entries.has(p.model))
-    entries.set(p.model, { id: p.model, source: "saved" });
+    entries.set(p.model, {
+      id: p.model,
+      kind: modelKind(p),
+      source: "saved",
+    });
   return [...entries.values()];
 }
 export function defaultModel(config: Config): ModelRef {
@@ -157,9 +178,35 @@ export function assignProvider(
   };
 }
 export function providerCanServe(provider: TextProfile, purpose: string) {
+  if (purpose === "tts") return supportsSpeech(provider);
+  if (modelKind(provider) === "speech") return false;
   if (purpose === "action:translate") return true;
   if (isTranslationOnly(provider)) return false;
   if (purpose === "ocr") return supportsImages(provider);
-  if (purpose === "tts") return supportsSpeech(provider);
   return true;
+}
+
+export function updateProviderModel(
+  config: Config,
+  updated: TextProfile,
+): Config {
+  let next = {
+    ...config,
+    providers: config.providers.map((p) => (p.id === updated.id ? updated : p)),
+  };
+  for (const purpose of modelPurposes(config)) {
+    if (
+      purpose.providerId !== updated.id ||
+      providerCanServe(updated, purpose.id)
+    )
+      continue;
+    if (purpose.id === "default") {
+      const fallback = next.providers.find(
+        (p) =>
+          p.id !== updated.id && p.enabled && providerCanServe(p, "default"),
+      );
+      if (fallback) next = assignProvider(next, purpose.id, fallback.id);
+    } else next = assignProvider(next, purpose.id, null);
+  }
+  return next;
 }

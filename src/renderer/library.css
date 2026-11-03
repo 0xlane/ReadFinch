@@ -80,8 +80,9 @@
   font-size: 13px;
   overflow-wrap: anywhere;
 }
-.model-dropdown [role="option"] span {
+.model-dropdown [role="option"] > span:first-child {
   flex: 1;
+  min-width: 0;
 }
 .model-dropdown [role="option"][data-active="true"] {
   background: var(--api-hover);
@@ -90,6 +91,94 @@
   padding: 9px 8px 4px;
   color: var(--api-muted);
   font-size: 11px;
+}
+.provider-list-name > span:first-child {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.model-capability-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: var(--api-muted);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.model-capability-badge svg {
+  flex-shrink: 0;
+}
+.model-capability-badge:not([data-compact="true"]) {
+  border-radius: 6px;
+  background: var(--api-hover);
+  padding: 3px 7px;
+}
+.model-capability-badge[data-kind="speech"] {
+  color: light-dark(#7852b5, #c1a2ef);
+}
+.model-capability-badge[data-kind="vision"] {
+  color: var(--api-accent);
+}
+.provider-list-name .model-capability-badge {
+  margin-top: 3px;
+  font-size: 10px;
+}
+.provider-list-name .model-capability-badge svg {
+  width: 11px;
+  height: 11px;
+}
+.model-capability-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.model-capability-edit {
+  color: var(--api-muted);
+  font-size: 11px;
+  padding: 3px 0 3px 7px;
+  gap: 3px;
+}
+.model-capability-edit:hover {
+  color: var(--api-accent);
+}
+.model-capability-settings > .field {
+  margin-top: 14px;
+}
+.provider-speech-settings {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--api-line);
+  display: grid;
+  gap: 14px;
+}
+.provider-speech-settings textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 64px;
+}
+.provider-optional-key {
+  margin: -10px 0 0;
+  color: var(--api-muted);
+  font-size: 12px;
+}
+.mimo-mark {
+  color: light-dark(#e96922, #ffad76);
+}
+@media (max-width: 760px) {
+  .model-dropdown .model-capability-badge {
+    font-size: 10px;
+    gap: 3px;
+  }
 }
 .model-fetch-button {
   display: inline-flex;

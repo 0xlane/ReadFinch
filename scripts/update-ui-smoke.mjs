@@ -278,7 +278,7 @@ try {
     JSON.stringify(
       {
         date: new Date().toISOString(),
-        version: "1.0.0",
+        version: JSON.parse(await readFile("package.json", "utf8")).version,
         checks,
         errors,
         scope:

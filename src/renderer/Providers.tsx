@@ -9,8 +9,18 @@ import {
   type Config,
   type TextProfile,
 } from "../shared/config";
-import { modelPurposes, type ModelPurpose } from "../shared/models";
-import { providerPreset, isTranslationOnly } from "../shared/provider-presets";
+import {
+  modelPurposes,
+  providerCanServe,
+  type ModelPurpose,
+} from "../shared/models";
+import {
+  providerPreset,
+  isTranslationOnly,
+  requiresApiKey,
+} from "../shared/provider-presets";
+import { modelKind } from "../shared/model-capabilities";
+import { ModelBadge } from "./ModelCapability";
 import { ProviderSpecificSettings } from "./ProviderSpecificSettings";
 import { ConnectionTestButton } from "./ConnectionTestButton";
 import { Field } from "./ui";
@@ -65,7 +75,9 @@ export function Providers(props: ProviderProps) {
     if (id) select(id);
   }
   const remaining = config.providers.filter((p) => p.id !== provider.id);
-  const fallback = remaining.find((p) => p.enabled && !isTranslationOnly(p));
+  const fallback = remaining.find(
+    (p) => p.enabled && providerCanServe(p, "default"),
+  );
   function remove() {
     if (!fallback) return;
     const id = provider.id;
@@ -128,7 +140,9 @@ export function Providers(props: ProviderProps) {
                 (use) => use.providerId === item.id,
               );
               const assigned =
-                item.model || isTranslationOnly(item) ? bindings : [];
+                item.model || isTranslationOnly(item)
+                  ? bindings.filter((use) => providerCanServe(item, use.id))
+                  : [];
               return (
                 <div
                   className="provider-list-item"
@@ -144,7 +158,12 @@ export function Providers(props: ProviderProps) {
                     onClick={() => select(item.id)}
                   >
                     <ProviderIcon preset={item.preset} />
-                    <span>{item.name || t("未命名提供商")}</span>
+                    <span className="provider-list-name">
+                      <span>{item.name || t("未命名提供商")}</span>
+                      {!isTranslationOnly(item) && (
+                        <ModelBadge kind={modelKind(item)} compact />
+                      )}
+                    </span>
                   </button>
                   {assigned.length > 0 && (
                     <span
@@ -258,12 +277,7 @@ function ProviderEditor({
         credentialState[provider.id]?.version,
         headerVersion,
       ])}
-      disabled={
-        busy ||
-        (!model && !translationOnly) ||
-        !provider.enabled ||
-        (provider.requiresKey && !credentialState[provider.id]?.available)
-      }
+      disabled={busy || (!model && !translationOnly) || !provider.enabled}
       run={() => test(provider.id)}
     />
   );
@@ -302,13 +316,11 @@ function ProviderEditor({
           onChange={(e) => change({ description: e.target.value })}
         />
       </Field>
-      {provider.requiresKey ? (
-        credential("text:" + provider.id, testButton)
-      ) : (
-        <div className="provider-field-heading">
-          <span>{t("无需 API Key")}</span>
-          {testButton}
-        </div>
+      {credential("text:" + provider.id, testButton)}
+      {!requiresApiKey(provider) && (
+        <p className="provider-optional-key">
+          {t("不需要身份验证时，可将 API Key 留空。")}
+        </p>
       )}
       <ProviderSpecificSettings provider={provider} change={change} />
       <Field
@@ -340,7 +352,7 @@ function ProviderEditor({
           <ChevronRight size={15} />
           {t("高级选项")}
         </summary>
-        {!translationOnly && (
+        {!translationOnly && modelKind(provider) !== "speech" && (
           <Field label={t("温度")} hint={t("留空使用提供商默认值。")}>
             <input
               type="number"
@@ -368,24 +380,6 @@ function ProviderEditor({
             key={provider.id + "|" + provider.endpoint}
             provider={provider}
           />
-        )}
-        <label>
-          <ProviderSwitch
-            label={t("需要 API Key")}
-            checked={provider.requiresKey}
-            onChange={(requiresKey) => change({ requiresKey })}
-          />
-          {t("需要 API Key")}
-        </label>
-        {!translationOnly && (
-          <label>
-            <ProviderSwitch
-              label={t("流式输出")}
-              checked={provider.stream}
-              onChange={(stream) => change({ stream })}
-            />
-            {t("流式输出")}
-          </label>
         )}
         <Field label={t("请求超时（秒）")}>
           <input

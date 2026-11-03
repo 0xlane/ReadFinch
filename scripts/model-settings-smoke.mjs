@@ -182,7 +182,7 @@ try {
   await nav("API 提供商");
   await button("添加提供商").click();
   await page.getByRole("dialog").waitFor();
-  assert.equal(await page.locator(".provider-catalog button").count(), 33);
+  assert.equal(await page.locator(".provider-catalog button").count(), 34);
   await shots("catalog");
   await button("关闭添加提供商").click();
   await field("API 基础地址").fill(base + "/v1");
@@ -351,6 +351,50 @@ try {
     "model discovery",
   );
   assert.equal(requests.at(-1).project, "local-fixture");
+  await search.fill("vendor");
+  await page
+    .locator('.model-dropdown [role="option"]')
+    .filter({ hasText: "vendor/custom-text" })
+    .waitFor();
+  await search.fill("");
+  assert.equal(
+    await page.locator('.model-dropdown [role="option"]').count(),
+    3,
+  );
+  assert.equal(
+    await page
+      .locator('.model-dropdown [role="option"]')
+      .filter({ hasText: "gpt-6-luna" })
+      .count(),
+    0,
+  );
+  await page
+    .locator('.model-dropdown [role="option"]')
+    .filter({ hasText: "vendor/custom-text" })
+    .click();
+  assert.equal(await field("输入自定义模型 ID").isChecked(), false);
+  await until(
+    async () => (await cfg()).providers[0].model === "vendor/custom-text",
+    "fetched model saved",
+  );
+  await search.fill("vendor/discovered-unused");
+  await search.press("Enter");
+  assert.equal(await field("输入自定义模型 ID").isChecked(), false);
+  await field("输入自定义模型 ID").check();
+  await page
+    .getByRole("combobox", { name: "自定义模型 ID", exact: true })
+    .fill("private/model");
+  await field("输入自定义模型 ID").uncheck();
+  assert.equal(await search.inputValue(), "vendor/discovered-unused");
+  await until(
+    async () =>
+      (await cfg()).providers[0].model === "vendor/discovered-unused" &&
+      !(await cfg()).providers[0].customModel,
+    "discovered model remains non-custom",
+  );
+  check(
+    "Fetched models replace presets; mouse and keyboard selections stay non-custom, and manual mode restores the previous selection",
+  );
   await search.fill("vendor");
   await page
     .locator(".model-input-field")

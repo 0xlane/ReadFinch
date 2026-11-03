@@ -1,7 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import {
   onlineProsody,
-  onlineVoices,
   speechChunks,
   speechTag,
   systemProsody,
@@ -215,7 +214,7 @@ export async function speakText(
       options.voice?.startsWith("api:") ? undefined : readyVoices(),
     ]);
     if (active !== job) return;
-    const choices = [...voices, ...onlineVoices(settings)];
+    const choices = [...voices, ...saved.onlineVoices];
     const choice = options.voice
       ? choices.find((v) => v.id === options.voice)
       : voiceForLanguage(choices, settings, code);

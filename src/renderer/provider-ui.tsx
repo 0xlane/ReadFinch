@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, AudioLines } from "lucide-react";
 import type { ProviderPreset } from "../shared/provider-presets";
 
 export function ProviderIcon({ preset }: { preset: ProviderPreset }) {
@@ -7,7 +7,9 @@ export function ProviderIcon({ preset }: { preset: ProviderPreset }) {
       className={"provider-icon provider-icon-" + preset}
       aria-hidden="true"
     >
-      {preset === "custom" || preset === "open-responses" ? (
+      {preset === "mimo" ? (
+        <AudioLines size={19} className="mimo-mark" />
+      ) : preset === "custom" || preset === "open-responses" ? (
         <SlidersHorizontal
           size={16}
           style={{ color: preset === "open-responses" ? "#5484ec" : undefined }}

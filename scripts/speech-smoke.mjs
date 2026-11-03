@@ -56,6 +56,14 @@ const server = createServer(async (req, res) => {
     res.end(wav);
   } else if (req.url === "/v1/chat/completions") {
     res.writeHead(200, { "content-type": "application/json" });
+    if (body.audio) {
+      res.end(
+        JSON.stringify({
+          choices: [{ message: { audio: { data: wav.toString("base64") } } }],
+        }),
+      );
+      return;
+    }
     res.end(
       JSON.stringify({
         choices: [{ message: { content: translated }, finish_reason: "stop" }],
@@ -237,7 +245,9 @@ try {
   await main
     .getByLabel("在线朗读提供商", { exact: true })
     .selectOption("voice-fixture");
-  await main.getByLabel("在线音色 ID", { exact: true }).fill("studio/reader-en");
+  await main
+    .getByLabel("在线音色 ID", { exact: true })
+    .fill("studio/reader-en");
   await button(main, "添加").click();
   await pickVoice("语言音色", "studio/reader-en");
   await button(main, "试听语言语音").click();
@@ -425,6 +435,128 @@ try {
     );
   }, "removing a voice did not clear its assignment");
   checked("Removing a custom voice clears only its assignments");
+  await button(main, "API 提供商").click();
+  await button(main, "添加提供商").click();
+  await main
+    .getByRole("dialog")
+    .getByRole("button", { name: "Xiaomi MiMo", exact: true })
+    .click();
+  await main.getByLabel("API 基础地址", { exact: true }).fill(p.endpoint);
+  await main.locator("#provider-key").fill("fixture-mimo-key");
+  const modelInput = main.getByRole("combobox", { name: "模型", exact: true });
+  await modelInput.fill("mimo-v2.5-tts");
+  await modelInput.press("Enter");
+  assert.equal(
+    await main.getByLabel("输入自定义模型 ID", { exact: true }).isChecked(),
+    false,
+  );
+  await main.getByLabel("语音接口", { exact: true }).waitFor();
+  assert.match(
+    await main
+      .getByLabel("语音接口", { exact: true })
+      .locator("option:checked")
+      .innerText(),
+    /Xiaomi MiMo/,
+  );
+  assert.equal(await main.getByLabel("推理强度", { exact: true }).count(), 0);
+  await main
+    .getByLabel("朗读风格", { exact: true })
+    .fill("Speak warmly and clearly.");
+  await main.locator(".provider-disclosure").click();
+  await main
+    .getByRole("switch", {
+      name: "将 mimo-v2.5-tts 用于 在线朗读",
+      exact: true,
+    })
+    .check();
+  assert.equal(
+    await main.locator(".model-assignment-list").getByRole("switch").count(),
+    1,
+  );
+  await main.locator(".provider-advanced > summary").click();
+  assert.equal(
+    await main
+      .getByRole("switch", { name: "需要 API Key", exact: true })
+      .count(),
+    0,
+  );
+  assert.equal(
+    await main.getByRole("switch", { name: "流式输出", exact: true }).count(),
+    0,
+  );
+  await main.locator(".provider-advanced > summary").click();
+  await button(main, "测试连接").click();
+  await until(
+    () => requests.at(-1).model === "mimo-v2.5-tts",
+    "MiMo connection test did not use speech",
+  );
+  assert.deepEqual(requests.at(-1).messages.at(-1), {
+    role: "assistant",
+    content: "ReadFinch",
+  });
+  assert.equal(requests.at(-1).audio.voice, "mimo_default");
+  const mimoConfig = (await api(main, "snapshot")).config;
+  const mimo = mimoConfig.providers.find((p) => p.preset === "mimo");
+  assert.equal(mimoConfig.tts.onlineProviderId, mimo.id);
+  assert.equal(mimo.customModel, false);
+  for (const theme of ["light", "dark"]) {
+    await api(main, "setTheme", { theme });
+    await main.waitForFunction(
+      (v) => document.documentElement.dataset.theme === v,
+      theme,
+    );
+    await main
+      .locator(".provider-model-control")
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
+    if (!packaged)
+      await main.screenshot({
+        path: pictures + "/mimo-provider-" + theme + ".png",
+      });
+  }
+  checked(
+    "MiMo provider automatically routes TTS, shows only speech features, hides irrelevant advanced toggles and tests the real speech endpoint",
+  );
+  await button(main, "文本转语音").click();
+  const speechProvider = main.getByLabel("在线朗读提供商", { exact: true });
+  assert.equal(
+    await speechProvider.locator('option[value="text-default"]').count(),
+    0,
+  );
+  await pickVoice("语言音色", "Mia");
+  await main.evaluate(() => {
+    window.__voiceEvents = [];
+  });
+  await button(main, "试听语言语音").click();
+  await until(
+    () => hasEvent(main, "audio-ended"),
+    "MiMo WAV was not decoded and played",
+  );
+  assert.equal(requests.at(-1).audio.voice, "Mia");
+  assert.equal(requests.at(-1).model, "mimo-v2.5-tts");
+  assert.match(requests.at(-1).messages.at(-1).content, /Hello/);
+  const voiceInput = main.getByRole("combobox", {
+    name: "语言音色",
+    exact: true,
+  });
+  await voiceInput.click();
+  await voiceInput.fill("alloy");
+  assert.equal(
+    await main.getByRole("option").filter({ hasText: "alloy" }).count(),
+    0,
+  );
+  await voiceInput.press("Escape");
+  await main.reload();
+  await main.getByRole("button", { name: "文本转语音", exact: true }).waitFor();
+  const reopened = (await api(main, "snapshot")).config;
+  assert.equal(reopened.tts.languageVoices.en, "api:Mia");
+  assert.equal(
+    reopened.providers.find((p) => p.id === mimo.id).speechInstructions,
+    "Speak warmly and clearly.",
+  );
+  assert.deepEqual(errors, []);
+  checked(
+    "MiMo voice choices are separate from OpenAI; Chromium plays decoded MiMo audio and voice/style settings survive reload",
+  );
   await writeFile(
     "docs/" + (packaged ? "packaged-" : "") + "speech-verification.json",
     JSON.stringify(

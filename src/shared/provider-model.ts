@@ -1,6 +1,5 @@
 import type { TextProfile } from "./config";
-import { BUILTIN_MODELS, defaultProviderModel } from "./model-catalog";
-import { isCustomProvider } from "./provider-presets";
+import { defaultProviderModel } from "./model-catalog";
 
 // The active model remains a single ID. Remember the list choice while editing a custom ID.
 export function chooseProviderModel(
@@ -8,16 +7,17 @@ export function chooseProviderModel(
   model: string,
   custom: boolean,
 ): TextProfile {
-  const builtin = BUILTIN_MODELS[provider.preset].some((m) => m.id === model);
-  const customModel = isCustomProvider(provider.preset) || custom || !builtin;
+  const customModel = custom;
   return {
     ...provider,
     model,
     customModel,
+    ...(model !== provider.model && !custom
+      ? { modelKind: undefined, speechProtocol: undefined }
+      : {}),
     builtinModel: customModel
       ? provider.builtinModel ||
-        (!provider.customModel &&
-        BUILTIN_MODELS[provider.preset].some((m) => m.id === provider.model)
+        (!provider.customModel && provider.model
           ? provider.model
           : defaultProviderModel(provider.preset).model)
       : model,
@@ -27,12 +27,10 @@ export function toggleCustomModel(
   provider: TextProfile,
   custom: boolean,
 ): TextProfile {
-  if (isCustomProvider(provider.preset) || custom)
-    return chooseProviderModel(provider, provider.model, true);
-  const candidates = BUILTIN_MODELS[provider.preset];
+  if (custom) return chooseProviderModel(provider, provider.model, true);
   const model =
-    [provider.builtinModel, provider.model].find((id) =>
-      candidates.some((m) => m.id === id),
-    ) ?? defaultProviderModel(provider.preset).model;
+    provider.builtinModel ||
+    (!provider.customModel && provider.model) ||
+    defaultProviderModel(provider.preset).model;
   return chooseProviderModel(provider, model, false);
 }

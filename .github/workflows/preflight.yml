@@ -1,0 +1,62 @@
+name: Release packaging preflight
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Package ${{ matrix.platform }} ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            command: --win nsis portable --x64
+          - os: macos-15
+            platform: macos
+            arch: arm64
+            command: --mac dmg zip --arm64
+          - os: macos-15-intel
+            platform: macos
+            arch: x64
+            command: --mac dmg zip --x64
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x64
+            command: --linux AppImage deb --x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - uses: actions/cache@v4
+        with:
+          path: assets/ocr/*.traineddata
+          key: ${{ runner.os }}-ocr-${{ hashFiles('assets/ocr/manifest.json') }}
+      - run: npm run assets:ocr
+      - run: npm run build
+      - run: npm run test:ocr
+      - name: Build platform packages
+        run: npx electron-builder ${{ matrix.command }} --publish never
+      - name: Run the Windows packaged application and bundled OCR
+        if: matrix.platform == 'windows'
+        run: node scripts/packaged-smoke.mjs release/win-unpacked/ReadFinch.exe --isolated-shortcuts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preflight-${{ matrix.platform }}-${{ matrix.arch }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb

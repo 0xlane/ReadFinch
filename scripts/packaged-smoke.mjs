@@ -102,7 +102,8 @@ try {
     .getByRole("button", { name: "API 提供商", exact: true })
     .click();
   await page.getByRole("button", { name: "添加提供商", exact: true }).click();
-  assert.equal(await page.locator(".provider-catalog > button").count(), 33);
+  assert.equal(await page.locator(".provider-catalog > button").count(), 34);
+  await page.getByRole("button", { name: /Xiaomi MiMo/ }).waitFor();
   await page
     .getByRole("button", { name: "关闭添加提供商", exact: true })
     .click();

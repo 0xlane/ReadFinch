@@ -20,7 +20,9 @@ import {
   isTranslationOnly,
   providerProtocol,
   supportsSpeech,
+  requiresApiKey,
 } from "../shared/provider-presets";
+import { modelKind, speechProtocol } from "../shared/model-capabilities";
 import { completeNative, synthesizeAzureSpeech } from "./provider-native";
 import { translateText } from "./provider-translation";
 import { completeReplicate } from "./provider-replicate";
@@ -42,20 +44,70 @@ export async function synthesizeSpeech(
 ) {
   if (!supportsSpeech(profile))
     throw new ProviderError("capability", t("此提供商不支持在线语音接口"));
-  if (profile.preset === "azure")
+  const protocol = speechProtocol(profile);
+  if (protocol === "azure")
     return synthesizeAzureSpeech(profile, key, text, voice, speed, signal);
+  if (protocol === "mimo" && /voiceclone/i.test(profile.model))
+    throw new ProviderError(
+      "capability",
+      t("此模型需要参考音频，请选择使用预置音色的 TTS 模型。"),
+    );
+  if (
+    protocol === "mimo" &&
+    /voicedesign/i.test(profile.model) &&
+    !profile.speechInstructions?.trim()
+  )
+    throw new ProviderError(
+      "capability",
+      t("此模型需要音色描述，请先填写朗读风格。"),
+    );
+  const instructions = [
+    profile.speechInstructions?.trim(),
+    protocol === "mimo" && speed !== 1
+      ? `Read at ${speed.toFixed(2)} times normal speaking speed.`
+      : undefined,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const base = profile.endpoint.replace(
+    /\/(?:audio\/speech|chat\/completions|responses)\/?$/,
+    "",
+  );
   const res = await request(
-    endpointUrl(profile.endpoint, "audio/speech"),
+    endpointUrl(
+      base,
+      protocol === "mimo" ? "chat/completions" : "audio/speech",
+    ),
     {
       method: "POST",
-      headers: auth(key, profile.requiresKey, profile.headers),
-      body: JSON.stringify({
-        model: profile.model,
-        input: text,
-        voice,
-        response_format: "mp3",
-        speed,
-      }),
+      headers: auth(key, requiresApiKey(profile), profile.headers),
+      body: JSON.stringify(
+        protocol === "mimo"
+          ? {
+              model: profile.model,
+              messages: [
+                ...(instructions
+                  ? [{ role: "user", content: instructions }]
+                  : []),
+                { role: "assistant", content: text },
+              ],
+              audio: {
+                format: "wav",
+                ...(/voicedesign/i.test(profile.model) ? {} : { voice }),
+              },
+              stream: false,
+            }
+          : {
+              model: profile.model,
+              input: text,
+              voice,
+              response_format: "mp3",
+              speed,
+              ...(instructions && !/(?:^|\/)tts-1(?:-hd)?$/.test(profile.model)
+                ? { instructions }
+                : {}),
+            },
+      ),
     },
     signal,
     profile.timeoutMs,
@@ -64,10 +116,36 @@ export async function synthesizeSpeech(
   if (!res.ok) {
     await res.body?.cancel();
     if (res.status === 400 || res.status === 404 || res.status === 422)
-      throw Error(
-        t("语音服务不支持当前模型或音色，请检查 /audio/speech 配置。"),
-      );
+      throw Error(t("语音服务不支持当前请求，请检查模型、音色与语音接口。"));
     throw httpError(res.status);
+  }
+  if (protocol === "mimo") {
+    const data = await responseJson(res, 17 * 1024 * 1024).catch((error) => {
+      if (signal.aborted) throw new ProviderError("cancelled", t("请求已取消"));
+      if ((error as Error).name === "TimeoutError")
+        throw new ProviderError(
+          "timeout",
+          t("请求超时，请检查服务或增加超时时间"),
+        );
+      throw error;
+    });
+    const audio = data.choices?.[0]?.message?.audio?.data;
+    if (
+      typeof audio !== "string" ||
+      !audio.length ||
+      audio.length % 4 !== 0 ||
+      !/^[A-Za-z0-9+/]+={0,2}$/.test(audio)
+    )
+      throw new ProviderError("speech", t("语音服务没有返回有效的音频"));
+    const bytes = Buffer.from(audio, "base64");
+    if (bytes.byteLength > 12 * 1024 * 1024) throw Error(t("音频超过大小限制"));
+    if (
+      bytes.length < 12 ||
+      bytes.toString("ascii", 0, 4) !== "RIFF" ||
+      bytes.toString("ascii", 8, 12) !== "WAVE"
+    )
+      throw new ProviderError("speech", t("语音服务没有返回有效的音频"));
+    return { bytes: new Uint8Array(bytes), mime: "audio/wav" };
   }
   const mime = (res.headers.get("content-type") ?? "")
     .split(";")[0]
@@ -119,6 +197,25 @@ function contentText(value: unknown): string {
   if (Array.isArray(value)) return value.map((v) => v?.text ?? "").join("");
   return "";
 }
+async function errorDetail(response: Response) {
+  if (!response.body) return "";
+  const reader = response.body.getReader(),
+    chunks: Uint8Array[] = [];
+  let size = 0;
+  try {
+    while (size < 4000) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const part = value.subarray(0, 4000 - size);
+      chunks.push(part);
+      size += part.length;
+    }
+    return Buffer.concat(chunks).toString("utf8");
+  } finally {
+    await reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
+}
 export async function complete(
   profile: Connection<TextProfile>,
   messages: unknown[],
@@ -126,6 +223,11 @@ export async function complete(
   signal: AbortSignal,
   onText: CompletionUpdate,
 ): Promise<string> {
+  if (modelKind(profile) === "speech")
+    throw new ProviderError(
+      "capability",
+      t("语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。"),
+    );
   if (isTranslationOnly(profile)) {
     if (!profile.translation)
       throw new ProviderError("capability", t("纯翻译提供商只能用于翻译"));
@@ -145,12 +247,13 @@ export async function complete(
     AbortSignal.timeout(profile.timeoutMs),
   ]);
   try {
+    let streaming = profile.stream;
     const send = (structured: boolean) =>
       request(
         endpointUrl(profile.endpoint, "chat/completions"),
         {
           method: "POST",
-          headers: auth(key, profile.requiresKey, profile.headers),
+          headers: auth(key, requiresApiKey(profile), profile.headers),
           body: JSON.stringify({
             model: profile.model,
             ...(profile.reasoningEffort && {
@@ -172,28 +275,39 @@ export async function complete(
                   },
                 }
               : {}),
-            stream: profile.stream,
+            stream: streaming,
           }),
         },
         deadline,
         profile.timeoutMs,
         profile,
       );
-    let res = await send(!!profile.outputContract);
+    let structured = !!profile.outputContract;
+    let res = await send(structured);
     // Some compatible endpoints support JSON by prompt but reject response_format.
     // Retry only an explicit format rejection, before any output was delivered.
-    if (
-      profile.outputContract &&
-      [400, 422].includes(res.status) &&
-      /response[_ ]format|json[_ ]schema|structured output/i.test(
-        (await res.text()).slice(0, 4000),
+    for (let retry = 0; retry < 2 && [400, 422].includes(res.status); retry++) {
+      const detail = await errorDetail(res);
+      if (
+        structured &&
+        /response[_ ]format|json[_ ]schema|structured output/i.test(detail)
       )
-    )
-      res = await send(false);
+        structured = false;
+      else if (
+        streaming &&
+        /\bstream(?:ing)?\b/i.test(detail) &&
+        /not support|unsupported|not allowed|must be false|disable/i.test(
+          detail,
+        )
+      )
+        streaming = false;
+      else break;
+      res = await send(structured);
+    }
     if (!res.ok) throw httpError(res.status);
     const progress = new CompletionProgress(onText);
     if (
-      !profile.stream ||
+      !streaming ||
       !res.headers.get("content-type")?.includes("text/event-stream")
     ) {
       const data = await res.json();

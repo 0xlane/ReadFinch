@@ -94,7 +94,7 @@ try {
   await api("settingsOpen", { tab: "text" });
   assert.equal(await modelField().inputValue(), "gpt-6-luna");
   await page.getByRole("button", { name: "添加提供商", exact: true }).click();
-  assert.equal(await page.locator("[data-provider-preset]").count(), 33);
+  assert.equal(await page.locator("[data-provider-preset]").count(), 34);
   for (const theme of ["light", "dark"]) {
     await api("setTheme", { theme });
     await page.waitForTimeout(100);
@@ -119,10 +119,11 @@ try {
   await page.getByRole("button", { name: "关闭添加提供商" }).click();
   await api("setTheme", { theme: "light" });
   checks.push(
-    "All 33 provider choices have working offline icons and no horizontal overflow in both themes",
+    "All 34 provider choices have working offline icons and no horizontal overflow in both themes",
   );
   for (const [preset, expected] of Object.entries({
     ...catalog.providers,
+    mimo: { defaultModel: "mimo-v2.6-flash", customModel: false },
     deepl: null,
     deeplx: null,
     "google-translate": null,
@@ -194,7 +195,19 @@ try {
     await page.locator(".model-dropdown").getByRole("option").count(),
     34,
   );
-  assert.equal(await page.getByText("语音模型", { exact: true }).count(), 1);
+  assert.equal(
+    await page
+      .locator(".model-group-label")
+      .filter({ hasText: "语音合成" })
+      .count(),
+    1,
+  );
+  assert.equal(
+    await page
+      .locator('.model-dropdown .model-capability-badge[data-kind="speech"]')
+      .count(),
+    3,
+  );
   await page.mouse.move(1, 1);
   await page
     .locator(".provider-editor")
@@ -256,11 +269,11 @@ try {
   await fetchButton().click();
   await page
     .locator(".model-dropdown")
-    .getByRole("option", { name: "vendor/model-119", exact: true })
+    .getByRole("option", { name: /^vendor\/model-119/ })
     .waitFor({ state: "attached" });
   assert.equal(
     await page.locator(".model-dropdown").getByRole("option").count(),
-    154,
+    121,
   );
   assert.ok(requests.length);
   const anchor = await page.locator(".model-anchor").boundingBox(),
@@ -282,14 +295,15 @@ try {
   await customField().fill("vendor/model-119");
   await page
     .locator(".model-dropdown")
-    .getByRole("option", { name: "vendor/model-119", exact: true })
+    .getByRole("option", { name: /^vendor\/model-119/ })
     .click();
   await saved(
     (c) =>
-      c.providers[0].model === "vendor/model-119" && c.providers[0].customModel,
+      c.providers[0].model === "vendor/model-119" &&
+      !c.providers[0].customModel,
   );
   checks.push(
-    "Custom mode fetches and searches 120 remote models without truncation or a modal",
+    "Discovery replaces built-in choices with all 121 remote models; selecting one turns custom input off",
   );
 
   mode = "error";
@@ -306,9 +320,9 @@ try {
   await fetchButton().click();
   await page
     .locator(".model-dropdown")
-    .getByRole("option", { name: "vendor/model-119", exact: true })
+    .getByRole("option", { name: /^vendor\/model-119/ })
     .waitFor({ state: "attached" });
-  await customField().press("Escape");
+  await modelField().press("Escape");
   checks.push(
     "Discovery errors and empty responses preserve the current model and allow retry",
   );
@@ -320,7 +334,8 @@ try {
     .click();
   await saved((c) => c.providers.at(-1).preset === "custom");
   assert.equal(await customField().inputValue(), "");
-  assert.equal(await customToggle().count(), 0);
+  assert.equal(await customToggle().count(), 1);
+  assert.equal(await customToggle().isChecked(), true);
   await customField().fill("my-private-model");
   await saved((c) => c.providers.at(-1).model === "my-private-model");
   assert.ok(
@@ -329,7 +344,7 @@ try {
       .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
   );
   checks.push(
-    "Custom endpoints require an explicit ID and have no misleading builtin-mode checkbox",
+    "Custom endpoints accept an explicit ID and allow switching to a discovered model",
   );
   assert.deepEqual(errors, []);
   await writeFile(

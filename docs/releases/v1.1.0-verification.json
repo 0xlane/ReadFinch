@@ -1,0 +1,158 @@
+{
+  "date": "2026-11-03T14:23:19.585Z",
+  "version": "1.1.0",
+  "platform": "Windows x64",
+  "typecheck": "passed",
+  "unitTests": {
+    "passed": 168,
+    "failed": 0
+  },
+  "build": "passed",
+  "packagesBuilt": [
+    "Windows x64 NSIS",
+    "Windows x64 portable"
+  ],
+  "packagedRuntime": {
+    "version": "1.1.0",
+    "packaged": true,
+    "offlineOcr": true,
+    "testHooksDisabled": true,
+    "shortcutsRegistered": true,
+    "rendererErrors": []
+  },
+  "offlineOcr": {
+    "network": "HTTP(S), fetch, TCP and TLS blocked in main and worker processes; no API key",
+    "cases": 6,
+    "proof": [
+      {
+        "pid": 17688,
+        "isMainThread": true,
+        "threadId": 0,
+        "network": "disabled"
+      },
+      {
+        "pid": 17688,
+        "isMainThread": false,
+        "threadId": 2,
+        "network": "disabled"
+      },
+      {
+        "pid": 17688,
+        "isMainThread": false,
+        "threadId": 3,
+        "network": "disabled"
+      }
+    ]
+  },
+  "suites": {
+    "providerSettings": {
+      "passed": true,
+      "checks": [
+        "System-default language, live English and Chinese, and dedicated shortcuts for all actions",
+        "One model per provider, duplicate credentials and settings, and bidirectional feature assignments",
+        "Real text, detection and image HTTP requests use each provider's model, scoped key, headers and temperature",
+        "Fetched models replace presets; mouse and keyboard selections stay non-custom, and manual mode restores the previous selection",
+        "Model search and discovery, export-safe credentials, and language persistence"
+      ],
+      "scope": "Isolated Electron profile, real renderer and loopback Chat Completions fixture"
+    },
+    "screenshotAndOcr": {
+      "passed": true,
+      "checks": [
+        "missing selection shows an explicit capture route; no implicit screenshot or model request",
+        "Esc and right-click cancel the real capture overlay, restore draft and pin, and never start OCR",
+        "local OCR starts once without a text model; corrected text reuses action cards, preserves its image, and never offers replacement",
+        "remote OCR displays its destination and sends one image only after the recognition click",
+        "switching OCR providers recognizes the current image immediately, including while busy; late results from the previous provider cannot replace the new result",
+        "OCR cancellation/new images isolate late results; text actions stay disabled while recognizing",
+        "an empty real OCR result offers recapture and cannot trigger a text action",
+        "The actual selection preview is pixel-identical to the native screenshot at current DPI; taskbar sizing and click-without-drag are correct",
+        "actual desktop capture matches the pointer-selected pixels at current scaling and automatically completes local OCR"
+      ],
+      "scope": "Real Electron windows, desktop capture/crop pixel comparison, and bundled Tesseract. Imported images use development hooks; remote OCR and text use a local HTTP fixture. Controlled foreground content, native UIA selection and external model quality are not implied by these checks."
+    },
+    "speechPlayback": {
+      "passed": true,
+      "checks": [
+        "System preview used the selected Windows voice and prosody, emitted start and end, and made zero network requests",
+        "Online preview and autosave used the selected speech provider and custom voice; Chromium decoded audio and applied pitch, speed and volume",
+        "Fallback preview plays the selected Chinese system voice while English is mapped online",
+        "Stop aborts an in-flight speech request before audio arrives",
+        "Selection toolbar detects English locally and plays the actual selected text using its online mapping",
+        "The translation result uses its target language with the saved voice and keeps the speech model separate from the text model",
+        "Starting a system preview stops the online request in a different pinned result window",
+        "The assigned provider's connection test uses the audio endpoint; there were no renderer errors",
+        "Removing a custom voice clears only its assignments",
+        "MiMo provider automatically routes TTS, shows only speech features, hides irrelevant advanced toggles and tests the real speech endpoint",
+        "MiMo voice choices are separate from OpenAI; Chromium plays decoded MiMo audio and voice/style settings survive reload"
+      ]
+    },
+    "providerCatalog": {
+      "passed": true,
+      "checks": [
+        "All 34 provider choices have working offline icons and no horizontal overflow in both themes",
+        "Every preset adds and autosaves the upstream default model; no network request on add",
+        "The selected ID remains visible; reopening scrolls to it; custom/builtin switching survives restart",
+        "Discovery replaces built-in choices with all 121 remote models; selecting one turns custom input off",
+        "Discovery errors and empty responses preserve the current model and allow retry",
+        "Custom endpoints accept an explicit ID and allow switching to a discovered model"
+      ],
+      "scope": "Isolated Electron windows and local HTTP fixtures; no real provider credentials or external model calls."
+    },
+    "nativeProviderAndProxy": {
+      "passed": true,
+      "checks": [
+        "Native Gemini streaming connection test uses the configured desktop proxy",
+        "Desktop OCR reaches native Gemini with image data and the same proxy",
+        "Selection translation works without a model; switching between native and pure providers updates the result and reuses cache"
+      ],
+      "scope": "Isolated Electron profile, local HTTP origin and proxy; no paid provider credentials."
+    },
+    "aboutAndUpdates": {
+      "passed": true,
+      "checks": [
+        "Automatic updates default on, save immediately, and stay separate from portable configuration",
+        "Update preference survives an application restart",
+        "About shows the brand, version, source, feedback and licenses; only fixed project links can open",
+        "Updates share the About page; download routes switch internally and never appear in the update card",
+        "Current, download progress, proxy fallback, ready, and error views have the correct controls",
+        "Chinese and English, both themes, and a compact window preserve readable navigation",
+        "Floating panels cannot install updates or change update preferences"
+      ],
+      "scope": "Real settings windows and persistence. Update presentation states use development-only hooks; manifest, transport, hashes, and updater coordination are covered by separate tests. No installer is executed by this UI test."
+    },
+    "liveProvider": {
+      "passed": true,
+      "checks": [
+        {
+          "name": "Live provider connection",
+          "passed": true
+        },
+        {
+          "name": "Live translation",
+          "passed": true,
+          "updates": 33,
+          "characters": 15,
+          "reasoningUpdates": 33
+        },
+        {
+          "name": "Live structured dictionary",
+          "passed": true,
+          "updates": 48,
+          "characters": 373
+        },
+        {
+          "name": "Live online bilingual OCR",
+          "passed": true,
+          "characters": 140
+        }
+      ],
+      "scope": "Isolated profile copy using the configured provider and synthetic text/image samples. No credentials, generated content or personal notes are recorded. MiMo/OpenAI speech use local protocol fixtures, not live cloud credentials."
+    }
+  },
+  "limitations": [
+    "Cloud translation, structured dictionary and image OCR were tested with the configured provider and synthetic samples. Provider credentials and generated content are not recorded.",
+    "OpenAI and MiMo speech protocols were tested with local HTTP fixtures and actual Chromium audio decoding/playback. This is not a live MiMo cloud account test.",
+    "macOS and Linux native desktop interactions were not exercised on this Windows machine. GitHub Actions separately validates platform builds and packages before publication."
+  ]
+}

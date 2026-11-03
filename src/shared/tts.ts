@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { speechProtocol, type ModelCapabilities } from "./model-capabilities";
 
 export const OnlineVoiceIdSchema = z
   .string()
@@ -62,11 +63,46 @@ export const onlineVoiceNames = [
   "shimmer",
   "verse",
 ];
-export function onlineVoices(settings: SpeechConfig): VoiceChoice[] {
+export function onlineVoices(
+  settings: SpeechConfig,
+  provider?: ModelCapabilities,
+): VoiceChoice[] {
+  const protocol = provider ? speechProtocol(provider) : "openai";
+  const names =
+    protocol === "mimo"
+      ? /mimo-v2-tts(?:$|[-/])/.test(provider?.model ?? "")
+        ? ["mimo_default", "default_zh", "default_en"]
+        : [
+            "mimo_default",
+            "冰糖",
+            "茉莉",
+            "苏打",
+            "白桦",
+            "Mia",
+            "Chloe",
+            "Milo",
+            "Dean",
+          ]
+      : /(?:^|\/)tts-1(?:-hd)?$/.test(provider?.model ?? "")
+        ? [
+            "alloy",
+            "ash",
+            "coral",
+            "echo",
+            "fable",
+            "onyx",
+            "nova",
+            "sage",
+            "shimmer",
+          ]
+        : onlineVoiceNames;
   return settings.onlineProviderId
-    ? [...new Set([...onlineVoiceNames, ...settings.customVoices])].map(
-        (name) => ({ id: "api:" + name, name, lang: "mul", local: false }),
-      )
+    ? [...new Set([...names, ...settings.customVoices])].map((name) => ({
+        id: "api:" + name,
+        name,
+        lang: "mul",
+        local: false,
+      }))
     : [];
 }
 export function onlineProsody({ rate, pitch, volume }: SpeechConfig) {

@@ -9,14 +9,16 @@ import {
 import {
   assignProvider,
   providerCanServe,
-  modelOptions,
   supportsImages,
   type ModelPurpose,
+  updateProviderModel,
 } from "../shared/models";
 import { ModelPicker, type ModelCatalogAccess } from "./ModelPicker";
 import { ProviderSwitch } from "./provider-ui";
 import { Field } from "./ui";
 import { isTranslationOnly } from "../shared/provider-presets";
+import { modelKind } from "../shared/model-capabilities";
+import { ModelCapability } from "./ModelCapability";
 
 export function ProviderModels({
   config,
@@ -33,12 +35,12 @@ export function ProviderModels({
   const [expanded, setExpanded] = useState(false);
   const model = provider.model;
   const translationOnly = isTranslationOnly(provider);
-  const capability = modelOptions(config, provider.id).find(
-    (option) => option.id === model,
-  )?.vision;
+  const speech = modelKind(provider) === "speech";
   const assigned = (purpose: ModelPurpose) =>
     purpose.providerId === provider.id;
-  const count = purposes.filter(assigned).length;
+  const count = purposes.filter(
+    (p) => assigned(p) && providerCanServe(provider, p.id),
+  ).length;
   return (
     <div className="provider-model-control">
       {!translationOnly && (
@@ -48,46 +50,46 @@ export function ProviderModels({
             label={t("模型")}
             placeholder={t("选择或输入模型 ID")}
             provider={provider}
-            onChange={(updated) => {
-              const changed = {
-                ...config,
-                providers: config.providers.map((p) =>
-                  p.id === provider.id ? updated : p,
-                ),
-              };
-              onChange(
-                config.defaults.ocrProfileId === provider.id &&
-                  !supportsImages(updated)
-                  ? assignProvider(changed, "ocr", null)
-                  : changed,
-              );
-            }}
+            onChange={(updated) =>
+              onChange(updateProviderModel(config, updated))
+            }
             {...catalog}
           />
-          <Field label={t("推理强度")}>
-            <select
-              aria-label={t("推理强度")}
-              value={provider.reasoningEffort ?? ""}
-              onChange={(e) => {
-                const effort = reasoningEfforts.find(
-                  (item) => item === e.currentTarget.value,
-                );
-                onChange({
-                  ...config,
-                  providers: config.providers.map((p) =>
-                    p.id === provider.id
-                      ? { ...p, reasoningEffort: effort }
-                      : p,
-                  ),
-                });
-              }}
-            >
-              <option value="">{t("提供商默认")}</option>
-              {reasoningEfforts.map((effort) => (
-                <option key={effort}>{effort}</option>
-              ))}
-            </select>
-          </Field>
+          <ModelCapability
+            provider={provider}
+            onChange={(p) => onChange(updateProviderModel(config, p))}
+          />
+          {speech && config.defaults.textProfileId === provider.id && (
+            <p className="model-fetch-note">
+              {t("语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。")}
+            </p>
+          )}
+          {!speech && (
+            <Field label={t("推理强度")}>
+              <select
+                aria-label={t("推理强度")}
+                value={provider.reasoningEffort ?? ""}
+                onChange={(e) => {
+                  const effort = reasoningEfforts.find(
+                    (item) => item === e.currentTarget.value,
+                  );
+                  onChange({
+                    ...config,
+                    providers: config.providers.map((p) =>
+                      p.id === provider.id
+                        ? { ...p, reasoningEffort: effort }
+                        : p,
+                    ),
+                  });
+                }}
+              >
+                <option value="">{t("提供商默认")}</option>
+                {reasoningEfforts.map((effort) => (
+                  <option key={effort}>{effort}</option>
+                ))}
+              </select>
+            </Field>
+          )}
         </>
       )}
       <button
@@ -117,7 +119,7 @@ export function ProviderModels({
                 .filter(
                   (purpose) =>
                     providerCanServe(provider, purpose.id) ||
-                    (purpose.id === "ocr" && !translationOnly),
+                    (purpose.id === "ocr" && !translationOnly && !speech),
                 )
                 .map((purpose) => {
                   const checked = assigned(purpose);
@@ -160,7 +162,11 @@ export function ProviderModels({
                     </label>
                   );
                 })}
-              <p>{t("未单独指定的指令使用默认模型。")}</p>
+              <p>
+                {speech
+                  ? t("在「文本转语音」中选择音色并试听。")
+                  : t("未单独指定的指令使用默认模型。")}
+              </p>
             </>
           )}
         </div>
