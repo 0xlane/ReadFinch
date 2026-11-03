@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-03T09:51:31.419Z",
+  "version": "0.15.1",
+  "packaged": true,
+  "checks": [
+    "Connection feedback stays inside the button: Testing, Success, Failed and Slow after 3 seconds; feedback resets after 5 seconds and raw replies never appear.",
+    "Changing connection settings invalidates an in-flight probe; dark mode keeps readable state icons and failed responses expose only safe diagnostics.",
+    "Packaged result keeps the same x/y when delayed suggestions arrive; oversized results scroll inside a bounded window."
+  ],
+  "rendererErrors": [],
+  "bounds": {
+    "before": {
+      "x": 1540,
+      "y": 202,
+      "width": 500,
+      "height": 229
+    },
+    "after": {
+      "x": 1540,
+      "y": 202,
+      "width": 500,
+      "height": 474
+    },
+    "capped": {
+      "x": 1540,
+      "y": 202,
+      "width": 500,
+      "height": 682
+    }
+  },
+  "scope": "Isolated desktop profile and local HTTP fixtures. Bottom-of-screen anchoring is driven through development-only selection hooks; packaged mode uses the normal command trial."
+}

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { besideCursor } from "../src/core/placement";
+import { besideCursor, planPanel, panelBounds } from "../src/core/placement";
 
 test("floating windows stay inside negative-coordinate and small display work areas", () => {
   const areas = [
@@ -34,4 +34,47 @@ test("a popup opens next to the cursor and flips above it near the bottom", () =
     besideCursor({ x: 250, y: 750 }, { width: 440, height: 320 }, area).y,
     420,
   );
+});
+
+test("a result chooses the roomier side once and keeps its origin when late suggestions arrive", () => {
+  const area = { x: 0, y: 0, width: 1280, height: 800 };
+  for (const [y, side] of [
+    [100, "below"],
+    [750, "above"],
+  ] as const) {
+    const plan = planPanel({ x: 260, y }, area, 520);
+    assert.equal(plan.side, side);
+    const first = panelBounds(plan, 220);
+    for (const height of [250, 380, 540, 720, 3000, 220]) {
+      const next = panelBounds(plan, height);
+      assert.deepEqual({ x: next.x, y: next.y }, { x: first.x, y: first.y });
+      assert.ok(next.y + next.height <= 792);
+    }
+  }
+});
+
+test("stable result plans clamp to small, offset and fractional-DIP work areas", () => {
+  for (const area of [
+    { x: -1536, y: -220, width: 1536, height: 864 },
+    { x: 1536, y: 0, width: 640, height: 360 },
+    { x: 0, y: 0, width: 768, height: 512 },
+  ]) {
+    for (const portion of [0, 0.25, 0.5, 0.75, 1]) {
+      const plan = planPanel(
+        {
+          x: area.x + area.width * portion + 0.4,
+          y: area.y + area.height * portion + 0.3,
+        },
+        area,
+        520,
+      );
+      const bounds = panelBounds(plan, 3000);
+      assert.ok(bounds.x >= area.x + 8 && bounds.y >= area.y + 8);
+      assert.ok(bounds.x + bounds.width <= area.x + area.width - 8);
+      assert.ok(bounds.y + bounds.height <= area.y + area.height - 8);
+      assert.ok(bounds.height <= 680);
+      assert.equal(bounds.x, Math.round(bounds.x));
+      assert.equal(bounds.y, Math.round(bounds.y));
+    }
+  }
 });

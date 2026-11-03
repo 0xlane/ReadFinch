@@ -312,6 +312,27 @@ try {
     (await api(main, "snapshot")).config.defaults.targetLanguage,
     "English",
   );
+  const beforeRapid = suggestCount();
+  await panel.evaluate(() => {
+    const select = document.querySelector('select[aria-label="目标语言"]');
+    for (const value of ["Deutsch", "Français"]) {
+      select.value = value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  });
+  await until(
+    async () =>
+      (await api(main, "snapshot")).config.defaults.targetLanguage ===
+        "Français" && suggestCount() === beforeRapid + 1,
+    "rapid language changes should run only the latest saved preference",
+  );
+  await card
+    .getByRole("checkbox", { name: "serendipity", exact: true })
+    .waitFor();
+  assert.equal(await panel.getByLabel("目标语言").inputValue(), "Français");
+  log(
+    "Rapid target-language changes save in order and start recommendations only for the latest choice.",
+  );
   await translate("An obsolete chance encounter");
   await until(() => lateStarted, "missing slow suggestion");
   await panel.getByRole("button", { name: "重新生成", exact: true }).waitFor();

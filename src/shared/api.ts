@@ -175,7 +175,7 @@ export type CallMap = {
     result: string;
   };
   listModels: { arg: { profileId: string }; result: string[] };
-  testText: { arg: { profileId: string }; result: string };
+  testText: { arg: { profileId: string }; result: { durationMs: number } };
   recognize: {
     arg: { id: string; profileId: string; dataUrl: string; refresh?: boolean };
     result: void;

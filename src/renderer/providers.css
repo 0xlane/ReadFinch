@@ -248,6 +248,81 @@
   font-size: 12px;
   line-height: 1.65;
 }
+.connection-test {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 74px;
+  min-height: 26px;
+}
+.connection-feedback {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.connection-feedback.success {
+  color: #16834b;
+  background: #16834b20;
+}
+.connection-feedback.failed {
+  color: #db3f54;
+  background: #db3f5420;
+}
+.connection-feedback.slow {
+  color: #a66a09;
+  background: #a66a0920;
+}
+[data-theme="dark"] .connection-feedback.success {
+  color: #6bd49b;
+  background: #6bd49b20;
+}
+[data-theme="dark"] .connection-feedback.failed {
+  color: #ff8b9c;
+  background: #ff8b9c20;
+}
+[data-theme="dark"] .connection-feedback.slow {
+  color: #efbf68;
+  background: #efbf6820;
+}
+.connection-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  width: 20px;
+}
+.connection-dots i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: connection-pulse 1s ease-in-out infinite;
+}
+.connection-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.connection-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes connection-pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .connection-dots i {
+    animation: none;
+  }
+}
 .provider-notice {
   margin-bottom: 8px;
 }

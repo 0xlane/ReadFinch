@@ -92,7 +92,12 @@ import type {
   SettingsTab,
   SettingsLocation,
 } from "../shared/api";
-import { besideCursor, type Point } from "../core/placement";
+import {
+  planPanel,
+  panelBounds,
+  type PanelPlacement,
+  type Point,
+} from "../core/placement";
 import { ShortcutRegistry, ShortcutRepeatGuard } from "../core/shortcuts";
 import { shortcutBindings } from "../shared/shortcuts";
 import { SelectionService } from "./native";
@@ -151,9 +156,10 @@ type PendingSuggestion = {
 };
 let pendingSuggestion: PendingSuggestion | undefined;
 let triggerAnchor: Point = { x: 0, y: 0 };
-let panelAnchor: Point = { x: 0, y: 0 };
 let panelPinned = false;
 let panelPlacedByUser = false;
+let panelPlacement: PanelPlacement | undefined;
+let panelFrame = "";
 let panelDialog = false;
 let captureReturn: BrowserWindow | undefined;
 let captureReturnPinned = false;
@@ -508,19 +514,6 @@ function openSettings(
   openMain();
   send(main, "settings", settingsLocation);
 }
-function positionNear(win: BrowserWindow, point: Point, height?: number) {
-  // Use the requested DIP size. Feeding getSize() back into setBounds() can
-  // accumulate native frame rounding on mixed-scale Windows monitors.
-  const width = win === panel ? 500 : 190;
-  const currentHeight = win === panel ? 320 : 40;
-  win.setBounds(
-    besideCursor(
-      point,
-      { width, height: height ?? currentHeight },
-      screen.getDisplayNearestPoint(point).workArea,
-    ),
-  );
-}
 function updateToolbar(): ToolbarView | null {
   const selection = native.current;
   if (!selection || !pill || pill.isDestroyed()) return null;
@@ -676,13 +669,25 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
   const reusePinned = panelPinned && panel?.isVisible();
   interaction = { ...value, pinned: !!reusePinned };
   if (!reusePinned) {
-    panelAnchor = anchor;
+    const expectsSuggestions =
+      store.config.noteSuggestion.enabled &&
+      (!value.actionId || value.actionId === "translate");
+    panelPlacement = planPanel(
+      anchor,
+      screen.getDisplayNearestPoint(anchor).workArea,
+      expectsSuggestions || value.capture ? 520 : 420,
+    );
+    panelFrame = "";
     panelPlacedByUser = false;
     panelPinned = false;
   }
   pill?.hide();
   const deliver = () => {
-    if (!reusePinned) positionNear(panel!, panelAnchor, 220);
+    if (!reusePinned) {
+      const bounds = panelBounds(panelPlacement!, 220);
+      panelFrame = JSON.stringify(bounds);
+      panel!.setBounds(bounds);
+    }
     panel!.show();
     panel!.focus();
     send(panel, "interaction", interaction!);
@@ -1373,10 +1378,15 @@ async function handle(
       });
     }
     case "panelResize": {
-      if (win !== panel || panelPlacedByUser) return;
+      if (win !== panel || panelPlacedByUser || !panelPlacement) return;
       const height = z.number().min(160).max(3000).parse(arg.height);
-      const area = screen.getDisplayNearestPoint(panelAnchor).workArea;
-      positionNear(win, panelAnchor, Math.min(height, 680, area.height - 16));
+      const bounds = panelBounds(panelPlacement, height);
+      // Ignore duplicate ResizeObserver notifications and Windows DIP rounding.
+      const frame = JSON.stringify(bounds);
+      if (frame !== panelFrame) {
+        panelFrame = frame;
+        win.setBounds(bounds);
+      }
       return;
     }
     case "shortcutRecording": {
@@ -1662,6 +1672,7 @@ async function handle(
       return;
     }
     case "testText": {
+      const startedAt = performance.now();
       const p = store.config.providers.find((p) => p.id === arg.profileId);
       if (!p) throw Error(t("服务不存在"));
       if (!p.enabled) throw Error(t("此 API 提供商已停用"));
@@ -1685,8 +1696,13 @@ async function handle(
           1,
           AbortSignal.timeout(p.timeoutMs),
         );
-        return t("语音接口已返回音频");
+        return { durationMs: Math.round(performance.now() - startedAt) };
       }
+      const targetLanguage = resolveResultLanguage(
+        store.config.defaults.targetLanguage,
+        store.config.appearance.language,
+        app.getPreferredSystemLanguages(),
+      );
       const result = await complete(
         {
           ...p,
@@ -1694,23 +1710,26 @@ async function handle(
           ...(isTranslationOnly(p)
             ? {
                 translation: {
-                  text: "Hello, world!",
+                  text: "Hi",
                   sourceLanguage: "en",
-                  targetLanguage: resolveResultLanguage(
-                    store.config.defaults.targetLanguage,
-                    store.config.appearance.language,
-                    app.getPreferredSystemLanguages(),
-                  ),
+                  targetLanguage,
                 },
               }
             : {}),
         },
-        [{ role: "user", content: "Reply with exactly: ReadFinch OK" }],
+        [
+          {
+            role: "user",
+            content: `Translate Hi into ${targetLanguage}. Return only the translation.`,
+          },
+        ],
         key,
         new AbortController().signal,
         () => {},
       );
-      return t("连接成功 · ") + result.slice(0, 100);
+      if (!result.trim())
+        throw Error(t("服务未返回有效内容，请检查模型 ID 和接口兼容性"));
+      return { durationMs: Math.round(performance.now() - startedAt) };
     }
     case "listModels": {
       const p = store.config.providers.find((p) => p.id === arg.profileId);

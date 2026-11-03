@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-03T09:28:28.575Z",
-  "version": "0.15.0",
+  "date": "2026-11-03T09:59:11.706Z",
+  "version": "0.15.1",
   "packaged": true,
   "titles": [
     "伴读雀"
@@ -19,6 +19,6 @@
   "rendererErrors": [],
   "preserved": "Providers, defaults, appearance and local notebase configuration match the pre-update profile; user data remains in the same directory.",
   "scope": "Actual current-user NSIS upgrade, default data directory; no isolated profile or credential changes. Installer completed silently with exit code 0.",
-  "uninstallDisplayName": "ReadFinch 0.15.0",
+  "uninstallDisplayName": "ReadFinch 0.15.1",
   "uninstaller": "Uninstall ReadFinch.exe"
 }

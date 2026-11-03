@@ -67,6 +67,7 @@ export function Settings({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [keys, setKeys] = useState<Record<string, string>>({});
+  const [keyVersions, setKeyVersions] = useState<Record<string, number>>({});
   const [visibleDraftKey, setVisibleDraftKey] = useState("");
   const keyScopes = useRef<Record<string, string>>({});
   const [imported, setImported] = useState<ImportPreview | null>(null);
@@ -247,6 +248,10 @@ export function Settings({
             placeholder={saved ? "••••••••••••••••••••••••" : t("输入 API Key")}
             value={keys[id] ?? ""}
             onChange={(e) => {
+              setKeyVersions((versions) => ({
+                ...versions,
+                [id]: (versions[id] ?? 0) + 1,
+              }));
               keyScopes.current[id] =
                 draft.providers
                   .find((p) => "text:" + p.id === id)
@@ -261,6 +266,10 @@ export function Settings({
               title={t("移除本机保存的密钥")}
               onClick={() =>
                 void perform(async () => {
+                  setKeyVersions((versions) => ({
+                    ...versions,
+                    [id]: (versions[id] ?? 0) + 1,
+                  }));
                   onSnapshot(
                     await window.readfinch.call("saveCredential", {
                       id,
@@ -874,21 +883,25 @@ export function Settings({
             })
           }
           credential={keyField}
+          credentialState={Object.fromEntries(
+            draft.providers.map((p) => [
+              p.id,
+              {
+                available:
+                  !!keys["text:" + p.id] ||
+                  snapshot.credentialIds.includes("text:" + p.id) ||
+                  snapshot.credentialIds.includes("headers:" + p.id),
+                version: keyVersions["text:" + p.id] ?? 0,
+              },
+            ]),
+          )}
           busy={busy}
           {...modelCatalog}
-          test={(id, model) =>
-            void perform(async () => {
-              await save();
-              await flushCredentials();
-              setMessage(
-                model +
-                  " · " +
-                  (await window.readfinch.call("testText", {
-                    profileId: id,
-                  })),
-              );
-            })
-          }
+          test={async (id) => {
+            await save();
+            await flushCredentials();
+            return window.readfinch.call("testText", { profileId: id });
+          }}
         />
       )}
       {tab === "ocr" && (

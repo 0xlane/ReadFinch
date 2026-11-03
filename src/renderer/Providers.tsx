@@ -12,6 +12,7 @@ import {
 import { modelPurposes, type ModelPurpose } from "../shared/models";
 import { providerPreset, isTranslationOnly } from "../shared/provider-presets";
 import { ProviderSpecificSettings } from "./ProviderSpecificSettings";
+import { ConnectionTestButton } from "./ConnectionTestButton";
 import { Field } from "./ui";
 import { ProviderIcon, ProviderSwitch } from "./provider-ui";
 import { ProviderModels } from "./ProviderModels";
@@ -25,7 +26,8 @@ type ProviderProps = ModelCatalogAccess & {
   savedEndpoints: Record<string, string>;
   duplicate: (id: string) => Promise<string | undefined>;
   credential: (id: string, action: ReactNode) => ReactNode;
-  test: (id: string, model: string) => void;
+  test: (id: string) => Promise<{ durationMs: number }>;
+  credentialState: Record<string, { available: boolean; version: number }>;
   busy: boolean;
 };
 
@@ -225,6 +227,7 @@ function ProviderEditor({
   remove,
   canRemove,
   savedEndpoints,
+  credentialState,
   ...catalog
 }: ProviderProps & {
   provider: TextProfile;
@@ -236,6 +239,7 @@ function ProviderEditor({
   const [advanced, setAdvanced] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [headerVersion, setHeaderVersion] = useState(0);
   const model = provider.model;
   const preset = providerPreset(provider.preset);
   const translationOnly = isTranslationOnly(provider);
@@ -248,20 +252,20 @@ function ProviderEditor({
     });
   }
   const testButton = (
-    <button
-      className="provider-small-button"
-      disabled={busy || (!model && !translationOnly) || !provider.enabled}
-      title={
-        translationOnly
-          ? t("测试翻译接口")
-          : model
-            ? t("使用 ") + model + t(" 测试连接")
-            : t("请先选择模型")
+    <ConnectionTestButton
+      identity={JSON.stringify([
+        provider,
+        credentialState[provider.id]?.version,
+        headerVersion,
+      ])}
+      disabled={
+        busy ||
+        (!model && !translationOnly) ||
+        !provider.enabled ||
+        (provider.requiresKey && !credentialState[provider.id]?.available)
       }
-      onClick={() => test(provider.id, model)}
-    >
-      {t("测试连接")}
-    </button>
+      run={() => test(provider.id)}
+    />
   );
   return (
     <section className="provider-editor" aria-label={t("提供商设置")}>
@@ -360,6 +364,7 @@ function ProviderEditor({
         />
         {advanced && savedEndpoints[provider.id] === provider.endpoint && (
           <RequestHeaders
+            onChange={() => setHeaderVersion((v) => v + 1)}
             key={provider.id + "|" + provider.endpoint}
             provider={provider}
           />

@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-02T16:05:38.515Z",
-  "version": "0.9.0",
+  "date": "2026-11-03T09:55:04.451Z",
+  "version": "0.15.1",
   "packaged": false,
   "checks": [
     "An explicit translation starts two independently routed requests; recommendations appear only after the translation, without writing any notes.",

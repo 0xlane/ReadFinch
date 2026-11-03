@@ -120,6 +120,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const autoRan = useRef("");
   const autoRecognized = useRef("");
   const currentJob = useRef("");
+  const translationIntent = useRef(0);
+  const latestRun = useRef(run);
+  latestRun.current = run;
   const shortcutAction = useRef<(id: string) => void>(() => {});
   const sessionId = useRef("");
   const content = useRef<HTMLDivElement>(null);
@@ -140,6 +143,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       snapshot.credentialIds.includes("text:" + provider.id));
 
   function stop() {
+    translationIntent.current++;
     const id = currentJob.current || resultRun.current;
     if (id) void window.readfinch.call("cancel", { id });
     currentJob.current = "";
@@ -458,9 +462,16 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   function rememberTranslation(
     preference: { targetLanguage: string } | { providerId: string },
   ) {
-    translationWrite.current = translationWrite.current
-      .then(() => window.readfinch.call("setTranslationPreference", preference))
-      .catch((e) => setNoteError((e as Error).message));
+    const write = translationWrite.current.then(() =>
+      window.readfinch.call("setTranslationPreference", preference),
+    );
+    translationWrite.current = write.catch((e) =>
+      setNoteError((e as Error).message),
+    );
+    return write.then(
+      () => true,
+      () => false,
+    );
   }
   async function saveResult(create = false) {
     const draft = noteDraft.current;
@@ -552,8 +563,13 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             )}
             onChange={(value) => {
               setTarget(value);
-              rememberTranslation({ targetLanguage: value });
-              void run(activeAction, undefined, value);
+              const intent = ++translationIntent.current;
+              void rememberTranslation({ targetLanguage: value }).then(
+                (saved) => {
+                  if (saved && intent === translationIntent.current)
+                    void latestRun.current(activeAction, undefined, value);
+                },
+              );
             }}
           />
         )}
@@ -1176,9 +1192,13 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
               const ref = { providerId: p.id, model: p.model };
               setProviderId(p.id);
               modelChoice.current = { actionId: activeAction?.id ?? null, ref };
-              if (activeAction?.id === "translate")
-                rememberTranslation({ providerId: p.id });
-              if (activeAction) void run(activeAction, ref);
+              if (activeAction?.id === "translate") {
+                const intent = ++translationIntent.current;
+                void rememberTranslation({ providerId: p.id }).then((saved) => {
+                  if (saved && intent === translationIntent.current)
+                    void latestRun.current(activeAction, ref);
+                });
+              } else if (activeAction) void run(activeAction, ref);
             }}
           />
         )}

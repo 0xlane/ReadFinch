@@ -4,7 +4,13 @@ import type { TextProfile } from "../shared/config";
 import { parseHeaders } from "../shared/headers";
 import { Field } from "./ui";
 
-export function RequestHeaders({ provider }: { provider: TextProfile }) {
+export function RequestHeaders({
+  provider,
+  onChange,
+}: {
+  provider: TextProfile;
+  onChange?: () => void;
+}) {
   const [value, setValue] = useState("");
   const [message, setMessage] = useState("");
   const [ready, setReady] = useState(false);
@@ -53,6 +59,7 @@ export function RequestHeaders({ provider }: { provider: TextProfile }) {
           value={value}
           onBlur={flush}
           onChange={(e) => {
+            onChange?.();
             const text = e.target.value;
             setValue(text);
             clearTimeout(timer.current);
