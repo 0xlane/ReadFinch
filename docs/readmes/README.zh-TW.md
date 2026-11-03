@@ -8,16 +8,14 @@
 
 **就在文字旁邊，陪你讀懂每一句。**
 
-翻譯一段文字、讀懂一個長句、修好一句表達——留在正在使用的應用程式裡，就能完成。
-
-A desktop reading and writing companion. · 随选随用的桌面阅读与写作助手。
+伴讀雀是一款開源的桌面閱讀與寫作助手。在不同應用程式中選取文字，即可翻譯、查詞、改善寫作或儲存筆記；無法選取的圖片文字，也能透過離線或線上 OCR 辨識。
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <strong>繁體中文</strong> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <a href="../../docs/readmes/README.fr.md">Français</a> · <a href="../../docs/readmes/README.de.md">Deutsch</a> · <a href="../../docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
-<img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
+<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="離線與線上 OCR">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -39,14 +37,14 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <a id="features"></a>
 
-## 文字在哪裡，協助就在哪裡
+## 主要功能
 
 | 想做什麼 | 伴讀雀如何協助 |
 | --- | --- |
 | **讀懂原文** | 即時查看逐步產生的譯文，查詢發音、釋義和例句，將長句拆解成容易理解的結構。 |
 | **改善表達** | 在原句中查看修改位置，對照修改理由與修訂稿，再將改好的文字帶回編輯器。 |
-| **辨識無法選取的文字** | 框選螢幕或匯入圖片，以內建 OCR 離線辨識簡體中文和英文。核對文字後，再執行指令。 |
-| **邊讀邊聽** | 朗讀選取內容、譯文與例句。依語言選擇系統離線語音或相容的線上語音，並調整語速、音高和音量。 |
+| **辨識無法選取的文字** | 框選螢幕或匯入圖片，選擇內建離線 OCR 或已設定的線上視覺供應商。核對辨識文字後，再執行指令。 |
+| **邊讀邊聽** | 透過系統離線語音或線上語音朗讀選取內容、譯文與例句，可依語言選擇聲音並試聽；可調整的播放設定取決於語音服務。 |
 | **自訂 AI 指令** | 設定供應商、提示詞、圖示、快捷鍵及輸出欄位，以 HTML + Liquid 編排結果卡片，並將欄位對應至本機筆記庫。 |
 | **留下值得記住的內容** | 收藏結果，或勾選建議儲存的詞彙。透過本機搜尋，回看儲存當時的原文與答案。 |
 
@@ -71,17 +69,28 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 </details>
 
-### 使用自己的供應商，選擇適合的模型
+### 離線與線上 OCR
 
-支援 33 種供應商選項，涵蓋 OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter 與純翻譯服務，支援原生 API、Chat Completions 和 Responses。每個 AI 供應商項目對應一個模型，可複製項目使用其他模型。翻譯、字典、寫作、OCR 和語言偵測可分別指定供應商，並支援模型建議、連線測試、溫度、自訂請求標頭及獨立代理設定。
+框選螢幕區域或匯入圖片，核對辨識出的文字後，即可繼續翻譯、查詞或執行自訂指令。
 
-### 用熟悉的語言閱讀
+| 辨識方式 | 使用說明 |
+| --- | --- |
+| **離線辨識 · 預設** | 內建引擎在本機辨識簡體中文和英文，不需要 API 帳戶、網路連線或額外下載語言套件。 |
+| **線上辨識 · 選用** | 透過已設定的視覺供應商擷取文字。支援的語言與辨識效果取決於模型；框選區域或匯入的圖片會傳送給該供應商。 |
 
-README 與應用程式預設的 8 種目標語言一致：
+使用線上 OCR 時，先在 API Providers 中設定支援圖片輸入的模型，再到 Screenshot OCR 選擇該供應商。內建離線引擎始終可用，離線辨識失敗也不會自動上傳圖片。
+
+### 為不同功能選擇供應商
+
+使用自己的 API 帳戶，連接 OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter 等預設供應商，或新增相容 Chat Completions、Responses 的自訂介面，也支援專用翻譯服務。每個 AI 供應商項目使用一個模型，複製項目即可設定其他模型。翻譯、詞典、寫作、OCR、語言偵測及線上朗讀可分別選擇供應商；模型建議、連線測試、溫度、自訂請求標頭及獨立代理依服務能力提供。
+
+### 語言支援
+
+翻譯與解釋可選擇以下 8 種預設目標語言：
 
 **English · 简体中文 · 繁體中文 · 日本語 · 한국어 · Français · Deutsch · Español**
 
-**應用程式介面目前支援簡體中文和英文**，預設跟隨系統語言。翻譯品質及其他語言能力取決於所選模型；內建離線 OCR 支援簡體中文和英文。
+**應用程式介面支援簡體中文與英文**，預設跟隨系統。介面語言與輸出語言分開設定；翻譯品質及支援的語言範圍取決於所選供應商與模型。
 
 <a id="get-started"></a>
 
@@ -89,9 +98,70 @@ README 與應用程式預設的 8 種目標語言一致：
 
 **[下載最新版](https://github.com/0xlane/ReadFinch/releases/latest)**
 
-從 GitHub Releases 下載適合目前系統的安裝套件。Windows 建議使用 setup.exe 安裝版，也可選擇免安裝的 portable.exe。macOS 請依晶片選擇 arm64（Apple 晶片）或 x64（Intel）。
+在最新發行版本中選擇適合目前系統的安裝套件，使用已封裝的應用程式不需要安裝開發工具。
 
-預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在「關於」頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。
+| 系統 | 安裝套件 |
+| --- | --- |
+| Windows x64 | `*-setup.exe` 為安裝版，`*-portable.exe` 為免安裝可攜版。 |
+| macOS | Apple 晶片選擇 `arm64`，Intel 選擇 `x64`，提供 `.dmg` 與 `.zip`。 |
+| Linux x64 | `.AppImage` 可直接執行，`amd64.deb` 適用於 Debian、Ubuntu。 |
+
+預設開啟自動檢查更新，可在「關於」頁調整或手動檢查。Windows 安裝版與 Linux AppImage 可在結束應用程式時安裝已下載的更新；Windows 可攜版、macOS 與 Linux DEB 需要手動安裝。
+
+### 第一次使用
+
+1. **連接供應商。** 開啟 API Providers，選擇預設或相容介面，填入所需憑證與模型並測試連線。可以設為預設供應商，也可指派給特定功能。
+2. **選取一句話。** 點選工具列上的 Translate，選擇目標語言。需要對照時，點圖釘保留結果即可。
+3. **從圖片取詞。** 使用下方 OCR 快捷鍵框選區域。離線 OCR 安裝後即可使用；線上辨識需在截圖辨識設定中選擇已設定的視覺供應商。核對文字後再繼續。
+
+### 常用快捷鍵
+
+| 指令 | Windows / Linux | macOS |
+| --- | --- | --- |
+| 翻譯選取文字 | `Alt + T` | `Option + T` |
+| 開啟字典 | `Alt + Shift + D` | `Option + Shift + D` |
+| 改善寫作 | `Alt + Shift + W` | `Option + Shift + W` |
+| 選擇指令 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
+| 框選螢幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| 讀取剪貼簿 | `Ctrl + Shift + V` | `Command + Shift + V` |
+
+快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。
+
+### 平台支援
+
+| 平台 | 如何取得文字 |
+| --- | --- |
+| Windows | 透過 UI Automation 讀取前景應用程式提供的文字選取範圍。 |
+| macOS | 讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。 |
+| Linux | X11 使用 PRIMARY 選取範圍，依賴 `xclip`、`xdotool`、`xprop`。Wayland 使用剪貼簿或桌面截圖入口，快捷鍵能力取決於桌面環境。 |
+
+自動取詞需要目前的應用程式提供可讀取的文字選取範圍。無法直接取詞時，可使用 OCR 或剪貼簿。系統權限、平台限制及驗證情況請參閱 [平台支援矩陣](../../docs/PLATFORMS.md)。
+
+## 資料與隱私
+
+**筆記與離線辨識保留在本機。** 筆記內容儲存在目前裝置；內建 OCR 在本機處理圖片，系統離線語音不需要線上朗讀服務。
+
+**請求傳送至你選擇的供應商。** 翻譯與 AI 指令傳送請求所需的文字，線上朗讀傳送待朗讀內容；線上 OCR 將框選區域或匯入的圖片傳送給所選視覺供應商。服務帳戶、可用性及使用費用由各供應商管理。
+
+**設定可以移轉。** 支援檔案匯入、匯出及手動 WebDAV 同步，移轉供應商設定、指令、快捷鍵與筆記欄位對應。API Key 和自訂請求標頭依裝置儲存，新裝置須另行設定；筆記內容不包含在設定同步中。
+
+<a id="documentation"></a>
+
+## 文件
+
+- [應用程式架構與原始碼目錄](../../docs/ARCHITECTURE.md)
+- [供應商、模型與功能指派](../../docs/MODELS.md)
+- [離線與線上 OCR](../../docs/OCR.md)
+- [設定管理與 WebDAV](../../docs/CONFIGURATION.md)
+- [平台支援與權限](../../docs/PLATFORMS.md)
+- [介面、翻譯與解釋語言](../../docs/LANGUAGES.md)
+- [版本發行與應用程式更新](../../docs/UPDATES.md)
+
+技術文件使用中文或英文。
+
+## 參與貢獻
+
+歡迎提出可重現的問題、互動建議、翻譯修訂和程式碼貢獻。回報時請註明作業系統與應用程式版本，並移除範例中的憑證和私人文字。 [回報問題](https://github.com/0xlane/ReadFinch/issues) · [貢獻程式碼](https://github.com/0xlane/ReadFinch/pulls).
 
 ### 從原始碼建置
 
@@ -108,60 +178,6 @@ npm start
 
 `assets:ocr` 僅在**開發建置階段**準備辨識資料。資料隨應用程式打包，安裝後無須下載語言套件。在目標作業系統上執行 `npm run dist`，安裝套件會產生於 `release/`。
 
-### 第一次使用
-
-1. **連接供應商。** 開啟 API Providers，選擇預設或相容介面，填入所需憑證與模型並測試連線。可以設為預設供應商，也可指派給特定功能。
-2. **選取一句話。** 點選工具列上的 Translate，選擇目標語言。需要對照時，點圖釘保留結果即可。
-3. **試試截圖取字。** 使用下方 OCR 快捷鍵，框選區域並核對辨識文字。內建 OCR 和系統朗讀不需要先設定 AI 供應商。
-
-### 常用快捷鍵
-
-| 指令 | Windows / Linux | macOS |
-| --- | --- | --- |
-| 翻譯選取文字 | `Alt + T` | `Option + T` |
-| 開啟字典 | `Alt + Shift + D` | `Option + Shift + D` |
-| 改善寫作 | `Alt + Shift + W` | `Option + Shift + W` |
-| 選擇指令 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 框選螢幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
-| 讀取剪貼簿 | `Ctrl + Shift + V` | `Command + Shift + V` |
-
-快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。
-
-### 融入桌面使用習慣
-
-| 平台 | 如何取得文字 |
-| --- | --- |
-| Windows | 透過 UI Automation 讀取前景應用程式提供的文字選取範圍。 |
-| macOS | 讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。 |
-| Linux | X11 使用 PRIMARY 選取範圍，依賴 `xclip`、`xdotool`、`xprop`。Wayland 使用剪貼簿或桌面截圖入口，快捷鍵能力取決於桌面環境。 |
-
-Windows 已在開發機器上驗證。macOS 和 Linux 提供對應實作，原生桌面互動仍須在目標系統驗收，詳見 [平台支援矩陣](../../docs/PLATFORMS.md).
-
-## 文字與資料，去向清楚
-
-**筆記和離線功能留在本機。** 筆記內容儲存於裝置上的 SQLite 資料庫；離線 OCR 和系統語音在本機執行。本機筆記庫頁面只顯示本機內容。
-
-**AI 請求交給你選擇的供應商。** 翻譯與自訂指令傳送所需文字，線上朗讀傳送待朗讀內容。遠端圖片辨識會先顯示原圖和目標供應商，由你明確開始請求。
-
-**設定可以移轉。** 支援檔案匯入、匯出及手動 WebDAV 同步，移轉供應商設定、指令、快捷鍵與筆記欄位對應。API Key 和自訂請求標頭依裝置儲存，新裝置須另行設定；筆記內容不包含在設定同步中。
-
-<a id="documentation"></a>
-
-## 進一步了解
-
-- [應用程式架構與原始碼目錄](../../docs/ARCHITECTURE.md)
-- [供應商、模型與功能指派](../../docs/MODELS.md)
-- [離線 OCR 與視覺介面](../../docs/OCR.md)
-- [設定管理與 WebDAV](../../docs/CONFIGURATION.md)
-- [平台支援與權限](../../docs/PLATFORMS.md)
-- [介面、翻譯與解釋語言](../../docs/LANGUAGES.md)
-
-技術文件使用中文或英文。
-
-## 一起讓伴讀雀更好用
-
-歡迎提出可重現的問題、互動建議、翻譯修訂和程式碼貢獻。回報時請註明作業系統與應用程式版本，並移除範例中的憑證和私人文字。 [回報問題](https://github.com/0xlane/ReadFinch/issues) · [貢獻程式碼](https://github.com/0xlane/ReadFinch/pulls).
-
 ```sh
 npm run typecheck
 npm test
@@ -174,7 +190,7 @@ README 文案維護於 `docs/readmes/content.json`。修改翻譯後執行 `npm 
 
 伴讀雀採用 **GPL-3.0-only** 授權。文字選取工具列和指令卡片的互動設計受到 **陪讀蛙（Read Frog）** 啟發。伴讀雀是獨立桌面專案，並非陪讀蛙官方發行版。
 
-[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [第三方元件與資源聲明](../../THIRD_PARTY_NOTICES.md).
+[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [第三方元件與資源聲明](../../THIRD_PARTY_NOTICES.md)
 
 <div align="right">
 

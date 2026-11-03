@@ -8,16 +8,14 @@
 
 **Dein Lesebegleiter, direkt neben deinen Worten.**
 
-Eine Passage übersetzen, einen schwierigen Satz verstehen oder einen eigenen Text verbessern – ohne die gerade verwendete App zu verlassen.
-
-A desktop reading and writing companion. · 随选随用的桌面阅读与写作助手。
+ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze markierten Text, schlage Wörter nach, überarbeite Formulierungen und speichere Notizen aus verschiedenen Apps. Für Text in Bildern stehen Offline- und Online-OCR bereit.
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <a href="../../docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <a href="../../docs/readmes/README.fr.md">Français</a> · <strong>Deutsch</strong> · <a href="../../docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
-<img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
+<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="Offline- und Online-OCR">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -39,14 +37,14 @@ Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine We
 
 <a id="features"></a>
 
-## Hilfe dort, wo dein Text ist
+## Funktionen
 
 | Was du vorhast | Wie ReadFinch hilft |
 | --- | --- |
 | **Lesen und verstehen** | Lies Übersetzungen schon während der Ausgabe, schlage Aussprache und Beispiele nach und zerlege lange Sätze in verständliche Teile. |
 | **Besser formulieren** | Sieh Änderungen im ursprünglichen Satz, verstehe die Begründungen und übernimm die überarbeitete Fassung in deinen Editor. |
-| **Nicht markierbaren Text lesen** | Erfasse einen Bildschirmausschnitt oder importiere ein Bild. Die integrierte OCR erkennt vereinfachtes Chinesisch und Englisch offline. Prüfe den Text, bevor du einen Befehl ausführst. |
-| **Beim Lesen zuhören** | Lass dir markierten Text, Übersetzungen und Beispiele vorlesen. Wähle je Sprache lokale Systemstimmen oder kompatible Online-Stimmen und passe Tempo, Tonhöhe und Lautstärke an. |
+| **Nicht markierbaren Text lesen** | Erfasse einen Bildschirmausschnitt oder importiere ein Bild. Nutze die integrierte Offline-OCR oder einen eingerichteten Online-Vision-Anbieter und prüfe den Text vor dem nächsten Befehl. |
+| **Beim Lesen zuhören** | Lass dir markierten Text, Übersetzungen und Beispiele mit Offline-Systemstimmen oder Online-Sprachausgabe vorlesen. Wähle und teste Stimmen je Sprache; die Wiedergabeeinstellungen hängen vom Sprachdienst ab. |
 | **Eigene KI-Befehle erstellen** | Lege Anbieter, Prompts, Symbol, Tastenkürzel und typisierte Ausgabefelder fest. Gestalte Ergebniskarten mit HTML + Liquid und ordne die Felder einem lokalen Notizbuch zu. |
 | **Wichtiges behalten** | Speichere ein Ergebnis oder übernimm einen Wortschatzvorschlag. Durchsuche lokale Notizbücher und sieh den ursprünglichen Text zusammen mit der gespeicherten Antwort wieder. |
 
@@ -71,17 +69,28 @@ Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine We
 
 </details>
 
-### Dein Anbieter. Dein Modell. Deine Wahl.
+### Offline- und Online-OCR
 
-Wähle aus 33 Anbieteroptionen, darunter OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter und reine Übersetzungsdienste. Native APIs, Chat Completions und Responses werden unterstützt. Jeder KI-Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben, OCR und Spracherkennung können unterschiedliche Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur, eigene Header und individuelle Proxy-Einstellungen sind verfügbar.
+Erfasse einen Bildschirmausschnitt oder importiere ein Bild, prüfe den erkannten Text und übersetze ihn anschließend, schlage ihn nach oder nutze einen eigenen KI-Befehl.
 
-### In deiner Sprache lesen
+| Modus | Funktionsweise |
+| --- | --- |
+| **Offline · Standard** | Die integrierte Engine erkennt vereinfachtes Chinesisch und Englisch auf deinem Gerät. Dafür sind weder API-Konto noch Netzwerkverbindung oder zusätzliche Sprachpakete nötig. |
+| **Online · optional** | Ein eingerichteter Vision-Anbieter liest den Text aus. Unterstützte Sprachen und Erkennungsqualität hängen vom Modell ab; der Bildschirmausschnitt oder das importierte Bild wird an diesen Anbieter gesendet. |
 
-Die README-Übersetzungen entsprechen den acht voreingestellten Zielsprachen der App:
+Richte für Online-OCR unter API Providers ein Modell mit Bildeingabe ein und wähle den Anbieter unter Screenshot OCR. Die integrierte Offline-Engine bleibt verfügbar. Wenn die Offline-Erkennung fehlschlägt, wird kein Bild automatisch hochgeladen.
+
+### Anbieter für jede Funktion
+
+Verbinde dein eigenes API-Konto über Vorlagen für OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter und weitere Anbieter oder nutze eine mit Chat Completions oder Responses kompatible API. Auch reine Übersetzungsdienste werden unterstützt. Jeder KI-Anbietereintrag verwendet ein Modell; dupliziere ihn für ein weiteres. Übersetzung, Wörterbuch, Schreibverbesserung, OCR, Erkennung der Textsprache und Online-Sprachausgabe können unterschiedliche Anbieter verwenden. Je nach Dienst stehen Modellvorschläge, Verbindungstests, Temperatur, eigene Header und ein Proxy pro Anbieter zur Verfügung.
+
+### Sprachen
+
+Für Übersetzungen und Erklärungen stehen acht voreingestellte Zielsprachen zur Auswahl:
 
 **English · 简体中文 · 繁體中文 · 日本語 · 한국어 · Français · Deutsch · Español**
 
-**Die App-Oberfläche ist derzeit auf Englisch und vereinfachtem Chinesisch verfügbar** und kann automatisch der Systemsprache folgen. Übersetzungsqualität und weitere unterstützte Sprachen hängen vom Modell ab. Die integrierte Offline-OCR erkennt vereinfachtes Chinesisch und Englisch.
+Die **Oberfläche unterstützt Englisch und vereinfachtes Chinesisch** und folgt standardmäßig der Systemsprache. Oberflächen- und Ausgabesprache lassen sich getrennt einstellen. Übersetzungsqualität und Sprachabdeckung hängen vom gewählten Anbieter und Modell ab.
 
 <a id="get-started"></a>
 
@@ -89,9 +98,70 @@ Die README-Übersetzungen entsprechen den acht voreingestellten Zielsprachen der
 
 **[Neueste Version herunterladen](https://github.com/0xlane/ReadFinch/releases/latest)**
 
-Laden Sie das Paket für Ihr Betriebssystem von GitHub Releases herunter. Unter Windows wählen Sie setup.exe zur Installation oder portable.exe für die portable Version. Für macOS wählen Sie arm64 für Apple Silicon oder x64 für Intel.
+Wähle auf der Seite der neuesten Veröffentlichung das Paket für dein Betriebssystem. Für die fertige App brauchst du keine Entwicklungswerkzeuge.
 
-Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Seite Über können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.
+| System | Paket |
+| --- | --- |
+| Windows x64 | `*-setup.exe` zum Installieren oder `*-portable.exe` für die Nutzung ohne Installation. |
+| macOS | `arm64` für Apple-Chips oder `x64` für Intel; als `.dmg` und `.zip` verfügbar. |
+| Linux x64 | `.AppImage` zum direkten Start oder `amd64.deb` für Debian und Ubuntu. |
+
+Die automatische Suche nach Updates ist standardmäßig aktiviert. Unter About kannst du sie einstellen oder manuell nach Updates suchen. Windows-Installationen und Linux-AppImages können heruntergeladene Updates beim Beenden installieren; portable Windows-Versionen, macOS und Linux-DEB-Pakete erfordern eine manuelle Installation.
+
+### Erste Schritte
+
+1. **Anbieter verbinden.** Wähle unter API Providers eine Vorlage oder einen kompatiblen Endpunkt, trage die benötigten Zugangsdaten und das Modell ein und teste die Verbindung. Weise den Anbieter als Standard oder einer bestimmten Funktion zu.
+2. **Einen Satz markieren.** Klicke in der Werkzeugleiste auf Translate und wähle die Zielsprache. Mit der Stecknadel bleibt das Ergebnis neben deiner Lektüre stehen.
+3. **Text aus einem Bild erfassen.** Nutze das OCR-Tastenkürzel unten und markiere einen Bereich. Offline-OCR funktioniert sofort; für Online-Erkennung wählst du unter Screenshot OCR einen eingerichteten Vision-Anbieter. Prüfe den Text, bevor du fortfährst.
+
+### Nützliche Tastenkürzel
+
+| Befehl | Windows / Linux | macOS |
+| --- | --- | --- |
+| Auswahl übersetzen | `Alt + T` | `Option + T` |
+| Wörterbuch öffnen | `Alt + Shift + D` | `Option + Shift + D` |
+| Text verbessern | `Alt + Shift + W` | `Option + Shift + W` |
+| Befehl auswählen | `Ctrl + Shift + Space` | `Command + Shift + Space` |
+| Bildschirmtext per OCR erfassen | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Text aus der Zwischenablage lesen | `Ctrl + Shift + V` | `Command + Shift + V` |
+
+Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.
+
+### Plattformunterstützung
+
+| Plattform | Texterfassung |
+| --- | --- |
+| Windows | Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation. |
+| macOS | Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots. |
+| Linux | Verwendet unter X11 die PRIMARY-Auswahl (`xclip`, `xdotool`, `xprop`). Unter Wayland werden Zwischenablage oder Screenshot-Portal genutzt; Tastenkürzel hängen von der Desktop-Umgebung ab. |
+
+Die automatische Auswahl setzt voraus, dass die aktive App ihren markierten Text zugänglich macht. Andernfalls kannst du OCR oder die Zwischenablage verwenden. Berechtigungen, Einschränkungen und Prüfstatus stehen in der [Plattformübersicht](../../docs/PLATFORMS.md).
+
+## Daten und Datenschutz
+
+**Notizen und Offline-Erkennung auf deinem Gerät.** Notizbuchinhalte bleiben auf deinem Gerät. Die integrierte OCR verarbeitet Bilder lokal, und Offline-Systemstimmen benötigen keinen Online-Sprachdienst.
+
+**Anfragen gehen an den gewählten Anbieter.** Übersetzungen und KI-Befehle senden den für die Anfrage nötigen Text; Online-Sprachausgabe sendet den vorzulesenden Text. Online-OCR überträgt den Bildschirmausschnitt oder das importierte Bild an den gewählten Vision-Anbieter. Konten, Verfügbarkeit und Nutzungsgebühren verwaltet der jeweilige Dienst.
+
+**Einstellungen lassen sich mitnehmen.** Importiere und exportiere Dateien oder synchronisiere die Konfiguration manuell per WebDAV. Anbieter, Befehle, Tastenkürzel und Feldzuordnungen der Notizbücher werden gemeinsam übertragen. API-Schlüssel und eigene Header bleiben gerätespezifisch und müssen auf einem anderen Gerät separat eingerichtet werden. Notizbuchinhalte gehören nicht zur Konfigurationssynchronisierung.
+
+<a id="documentation"></a>
+
+## Dokumentation
+
+- [Architektur und Quellcode-Struktur](../../docs/ARCHITECTURE.md)
+- [Anbieter, Modelle und Funktionszuordnung](../../docs/MODELS.md)
+- [Offline- und Online-OCR](../../docs/OCR.md)
+- [Konfiguration und WebDAV](../../docs/CONFIGURATION.md)
+- [Plattformen und Berechtigungen](../../docs/PLATFORMS.md)
+- [Sprachen für Oberfläche, Übersetzung und Erklärungen](../../docs/LANGUAGES.md)
+- [Veröffentlichungen und App-Updates](../../docs/UPDATES.md)
+
+Die technische Dokumentation ist auf Chinesisch oder Englisch verfügbar.
+
+## Mitwirken
+
+Reproduzierbare Fehlerberichte, Verbesserungsvorschläge, Übersetzungskorrekturen und Pull Requests sind willkommen. Nenne Betriebssystem und App-Version und entferne Zugangsdaten sowie private Texte aus Beispielen. [Problem melden](https://github.com/0xlane/ReadFinch/issues) · [Code beitragen](https://github.com/0xlane/ReadFinch/pulls).
 
 ### Aus dem Quellcode erstellen
 
@@ -108,60 +178,6 @@ npm start
 
 `assets:ocr` lädt die Erkennungsdaten **bei der Vorbereitung des Entwicklungs-Builds** herunter. Die Daten werden mit der App ausgeliefert; nach der Installation ist kein Sprachpaket-Download nötig. Mit `npm run dist` auf dem Zielbetriebssystem entstehen Pakete im Verzeichnis `release/`.
 
-### Die ersten Schritte in der App
-
-1. **Anbieter verbinden.** Wähle unter API Providers eine Vorlage oder einen kompatiblen Endpunkt, trage die benötigten Zugangsdaten und das Modell ein und teste die Verbindung. Weise den Anbieter als Standard oder einer bestimmten Funktion zu.
-2. **Einen Satz markieren.** Klicke in der Werkzeugleiste auf Translate und wähle die Zielsprache. Mit der Stecknadel bleibt das Ergebnis neben deiner Lektüre stehen.
-3. **Eine Bildschirmaufnahme ausprobieren.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Offline-OCR und Systemstimmen funktionieren auch ohne eingerichteten KI-Anbieter.
-
-### Nützliche Tastenkürzel
-
-| Befehl | Windows / Linux | macOS |
-| --- | --- | --- |
-| Auswahl übersetzen | `Alt + T` | `Option + T` |
-| Wörterbuch öffnen | `Alt + Shift + D` | `Option + Shift + D` |
-| Text verbessern | `Alt + Shift + W` | `Option + Shift + W` |
-| Befehl auswählen | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Bildschirmtext per OCR erfassen | `Ctrl + Shift + 2` | `Command + Shift + 2` |
-| Text aus der Zwischenablage lesen | `Ctrl + Shift + V` | `Command + Shift + V` |
-
-Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.
-
-### Integration in den Desktop
-
-| Plattform | Texterfassung |
-| --- | --- |
-| Windows | Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation. |
-| macOS | Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots. |
-| Linux | Verwendet unter X11 die PRIMARY-Auswahl (`xclip`, `xdotool`, `xprop`). Unter Wayland werden Zwischenablage oder Screenshot-Portal genutzt; Tastenkürzel hängen von der Desktop-Umgebung ab. |
-
-Windows wurde auf dem Entwicklungsrechner geprüft. Implementierungen für macOS und Linux sind vorhanden; native Desktop-Abläufe müssen weiterhin auf den Zielsystemen geprüft werden. Details stehen in der [Plattformübersicht](../../docs/PLATFORMS.md).
-
-## Klare Grenzen für deine Daten
-
-**Notizen und Offline-Funktionen bleiben auf dem Gerät.** Notizbuchinhalte liegen in einer lokalen SQLite-Datenbank. Offline-OCR und Systemstimmen arbeiten lokal. Die lokale Notizbuchseite zeigt ausschließlich lokale Inhalte.
-
-**KI-Anfragen gehen an deinen gewählten Anbieter.** Übersetzung und eigene Befehle senden den benötigten Text; Online-Sprachausgabe sendet den vorzulesenden Text. Bei entfernter Bilderkennung werden Bild und Empfänger zuerst angezeigt. Gesendet wird erst, wenn du die Anfrage ausdrücklich startest.
-
-**Einstellungen lassen sich mitnehmen.** Importiere und exportiere Dateien oder synchronisiere die Konfiguration manuell per WebDAV. Anbieter, Befehle, Tastenkürzel und Feldzuordnungen der Notizbücher werden gemeinsam übertragen. API-Schlüssel und eigene Header bleiben gerätespezifisch und müssen auf einem anderen Gerät separat eingerichtet werden. Notizbuchinhalte gehören nicht zur Konfigurationssynchronisierung.
-
-<a id="documentation"></a>
-
-## Mehr erfahren
-
-- [Architektur und Quellcode-Struktur](../../docs/ARCHITECTURE.md)
-- [Anbieter, Modelle und Funktionszuordnung](../../docs/MODELS.md)
-- [Offline-OCR und Vision-APIs](../../docs/OCR.md)
-- [Konfiguration und WebDAV](../../docs/CONFIGURATION.md)
-- [Plattformen und Berechtigungen](../../docs/PLATFORMS.md)
-- [Sprachen für Oberfläche, Übersetzung und Erklärungen](../../docs/LANGUAGES.md)
-
-Die technische Dokumentation ist auf Chinesisch oder Englisch verfügbar.
-
-## ReadFinch gemeinsam verbessern
-
-Reproduzierbare Fehlerberichte, Verbesserungsvorschläge, Übersetzungskorrekturen und Pull Requests sind willkommen. Nenne Betriebssystem und App-Version und entferne Zugangsdaten sowie private Texte aus Beispielen. [Problem melden](https://github.com/0xlane/ReadFinch/issues) · [Code beitragen](https://github.com/0xlane/ReadFinch/pulls).
-
 ```sh
 npm run typecheck
 npm test
@@ -174,7 +190,7 @@ Die README-Texte stehen in `docs/readmes/content.json`. Führe nach einer Übers
 
 ReadFinch steht unter **GPL-3.0-only**. Die Bedienung der Auswahl-Werkzeugleiste und der Befehlskarten ist von **Read Frog** inspiriert. ReadFinch ist ein unabhängiges Desktop-Projekt und keine offizielle Read-Frog-Veröffentlichung.
 
-[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [Hinweise zu Drittanbieterkomponenten](../../THIRD_PARTY_NOTICES.md).
+[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [Hinweise zu Drittanbieterkomponenten](../../THIRD_PARTY_NOTICES.md)
 
 <div align="right">
 

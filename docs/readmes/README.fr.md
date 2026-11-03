@@ -8,16 +8,14 @@
 
 **Un compagnon de lecture, juste à côté de vos mots.**
 
-Traduisez un passage, comprenez une phrase difficile ou améliorez votre rédaction, sans quitter l’application que vous utilisez.
-
-A desktop reading and writing companion. · 随选随用的桌面阅读与写作助手。
+ReadFinch est une application de bureau open source dédiée à la lecture et à l’écriture. Traduisez une sélection, consultez un mot, améliorez un texte et enregistrez des notes depuis vos applications. Pour le texte contenu dans une image, utilisez l’OCR hors ligne ou en ligne.
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <a href="../../docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <strong>Français</strong> · <a href="../../docs/readmes/README.de.md">Deutsch</a> · <a href="../../docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
-<img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
+<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="OCR hors ligne et en ligne">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -39,14 +37,14 @@ Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFi
 
 <a id="features"></a>
 
-## Un coup de main là où se trouve votre texte
+## Fonctionnalités
 
 | Votre besoin | L’aide de ReadFinch |
 | --- | --- |
 | **Lire et comprendre** | Suivez la traduction à mesure qu’elle s’affiche, consultez la prononciation et les exemples, et décomposez les phrases longues. |
 | **Mieux écrire** | Repérez les modifications dans le texte d’origine, comprenez leur raison et reprenez la version améliorée dans votre éditeur. |
-| **Lire du texte non sélectionnable** | Capturez une zone de l’écran ou importez une image. L’OCR intégré reconnaît le chinois simplifié et l’anglais hors ligne. Vérifiez le texte avant de lancer une commande. |
-| **Écouter en lisant** | Faites lire une sélection, une traduction ou un exemple. Choisissez des voix système hors ligne ou des voix en ligne compatibles par langue, puis réglez le débit, la hauteur et le volume. |
+| **Lire du texte non sélectionnable** | Capturez une zone de l’écran ou importez une image. Utilisez l’OCR intégré hors ligne ou un fournisseur de vision en ligne, puis vérifiez le texte avant de lancer une commande. |
+| **Écouter en lisant** | Écoutez sélections, traductions et exemples avec les voix système hors ligne ou la synthèse vocale en ligne. Choisissez et essayez une voix par langue ; les réglages de lecture dépendent du service vocal. |
 | **Créer vos commandes IA** | Définissez le fournisseur, les prompts, l’icône, le raccourci et les champs de sortie typés. Composez les cartes avec HTML + Liquid et associez les champs à un carnet local. |
 | **Garder l’essentiel** | Enregistrez un résultat ou acceptez une suggestion de vocabulaire. Recherchez dans vos carnets locaux et retrouvez le passage d’origine avec la réponse enregistrée. |
 
@@ -71,17 +69,28 @@ Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFi
 
 </details>
 
-### Votre fournisseur. Votre modèle. Votre choix.
+### OCR hors ligne et en ligne
 
-Choisissez parmi 33 options de fournisseurs, dont OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter et des services de traduction dédiés. Les API natives, Chat Completions et Responses sont pris en charge. Chaque entrée IA contient un modèle ; dupliquez-la pour en utiliser un autre. Attribuez des fournisseurs différents à la traduction, au dictionnaire, à la rédaction, à l’OCR et à la détection de langue. Suggestions de modèles, tests de connexion, température, en-têtes personnalisés et proxy par fournisseur sont disponibles.
+Capturez une zone de l’écran ou importez une image, vérifiez le texte reconnu, puis traduisez-le, consultez le dictionnaire ou exécutez une commande personnalisée.
 
-### Lire dans votre langue
+| Mode | Fonctionnement |
+| --- | --- |
+| **Hors ligne · par défaut** | Le moteur intégré reconnaît le chinois simplifié et l’anglais sur votre appareil. Aucun compte API, accès réseau ni téléchargement de pack linguistique n’est nécessaire. |
+| **En ligne · facultatif** | Un fournisseur de vision configuré extrait le texte. Les langues et la qualité de reconnaissance dépendent de son modèle ; la zone capturée ou l’image importée lui est envoyée. |
 
-Les traductions du README correspondent aux huit langues cibles prédéfinies dans l’application :
+Pour l’OCR en ligne, configurez un modèle acceptant les images dans API Providers, puis sélectionnez ce fournisseur dans Screenshot OCR. Le moteur hors ligne reste disponible et un échec de reconnaissance locale ne provoque jamais l’envoi automatique de l’image.
+
+### Un fournisseur pour chaque fonction
+
+Connectez votre propre compte API grâce aux préréglages OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter et d’autres, ou ajoutez une API compatible Chat Completions ou Responses. Les services de traduction spécialisés sont également pris en charge. Chaque entrée de fournisseur IA utilise un modèle ; dupliquez-la pour en utiliser un autre. Affectez des fournisseurs distincts à la traduction, au dictionnaire, à la rédaction, à l’OCR, à la détection de langue et à la synthèse vocale en ligne. Selon le service, vous disposez de suggestions de modèles, de tests de connexion, de la température, d’en-têtes personnalisés et d’un proxy par fournisseur.
+
+### Langues
+
+Huit langues prédéfinies sont proposées pour les traductions et les explications :
 
 **English · 简体中文 · 繁體中文 · 日本語 · 한국어 · Français · Deutsch · Español**
 
-**L’interface de l’application est actuellement disponible en anglais et en chinois simplifié**, avec sélection automatique selon le système. La qualité des traductions et la prise en charge d’autres langues dépendent du modèle. L’OCR hors ligne intégré reconnaît le chinois simplifié et l’anglais.
+L’**interface est disponible en anglais et en chinois simplifié** et suit par défaut la langue du système. La langue de l’interface et celle des résultats se règlent séparément. La qualité des traductions et les langues couvertes dépendent du fournisseur et du modèle choisis.
 
 <a id="get-started"></a>
 
@@ -89,9 +98,70 @@ Les traductions du README correspondent aux huit langues cibles prédéfinies da
 
 **[Télécharger la dernière version](https://github.com/0xlane/ReadFinch/releases/latest)**
 
-Téléchargez le paquet adapté à votre système depuis GitHub Releases. Sous Windows, choisissez setup.exe pour installer l’application ou portable.exe pour une utilisation sans installation. Sous macOS, choisissez arm64 pour Apple Silicon ou x64 pour Intel.
+Choisissez le paquet adapté à votre système dans la dernière version publiée. Aucun outil de développement n’est nécessaire pour utiliser l’application précompilée.
 
-Les mises à jour automatiques sont activées par défaut. Les installations Windows et les AppImages Linux téléchargent les mises à jour en arrière-plan et les installent à la fermeture. Les autres paquets proposent un téléchargement vérifié à installer manuellement. La page À propos permet de modifier ce réglage ou de lancer une vérification. En cas d’échec de GitHub, le téléchargement passe par gh-proxy.
+| Système | Paquet |
+| --- | --- |
+| Windows x64 | `*-setup.exe` pour installer, ou `*-portable.exe` pour utiliser la version sans installation. |
+| macOS | `arm64` pour les puces Apple ou `x64` pour Intel ; formats `.dmg` et `.zip`. |
+| Linux x64 | `.AppImage` pour une exécution directe, ou `amd64.deb` pour Debian et Ubuntu. |
+
+La recherche automatique de mises à jour est activée par défaut. Vous pouvez la régler ou lancer une recherche manuelle dans About. Les installations Windows et les AppImages Linux peuvent appliquer une mise à jour téléchargée à la fermeture ; les versions portables Windows, macOS et les paquets DEB Linux nécessitent une installation manuelle.
+
+### Premiers pas
+
+1. **Connectez un fournisseur.** Dans API Providers, choisissez un préréglage ou une API compatible, renseignez les identifiants nécessaires et le modèle, puis testez la connexion. Affectez-le par défaut ou à une fonction précise.
+2. **Sélectionnez une phrase.** Cliquez sur Translate dans la barre d’outils, choisissez la langue cible et épinglez le résultat pour continuer à lire en parallèle.
+3. **Récupérez du texte dans une image.** Utilisez le raccourci OCR ci-dessous pour sélectionner une zone. L’OCR hors ligne fonctionne immédiatement ; pour la reconnaissance en ligne, choisissez un fournisseur de vision configuré dans Screenshot OCR. Vérifiez le texte avant de continuer.
+
+### Raccourcis utiles
+
+| Commande | Windows / Linux | macOS |
+| --- | --- | --- |
+| Traduire la sélection | `Alt + T` | `Option + T` |
+| Ouvrir le dictionnaire | `Alt + Shift + D` | `Option + Shift + D` |
+| Améliorer la rédaction | `Alt + Shift + W` | `Option + Shift + W` |
+| Choisir une commande | `Ctrl + Shift + Space` | `Command + Shift + Space` |
+| Capturer du texte par OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Lire le presse-papiers | `Ctrl + Shift + V` | `Command + Shift + V` |
+
+Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.
+
+### Plateformes prises en charge
+
+| Plateforme | Acquisition du texte |
+| --- | --- |
+| Windows | Lit les sélections exposées par l’application au premier plan via UI Automation. |
+| macOS | L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran. |
+| Linux | Utilise la sélection PRIMARY sous X11 (`xclip`, `xdotool`, `xprop`). Sous Wayland, utilise le presse-papiers ou le portail de capture du bureau ; les raccourcis dépendent de l’environnement. |
+
+La détection automatique dépend de l’accès au texte sélectionné fourni par l’application active. Sinon, utilisez l’OCR ou le presse-papiers. Les autorisations, limites et validations par plateforme figurent dans la [matrice de prise en charge](../../docs/PLATFORMS.md).
+
+## Données et confidentialité
+
+**Notes et reconnaissance hors ligne sur votre appareil.** Le contenu des carnets reste sur votre appareil. L’OCR intégré traite les images localement et les voix système hors ligne ne nécessitent pas de service vocal en ligne.
+
+**Les requêtes vont au fournisseur choisi.** La traduction et les commandes IA envoient le texte nécessaire à la requête ; la synthèse vocale en ligne envoie le texte à lire. L’OCR en ligne transmet la zone capturée ou l’image importée au fournisseur de vision sélectionné. Les comptes, la disponibilité et les frais d’utilisation relèvent de chaque service.
+
+**Des réglages transférables.** Importez ou exportez un fichier, ou synchronisez manuellement la configuration par WebDAV. Fournisseurs, commandes, raccourcis et correspondances des champs de carnet sont transférés ensemble. Les clés API et les en-têtes personnalisés restent propres à chaque appareil. Le contenu des carnets n’est pas inclus dans la synchronisation des réglages.
+
+<a id="documentation"></a>
+
+## Documentation
+
+- [Architecture et organisation du code](../../docs/ARCHITECTURE.md)
+- [Fournisseurs, modèles et affectation des fonctions](../../docs/MODELS.md)
+- [OCR hors ligne et en ligne](../../docs/OCR.md)
+- [Configuration et WebDAV](../../docs/CONFIGURATION.md)
+- [Plateformes et autorisations](../../docs/PLATFORMS.md)
+- [Langues de l’interface, des traductions et des explications](../../docs/LANGUAGES.md)
+- [Versions et mises à jour de l’application](../../docs/UPDATES.md)
+
+La documentation technique est disponible en chinois ou en anglais.
+
+## Contribuer
+
+Les rapports de bugs reproductibles, suggestions d’ergonomie, corrections de traduction et pull requests sont les bienvenus. Indiquez votre système et la version de l’application, et retirez les identifiants et textes privés de vos exemples. [Ouvrir un ticket](https://github.com/0xlane/ReadFinch/issues) · [Contribuer au code](https://github.com/0xlane/ReadFinch/pulls).
 
 ### Compiler depuis les sources
 
@@ -108,60 +178,6 @@ npm start
 
 `assets:ocr` télécharge les données de reconnaissance **pendant la préparation du développement**. Elles sont incluses dans l’application : aucune langue n’est à télécharger après l’installation. Exécutez `npm run dist` sur le système cible pour créer les paquets dans `release/`.
 
-### Vos premiers pas
-
-1. **Connectez un fournisseur.** Dans API Providers, choisissez un préréglage ou une API compatible, renseignez les identifiants nécessaires et le modèle, puis testez la connexion. Affectez-le par défaut ou à une fonction précise.
-2. **Sélectionnez une phrase.** Cliquez sur Translate dans la barre d’outils, choisissez la langue cible et épinglez le résultat pour continuer à lire en parallèle.
-3. **Essayez une capture.** Avec le raccourci OCR ci-dessous, sélectionnez une zone puis vérifiez le texte reconnu. L’OCR hors ligne et les voix système fonctionnent avant toute configuration d’un fournisseur IA.
-
-### Raccourcis utiles
-
-| Commande | Windows / Linux | macOS |
-| --- | --- | --- |
-| Traduire la sélection | `Alt + T` | `Option + T` |
-| Ouvrir le dictionnaire | `Alt + Shift + D` | `Option + Shift + D` |
-| Améliorer la rédaction | `Alt + Shift + W` | `Option + Shift + W` |
-| Choisir une commande | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capturer du texte par OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
-| Lire le presse-papiers | `Ctrl + Shift + V` | `Command + Shift + V` |
-
-Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.
-
-### Intégration au bureau
-
-| Plateforme | Acquisition du texte |
-| --- | --- |
-| Windows | Lit les sélections exposées par l’application au premier plan via UI Automation. |
-| macOS | L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran. |
-| Linux | Utilise la sélection PRIMARY sous X11 (`xclip`, `xdotool`, `xprop`). Sous Wayland, utilise le presse-papiers ou le portail de capture du bureau ; les raccourcis dépendent de l’environnement. |
-
-Windows a été vérifié sur la machine de développement. Des implémentations macOS et Linux sont présentes, mais les interactions natives doivent encore être validées sur les systèmes cibles. Consultez la [matrice de prise en charge](../../docs/PLATFORMS.md).
-
-## Des limites claires pour vos données
-
-**Des notes et des fonctions hors ligne sur votre appareil.** Les carnets sont stockés dans une base SQLite locale. L’OCR hors ligne et les voix système s’exécutent localement. La page des carnets locaux n’affiche que du contenu local.
-
-**L’IA utilise le fournisseur choisi.** La traduction et les commandes envoient le texte nécessaire ; la synthèse vocale en ligne envoie le texte à lire. La reconnaissance d’image distante affiche d’abord l’image et son destinataire, puis attend votre lancement explicite.
-
-**Des réglages transférables.** Importez ou exportez un fichier, ou synchronisez manuellement la configuration par WebDAV. Fournisseurs, commandes, raccourcis et correspondances des champs de carnet sont transférés ensemble. Les clés API et les en-têtes personnalisés restent propres à chaque appareil. Le contenu des carnets n’est pas inclus dans la synchronisation des réglages.
-
-<a id="documentation"></a>
-
-## Pour aller plus loin
-
-- [Architecture et organisation du code](../../docs/ARCHITECTURE.md)
-- [Fournisseurs, modèles et affectation des fonctions](../../docs/MODELS.md)
-- [OCR hors ligne et API de vision](../../docs/OCR.md)
-- [Configuration et WebDAV](../../docs/CONFIGURATION.md)
-- [Plateformes et autorisations](../../docs/PLATFORMS.md)
-- [Langues de l’interface, des traductions et des explications](../../docs/LANGUAGES.md)
-
-La documentation technique est disponible en chinois ou en anglais.
-
-## Faisons grandir ReadFinch
-
-Les rapports de bugs reproductibles, suggestions d’ergonomie, corrections de traduction et pull requests sont les bienvenus. Indiquez votre système et la version de l’application, et retirez les identifiants et textes privés de vos exemples. [Ouvrir un ticket](https://github.com/0xlane/ReadFinch/issues) · [Contribuer au code](https://github.com/0xlane/ReadFinch/pulls).
-
 ```sh
 npm run typecheck
 npm test
@@ -174,7 +190,7 @@ Les textes du README se trouvent dans `docs/readmes/content.json`. Après une mo
 
 ReadFinch est distribué sous licence **GPL-3.0-only**. Les interactions de la barre de sélection et des cartes de commande s’inspirent de **Read Frog**. ReadFinch est un projet de bureau indépendant, pas une version officielle de Read Frog.
 
-[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [Mentions des composants tiers](../../THIRD_PARTY_NOTICES.md).
+[GPL-3.0-only](../../LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [Mentions des composants tiers](../../THIRD_PARTY_NOTICES.md)
 
 <div align="right">
 

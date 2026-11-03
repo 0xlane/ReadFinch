@@ -74,14 +74,12 @@ for (const code of order) {
 
 ${c.intro}
 
-A desktop reading and writing companion. · 随选随用的桌面阅读与写作助手。
-
 <p>${links}</p>
 
 <p>
 <a href="${local("LICENSE")}"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-${version}-4d443e?style=flat-square" alt="${version}">
-<img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
+<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="${escape(c.ocrTitle)}">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -121,6 +119,16 @@ ${picture("notebook", 860, c.notebookAlt)}
 
 </details>
 
+### ${c.ocrTitle}
+
+${c.ocrIntro}
+
+| ${c.ocrHeaders[0]} | ${c.ocrHeaders[1]} |
+| --- | --- |
+${c.ocrModes.map(([name, body]) => "| **" + name + "** | " + body + " |").join("\n")}
+
+${c.ocrSetup}
+
 ### ${c.providerTitle}
 
 ${c.providers}
@@ -141,22 +149,13 @@ ${c.languageNote}
 
 ${c.downloadIntro}
 
+| ${c.downloadHeaders[0]} | ${c.downloadHeaders[1]} |
+| --- | --- |
+| Windows x64 | ${c.downloads[0]} |
+| macOS | ${c.downloads[1]} |
+| Linux x64 | ${c.downloads[2]} |
+
 ${c.updatesInfo}
-
-### ${c.buildTitle}
-
-${c.buildIntro}
-
-\`\`\`sh
-git clone https://github.com/0xlane/ReadFinch.git
-cd ReadFinch
-npm ci
-npm run assets:ocr
-npm run build
-npm start
-\`\`\`
-
-${c.buildNote}
 
 ### ${c.firstRunTitle}
 
@@ -178,7 +177,7 @@ ${c.shortcutsNote}
 | macOS | ${c.platforms[1]} |
 | Linux | ${c.platforms[2]} |
 
-${c.platformNote} [${c.platformLink}](${local("docs/PLATFORMS.md")}).
+${c.platformNote} [${c.platformLink}](${local("docs/PLATFORMS.md")})${code.startsWith("zh") || code === "ja" ? "。" : "."}
 
 ## ${c.dataTitle}
 
@@ -194,12 +193,28 @@ ${c.data.map((p) => p).join("\n\n")}
 - [${c.docs[3]}](${local("docs/CONFIGURATION.md")})
 - [${c.docs[4]}](${local("docs/PLATFORMS.md")})
 - [${c.docs[5]}](${local("docs/LANGUAGES.md")})
+- [${c.docs[6]}](${local("docs/UPDATES.md")})
 
 ${c.docsNote}
 
 ## ${c.contributeTitle}
 
 ${c.contribute} [${c.issueLink}](${repo}/issues) · [${c.prLink}](${repo}/pulls).
+
+### ${c.buildTitle}
+
+${c.buildIntro}
+
+\`\`\`sh
+git clone https://github.com/0xlane/ReadFinch.git
+cd ReadFinch
+npm ci
+npm run assets:ocr
+npm run build
+npm start
+\`\`\`
+
+${c.buildNote}
 
 \`\`\`sh
 npm run typecheck
@@ -213,7 +228,7 @@ ${c.translationNote}
 
 ${c.license}
 
-[GPL-3.0-only](${local("LICENSE")}) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [${c.noticesLink}](${local("THIRD_PARTY_NOTICES.md")}).
+[GPL-3.0-only](${local("LICENSE")}) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [${c.noticesLink}](${local("THIRD_PARTY_NOTICES.md")})
 
 <div align="right">
 
