@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 13,
+  "schemaVersion": 14,
   "tts": {
     "onlineProviderId": null,
     "customVoices": [],
@@ -33,6 +33,10 @@
       "model": "gpt-6-luna",
       "customModel": false,
       "temperature": null,
+      "proxy": {
+        "mode": "system",
+        "address": ""
+      },
       "instruction": "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.",
       "requiresKey": true,
       "timeoutMs": 60000,

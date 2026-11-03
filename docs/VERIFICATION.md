@@ -1,5 +1,14 @@
 # 交付与验证报告
 
+2026-11-03 · **ReadFinch / 伴读雀 0.13.0**
+
+- 每个 API 提供商的高级选项增加「使用全局代理（跟随系统）」「禁用代理」「自定义代理」。支持无需认证的 HTTP、HTTPS、SOCKS4 和 SOCKS5 地址，自动保存，复制和迁移保留设置。[配置说明](PROXY.md) · [浅色](screenshots/v0.13/provider-proxy-light.png) · [深色](screenshots/v0.13/provider-proxy-dark.png)
+- 开发版与 Windows 打包版使用本机代理验证模型发现、连接测试、流式文本、图片、LLM 语言检测和语音请求；覆盖 HTTPS CONNECT、HTTPS 代理、SOCKS4/5、并发提供商、生成中切换、取消、空地址和连接失败不直连。系统代理通过隔离 Electron 会话模拟，TLS 仅信任临时测试密钥，未修改操作系统代理或证书存储。[开发检查](proxy-verification.json) · [打包检查](packaged-proxy-verification.json)
+- 类型检查、86 项核心测试与生产构建通过。代理变更会区分模型目录和回答缓存。凭据、请求头、功能分配及四项旧配置升级回归通过，原账户、模型和本机凭据保持兼容。[核心输出](core-tests.txt) · [设置回归](settings-verification.json) · [升级回归](upgrade-verification.json)
+- Windows 打包程序的快捷键、笔记、离线图标与随包中英文 OCR 检查通过，无渲染错误。安装/卸载界面、真实外部代理账号和 macOS/Linux 桌面交互不在本次验收范围。[打包回归](packaged-smoke.json)
+
+## 0.12.1
+
 2026-11-03 · **ReadFinch / 伴读雀 0.12.1**
 
 - 对照 Read Frog 提交 `96083134b111e56762f578b143bcd48e85058ba3`，同步现有六类提供商的默认模型和 85 个文字模型候选及顺序。新增时自动填入，旧版非空模型保持原值。数据由静态解析脚本提取，上游来源随目录保存。[对照范围](MODELS.md)
@@ -87,7 +96,7 @@
 
 ## 交付产物
 
-当前 Windows x64 安装程序 `release/ReadFinch Setup 0.12.1.exe` 与便携程序 `release/ReadFinch 0.12.1.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
+当前 Windows x64 安装程序 `release/ReadFinch Setup 0.13.0.exe` 与便携程序 `release/ReadFinch 0.13.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
 
 ## 未完成验收
 

@@ -1,4 +1,5 @@
 import { defaultSpeech, SpeechConfigSchema } from "./tts";
+import { defaultProxy, ProxySchema } from "./proxy";
 import { iconPosition, legacyIcons } from "./icons";
 import { z } from "zod";
 import {
@@ -102,6 +103,7 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
   builtinModel: z.string().max(200).optional(),
   temperature: z.number().min(0).max(2).nullable().default(null),
   reasoningEffort: z.enum(reasoningEfforts).optional(),
+  proxy: ProxySchema.default(defaultProxy),
 });
 const LegacyOcrProfileSchema = z
   .object({
@@ -146,7 +148,7 @@ export const ActionSchema = z
   .strict();
 export const ConfigSchema = z
   .object({
-    schemaVersion: z.literal(13),
+    schemaVersion: z.literal(14),
     tts: SpeechConfigSchema,
     localNotebases: z.array(LocalNotebaseSchema).max(1000),
     noteSuggestion: z.strictObject({
@@ -309,6 +311,7 @@ export function createProvider(
     endpoint: preset.endpoint,
     ...defaultProviderModel(preset.id),
     temperature: null,
+    proxy: defaultProxy(),
     instruction: OCR_INSTRUCTION,
     requiresKey: true,
     timeoutMs: 60000,
@@ -403,7 +406,7 @@ const retiredDefaults = [
 ];
 function baseConfig(): Config {
   return {
-    schemaVersion: 13,
+    schemaVersion: 14,
     tts: defaultSpeech(),
     localNotebases: [],
     noteSuggestion: { enabled: true, actionId: null, providerId: null },
@@ -548,7 +551,7 @@ export function upgradeProviders(raw: unknown) {
     config: {
       ...rest,
       schemaVersion: 3,
-      providers,
+      providers: providers.map(({ proxy, ...provider }) => provider),
       defaults: {
         ...old.defaults,
         textProfileId: textIds.get(old.defaults.textProfileId),
@@ -620,6 +623,7 @@ function migrateSingleModel(raw: Record<string, any>, moves: CredentialMove[]) {
       ids.set(model, id);
       nextProviders.push({
         ...provider,
+        proxy: defaultProxy(),
         id,
         model,
         name:
@@ -1010,7 +1014,7 @@ export function parseConfig(
     candidate &&
     typeof candidate === "object" &&
     "schemaVersion" in candidate &&
-    (candidate.schemaVersion === 12 || candidate.schemaVersion === 13) &&
+    [12, 13, 14].includes(Number(candidate.schemaVersion)) &&
     "actions" in candidate &&
     Array.isArray(candidate.actions)
   ) {
@@ -1065,6 +1069,13 @@ export function parseConfig(
       }),
     };
   }
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 13
+  )
+    candidate = { ...candidate, schemaVersion: 14 };
   const result = ConfigSchema.safeParse(candidate);
   if (!result.success)
     throw Error(

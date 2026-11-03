@@ -11,8 +11,15 @@ export type ModelInfo = {
   kind?: "speech";
   source: "builtin" | "remote" | "saved";
 };
-export const catalogKey = (provider: Pick<TextProfile, "id" | "endpoint">) =>
-  provider.id + "|" + provider.endpoint;
+export const catalogKey = (
+  provider: Pick<TextProfile, "id" | "endpoint" | "proxy">,
+) =>
+  JSON.stringify([
+    provider.id,
+    provider.endpoint,
+    provider.proxy.mode,
+    provider.proxy.mode === "custom" ? provider.proxy.address.trim() : "",
+  ]);
 export function modelOptions(
   config: Config,
   providerId: string,

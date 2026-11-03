@@ -420,6 +420,14 @@
 .provider-advanced .field input {
   width: 112px;
 }
+.provider-proxy .field input,
+.provider-proxy .field select {
+  width: 100%;
+  min-width: 0;
+}
+.provider-proxy-error {
+  color: var(--danger, #d92d20);
+}
 .model-assignment-list {
   padding-top: 5px;
 }

@@ -33,6 +33,7 @@ import {
 } from "../core/note-suggestions";
 import { sameDraft } from "../shared/draft";
 import { CompletionCache } from "../core/completion-cache";
+import { providerFetch } from "./provider-network";
 import { ConfigStore, readJson, atomicWrite } from "../core/store";
 import { DavSync, davUrl, type DavSettings } from "../core/sync";
 import {
@@ -42,6 +43,7 @@ import {
   actionMessages,
   recognizeVision,
   JobGate,
+  setProviderTransport,
 } from "../core/providers";
 import { parseHeaders } from "../shared/headers";
 import { createNotebase, connectedBook } from "../shared/notebases";
@@ -113,6 +115,7 @@ const secrets = new Secrets(dataDir);
 const native = new SelectionService(nativeRoot);
 const jobs = new JobGate();
 const resultCache = new CompletionCache();
+setProviderTransport(providerFetch);
 const cachedComplete = resultCache.run.bind(resultCache);
 let main: BrowserWindow;
 let pill: BrowserWindow | undefined;

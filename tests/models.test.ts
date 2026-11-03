@@ -59,6 +59,7 @@ test("v4/v5 multi-model providers split deterministically and preserve actions, 
     const old: any = defaultConfig(),
       p = old.providers[0];
     old.schemaVersion = schemaVersion;
+    delete p.proxy;
     Object.assign(p, {
       model: "default",
       models: ["lookup", "image", "saved"],
@@ -70,7 +71,7 @@ test("v4/v5 multi-model providers split deterministically and preserve actions, 
     const moves: import("../src/shared/config").CredentialMove[] = [];
     const c = parseConfig(old, moves);
     assert.deepEqual(c, parseConfig(old));
-    assert.equal(c.schemaVersion, 13);
+    assert.equal(c.schemaVersion, 14);
     assert.equal(actionModel(c, c.actions[1]).model, "lookup");
     assert.equal(
       c.providers.find((p) => p.id === c.defaults.ocrProfileId)?.model,

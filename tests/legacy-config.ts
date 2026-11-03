@@ -6,7 +6,7 @@ export function legacyConfig(version = 2): any {
     ...rest,
     schemaVersion: version,
     textProfiles: providers.map(
-      ({ description, enabled, preset, temperature, customModel, instruction, ...p }) => p,
+      ({ description, enabled, preset, temperature, customModel, instruction, proxy, ...p }) => p,
     ),
     ocrProfiles: [
       {

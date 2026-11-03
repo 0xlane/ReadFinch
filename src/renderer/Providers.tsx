@@ -1,5 +1,6 @@
 import { t } from "../shared/i18n";
 import { RequestHeaders } from "./RequestHeaders";
+import { ProviderProxySettings } from "./ProviderProxySettings";
 import { useRef, useState, type ReactNode } from "react";
 import { Plus, ChevronRight } from "lucide-react";
 import {
@@ -335,6 +336,10 @@ function ProviderEditor({
             }
           />
         </Field>
+        <ProviderProxySettings
+          value={provider.proxy}
+          onChange={(proxy) => change({ proxy })}
+        />
         {advanced && savedEndpoints[provider.id] === provider.endpoint && (
           <RequestHeaders
             key={provider.id + "|" + provider.endpoint}

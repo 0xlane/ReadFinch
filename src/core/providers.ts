@@ -8,6 +8,20 @@ type Connection<T> = T & {
   outputContract?: object;
 };
 
+export type ProviderTransport = (
+  url: string,
+  init: RequestInit,
+  profile: Pick<TextProfile, "id" | "proxy">,
+) => Promise<Response>;
+let transport: ProviderTransport = (url, init, profile) => {
+  if (profile.proxy?.mode === "custom")
+    throw new ProviderError("proxy", t("自定义代理需要桌面应用的网络连接"));
+  return fetch(url, init);
+};
+export function setProviderTransport(value: ProviderTransport) {
+  transport = value;
+}
+
 export class ProviderError extends Error {
   constructor(
     readonly code: string,
@@ -48,6 +62,7 @@ export async function listModels(
     { method: "GET", headers: auth(key, profile.requiresKey, profile.headers) },
     signal,
     Math.min(profile.timeoutMs, 30000),
+    profile,
   );
   if (!res.ok) throw httpError(res.status);
   const chunks: Uint8Array[] = [];
@@ -93,23 +108,30 @@ export async function request(
   init: RequestInit,
   signal: AbortSignal,
   timeoutMs: number,
+  profile: Pick<TextProfile, "id" | "proxy">,
 ) {
+  const deadline = AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]);
   try {
-    return await fetch(url, {
-      ...init,
-      redirect: "error",
-      signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
-    });
+    return await transport(
+      url,
+      {
+        ...init,
+        redirect: "error",
+        signal: deadline,
+      },
+      profile,
+    );
   } catch (e) {
     if (signal.aborted) throw new ProviderError("cancelled", t("请求已取消"));
-    if ((e as Error).name === "TimeoutError")
+    if (deadline.aborted || (e as Error).name === "TimeoutError")
       throw new ProviderError(
         "timeout",
         t("请求超时，请检查服务或增加超时时间"),
       );
+    if (e instanceof ProviderError) throw e;
     throw new ProviderError(
       "network",
-      t("无法连接服务，请检查地址、网络和本地服务运行状态"),
+      t("无法连接服务，请检查服务地址、代理设置和网络"),
     );
   }
 }
@@ -152,6 +174,7 @@ export async function synthesizeSpeech(
     },
     signal,
     profile.timeoutMs,
+    profile,
   );
   if (!res.ok) {
     await res.body?.cancel();
@@ -257,6 +280,7 @@ export async function complete(
         },
         deadline,
         profile.timeoutMs,
+        profile,
       );
     let res = await send(!!profile.outputContract);
     // Some compatible endpoints support JSON by prompt but reject response_format.

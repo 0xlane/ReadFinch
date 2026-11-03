@@ -1,10 +1,10 @@
 {
-  "version": "0.12.1",
-  "date": "2026-11-03T06:03:25.848Z",
+  "version": "0.13.0",
+  "date": "2026-11-03T06:38:36.057Z",
   "checks": [
     "Schema v2 upgrades text/vision providers with colliding IDs, retains selected vision service, retires native Ollama, preserves source config and migrates OS-encrypted credentials without requests",
     "Migrated text and vision credentials authenticate distinct real HTTP fixture requests, with actual PNG image input",
-    "First save backs up the complete original v2 config; schema v13 and encrypted keys survive restart without duplicate providers or plaintext secrets",
+    "First save backs up the complete original v2 config; schema v14 and encrypted keys survive restart without duplicate providers or plaintext secrets",
     "Schema v4 splits a multi-model account, retaining per-action and OCR bindings and endpoint-scoped OS-encrypted credentials on all three providers"
   ],
   "scope": "Actual Electron restart and OS safeStorage encryption, isolated schema v2/v4 fixtures, localhost HTTP requests; no user data used."

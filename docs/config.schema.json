@@ -4,7 +4,7 @@
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 13
+      "const": 14
     },
     "tts": {
       "type": "object",
@@ -325,6 +325,32 @@
               "high",
               "xhigh"
             ]
+          },
+          "proxy": {
+            "default": {
+              "mode": "system",
+              "address": ""
+            },
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string",
+                "enum": [
+                  "system",
+                  "direct",
+                  "custom"
+                ]
+              },
+              "address": {
+                "type": "string",
+                "maxLength": 2048
+              }
+            },
+            "required": [
+              "mode",
+              "address"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -340,7 +366,8 @@
           "timeoutMs",
           "stream",
           "customModel",
-          "temperature"
+          "temperature",
+          "proxy"
         ],
         "additionalProperties": false
       }
@@ -762,6 +789,6 @@
     "shortcuts"
   ],
   "additionalProperties": false,
-  "$id": "https://readfinch.local/schema/config-v13.json",
+  "$id": "https://readfinch.local/schema/config-v14.json",
   "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
 }

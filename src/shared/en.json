@@ -916,5 +916,19 @@
   "完成编辑": "Done editing",
   "伴读雀": "ReadFinch",
   "图片请求已完成，请核对识别内容是否包含 ReadFinch OCR 123 和“你好，世界”。": "Image request complete. Check the result for ReadFinch OCR 123 and “你好，世界”.",
-  "远程位置须为相对文件路径，例如 ReadFinch/config.json": "Use a relative path such as ReadFinch/config.json"
+  "远程位置须为相对文件路径，例如 ReadFinch/config.json": "Use a relative path such as ReadFinch/config.json",
+  "代理": "Proxy",
+  "提供商代理": "Provider proxy",
+  "使用全局代理": "Use global proxy",
+  "禁用代理": "Disable proxy",
+  "自定义代理": "Custom proxy",
+  "代理地址": "Proxy address",
+  "跟随操作系统的代理设置。": "Follow the operating system proxy settings.",
+  "此提供商直接连接，不使用系统代理。": "Connect this provider directly, without the system proxy.",
+  "仅此提供商使用指定代理，连接失败时不会改为直连。": "Use this proxy for this provider. Failed connections will not fall back to a direct connection.",
+  "支持无需认证的 HTTP、HTTPS、SOCKS4、SOCKS5 代理。": "Supports HTTP, HTTPS, SOCKS4 and SOCKS5 proxies without authentication.",
+  "请输入 HTTP、HTTPS、SOCKS4 或 SOCKS5 代理地址，不含账号、密码、路径或查询参数": "Enter an HTTP, HTTPS, SOCKS4 or SOCKS5 proxy URL without credentials, paths or query parameters.",
+  "请先填写此提供商的自定义代理地址": "Enter a custom proxy address for this provider first.",
+  "自定义代理需要桌面应用的网络连接": "Custom proxies require the desktop app network transport.",
+  "无法连接服务，请检查服务地址、代理设置和网络": "Could not connect. Check the service URL, proxy settings and network."
 }

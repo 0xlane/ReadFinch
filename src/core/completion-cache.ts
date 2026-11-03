@@ -48,6 +48,7 @@ export class CompletionCache {
     const id = digest([
       profile.id,
       profile.endpoint,
+      profile.proxy,
       profile.model,
       profile.temperature,
       profile.reasoningEffort ?? null,

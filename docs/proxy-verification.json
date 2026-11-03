@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-03T06:42:02.815Z",
+  "version": "0.13.0",
+  "checks": [
+    "Custom proxy autosaves and routes model discovery, connection tests, streamed text, vision, language detection and speech",
+    "Global follows the app's system session; disabled bypasses it; switching modes retains the custom address",
+    "Copied providers retain proxy settings; concurrent providers and changes during a stream stay isolated",
+    "HTTPS destinations use CONNECT; HTTPS proxies and SOCKS4/SOCKS5 proxies carry real loopback requests",
+    "Streaming cancellation works through the proxy; failed or empty custom proxies never fall back to direct",
+    "Saved per-provider proxy settings survive restart without renderer errors"
+  ],
+  "rendererErrors": [],
+  "scope": "Isolated Electron profile and local HTTP/HTTPS/SOCKS proxies. System proxy is simulated by configuring only the isolated default session; OS settings and real provider credentials are untouched. TLS trust is pinned to the disposable fixture key."
+}
