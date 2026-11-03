@@ -51,10 +51,10 @@ function SettingsApp({
   }, [tab]);
   useEffect(() => {
     let current = true;
-    void window.texthop.call("settingsLocation").then((v) => {
+    void window.readfinch.call("settingsLocation").then((v) => {
       if (current) setLocation(v);
     });
-    const off = window.texthop.on("settings", (v) => {
+    const off = window.readfinch.on("settings", (v) => {
       current = false;
       setLocation(v);
     });
@@ -75,7 +75,7 @@ function SettingsApp({
           className="window-control"
           aria-label={t("最小化")}
           onClick={() =>
-            void window.texthop.call("window", { command: "minimize" })
+            void window.readfinch.call("window", { command: "minimize" })
           }
         >
           <Minus size={16} />
@@ -85,7 +85,7 @@ function SettingsApp({
           aria-label={t("关闭设置")}
           title={t("关闭后继续在托盘运行")}
           onClick={() =>
-            void window.texthop.call("window", { command: "close" })
+            void window.readfinch.call("window", { command: "close" })
           }
         >
           <X size={17} />

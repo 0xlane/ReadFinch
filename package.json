@@ -1,14 +1,14 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
   "private": true,
   "type": "module",
   "main": "dist/main/main.cjs",
-  "desktopName": "app.texthop.TextHop.desktop",
+  "desktopName": "app.readfinch.ReadFinch.desktop",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
@@ -72,7 +72,7 @@
     "vite": "8.3.5"
   },
   "build": {
-    "appId": "app.texthop.TextHop",
+    "appId": "app.readfinch.ReadFinch",
     "asar": true,
     "directories": {
       "output": "release"
@@ -116,7 +116,9 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "ReadFinch",
+      "uninstallDisplayName": "ReadFinch ${version}"
     },
     "mac": {
       "target": [
@@ -139,7 +141,7 @@
       "desktop": {
         "entry": {
           "Name": "ReadFinch",
-          "StartupWMClass": "app.texthop.TextHop"
+          "StartupWMClass": "app.readfinch.ReadFinch"
         }
       },
       "syncDesktopName": true

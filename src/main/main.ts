@@ -1,4 +1,4 @@
-import { APP_NAME, LEGACY_APP_NAME, APP_ID } from "../shared/brand";
+import { APP_NAME, APP_ID } from "../shared/brand";
 import { OnlineVoiceIdSchema } from "../shared/tts";
 import {
   app,
@@ -99,10 +99,9 @@ import { Secrets } from "./secrets";
 
 const dataArg = process.argv.find((a) => a.startsWith("--data-dir="));
 if (dataArg) app.setPath("userData", path.resolve(dataArg.slice(11)));
-else
-  app.setPath("userData", path.join(app.getPath("appData"), LEGACY_APP_NAME));
-// Keep the storage/keychain identity so the rename cannot orphan settings or credentials.
-app.setName(LEGACY_APP_NAME);
+else app.setPath("userData", path.join(app.getPath("appData"), APP_NAME));
+app.setName(APP_NAME);
+if (process.platform === "win32") app.setAppUserModelId(APP_ID);
 app.commandLine.appendSwitch("enable-features", "GlobalShortcutsPortal");
 if (process.platform === "linux") app.setDesktopName(APP_ID + ".desktop");
 const root = app.getAppPath();
@@ -213,7 +212,7 @@ function send<K extends keyof EventMap>(
   value: EventMap[K],
 ) {
   if (win && !win.isDestroyed() && !win.webContents.isDestroyed())
-    win.webContents.send("texthop:" + key, value);
+    win.webContents.send("readfinch:" + key, value);
 }
 function broadcast<K extends keyof EventMap>(key: K, value: EventMap[K]) {
   for (const win of windows) send(win, key, value);
@@ -1909,7 +1908,7 @@ async function boot() {
   session.defaultSession.setPermissionRequestHandler(
     (_wc, _permission, callback) => callback(false),
   );
-  ipcMain.handle("texthop:call", async (event, method, arg) => {
+  ipcMain.handle("readfinch:call", async (event, method, arg) => {
     try {
       const win = BrowserWindow.fromWebContents(event.sender);
       if (
@@ -1977,9 +1976,9 @@ async function boot() {
   native.start();
   // Integration fixtures drive this coordinator only in development; never
   // expose synthetic selections or test IPC in a packaged application.
-  if (!app.isPackaged && process.env.TEXTHOP_TEST_HOOKS === "1") {
+  if (!app.isPackaged && process.env.READFINCH_TEST_HOOKS === "1") {
     Object.assign(globalThis, {
-      __texthopTest: {
+      __readfinchTest: {
         shortcut(
           id: string,
           target: "external" | "panel" | "settings" = "external",

@@ -277,7 +277,7 @@ test("vision uses OpenAI image_url, honors stream preference, and reports text-o
     }
     r.setHeader("Content-Type", "application/json");
     r.end(
-      JSON.stringify({ choices: [{ message: { content: "TextHop 123" } }] }),
+      JSON.stringify({ choices: [{ message: { content: "ReadFinch 123" } }] }),
     );
   });
   try {
@@ -297,7 +297,7 @@ test("vision uses OpenAI image_url, honors stream preference, and reports text-o
       new AbortController().signal,
       () => {},
     );
-    assert.equal(output, "TextHop 123");
+    assert.equal(output, "ReadFinch 123");
     assert.equal(calls[0].url, "/chat/completions");
     assert.equal(calls[0].auth, "Bearer fixture-key");
     assert.equal(calls[0].body.stream, false);

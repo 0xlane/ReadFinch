@@ -11,7 +11,7 @@ const executable = path.resolve(
 const dataDir = path.resolve(".local/packaged-smoke-" + Date.now());
 await mkdir(dataDir, { recursive: true });
 // A packaged application must ignore even an explicitly supplied test-hook flag.
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   executablePath: executable,
@@ -23,10 +23,10 @@ try {
   const page = await app.firstWindow();
   page.on("pageerror", (e) => errors.push(e.message));
   await page.evaluate(async () => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     if (s.interfaceLocale !== "zh-CN") {
       s.config.appearance.language = "zh-CN";
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -35,14 +35,14 @@ try {
   await page
     .getByRole("heading", { name: "通用", exact: true })
     .waitFor({ timeout: 30000 });
-  const original = await page.evaluate(() => window.texthop.call("snapshot"));
+  const original = await page.evaluate(() => window.readfinch.call("snapshot"));
   assert.equal(
     original.config.actions.find((a) => a.id === "translate").shortcut,
     "Alt+T",
   );
   if (isolated)
     await page.evaluate(async () => {
-      const state = await window.texthop.call("snapshot");
+      const state = await window.readfinch.call("snapshot");
       state.config.shortcuts = {
         selection: "Control+Alt+Shift+F8",
         capture: "Control+Alt+Shift+F11",
@@ -57,12 +57,12 @@ try {
           (a) => a.id === ["translate", "dictionary", "polish"][index],
         ).shortcut = key;
       });
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: state.config,
         revision: state.revision,
       });
     });
-  const state = await page.evaluate(() => window.texthop.call("snapshot"));
+  const state = await page.evaluate(() => window.readfinch.call("snapshot"));
   assert.equal(state.config.schemaVersion, 14);
   assert.equal(state.config.noteSuggestion.enabled, true);
   assert.deepEqual(state.shortcutErrors, []);
@@ -114,19 +114,19 @@ try {
     .getByRole("switch", { name: "将 gpt-4.1-mini 用于 翻译", exact: true })
     .check();
   await page.waitForFunction(async () => {
-    const { config } = await window.texthop.call("snapshot");
+    const { config } = await window.readfinch.call("snapshot");
     const translation = config.actions.find((a) => a.id === "translate");
     return config.providers.some(
       (p) => p.id === translation.providerId && p.model === "gpt-4.1-mini",
     );
   });
   assert.equal(
-    (await page.evaluate(() => window.texthop.call("snapshot"))).config.defaults
-      .ocrProfileId,
+    (await page.evaluate(() => window.readfinch.call("snapshot"))).config
+      .defaults.ocrProfileId,
     "ocr-offline",
   );
   const library = await page.evaluate(() =>
-    window.texthop.call("notesList", { offset: 0, search: "", notebook: "" }),
+    window.readfinch.call("notesList", { offset: 0, search: "", notebook: "" }),
   );
   assert.equal(library.total, 0);
   const glyph = await page.evaluate(async () => {
@@ -142,7 +142,7 @@ try {
     (await readFile("tests/fixtures/bilingual-light.png")).toString("base64");
   const started = Date.now();
   const recognized = await page.evaluate(async (image) => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     const id = crypto.randomUUID();
     return new Promise((resolve, reject) => {
       let text = "";
@@ -151,7 +151,7 @@ try {
         off();
         reject(Error("Packaged OCR timed out"));
       }, 60000);
-      const off = window.texthop.on("job", (event) => {
+      const off = window.readfinch.on("job", (event) => {
         if (event.id !== id) return;
         if (event.text !== undefined) text = event.text;
         if (event.confidence !== undefined) confidence = event.confidence;
@@ -162,7 +162,7 @@ try {
           else reject(Error(event.message ?? event.status));
         }
       });
-      window.texthop
+      window.readfinch
         .call("recognize", {
           id,
           profileId: s.config.defaults.ocrProfileId,
@@ -181,9 +181,11 @@ try {
   const packageState = await app.evaluate(
     ({ app, globalShortcut }, keys) => ({
       packaged: app.isPackaged,
+      name: app.getName(),
       version: app.getVersion(),
       resources: process.resourcesPath,
-      developmentSelectionHook: typeof globalThis.__texthopTest !== "undefined",
+      developmentSelectionHook:
+        typeof globalThis.__readfinchTest !== "undefined",
       actionShortcutsRegistered: keys.every((key) =>
         globalShortcut.isRegistered(key),
       ),
@@ -191,6 +193,7 @@ try {
     state.config.actions.map((a) => a.shortcut).filter(Boolean),
   );
   assert.equal(packageState.packaged, true);
+  assert.equal(packageState.name, "ReadFinch");
   assert.equal(packageState.developmentSelectionHook, false);
   assert.equal(packageState.actionShortcutsRegistered, true);
   assert.equal(
@@ -245,8 +248,9 @@ try {
   const report = {
     date: new Date().toISOString(),
     platform: process.platform,
-    executable,
+    executable: path.basename(executable),
     ...packageState,
+    resources: path.relative(path.dirname(executable), packageState.resources),
     isolatedShortcuts: isolated,
     providerModelAndPurposeAssignment: true,
     offlineCommandIconSheets: true,

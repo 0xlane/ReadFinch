@@ -18,7 +18,7 @@ if (process.platform === "win32") {
       "/nologo",
       "/target:exe",
       "/platform:anycpu",
-      `/out:${path.resolve("native/bin/texthop-selection.exe")}`,
+      `/out:${path.resolve("native/bin/readfinch-selection.exe")}`,
       "/r:System.Web.Extensions.dll",
       `/r:${path.join(framework, "WPF/UIAutomationClient.dll")}`,
       `/r:${path.join(framework, "WPF/UIAutomationTypes.dll")}`,
@@ -33,7 +33,7 @@ if (process.platform === "win32") {
     [
       "native/macos/SelectionBridge.swift",
       "-o",
-      "native/bin/texthop-selection",
+      "native/bin/readfinch-selection",
     ],
     { stdio: "inherit" },
   );

@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import path from "node:path";
-const port = Number(process.env.TEXTHOP_FIXTURE_PORT ?? 9876);
+const port = Number(process.env.READFINCH_FIXTURE_PORT ?? 9876);
 const dir = path.resolve(".local/webdav-fixture");
 await mkdir(dir, { recursive: true });
 const file = path.join(dir, "config.json");
@@ -12,13 +12,13 @@ const hash = (data) =>
 let queue = Promise.resolve();
 const server = createServer(async (req, res) => {
   try {
-    if (req.url === "/dav/TextHop/config.json") {
+    if (req.url === "/dav/ReadFinch/config.json") {
       if (
         req.headers.authorization !==
-        "Basic " + Buffer.from("texthop:fixture").toString("base64")
+        "Basic " + Buffer.from("readfinch:fixture").toString("base64")
       ) {
         res.writeHead(401, {
-          "WWW-Authenticate": 'Basic realm="TextHop local fixture"',
+          "WWW-Authenticate": 'Basic realm="ReadFinch local fixture"',
         });
         res.end();
         return;
@@ -108,7 +108,7 @@ const server = createServer(async (req, res) => {
       const isImage =
         !!content?.images?.length || Array.isArray(content?.content);
       const text = isImage
-        ? "TextHop OCR 123\n你好，世界！\n[固定测试响应；不代表真实视觉推理]"
+        ? "ReadFinch OCR 123\n你好，世界！\n[固定测试响应；不代表真实视觉推理]"
         : "这是本机 fixture 的固定响应，用于验证调用、流式输出和界面。\n\n此服务不会运行真实 AI 模型。";
       if (req.url === "/api/chat") {
         res.setHeader("Content-Type", "application/json");
@@ -131,7 +131,7 @@ const server = createServer(async (req, res) => {
       return;
     }
     res.writeHead(404);
-    res.end("TextHop development fixtures only");
+    res.end("ReadFinch development fixtures only");
   } catch {
     if (!res.headersSent) res.writeHead(400);
     res.end("Invalid fixture request");
@@ -139,6 +139,6 @@ const server = createServer(async (req, res) => {
 });
 server.listen(port, "127.0.0.1", () =>
   console.log(
-    `TextHop FIXTURE ONLY\nText API: http://127.0.0.1:${port}/v1 (any model ID, no API key)\nOllama protocol: http://127.0.0.1:${port}\nWebDAV: http://127.0.0.1:${port}/dav/ | texthop / fixture | TextHop/config.json\nAll model results are fixed test responses. Ctrl+C stops the server.`,
+    `ReadFinch FIXTURE ONLY\nText API: http://127.0.0.1:${port}/v1 (any model ID, no API key)\nOllama protocol: http://127.0.0.1:${port}\nWebDAV: http://127.0.0.1:${port}/dav/ | readfinch / fixture | ReadFinch/config.json\nAll model results are fixed test responses. Ctrl+C stops the server.`,
   ),
 );

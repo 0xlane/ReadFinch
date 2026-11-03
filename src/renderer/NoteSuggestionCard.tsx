@@ -16,7 +16,7 @@ export function NoteSuggestionCard({ data }: { data: SuggestionCardData }) {
       const indexes = selected.flatMap((checked, index) =>
         checked ? [index] : [],
       );
-      const [id] = await window.texthop.call("saveSuggestions", {
+      const [id] = await window.readfinch.call("saveSuggestions", {
         id: data.id,
         indexes,
         create,
@@ -44,7 +44,7 @@ export function NoteSuggestionCard({ data }: { data: SuggestionCardData }) {
           aria-label={t("显示猜你想存")}
           disabled={busy}
           onClick={() =>
-            void window.texthop
+            void window.readfinch
               .call("disableNoteSuggestions")
               .catch((e) => setError(e.message))
           }
@@ -105,7 +105,7 @@ export function NoteSuggestionCard({ data }: { data: SuggestionCardData }) {
           <button
             className="text-button suggestion-link"
             onClick={() =>
-              void window.texthop
+              void window.readfinch
                 .call("settingsOpen", { tab: "notes", noteId: saved })
                 .catch((e) => setError(e.message))
             }

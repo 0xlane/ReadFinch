@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const isolated = process.argv.includes("--isolated-shortcuts");
-const output = isolated ? "docs/screenshots/v0.3" : "docs/screenshots/v0.5";
+const output = isolated ? "docs/screenshots/current" : "docs/screenshots/current";
 await mkdir(output, { recursive: true });
 const checks = [],
   errors = [],
@@ -48,7 +48,7 @@ const server = createServer(async (req, res) => {
   );
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const runtime = await electron.launch({
   args: [".", `--data-dir=${path.resolve(".local/shortcuts-" + Date.now())}`],
@@ -61,7 +61,7 @@ runtime.on("window", (page) => {
 const main = await runtime.firstWindow();
 main.setDefaultTimeout(12000);
 const call = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -94,8 +94,8 @@ async function trigger(id, text, delay = 0, target = "external") {
   await runtime.evaluate(
     (_, { id, value, delay, target }) => {
       if (target === "external")
-        globalThis.__texthopTest.nextSelection(value, delay);
-      globalThis.__texthopTest.shortcut(id, target);
+        globalThis.__readfinchTest.nextSelection(value, delay);
+      globalThis.__readfinchTest.shortcut(id, target);
     },
     {
       id,
@@ -133,10 +133,10 @@ async function record(label, key) {
 let panel;
 try {
   await main.evaluate(async () => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     if (s.interfaceLocale !== "zh-CN") {
       s.config.appearance.language = "zh-CN";
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -200,7 +200,7 @@ try {
     });
   });
   await runtime.evaluate(
-    (_, value) => globalThis.__texthopTest.select(value),
+    (_, value) => globalThis.__readfinchTest.select(value),
     selection("STALE MOUSE SELECTION"),
   );
   await trigger(
@@ -364,7 +364,7 @@ try {
     "data:image/png;base64," +
     (await readFile("tests/fixtures/bilingual-light.png")).toString("base64");
   await runtime.evaluate(
-    (_, dataUrl) => globalThis.__texthopTest.image(dataUrl),
+    (_, dataUrl) => globalThis.__readfinchTest.image(dataUrl),
     dataUrl,
   );
   await panel.waitForFunction(
@@ -415,13 +415,13 @@ try {
     "Repeated held-key callbacks are suppressed; late reads cannot override a newer shortcut or reopen a dismissed popup",
   );
   await runtime.evaluate(
-    (_, value) => globalThis.__texthopTest.select(value),
+    (_, value) => globalThis.__readfinchTest.select(value),
     selection("NATIVE PROTOCOL CACHE MUST NOT RETURN"),
   );
   assert.equal((await call(main, "snapshot")).nativeState, "ready");
   const nativeReadStarted = Date.now();
   const nativeRead = await runtime.evaluate(() =>
-    globalThis.__texthopTest.readNativeSelection(),
+    globalThis.__readfinchTest.readNativeSelection(),
   );
   const nativeReadMilliseconds = Date.now() - nativeReadStarted;
   assert.ok(

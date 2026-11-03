@@ -18,8 +18,6 @@ The identity uses a warm-white ground, a charcoal wing, warm-gray crown and apri
 
 [README banner](../assets/readfinch-banner.png), generated with the built-in imagegen tool. The image is stored inside this repository and is not fetched from a private asset host. [Exact generation prompt](BANNER-PROMPT.md).
 
-## Upgrade identity
+## Application identity
 
-The public product name, package name, executable, repository, documentation and UI use ReadFinch / 伴读雀. The existing Electron storage/keychain identity, app ID, startup registration key, IPC channel names and native helper filenames retain their legacy identifiers. This preserves existing settings, encrypted credentials, notebook files, installation identity. Startup registration keys stay stable; when relocating a portable executable, toggle launch at login off and on to register its new path. The workspace directory need not be renamed.
-
-Previously saved WebDAV paths and exported configuration content are not rewritten. Historical test reports and screenshot fixtures keep their original names.
+The product name, executable, installer and startup registration use **ReadFinch**. The package and renderer bridge use `readfinch`; the application ID and Linux desktop identity use `app.readfinch.ReadFinch`. Native selection helpers are named `readfinch-selection`. The application uses its own ReadFinch data directory and encryption identity, with no alternate product-name aliases or automatic import from another application's directory. When relocating a portable executable, toggle launch at login off and on to register its new path.

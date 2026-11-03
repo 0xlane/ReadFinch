@@ -65,8 +65,8 @@ export class SelectionService extends EventEmitter {
       this.nativeRoot,
       "bin",
       process.platform === "win32"
-        ? "texthop-selection.exe"
-        : "texthop-selection",
+        ? "readfinch-selection.exe"
+        : "readfinch-selection",
     );
     this.child = spawn(binary, [String(process.pid)], {
       windowsHide: true,

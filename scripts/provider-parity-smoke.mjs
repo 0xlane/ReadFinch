@@ -8,7 +8,7 @@ const catalog = JSON.parse(
 );
 const packaged = process.argv.includes("--packaged");
 const dataDir = path.resolve(".local/provider-parity-" + Date.now());
-const out = "docs/screenshots/v0.12.1";
+const out = "docs/screenshots/current";
 await mkdir(out, { recursive: true });
 const errors = [],
   checks = [],
@@ -55,7 +55,7 @@ async function launch() {
 }
 let page;
 const api = (method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });

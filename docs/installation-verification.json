@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-03T07:37:38.08Z",
+  "version": "0.14.0",
+  "name": "ReadFinch",
+  "packaged": true,
+  "installDirectory": "%LOCALAPPDATA%/Programs/ReadFinch",
+  "dataDirectory": "%APPDATA%/ReadFinch",
+  "titles": [
+    "伴读雀"
+  ],
+  "defaultProviders": 1,
+  "credentials": 0,
+  "localNotes": 0,
+  "interfaceLanguage": "system",
+  "startupEnabled": false,
+  "bundledOcrReady": true,
+  "nativeState": "ready",
+  "nativeHelper": "readfinch-selection.exe",
+  "rendererErrors": [],
+  "scope": "Actual current-user NSIS installation, default data directory, no profile override or automatic import. Installer completed silently with exit code 0.",
+  "uninstallDisplayName": "ReadFinch 0.14.0",
+  "uninstaller": "Uninstall ReadFinch.exe",
+  "previousInstallationRemoved": true,
+  "shortcuts": [
+    {
+      "Name": "ReadFinch.lnk",
+      "ApplicationId": "app.readfinch.ReadFinch",
+      "Target": "ReadFinch.exe"
+    },
+    {
+      "Name": "ReadFinch.lnk",
+      "ApplicationId": "app.readfinch.ReadFinch",
+      "Target": "ReadFinch.exe"
+    }
+  ]
+}

@@ -15,7 +15,7 @@ const server = createServer(async (req, res) => {
   requests.push({ body, auth: req.headers.authorization });
   res.setHeader("Content-Type", "application/json");
   res.end(
-    JSON.stringify({ choices: [{ message: { content: "TextHop OK" } }] }),
+    JSON.stringify({ choices: [{ message: { content: "ReadFinch OK" } }] }),
   );
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -30,10 +30,10 @@ const launch = async () => {
   });
   page = await app.firstWindow();
   await page.evaluate(async () => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     if (s.interfaceLocale !== "zh-CN") {
       s.config.appearance.language = "zh-CN";
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -42,7 +42,7 @@ const launch = async () => {
   await page.getByRole("heading", { name: "通用", exact: true }).waitFor();
 };
 const call = (method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -151,7 +151,7 @@ try {
         off();
         reject(Error("Vision test timed out"));
       }, 15000);
-      const off = window.texthop.on("job", (event) => {
+      const off = window.readfinch.on("job", (event) => {
         if (
           event.id !== id ||
           !["done", "error", "cancelled"].includes(event.status)
@@ -163,7 +163,7 @@ try {
           ? resolve()
           : reject(Error(event.message ?? event.status));
       });
-      window.texthop.call("testVision", { id, profileId }).catch((error) => {
+      window.readfinch.call("testVision", { id, profileId }).catch((error) => {
         clearTimeout(timer);
         off();
         reject(error);

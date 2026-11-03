@@ -169,7 +169,7 @@ test("invalid suggestion JSON never enters the shared cache; a valid empty resul
 
 test("existing SQLite notes survive excerpt migration and accepting recommendations is atomic and idempotent", async () => {
   const file = path.join(
-    await mkdtemp(path.join(os.tmpdir(), "texthop-excerpts-")),
+    await mkdtemp(path.join(os.tmpdir(), "readfinch-excerpts-")),
     "notes.sqlite",
   );
   const legacy = new DatabaseSync(file);

@@ -88,7 +88,7 @@ export function Settings({
   ]);
   useEffect(() => {
     if (visionJob.current) {
-      void window.texthop.call("cancel", { id: visionJob.current });
+      void window.readfinch.call("cancel", { id: visionJob.current });
       visionJob.current = "";
       setBusy(false);
     }
@@ -105,7 +105,7 @@ export function Settings({
   }, [tab]);
   useEffect(
     () =>
-      window.texthop.on("job", (event) => {
+      window.readfinch.on("job", (event) => {
         if (event.id !== visionJob.current) return;
         if (event.text !== undefined || event.status === "done")
           setVisionResult((current) => ({
@@ -152,7 +152,7 @@ export function Settings({
           throw Error(t("请补全设置：") + t(valid.error.issues[0].message));
         setAutoState("保存中…");
         setAutoError("");
-        const result = await window.texthop.call("saveConfig", {
+        const result = await window.readfinch.call("saveConfig", {
           config: value,
           revision: state.revision,
         });
@@ -194,7 +194,7 @@ export function Settings({
         void (async () => {
           await save();
           for (const [id, value, expectedScope] of pending) {
-            const result = await window.texthop.call("saveCredential", {
+            const result = await window.readfinch.call("saveCredential", {
               id,
               value,
               expectedScope,
@@ -216,7 +216,7 @@ export function Settings({
   }, [keys]);
   async function credential(id: string) {
     const value = latest.current.keys[id] ?? "";
-    const result = await window.texthop.call("saveCredential", {
+    const result = await window.readfinch.call("saveCredential", {
       id,
       value,
       expectedScope: keyScopes.current[id],
@@ -261,7 +261,7 @@ export function Settings({
               onClick={() =>
                 void perform(async () => {
                   onSnapshot(
-                    await window.texthop.call("saveCredential", {
+                    await window.readfinch.call("saveCredential", {
                       id,
                       value: "",
                     }),
@@ -297,7 +297,7 @@ export function Settings({
       remotePath: source.remotePath,
       ...(source.password ? { password: source.password } : {}),
     };
-    const result = await window.texthop.call("saveSync", value);
+    const result = await window.readfinch.call("saveSync", value);
     onSnapshot(result);
     setSync((current) =>
       rebaseDraft(current, source, { ...result.sync, password: "" }),
@@ -332,7 +332,7 @@ export function Settings({
       const key = catalogKey(profile);
       await save();
       await flushCredentials();
-      const result = await window.texthop.call("listModels", { profileId: id });
+      const result = await window.readfinch.call("listModels", { profileId: id });
       setCatalogs((current) => ({ ...current, [key]: result }));
       return result;
     },
@@ -415,7 +415,7 @@ export function Settings({
           }
           test={async (actionId) => {
             await save();
-            await window.texthop.call("panelOpen", {
+            await window.readfinch.call("panelOpen", {
               source: "action-test",
               actionId,
             });
@@ -451,7 +451,7 @@ export function Settings({
                   onClick={() =>
                     void perform(async () => {
                       await save().catch(() => {});
-                      const result = await window.texthop.call("setTheme", {
+                      const result = await window.readfinch.call("setTheme", {
                         theme: value,
                       });
                       setDraft((current) => ({
@@ -594,7 +594,7 @@ export function Settings({
                 className="secondary"
                 onClick={() =>
                   void perform(
-                    () => window.texthop.call("clearCache"),
+                    () => window.readfinch.call("clearCache"),
                     t("结果缓存已清空"),
                   )
                 }
@@ -634,7 +634,7 @@ export function Settings({
                   className="secondary"
                   onClick={() =>
                     void perform(async () =>
-                      onSnapshot(await window.texthop.call("resumeToolbar")),
+                      onSnapshot(await window.readfinch.call("resumeToolbar")),
                     )
                   }
                 >
@@ -845,7 +845,7 @@ export function Settings({
             perform(async () => {
               const state = await save();
               await flushCredentials();
-              const result = await window.texthop.call("duplicateProvider", {
+              const result = await window.readfinch.call("duplicateProvider", {
                 id,
                 revision: state.revision,
               });
@@ -865,7 +865,7 @@ export function Settings({
               setMessage(
                 model +
                   " · " +
-                  (await window.texthop.call("testText", {
+                  (await window.readfinch.call("testText", {
                     profileId: id,
                   })),
               );
@@ -890,7 +890,7 @@ export function Settings({
               await flushCredentials();
               const id = crypto.randomUUID();
               visionJob.current = id;
-              await window.texthop.call("testVision", { id, profileId });
+              await window.readfinch.call("testVision", { id, profileId });
             } catch (e) {
               setBusy(false);
               setError((e as Error).message);
@@ -974,7 +974,7 @@ export function Settings({
                 onClick={() =>
                   void perform(async () => {
                     await saveDav();
-                    setMessage(await window.texthop.call("testSync"));
+                    setMessage(await window.readfinch.call("testSync"));
                   })
                 }
               >
@@ -986,7 +986,7 @@ export function Settings({
                 onClick={() =>
                   void perform(async () => {
                     await saveDav();
-                    const result = await window.texthop.call("sync", {});
+                    const result = await window.readfinch.call("sync", {});
                     setSyncResult(result);
                     setMessage(result.message);
                   })
@@ -1041,7 +1041,7 @@ export function Settings({
                     }
                     onClick={() =>
                       void perform(async () => {
-                        const result = await window.texthop.call("sync", {
+                        const result = await window.readfinch.call("sync", {
                           resolution: choice,
                           token: syncResult.token,
                         });
@@ -1077,7 +1077,7 @@ export function Settings({
                   className="secondary"
                   onClick={() =>
                     void perform(async () => {
-                      const file = await window.texthop.call("exportConfig");
+                      const file = await window.readfinch.call("exportConfig");
                       if (file) setMessage(t("已导出到 ") + file);
                     })
                   }
@@ -1094,7 +1094,7 @@ export function Settings({
                   className="secondary"
                   onClick={() =>
                     void perform(async () =>
-                      setImported(await window.texthop.call("previewImport")),
+                      setImported(await window.readfinch.call("previewImport")),
                     )
                   }
                 >
@@ -1139,7 +1139,7 @@ export function Settings({
                     onClick={() =>
                       void perform(async () => {
                         onSnapshot(
-                          await window.texthop.call("applyImport", {
+                          await window.readfinch.call("applyImport", {
                             token: imported.token,
                             mode,
                             revision: snapshot.revision,
@@ -1167,7 +1167,7 @@ export function Settings({
               </div>
               <button
                 className="secondary"
-                onClick={() => void window.texthop.call("openData")}
+                onClick={() => void window.readfinch.call("openData")}
               >
                 {t("打开数据目录")}
               </button>

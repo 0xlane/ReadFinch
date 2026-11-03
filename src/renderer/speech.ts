@@ -87,14 +87,14 @@ function finish(job: Playback, error = "") {
   active = undefined;
   job.release?.();
   changed(error ? "error" : "idle", error ? job.key : "", error);
-  void window.texthop.call("speechEnd", { id: job.id }).catch(() => {});
+  void window.readfinch.call("speechEnd", { id: job.id }).catch(() => {});
 }
 export function stopSpeaking(key?: string) {
   if (active && (!key || active.key === key)) finish(active);
 }
 export function useSpeechEvents() {
   useEffect(() => {
-    const off = window.texthop.on("speechStop", (id) => {
+    const off = window.readfinch.on("speechStop", (id) => {
       if (active?.id === id) stopSpeaking();
     });
     const hidden = () => {
@@ -144,7 +144,7 @@ async function playOnlineChunk(
   settings: SpeechConfig,
 ) {
   const { speed, playbackRate, volume } = onlineProsody(settings);
-  const result = await window.texthop.call("speechAudio", {
+  const result = await window.readfinch.call("speechAudio", {
     id: job.id,
     providerId: settings.onlineProviderId!,
     text,
@@ -199,14 +199,14 @@ export async function speakText(
   active = job;
   changed("loading", key);
   try {
-    const saved = await window.texthop.call("speechBegin", { id: job.id });
+    const saved = await window.readfinch.call("speechBegin", { id: job.id });
     if (active !== job) return;
     const settings = options.config ?? saved;
     const known = speechTag(language ?? "");
     const [code] = await Promise.all([
       known !== "und"
         ? known
-        : window.texthop
+        : window.readfinch
             .call("detectLanguage", {
               text: text.slice(0, 2000),
               localOnly: true,

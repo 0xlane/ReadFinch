@@ -38,7 +38,7 @@ Windows 原生辅助进程已成功编译并返回 `Windows UI Automation 已连
 - macOS：在目标机编译 Swift helper；通过系统界面授权辅助功能和录屏；验证菜单栏/焦点、AXSelectedText、全局快捷键。签名和 notarization 应在分发前完成。
 - X11：安装 `xclip xdotool xprop`，验证 PRIMARY 所有者与前台应用切换。它不是读取所有应用内部编辑模型的通用 API，无法保证原位替换。
 - 0.2.2 的快捷键显式刷新使用 Windows/macOS helper 的带请求 ID 的响应；Windows 不因快捷键仍按住 Shift 而跳过读取。X11 重新读取 PRIMARY 并核对查询前后的前台窗口，但 PRIMARY 的保留/所有者行为仍由目标应用决定。Wayland 无通用选区时继续通过 OCR 或剪贴板入口取词。
-- Wayland：安装 `xdg-desktop-portal`、对应桌面后端（KDE 为 `xdg-desktop-portal-kde`）和 `python3-gi`。安装包的 `.desktop` 名称、Electron desktopName 与 StartupWMClass 使用 `app.texthop.TextHop`。快捷键需门户授权；开发未安装应用时可能只能使用主界面按钮。
+- Wayland：安装 `xdg-desktop-portal`、对应桌面后端（KDE 为 `xdg-desktop-portal-kde`）和 `python3-gi`。安装包的 `.desktop` 名称、Electron desktopName 与 StartupWMClass 使用 `app.readfinch.ReadFinch`。快捷键需门户授权；开发未安装应用时可能只能使用主界面按钮。
 - Wayland 不尝试通过 X11 工具绕过合成器限制，也不合成粘贴事件。用户先复制，然后显式调用剪贴板入口。
 
 平台依据：[Electron 截屏 API](https://www.electronjs.org/docs/latest/api/desktop-capturer)、[GlobalShortcut 的 Linux 行为](https://www.electronjs.org/docs/latest/api/global-shortcut)、[SafeStorage](https://www.electronjs.org/docs/latest/api/safe-storage)、[Screenshot portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Screenshot.html)、[Windows TextPattern](https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-textpattern-overview)。

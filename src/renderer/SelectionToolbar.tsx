@@ -52,7 +52,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
   function send(command: Command) {
     const token = latest.current?.token;
     if (token)
-      void window.texthop
+      void window.readfinch
         .call("toolbar", { ...command, token })
         .catch(() => {});
   }
@@ -74,11 +74,11 @@ export function SelectionToolbar({ config }: { config: Config }) {
       latest.current = state;
       setView(state);
     }
-    const off = window.texthop.on("toolbarState", (v) => {
+    const off = window.readfinch.on("toolbarState", (v) => {
       received = true;
       apply(v);
     });
-    void window.texthop.call("toolbarState").then((v) => {
+    void window.readfinch.call("toolbarState").then((v) => {
       if (alive && !received) apply(v);
     });
     function key(e: KeyboardEvent) {
@@ -127,12 +127,12 @@ export function SelectionToolbar({ config }: { config: Config }) {
     const token = latest.current?.token;
     if (!token) return;
     if (item.action)
-      await window.texthop.call("selectionOpen", {
+      await window.readfinch.call("selectionOpen", {
         actionId: item.action.id,
         token,
       });
     else {
-      const selection = await window.texthop.call("selectionGet");
+      const selection = await window.readfinch.call("selectionGet");
       if (selection?.token === token)
         await speakText(
           selection.text,

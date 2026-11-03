@@ -4,10 +4,10 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const dir = path.resolve(".local/toolbar-" + Date.now()),
-  output = "docs/screenshots/v0.6";
+  output = "docs/screenshots/current";
 await mkdir(dir, { recursive: true });
 await mkdir(output, { recursive: true });
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 let app, main, pill;
 const checks = [];
@@ -25,7 +25,7 @@ async function launch() {
   await main.locator("main h1").waitFor();
 }
 const call = (m, arg) =>
-  main.evaluate(([m, arg]) => window.texthop.call(m, arg), [m, arg]);
+  main.evaluate(([m, arg]) => window.readfinch.call(m, arg), [m, arg]);
 const state = () => call("snapshot");
 const visible = () =>
   app.evaluate(
@@ -46,7 +46,7 @@ async function select(name = "Reader") {
   await app.evaluate(
     ({ screen }, a) => {
       const area = screen.getPrimaryDisplay().workArea;
-      globalThis.__texthopTest.select(a, {
+      globalThis.__readfinchTest.select(a, {
         x: area.x + Math.round(area.width * 0.4),
         y: area.y + Math.round(area.height * 0.38),
       });
@@ -185,7 +185,7 @@ try {
   );
   const panel = app.windows().find((w) => w.url().includes("mode=panel"));
   const session = await panel.evaluate(() =>
-    window.texthop.call("interactionGet"),
+    window.readfinch.call("interactionGet"),
   );
   assert.equal(session.text, "A selected sentence.");
   assert.equal(session.actionId, "translate");

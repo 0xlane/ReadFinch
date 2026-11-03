@@ -45,11 +45,7 @@ Windows 的无边框窗口默认仍可能带有原生框架，并受工作区尺
 
 识别创建独立 Worker，只从随包路径加载 WASM 和识别资源，没有 CDN 回退。若安装文件损坏，界面提示重新安装；离线识别失败不会自动发送图片到外部服务。
 
-本机样例结果：普通中英文和深色截图的 5 个关键词/路径/代码校验项全部匹配；13 px 小字样例匹配 3/4。Tesseract 报告的置信度是引擎信息，不是准确率保证。样例上的冷启动约 0.4–0.6 秒，识别约 0.3–0.8 秒，测试进程 RSS 约 185–192 MB。运行时对较小截图做有限 2× 放大。数值只代表当前 Windows 机器与这些样例。
-
-Windows WinRT OCR 实测可用 `en-US`、`zh-Hans-CN`。最新记录中首个混合样例约 163 ms，但合并了行并在中文、路径和代码标点中加入空格/替换字符。Tesseract 更适合本版强调的文字、路径和代码提取，同时可复用于 macOS/Linux。因此选择统一引擎；小字、复杂排版、竖排、手写和低清晰度仍需人工核对。
-
-原始结果见 [offline-ocr-verification.json](offline-ocr-verification.json)、[ocr-smoke.json](ocr-smoke.json) 和 [windows-ocr-comparison.json](windows-ocr-comparison.json)。
+离线回归覆盖中英文、深浅背景、小字号、路径与代码。识别置信度由引擎报告，不等于准确率保证；低清晰度、复杂排版和手写内容仍需人工校对。[离线测试记录](offline-ocr-verification.json)
 
 ## 离线复现
 

@@ -27,7 +27,7 @@ export function ShortcutRecorder({
     setRecording(false);
     setHint("");
     if (id)
-      void window.texthop
+      void window.readfinch
         .call("shortcutRecording", { id, active: false })
         .catch(() => {});
   }
@@ -39,7 +39,7 @@ export function ShortcutRecorder({
     setRecording(true);
     setHint(t("正在准备…"));
     try {
-      await window.texthop.call("shortcutRecording", { id, active: true });
+      await window.readfinch.call("shortcutRecording", { id, active: true });
       if (owner.current === id) {
         ready.current = true;
         setHint(t("按组合键 · Esc 取消 · Backspace 清空"));

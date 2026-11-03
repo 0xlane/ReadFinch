@@ -78,7 +78,7 @@ export function noteOutput(
   const fields = view.outputSchema.map((f, i) => ({ ...f, name: names[i] }));
   let layout = view.layout;
   const changes = view.outputSchema
-    .map((f, i) => ({ from: f.name, to: names[i], temp: "_texthop_" + f.id }))
+    .map((f, i) => ({ from: f.name, to: names[i], temp: "_readfinch_" + f.id }))
     .filter((c) => c.from !== c.to);
   if (layout) {
     for (const c of changes) {

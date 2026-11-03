@@ -10,7 +10,7 @@ const cases = [
       "Small steps",
       "你好",
       "世界",
-      "C:\\Projects\\TextHop\\src\\main.ts",
+      "C:\\Projects\\ReadFinch\\src\\main.ts",
       "const total = 42;",
     ],
   },
@@ -20,13 +20,13 @@ const cases = [
       "Small steps",
       "你好",
       "世界",
-      "C:\\Projects\\TextHop\\src\\main.ts",
+      "C:\\Projects\\ReadFinch\\src\\main.ts",
       "const total = 42;",
     ],
   },
   {
     name: "small-interface",
-    tokens: ["Error", "42", "C:\\Projects\\TextHop", "世界"],
+    tokens: ["Error", "42", "C:\\Projects\\ReadFinch", "世界"],
   },
 ];
 const results = [];

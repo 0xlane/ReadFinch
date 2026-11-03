@@ -70,7 +70,7 @@ test("line cleanup preserves code, paths, logs and paragraph boundaries", () => 
   );
 });
 test("store persists actions, protects last valid state and detects concurrent writes", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "texthop-store-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "readfinch-store-"));
   const store = new ConfigStore(dir);
   await store.init();
   const original = store.config;

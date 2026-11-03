@@ -1,5 +1,5 @@
 {
-  "version": "0.13.0",
+  "version": "0.14.0",
   "checks": [
     "System-default language, live English and Chinese, and dedicated shortcuts for all actions",
     "One model per provider, duplicate credentials and settings, and bidirectional feature assignments",

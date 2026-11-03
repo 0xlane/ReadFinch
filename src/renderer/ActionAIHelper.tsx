@@ -59,7 +59,7 @@ export function ActionAIHelper({
         ),
         targetLanguage: config.defaults.targetLanguage,
       });
-      await window.texthop.call("clipboardWrite", { text });
+      await window.readfinch.call("clipboardWrite", { text });
       setCopied(true);
       clearTimeout(timer.current);
       timer.current = setTimeout(() => setCopied(false), 1500);

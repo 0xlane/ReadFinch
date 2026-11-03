@@ -75,7 +75,7 @@ try {
   }
   console.log("Target ready", await waitReply("ready"));
   console.log(
-    "请将 TextHop Native Test 编辑器切换到前台；测试只操作这份专用样例文本。无法获得前台时将在 60 秒后报告未通过。",
+    "请将 ReadFinch Native Test 编辑器切换到前台；测试只操作这份专用样例文本。无法获得前台时将在 60 秒后报告未通过。",
   );
   const waitWindow = async (mode) => {
     for (let n = 0; n < 600; n++) {
@@ -91,7 +91,7 @@ try {
     console.log(
       "Bridge",
       await main.evaluate(
-        async () => (await window.texthop.call("snapshot")).nativeStatus,
+        async () => (await window.readfinch.call("snapshot")).nativeStatus,
       ),
     );
     throw Error(
@@ -120,7 +120,7 @@ try {
   // Read the observed selection token in an isolated test window, from the bridge event.
   await panel.evaluate(() => {
     window.__testSelection = null;
-    window.texthop.on(
+    window.readfinch.on(
       "interaction",
       (value) => (window.__testSelection = value.selection),
     );
@@ -134,7 +134,7 @@ try {
   assert.equal(previousSelection.canReplace, true);
   await panel.evaluate(
     async (token) =>
-      window.texthop.call("replace", {
+      window.readfinch.call("replace", {
         token,
         text: "Small changes, lasting impact.",
       }),
@@ -156,7 +156,7 @@ try {
   await new Promise((r) => setTimeout(r, 350));
   const rejected = await panel.evaluate(async (token) => {
     try {
-      await window.texthop.call("replace", {
+      await window.readfinch.call("replace", {
         token,
         text: "MUST NOT BE INSERTED",
       });
@@ -172,7 +172,7 @@ try {
   await new Promise((r) => setTimeout(r, 200));
   const targetRect = await command("status");
   assert.equal(targetRect.foreground, targetRect.hwnd, "The sample editor must be in front before OCR capture");
-  await main.evaluate(() => window.texthop.call("capture"));
+  await main.evaluate(() => window.readfinch.call("capture"));
   const overlay = await waitWindow("capture");
   const display = await app.evaluate(({ screen }) => {
     const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());

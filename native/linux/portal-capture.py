@@ -7,7 +7,7 @@ except ImportError:
     print(json.dumps({"error": "请安装 python3-gi 和 xdg-desktop-portal（KDE 还需要 xdg-desktop-portal-kde）"})); sys.exit(1)
 bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
 loop = GLib.MainLoop()
-token = "texthop_" + uuid.uuid4().hex
+token = "readfinch_" + uuid.uuid4().hex
 sender = bus.get_unique_name()[1:].replace('.', '_')
 request_path = '/org/freedesktop/portal/desktop/request/' + sender + '/' + token
 def response(connection, sender, object_path, interface, signal, params, data):

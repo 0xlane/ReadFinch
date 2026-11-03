@@ -135,7 +135,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
 
   function stop() {
     const id = currentJob.current || resultRun.current;
-    if (id) void window.texthop.call("cancel", { id });
+    if (id) void window.readfinch.call("cancel", { id });
     currentJob.current = "";
     resultRun.current = "";
     setSuggestions(null);
@@ -175,19 +175,19 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       stopSpeaking();
     }
     const offs = [
-      window.texthop.on("interaction", receive),
-      window.texthop.on("noteSuggestions", (value) => {
+      window.readfinch.on("interaction", receive),
+      window.readfinch.on("noteSuggestions", (value) => {
         if (value.id === resultRun.current)
           setSuggestions(value.items.length ? value : null);
       }),
-      window.texthop.on("actionShortcut", ({ actionId }) =>
+      window.readfinch.on("actionShortcut", ({ actionId }) =>
         shortcutAction.current(actionId),
       ),
-      window.texthop.on("hidden", () => {
+      window.readfinch.on("hidden", () => {
         stop();
         stopSpeaking();
       }),
-      window.texthop.on("job", (event) => {
+      window.readfinch.on("job", (event) => {
         if (event.id !== currentJob.current) return;
         if (event.text !== undefined) {
           if (event.kind === "ocr") {
@@ -209,7 +209,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           currentJob.current = "";
         }
       }),
-      window.texthop.on("selectionInvalid", () =>
+      window.readfinch.on("selectionInvalid", () =>
         setSession((value) =>
           value?.selection
             ? { ...value, selection: { ...value.selection, canReplace: false } }
@@ -217,10 +217,10 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         ),
       ),
     ];
-    void window.texthop.call("interactionGet").then(receive);
+    void window.readfinch.call("interactionGet").then(receive);
     const key = (event: KeyboardEvent) => {
       if (event.key === "Escape")
-        void window.texthop.call("window", { command: "dismiss" });
+        void window.readfinch.call("window", { command: "dismiss" });
     };
     addEventListener("keydown", key);
     return () => {
@@ -281,7 +281,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           180,
           Math.ceil(content.current!.getBoundingClientRect().height + 92),
         );
-        void window.texthop.call("panelResize", {
+        void window.readfinch.call("panelResize", {
           height: Math.min(3000, height),
         });
       });
@@ -368,7 +368,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     resultRun.current = id;
     setPhase("running");
     try {
-      await window.texthop.call("runAction", {
+      await window.readfinch.call("runAction", {
         id,
         actionId: action.id,
         text,
@@ -401,7 +401,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     const id = crypto.randomUUID();
     currentJob.current = id;
     try {
-      await window.texthop.call("recognize", {
+      await window.readfinch.call("recognize", {
         id,
         profileId: ocrProfile,
         dataUrl: image.dataUrl,
@@ -424,14 +424,14 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   };
   async function importImage() {
     try {
-      await window.texthop.call("imageImport");
+      await window.readfinch.call("imageImport");
     } catch (error) {
       setError((error as Error).message);
     }
   }
   async function copy(value: string) {
     try {
-      await window.texthop.call("clipboardWrite", { text: value });
+      await window.readfinch.call("clipboardWrite", { text: value });
       setCopied(true);
     } catch (error) {
       setError((error as Error).message);
@@ -448,7 +448,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     preference: { targetLanguage: string } | { providerId: string },
   ) {
     translationWrite.current = translationWrite.current
-      .then(() => window.texthop.call("setTranslationPreference", preference))
+      .then(() => window.readfinch.call("setTranslationPreference", preference))
       .catch((e) => setNoteError((e as Error).message));
   }
   async function saveResult(create = false) {
@@ -457,7 +457,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     setSavingNote(true);
     setNoteError("");
     try {
-      const id = await window.texthop.call("saveNote", {
+      const id = await window.readfinch.call("saveNote", {
         note: { ...draft, result },
         create,
       });
@@ -548,7 +548,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           title={pinned ? t("取消固定") : t("固定")}
           onClick={() => {
             setPinned(!pinned);
-            void window.texthop.call("window", {
+            void window.readfinch.call("window", {
               command: "pin",
               value: !pinned,
             });
@@ -565,7 +565,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           aria-label={t("收起浮窗")}
           title={t("关闭 · Esc")}
           onClick={() =>
-            void window.texthop.call("window", { command: "dismiss" })
+            void window.readfinch.call("window", { command: "dismiss" })
           }
         >
           <ReferenceIcon name="tabler-x" />
@@ -583,7 +583,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
               </p>
               <button
                 className="primary capture-entry"
-                onClick={() => void window.texthop.call("capture")}
+                onClick={() => void window.readfinch.call("capture")}
               >
                 <ScanLine size={17} />
                 <span>{t("框选文字")}</span>
@@ -593,7 +593,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                 <button
                   className="text-button"
                   onClick={() =>
-                    void window.texthop.call("panelOpen", {
+                    void window.readfinch.call("panelOpen", {
                       source: "clipboard",
                     })
                   }
@@ -670,7 +670,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                     ) : (
                       <button
                         className="text-button"
-                        onClick={() => void window.texthop.call("capture")}
+                        onClick={() => void window.readfinch.call("capture")}
                       >
                         <ScanLine size={13} />
                         {t("重新框选")}
@@ -853,7 +853,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   <button
                     className="secondary"
                     onClick={() =>
-                      void window.texthop.call("panelOpen", {
+                      void window.readfinch.call("panelOpen", {
                         source: "clipboard",
                       })
                     }
@@ -863,7 +863,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   </button>
                   <button
                     className="secondary"
-                    onClick={() => void window.texthop.call("capture")}
+                    onClick={() => void window.readfinch.call("capture")}
                   >
                     <ScanLine size={15} />
                     {t("框选文字")}
@@ -974,7 +974,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                       disabled={savingNote}
                       onClick={async () => {
                         if (savedNote) {
-                          await window.texthop.call("settingsOpen", {
+                          await window.readfinch.call("settingsOpen", {
                             tab: "notes",
                             noteId: savedNote,
                           });
@@ -998,7 +998,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                         className="text-button"
                         onClick={async () => {
                           try {
-                            await window.texthop.call("replace", {
+                            await window.readfinch.call("replace", {
                               token: session.selection!.token,
                               text: copyableResult(
                                 result,
@@ -1007,7 +1007,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                                 resultSource,
                               ),
                             });
-                            await window.texthop.call("window", {
+                            await window.readfinch.call("window", {
                               command: "dismiss",
                             });
                           } catch (error) {
@@ -1054,7 +1054,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   <button
                     className="text-button"
                     onClick={() =>
-                      void window.texthop.call("settingsOpen", { tab: "tts" })
+                      void window.readfinch.call("settingsOpen", { tab: "tts" })
                     }
                   >
                     {t("文本转语音")}
@@ -1076,7 +1076,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                 <button
                   className="text-button"
                   onClick={() =>
-                    void window.texthop.call("settingsOpen", { tab: "text" })
+                    void window.readfinch.call("settingsOpen", { tab: "text" })
                   }
                 >
                   {t("配置文字模型")}
@@ -1101,7 +1101,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                 <button
                   className="text-button"
                   onClick={() =>
-                    void window.texthop.call("settingsOpen", { tab: "ocr" })
+                    void window.readfinch.call("settingsOpen", { tab: "ocr" })
                   }
                 >
                   {t("检查识别设置")}
@@ -1169,7 +1169,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           aria-label={t("打开设置")}
           title={working ? t("配置指令") : t("设置")}
           onClick={() =>
-            void window.texthop.call("settingsOpen", {
+            void window.readfinch.call("settingsOpen", {
               tab: ocrInput
                 ? "ocr"
                 : missingSelection

@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const output = "docs/screenshots/v0.11";
+const output = "docs/screenshots/current";
 await mkdir(output, { recursive: true });
 const requests = [];
 const checks = [];
@@ -40,7 +40,7 @@ const server = createServer(async (req, res) => {
   );
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   args: [".", `--data-dir=${path.resolve(".local/input-flow-" + Date.now())}`],
@@ -52,7 +52,7 @@ app.on("window", (page) =>
 const main = await app.firstWindow();
 main.setDefaultTimeout(15000);
 const call = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -83,7 +83,7 @@ async function modePage(mode) {
 async function useOcr(id, model = "ocr-fixture") {
   await main.evaluate(
     async ({ id, model, endpoint }) => {
-      const s = await window.texthop.call("snapshot");
+      const s = await window.readfinch.call("snapshot");
       Object.assign(s.config.providers[0], {
         endpoint,
         requiresKey: false,
@@ -102,7 +102,7 @@ async function useOcr(id, model = "ocr-fixture") {
       s.config.providers.find((profile) => profile.id === "ocr-fixture").model =
         model;
       s.config.defaults.ocrProfileId = id;
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -112,7 +112,7 @@ async function useOcr(id, model = "ocr-fixture") {
 }
 async function acquiredImage(dataUrl, source = "capture") {
   await app.evaluate(
-    (_, { dataUrl, source }) => globalThis.__texthopTest.image(dataUrl, source),
+    (_, { dataUrl, source }) => globalThis.__readfinchTest.image(dataUrl, source),
     { dataUrl, source },
   );
 }
@@ -123,10 +123,10 @@ let panel;
 let screenCapture;
 try {
   await main.evaluate(async () => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     if (s.interfaceLocale !== "zh-CN") {
       s.config.appearance.language = "zh-CN";
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -134,7 +134,7 @@ try {
   });
   await main.getByRole("heading", { name: "通用", exact: true }).waitFor();
   await call(main, "setTheme", { theme: "light" });
-  await app.evaluate(() => globalThis.__texthopTest.clearSelection());
+  await app.evaluate(() => globalThis.__readfinchTest.clearSelection());
   await call(main, "selectionOpen", { actionId: "translate" });
   panel = await modePage("panel");
   await panel.getByText("未读到选中文字", { exact: true }).waitFor();
@@ -153,7 +153,7 @@ try {
   await panel.getByRole("button", { name: "保持浮窗", exact: true }).click();
   await panel.evaluate(() => {
     window.__inputJobs = [];
-    window.texthop.on("job", (event) =>
+    window.readfinch.on("job", (event) =>
       window.__inputJobs.push({ kind: event.kind, status: event.status }),
     );
   });
@@ -345,7 +345,7 @@ try {
     await win.loadURL(
       "data:text/html;charset=utf-8," +
         encodeURIComponent(
-          '<html><body style="margin:24px;background:white;color:black;font:30px Arial,sans-serif;line-height:1.65">TextHop SCREEN OCR 2468<br>Small steps make a big difference.<br>你好，世界！<br>C:\\Projects\\TextHop</body></html>',
+          '<html><body style="margin:24px;background:white;color:black;font:30px Arial,sans-serif;line-height:1.65">ReadFinch SCREEN OCR 2468<br>Small steps make a big difference.<br>你好，世界！<br>C:\\Projects\\ReadFinch</body></html>',
         ),
     );
     win.show();

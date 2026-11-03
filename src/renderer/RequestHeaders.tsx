@@ -16,14 +16,14 @@ export function RequestHeaders({ provider }: { provider: TextProfile }) {
     const text = pending.current;
     if (text === undefined) return;
     pending.current = undefined;
-    void window.texthop
+    void window.readfinch
       .call("providerHeaders", { ...args, value: text })
       .then(() => setMessage(""))
       .catch((e) => setMessage(e.message));
   }
   useEffect(() => {
     let alive = true;
-    window.texthop
+    window.readfinch
       .call("providerHeaders", args)
       .then((v) => {
         if (alive) {
@@ -49,7 +49,7 @@ export function RequestHeaders({ provider }: { provider: TextProfile }) {
           rows={3}
           spellCheck={false}
           disabled={!ready}
-          placeholder={'{ "X-Project": "texthop" }'}
+          placeholder={'{ "X-Project": "readfinch" }'}
           value={value}
           onBlur={flush}
           onChange={(e) => {

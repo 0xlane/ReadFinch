@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const packaged = process.argv.includes("--packaged");
 const dir = path.resolve(".local/speech-smoke-" + Date.now());
-const pictures = "docs/screenshots/v0.10";
+const pictures = "docs/screenshots/current";
 await mkdir(dir, { recursive: true });
 await mkdir(pictures, { recursive: true });
 const requests = [],
@@ -67,7 +67,7 @@ const server = createServer(async (req, res) => {
   }
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   ...(packaged
@@ -78,7 +78,7 @@ const app = await electron.launch({
 });
 const main = await app.firstWindow();
 const api = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -319,7 +319,7 @@ try {
       "Every morning I read the newspaper in the kitchen before I leave for work.";
     await app.evaluate(
       (_, text) =>
-        globalThis.__texthopTest.select({
+        globalThis.__readfinchTest.select({
           token: crypto.randomUUID(),
           app: "Reader",
           x: 540,

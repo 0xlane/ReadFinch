@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const output = "docs/screenshots/v0.13",
+const output = "docs/screenshots/current",
   dataDir = path.resolve(".local/models-" + Date.now());
 await mkdir(output, { recursive: true });
 await mkdir(dataDir, { recursive: true });
@@ -66,7 +66,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   args: [".", `--data-dir=${dataDir}`],
@@ -78,7 +78,7 @@ app.on("window", (p) =>
 const page = await app.firstWindow();
 page.setDefaultTimeout(15000);
 const call = (method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -104,7 +104,7 @@ async function job(method, arg) {
           off();
           reject(Error("Job timed out"));
         }, 20000);
-        const off = window.texthop.on("job", (e) => {
+        const off = window.readfinch.on("job", (e) => {
           if (e.id !== id || !["done", "error", "cancelled"].includes(e.status))
             return;
           clearTimeout(timer);
@@ -113,7 +113,7 @@ async function job(method, arg) {
             ? resolve()
             : reject(Error(e.message ?? e.status));
         });
-        window.texthop.call(method, { ...arg, id }).catch((e) => {
+        window.readfinch.call(method, { ...arg, id }).catch((e) => {
           clearTimeout(timer);
           off();
           reject(e);

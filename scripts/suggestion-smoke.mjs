@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const dir = path.resolve(".local/suggestion-smoke-" + Date.now());
-const output = "docs/screenshots/v0.9";
+const output = "docs/screenshots/current";
 const packaged = process.argv.includes("--packaged");
 await mkdir(dir, { recursive: true });
 await mkdir(output, { recursive: true });
@@ -102,7 +102,7 @@ const server = createServer(async (req, res) => {
   );
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   ...(packaged
@@ -114,7 +114,7 @@ const app = await electron.launch({
 app.on("window", (page) => page.on("pageerror", (e) => errors.push(e.message)));
 const main = await app.firstWindow();
 const api = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -136,7 +136,7 @@ const list = () =>
 async function select(text) {
   await app.evaluate(
     (_, text) =>
-      globalThis.__texthopTest.select({
+      globalThis.__readfinchTest.select({
         token: crypto.randomUUID(),
         app: "Reader",
         text,

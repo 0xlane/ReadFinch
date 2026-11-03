@@ -13,26 +13,27 @@ const app = await electron.launch({
 });
 try {
   const readyPage = await app.firstWindow();
-  await readyPage.getByText("让文字，自在流动。").waitFor();
+  await readyPage.locator("main h1").waitFor();
   for (const item of [
+    { name: "bilingual-light", dark: false, size: 30 },
     { name: "bilingual-dark", dark: true, size: 24 },
     { name: "small-interface", dark: true, size: 13 },
   ]) {
     const image = await app.evaluate(async ({ BrowserWindow }, item) => {
       const w = new BrowserWindow({
-        width: 900,
-        height: 380,
+        width: item.dark ? 900 : 1100,
+        height: item.dark ? 380 : 430,
         show: false,
         webPreferences: { sandbox: true, offscreen: true },
       });
       const text =
         item.size === 13
-          ? "Error 42: connection refused<br>你好，世界！小字号混合文字。<br><code>C:\\Projects\\TextHop<br>const total = 42; // Hello 世界</code>"
-          : "TextHop · 让文字自在流动<br>Small steps make a big difference.<br>你好，世界！每一小步，都能带来改变。<br><code>C:\\Projects\\TextHop\\src\\main.ts<br>const total = 42; // Hello 世界</code>";
+          ? "Error 42: connection refused<br>你好，世界！小字号混合文字。<br><code>C:\\Projects\\ReadFinch<br>const total = 42; // Hello 世界</code>"
+          : "<h1>ReadFinch · 让文字自在流动</h1>Small steps make a big difference.<br>你好，世界！每一小步，都能带来改变。<br><code>C:\\Projects\\ReadFinch\\src\\main.ts<br>const total = 42; // Hello 世界</code>";
       await w.loadURL(
         "data:text/html;charset=utf-8," +
           encodeURIComponent(
-            `<style>body{background:${item.dark ? "#19221d" : "white"};color:${item.dark ? "#e9f2e9" : "#19221d"};font:${item.size}px "Microsoft YaHei",Arial;padding:28px;line-height:1.9}code{font:${item.size - 2}px Consolas}</style>${text}`,
+            `<style>body{background:${item.dark ? "#19221d" : "white"};color:${item.dark ? "#e9f2e9" : "#19221d"};font:${item.size}px "Microsoft YaHei",Arial;padding:28px;line-height:1.9}h1{font-size:${item.dark ? item.size : item.size + 8}px;font-weight:${item.dark ? 400 : 700};margin:0 0 ${item.dark ? 0 : 20}px}code{font:${item.size - (item.dark ? 2 : 6)}px Consolas}</style>${text}`,
           ),
       );
       await new Promise((r) => setTimeout(r, 250));

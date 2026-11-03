@@ -34,14 +34,14 @@ export function LocalNotebook({
   const [confirming, setConfirming] = useState(false);
   const [copied, setCopied] = useState(false);
   useEffect(
-    () => window.texthop.on("notesChanged", () => setRevision((n) => n + 1)),
+    () => window.readfinch.on("notesChanged", () => setRevision((n) => n + 1)),
     [],
   );
   useEffect(() => {
     let current = true;
     const timer = setTimeout(
       () =>
-        void window.texthop
+        void window.readfinch
           .call("notesList", {
             search: search.trim(),
             notebook: "",
@@ -90,7 +90,7 @@ export function LocalNotebook({
     setConfirming(false);
     setCopied(false);
     if (selected)
-      void window.texthop
+      void window.readfinch
         .call("noteGet", { id: selected })
         .then((n) => {
           if (current) setNote(n);
@@ -212,7 +212,7 @@ export function LocalNotebook({
                           className="secondary"
                           onClick={async () => {
                             try {
-                              await window.texthop.call("clipboardWrite", {
+                              await window.readfinch.call("clipboardWrite", {
                                 text: copyableResult(
                                   note.result,
                                   note.format,
@@ -246,7 +246,7 @@ export function LocalNotebook({
                               return;
                             }
                             try {
-                              await window.texthop.call("noteDelete", {
+                              await window.readfinch.call("noteDelete", {
                                 id: n.id,
                               });
                               setSelected("");

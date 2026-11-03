@@ -20,7 +20,7 @@ app.on("window", (page) =>
   page.on("pageerror", (error) => errors.push(error.message)),
 );
 const api = (page, method) =>
-  page.evaluate((method) => window.texthop.call(method), method);
+  page.evaluate((method) => window.readfinch.call(method), method);
 try {
   const main = await app.firstWindow();
   await main.getByRole("navigation").first().waitFor();

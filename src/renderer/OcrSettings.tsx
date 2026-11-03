@@ -71,7 +71,7 @@ export function OcrSettings({
           <button
             className="provider-help-link"
             onClick={() =>
-              void window.texthop.call("settingsOpen", { tab: "text" })
+              void window.readfinch.call("settingsOpen", { tab: "text" })
             }
           >
             {t("管理 API 提供商")} <ExternalLink size={12} />

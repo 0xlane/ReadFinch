@@ -1,21 +1,21 @@
 {
-  "date": "2026-10-31T11:19:53.440Z",
+  "date": "2026-11-03T07:32:07.608Z",
   "network": "HTTP(S), fetch, TCP and TLS blocked in main and worker processes; no API key",
   "proof": [
     {
-      "pid": 32536,
+      "pid": 1920,
       "isMainThread": true,
       "threadId": 0,
       "network": "disabled"
     },
     {
-      "pid": 32536,
+      "pid": 1920,
       "isMainThread": false,
       "threadId": 2,
       "network": "disabled"
     },
     {
-      "pid": 32536,
+      "pid": 1920,
       "isMainThread": false,
       "threadId": 3,
       "network": "disabled"
@@ -25,68 +25,68 @@
     {
       "sample": "bilingual-light",
       "segmentation": "3",
-      "startupMs": 469,
-      "recognitionMs": 603,
+      "startupMs": 545,
+      "recognitionMs": 561,
       "confidence": 93,
       "matched": 5,
       "total": 5,
-      "text": "TextHop“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n",
-      "rssMB": 185
+      "text": "ReadFinch“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\n\nC:\\Projects\\ReadFinch\\src\\main.ts\nconst total = 42; // Hello 世界\n",
+      "rssMB": 186
     },
     {
       "sample": "bilingual-dark",
       "segmentation": "3",
-      "startupMs": 469,
-      "recognitionMs": 657,
-      "confidence": 91,
+      "startupMs": 545,
+      "recognitionMs": 672,
+      "confidence": 92,
       "matched": 5,
       "total": 5,
-      "text": "TextHop - 让文字自在流动\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n",
-      "rssMB": 188
+      "text": "ReadFinch . 让文字自在流动\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\ReadFinch\\src\\main.ts\nconst total = 42; // Hello 世界\n",
+      "rssMB": 189
     },
     {
       "sample": "small-interface",
       "segmentation": "3",
-      "startupMs": 469,
-      "recognitionMs": 304,
-      "confidence": 79,
-      "matched": 3,
+      "startupMs": 545,
+      "recognitionMs": 21,
+      "confidence": 95,
+      "matched": 0,
       "total": 4,
-      "text": "Error 42: connection refused\n\n(OE, HA! 小字号混合文字.\nCNProjectsVTexthop\nconst total = 425 // Hello 世界\n",
-      "rssMB": 188
+      "text": "",
+      "rssMB": 193
     },
     {
       "sample": "bilingual-light",
       "segmentation": "6",
-      "startupMs": 392,
-      "recognitionMs": 511,
-      "confidence": 93,
+      "startupMs": 453,
+      "recognitionMs": 539,
+      "confidence": 92,
       "matched": 5,
       "total": 5,
-      "text": "TextHop“。让文字自在流动\nSmall steps make a big difference.\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\TextHop\\src\\main.ts\n\nconst total = 42; // Hello 世界\n",
-      "rssMB": 189
+      "text": "ReadFinch“。让文字自在流动\nSmall steps make a big difference.\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\ReadFinch\\src\\main.ts\n\nconst total = 42; // Hello 世界\n",
+      "rssMB": 190
     },
     {
       "sample": "bilingual-dark",
       "segmentation": "6",
-      "startupMs": 392,
-      "recognitionMs": 711,
-      "confidence": 92,
+      "startupMs": 453,
+      "recognitionMs": 955,
+      "confidence": 93,
       "matched": 5,
       "total": 5,
-      "text": "TextHop - 让文字自在流动\n\nSmall steps make a big difference.\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n",
-      "rssMB": 192
+      "text": "ReadFinch . 让文字自在流动\n\nSmall steps make a big difference.\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\ReadFinch\\src\\main.ts\nconst total = 42; // Hello 世界\n",
+      "rssMB": 193
     },
     {
       "sample": "small-interface",
       "segmentation": "6",
-      "startupMs": 392,
-      "recognitionMs": 286,
-      "confidence": 79,
+      "startupMs": 453,
+      "recognitionMs": 284,
+      "confidence": 80,
       "matched": 3,
       "total": 4,
-      "text": "Error 42: connection refused\n(OE, HA! 小字号混合文字.\nCNProjectsVTexthop\n\nconst total = 425 // Hello 世界\n",
-      "rssMB": 189
+      "text": "Error 42: connection refused\n(OE, HA! 小字号混合文字.\nc:\\Projects\\ReadFinch\n\nconst total = 425 // Hello 世界\n",
+      "rssMB": 190
     }
   ]
 }

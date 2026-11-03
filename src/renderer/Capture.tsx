@@ -12,8 +12,8 @@ export function CaptureOverlay() {
   const submitting = useRef(false);
   const imageReady = useRef(false);
   useEffect(() => {
-    void window.texthop.call("captureData").then(setImage);
-    void window.texthop.call("snapshot").then(({ config }) => {
+    void window.readfinch.call("captureData").then(setImage);
+    void window.readfinch.call("snapshot").then(({ config }) => {
       const profile = ocrProfiles(config).find(
         (item) => item.id === config.defaults.ocrProfileId,
       );
@@ -25,7 +25,7 @@ export function CaptureOverlay() {
     });
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape")
-        void window.texthop.call("window", { command: "dismiss" });
+        void window.readfinch.call("window", { command: "dismiss" });
     };
     addEventListener("keydown", key);
     return () => removeEventListener("keydown", key);
@@ -84,7 +84,7 @@ export function CaptureOverlay() {
         };
         if (crop.width > 3 && crop.height > 3 && !submitting.current) {
           submitting.current = true;
-          void window.texthop
+          void window.readfinch
             .call("crop", {
               ...crop,
               viewportWidth: innerWidth,
@@ -107,7 +107,7 @@ export function CaptureOverlay() {
       }}
       onContextMenu={(event) => {
         event.preventDefault();
-        void window.texthop.call("window", { command: "dismiss" });
+        void window.readfinch.call("window", { command: "dismiss" });
       }}
     >
       {image && (
@@ -118,11 +118,11 @@ export function CaptureOverlay() {
           onLoad={() => {
             imageReady.current = true;
             requestAnimationFrame(
-              () => void window.texthop.call("captureReady"),
+              () => void window.readfinch.call("captureReady"),
             );
           }}
           onError={() =>
-            void window.texthop.call("window", { command: "dismiss" })
+            void window.readfinch.call("window", { command: "dismiss" })
           }
         />
       )}

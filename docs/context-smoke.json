@@ -1,6 +1,6 @@
 {
-  "version": "0.10.0",
-  "date": "2026-11-02T16:59:26.510Z",
+  "version": "0.14.0",
+  "date": "2026-11-03T07:33:18.729Z",
   "checks": [
     "main window contains settings only",
     "theme applies immediately and preserves unsaved fields",
@@ -21,6 +21,6 @@
   ],
   "requests": 15,
   "rendererErrors": [],
-  "ocrText": "TextHop“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\n\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
+  "ocrText": "ReadFinch“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能市来改变。\n\nC:\\Projects\\ReadFinch\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
   "scope": "Real Electron windows and bundled OCR. Selection events/model replies are development fixtures; native OS selection is tested separately."
 }

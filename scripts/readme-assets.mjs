@@ -34,7 +34,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const api = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -125,7 +125,7 @@ try {
       });
       assert.equal(
         await app.evaluate(({ app }) => app.getName()),
-        "TextHop",
+        "ReadFinch",
         "Legacy storage/encryption identity must be retained",
       );
       await main
@@ -144,7 +144,7 @@ try {
         .getByLabel(english ? "Original text" : "原文", { exact: true })
         .fill(source);
       await panel.evaluate(() =>
-        window.texthop.on(
+        window.readfinch.on(
           "noteSuggestions",
           (v) => (window.__readmeSuggestion = v),
         ),

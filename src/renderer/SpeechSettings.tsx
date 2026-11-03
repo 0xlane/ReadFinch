@@ -444,7 +444,7 @@ export function SpeechSettings({
           <button
             className="text-button"
             onClick={() =>
-              void window.texthop.call("settingsOpen", { tab: "text" })
+              void window.readfinch.call("settingsOpen", { tab: "text" })
             }
           >
             {t("配置 API 提供商")}

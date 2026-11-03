@@ -31,7 +31,7 @@ await writeFile(
       signed: false,
       artifacts,
       verification:
-        "Windows packaged checks use an isolated profile and local fixtures. Installer and uninstaller UI were not exercised.",
+        "Windows packaged checks use an isolated profile and local fixtures. See installation-verification.json for the separately verified current-user installation; interactive installer and uninstaller UI were not exercised.",
     },
     null,
     2,

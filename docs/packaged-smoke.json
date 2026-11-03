@@ -1,10 +1,11 @@
 {
-  "date": "2026-11-03T06:45:31.595Z",
+  "date": "2026-11-03T07:35:22.975Z",
   "platform": "win32",
-  "executable": "C:\\Users\\reinject\\Documents\\project\\TextHop\\release\\win-unpacked\\ReadFinch.exe",
+  "executable": "ReadFinch.exe",
   "packaged": true,
-  "version": "0.13.0",
-  "resources": "C:\\Users\\reinject\\Documents\\project\\TextHop\\release\\win-unpacked\\resources",
+  "name": "ReadFinch",
+  "version": "0.14.0",
+  "resources": "resources",
   "developmentSelectionHook": false,
   "actionShortcutsRegistered": true,
   "isolatedShortcuts": true,
@@ -13,9 +14,9 @@
   "localNoteLibrary": true,
   "ocrReady": true,
   "nativeStatus": "Windows UI Automation 已连接",
-  "ocrMilliseconds": 3472,
-  "text": "TextHop“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能带来改变。\n\nC:\\Projects\\TextHop\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
-  "confidence": 93,
+  "ocrMilliseconds": 1276,
+  "text": "ReadFinch“。让文字自在流动\n\nSmall steps make a big difference.\n\n你好，世界! 每一小步，都能市来改变。\n\nC:\\Projects\\ReadFinch\\src\\main.ts\nconst total = 42; // Hello 世界\n\n",
+  "confidence": 92,
   "rendererErrors": [],
   "nativeIcons": [
     {

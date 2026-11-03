@@ -7,7 +7,7 @@ import { proxyFixtures } from "./proxy-fixtures.mjs";
 
 const packaged = process.argv.includes("--packaged");
 const dataDir = path.resolve(".local/proxy-" + Date.now()),
-  out = "docs/screenshots/v0.13";
+  out = "docs/screenshots/current";
 await mkdir(out, { recursive: true });
 const f = await proxyFixtures(path.join(dataDir, "tls"));
 const checks = [],
@@ -38,7 +38,7 @@ async function launch() {
   await page.locator("main h1").waitFor();
 }
 const api = (method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -81,11 +81,11 @@ async function job(method, arg, cancelAfterPartial = false) {
           off();
           reject(Error("Timed out waiting for proxy stream"));
         }, 12000);
-        const off = window.texthop.on("job", (event) => {
+        const off = window.readfinch.on("job", (event) => {
           if (event.id !== id) return;
           if (event.status === "streaming" && event.text) {
             partial.push(event.text);
-            if (cancelAfterPartial) void window.texthop.call("cancel", { id });
+            if (cancelAfterPartial) void window.readfinch.call("cancel", { id });
           }
           if (["done", "error", "cancelled"].includes(event.status)) {
             clearTimeout(timer);
@@ -93,7 +93,7 @@ async function job(method, arg, cancelAfterPartial = false) {
             resolve({ event, partial });
           }
         });
-        window.texthop.call(method, arg).catch((error) => {
+        window.readfinch.call(method, arg).catch((error) => {
           clearTimeout(timer);
           off();
           reject(error);

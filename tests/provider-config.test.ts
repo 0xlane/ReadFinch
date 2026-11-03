@@ -86,7 +86,7 @@ test("legacy migration still rejects unknown fields, secrets and broken OCR refe
   }
 });
 test("local upgrade preserves original config until saving and supplies only endpoint-scoped credential moves", async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), "texthop-upgrade-"));
+  const dir = await mkdtemp(path.join(os.tmpdir(), "readfinch-upgrade-"));
   const old = legacyConfig();
   old.ocrProfiles.push({
     ...old.ocrProfiles[0],

@@ -1,29 +1,29 @@
 {
-  "date": "2026-11-03T06:47:32.655Z",
-  "version": "0.13.0",
+  "date": "2026-11-03T07:39:28.600Z",
+  "version": "0.14.0",
   "platform": "Windows x64",
   "signed": false,
   "artifacts": [
     {
-      "path": "release/ReadFinch 0.13.0.exe",
-      "bytes": 123898490,
-      "sha256": "bfca19668175ecf854e6dc8c1318e338fca4967cf90f9c93039e8f685a23f1e7"
+      "path": "release/ReadFinch 0.14.0.exe",
+      "bytes": 123897385,
+      "sha256": "17930573f50efbc8249c96f1cc97e3257f0d13359384c225ee5ce8f64a1b694d"
     },
     {
-      "path": "release/ReadFinch Setup 0.13.0.exe",
-      "bytes": 144794252,
-      "sha256": "5977e68412cdebb6ded9c7610e2f334c1fb5db31248ac36e0cfc26a4b1e64325"
+      "path": "release/ReadFinch Setup 0.14.0.exe",
+      "bytes": 144793921,
+      "sha256": "54fc915235da10b710873634b51ae408348341d528c6dfc8c3ca5170fd3b35bb"
     },
     {
       "path": "release/win-unpacked/ReadFinch.exe",
       "bytes": 249798656,
-      "sha256": "b93a111cfbc6406974545d6ae96e06ccafc17c8f8811b9e8ceafe8e2bc44bf03"
+      "sha256": "eef2d6cf289fe8cf78687b027e3bd8f3308e14f8549d68fa7fcaf0e6ea335ed6"
     },
     {
       "path": "release/win-unpacked/resources/app.asar",
-      "bytes": 61143938,
-      "sha256": "3cfee1ffad5af20bcf8aa2693e89ff2590527ecff17467eaa3af0f79ba038a96"
+      "bytes": 61144128,
+      "sha256": "3626c2fd575a7d054b3df3d6dca35b4c5d2d1c6e665ff62705f2dc8c3ee4d182"
     }
   ],
-  "verification": "Windows packaged checks use an isolated profile and local fixtures. Installer and uninstaller UI were not exercised."
+  "verification": "Windows packaged checks use an isolated profile and local fixtures. See installation-verification.json for the separately verified current-user installation; interactive installer and uninstaller UI were not exercised."
 }

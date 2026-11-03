@@ -14,8 +14,9 @@ import { t } from "../shared/i18n";
 export const LOGIN_ARG = "--autostart";
 const args = () =>
   app.isPackaged ? [LOGIN_ARG] : [app.getAppPath(), LOGIN_ARG];
-// Retain the registration key so existing startup preferences are not duplicated.
-const windowsName = () => (app.isPackaged ? "TextHop" : "TextHop Development");
+// Installed and development builds have separate startup registrations.
+const windowsName = () =>
+  app.isPackaged ? "ReadFinch" : "ReadFinch Development";
 const windowsCommand = () => ({
   path:
     (app.isPackaged && process.env.PORTABLE_EXECUTABLE_FILE) ||
@@ -27,8 +28,8 @@ const desktopFile = () =>
     app.getPath("appData"),
     "autostart",
     app.isPackaged
-      ? "app.texthop.TextHop.desktop"
-      : "app.texthop.TextHop-dev.desktop",
+      ? "app.readfinch.ReadFinch.desktop"
+      : "app.readfinch.ReadFinch-dev.desktop",
   );
 
 export function startsInTray(argv: string[]) {

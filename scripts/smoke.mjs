@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const dir = path.resolve(".local/context-smoke-" + Date.now());
-const output = "docs/screenshots/v0.9";
+const output = "docs/screenshots/current";
 await mkdir(dir, { recursive: true });
 await mkdir(output, { recursive: true });
 const errors = [];
@@ -101,7 +101,7 @@ const server = createServer(async (req, res) => {
   res.end("data: [DONE]\n\n");
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const runtime = await electron.launch({
   args: [".", `--data-dir=${dir}`],
@@ -115,7 +115,7 @@ runtime.on("window", watch);
 const main = await runtime.firstWindow();
 watch(main);
 const api = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });
@@ -140,14 +140,14 @@ const visible = (mode) =>
 async function setModel(model) {
   await main.evaluate(
     async ({ model, endpoint }) => {
-      const s = await window.texthop.call("snapshot");
+      const s = await window.readfinch.call("snapshot");
       Object.assign(s.config.providers[0], {
         model,
         endpoint,
         requiresKey: false,
         name: "本机测试服务 · fixture",
       });
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -161,7 +161,7 @@ async function injectSelection(text) {
     BrowserWindow.getAllWindows()
       .find((w) => w.webContents.getURL().includes("mode=main"))
       .show();
-    globalThis.__texthopTest.select({
+    globalThis.__readfinchTest.select({
       token: "fixture-" + Date.now(),
       text,
       app: "阅读器 · 选区样例",
@@ -173,10 +173,10 @@ async function injectSelection(text) {
 }
 try {
   await main.evaluate(async () => {
-    const s = await window.texthop.call("snapshot");
+    const s = await window.readfinch.call("snapshot");
     if (s.interfaceLocale !== "zh-CN") {
       s.config.appearance.language = "zh-CN";
-      await window.texthop.call("saveConfig", {
+      await window.readfinch.call("saveConfig", {
         config: s.config,
         revision: s.revision,
       });
@@ -194,10 +194,13 @@ try {
   );
   assert.equal(await exclusion.inputValue(), "fixture-unsaved.exe");
   await runtime.evaluate(({ BrowserWindow }) =>
-    BrowserWindow.getAllWindows()[0].webContents.send("texthop:nativeStatus", {
-      state: "ready",
-      message: "fixture status",
-    }),
+    BrowserWindow.getAllWindows()[0].webContents.send(
+      "readfinch:nativeStatus",
+      {
+        state: "ready",
+        message: "fixture status",
+      },
+    ),
   );
   assert.equal(await exclusion.inputValue(), "fixture-unsaved.exe");
   await main.screenshot({ path: output + "/settings-dark.png" });
@@ -212,7 +215,7 @@ try {
   );
   await main.waitForFunction(
     async () =>
-      (await window.texthop.call("snapshot")).config.selection
+      (await window.readfinch.call("snapshot")).config.selection
         .excludedApps[0] === "fixture-unsaved.exe",
   );
   checks.push("theme applies immediately and preserves unsaved fields");
@@ -428,7 +431,7 @@ try {
   await ttl.selectOption("60");
   await main.waitForFunction(
     async () =>
-      (await window.texthop.call("snapshot")).config.cache.minutes === 60,
+      (await window.readfinch.call("snapshot")).config.cache.minutes === 60,
   );
   await main.getByRole("switch", { name: "启用结果缓存" }).click();
   assert.ok(await ttl.isDisabled());
@@ -552,7 +555,7 @@ try {
     "data:image/png;base64," +
     (await readFile("tests/fixtures/bilingual-light.png")).toString("base64");
   await runtime.evaluate(
-    (_, dataUrl) => globalThis.__texthopTest.image(dataUrl),
+    (_, dataUrl) => globalThis.__readfinchTest.image(dataUrl),
     dataUrl,
   );
   await panel.waitForFunction(
@@ -608,7 +611,10 @@ try {
     () => document.documentElement.dataset.theme === "light",
   );
   await main.screenshot({ path: output + "/actions-light.png" });
-  await main.getByRole("button", { name: "定制化", exact: true }).click();
+  await main
+    .locator(".command-fields .section-line")
+    .getByRole("button", { name: "定制化", exact: true })
+    .click();
   await main.getByLabel("指令名称", { exact: true }).fill("显微镜词典");
   await main.getByRole("button", { name: "固定到工具栏", exact: true }).click();
   const chooseIcon = main.getByRole("button", { name: "选择指令图标" });

@@ -22,7 +22,7 @@ const application = await electron.launch({
 try {
   const page = await application.firstWindow();
   await page.waitForLoadState();
-  await page.evaluate(() => window.texthop.call("snapshot"));
+  await page.evaluate(() => window.readfinch.call("snapshot"));
   assert.equal(
     await application.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows().some((w) => w.isVisible()),
@@ -38,7 +38,7 @@ try {
     const previousPortable = process.env.PORTABLE_EXECUTABLE_FILE;
     if (app.isPackaged)
       process.env.PORTABLE_EXECUTABLE_FILE =
-        "C:\\Test Folder\\TextHop portable.exe";
+        "C:\\Test Folder\\ReadFinch portable.exe";
     const fixture = (globalThis.startupFixture = {
       calls: [],
       active: false,
@@ -78,7 +78,7 @@ try {
     };
   });
   await page.evaluate(() =>
-    window.texthop.call("setTheme", { theme: "light" }),
+    window.readfinch.call("setTheme", { theme: "light" }),
   );
   const checked = () =>
     application.evaluate(
@@ -102,7 +102,7 @@ try {
   if (process.platform === "win32") {
     assert.equal(registration.args.at(-1), "--autostart");
     if (packaged)
-      assert.equal(registration.path, "C:\\Test Folder\\TextHop portable.exe");
+      assert.equal(registration.path, "C:\\Test Folder\\ReadFinch portable.exe");
   }
   await application.evaluate(() => {
     startupFixture.active = false;
@@ -114,7 +114,7 @@ try {
   assert.equal(await checked(), false);
   await application.evaluate(() => startupFixture.restore());
   await page.evaluate(() =>
-    window.texthop.call("settingsOpen", { tab: "general" }),
+    window.readfinch.call("settingsOpen", { tab: "general" }),
   );
   assert.ok(
     await application.evaluate(({ BrowserWindow }) =>
@@ -122,11 +122,11 @@ try {
     ),
   );
   await page.evaluate(async () => {
-    const state = await window.texthop.call("snapshot");
+    const state = await window.readfinch.call("snapshot");
     if (state.config.cache.minutes !== 30)
       throw Error("Unexpected cache default");
     state.config.cache.minutes = 17;
-    await window.texthop.call("saveConfig", {
+    await window.readfinch.call("saveConfig", {
       config: state.config,
       revision: state.revision,
     });
@@ -142,10 +142,10 @@ try {
   await duration.selectOption("360");
   await page.waitForFunction(
     async () =>
-      (await window.texthop.call("snapshot")).config.cache.minutes === 360,
+      (await window.readfinch.call("snapshot")).config.cache.minutes === 360,
   );
   assert.equal(await duration.locator('option[value="17"]').count(), 0);
-  const screenshots = path.resolve("docs/screenshots/v0.9");
+  const screenshots = path.resolve("docs/screenshots/current");
   await mkdir(screenshots, { recursive: true });
   await page
     .locator(".cache-settings")

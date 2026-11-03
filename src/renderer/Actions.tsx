@@ -311,7 +311,7 @@ export function Actions({
                   <button
                     className="text-button"
                     onClick={() =>
-                      void window.texthop.call("settingsOpen", {
+                      void window.readfinch.call("settingsOpen", {
                         tab: "shortcuts",
                       })
                     }

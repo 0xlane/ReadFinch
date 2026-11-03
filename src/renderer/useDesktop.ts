@@ -6,8 +6,8 @@ export function useDesktop() {
   const [error, setError] = useState("");
   useEffect(() => {
     const off = [
-      window.texthop.on("config", setSnapshot),
-      window.texthop.on("nativeStatus", (state) =>
+      window.readfinch.on("config", setSnapshot),
+      window.readfinch.on("nativeStatus", (state) =>
         setSnapshot((value) =>
           value
             ? {
@@ -18,14 +18,14 @@ export function useDesktop() {
             : value,
         ),
       ),
-      window.texthop.on("theme", (theme) => {
+      window.readfinch.on("theme", (theme) => {
         document.documentElement.dataset.theme = theme.effective;
         setSnapshot((value) =>
           value ? { ...value, effectiveTheme: theme.effective } : value,
         );
       }),
     ];
-    void window.texthop
+    void window.readfinch
       .call("snapshot")
       .then(setSnapshot)
       .catch((error) => setError(error.message));

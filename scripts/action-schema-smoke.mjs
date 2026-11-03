@@ -5,7 +5,7 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const packaged = process.argv.includes("--packaged");
-const out = "docs/screenshots/v0.11",
+const out = "docs/screenshots/current",
   dir = path.resolve(".local/schema-" + Date.now());
 await mkdir(out, { recursive: true });
 await mkdir(dir, { recursive: true });
@@ -55,7 +55,7 @@ app.on("window", (w) => w.on("pageerror", (e) => errors.push(e.message)));
 const main = await app.firstWindow();
 main.setDefaultTimeout(10000);
 const api = (page, method, arg) =>
-  page.evaluate(({ method, arg }) => window.texthop.call(method, arg), {
+  page.evaluate(({ method, arg }) => window.readfinch.call(method, arg), {
     method,
     arg,
   });

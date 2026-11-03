@@ -122,7 +122,7 @@ test("clearing in flight, cancellation and incomplete streams cannot populate ca
 });
 test("local notes retain structured output and provenance across restart and support independent search and deletion", async () => {
   const file = path.join(
-    await mkdtemp(path.join(os.tmpdir(), "texthop-notes-")),
+    await mkdtemp(path.join(os.tmpdir(), "readfinch-notes-")),
     "notes.sqlite",
   );
   const n: NoteInput = {

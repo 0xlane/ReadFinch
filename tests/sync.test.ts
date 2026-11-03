@@ -25,7 +25,7 @@ async function setup() {
       req.socket.destroy();
       return;
     }
-    if (req.url !== "/TextHop/config.json") {
+    if (req.url !== "/ReadFinch/config.json") {
       res.writeHead(404);
       res.end();
       return;
@@ -86,13 +86,13 @@ async function setup() {
     enabled: true,
     url: `http://127.0.0.1:${address.port}`,
     username: "",
-    remotePath: "TextHop/config.json",
+    remotePath: "ReadFinch/config.json",
   };
   const a = new ConfigStore(
-    await mkdtemp(path.join(os.tmpdir(), "texthop-a-")),
+    await mkdtemp(path.join(os.tmpdir(), "readfinch-a-")),
   );
   const b = new ConfigStore(
-    await mkdtemp(path.join(os.tmpdir(), "texthop-b-")),
+    await mkdtemp(path.join(os.tmpdir(), "readfinch-b-")),
   );
   await a.init();
   await b.init();
@@ -152,7 +152,7 @@ test("an in-flight sync stays bound to its original server when settings change"
   const f = await setup();
   try {
     await f.da.sync();
-    const endpoint = f.settings.url + "/TextHop/config.json";
+    const endpoint = f.settings.url + "/ReadFinch/config.json";
     const updated = f.a.config;
     updated.appearance.theme = "dark";
     await f.a.save(updated);

@@ -263,6 +263,6 @@ export interface DesktopAPI {
 }
 declare global {
   interface Window {
-    texthop: DesktopAPI;
+    readfinch: DesktopAPI;
   }
 }

@@ -1,8 +1,8 @@
 # 配置管理与服务商
 
-## 品牌升级
+## 应用数据
 
-ReadFinch（伴读雀）沿用原 TextHop 的本机存储与加密身份。已有配置、凭据和 SQLite 笔记无需导出重建；历史 WebDAV 路径继续生效。参见 [品牌与升级说明](brand/READFINCH.md)。
+ReadFinch（伴读雀）使用独立的应用标识 `app.readfinch.ReadFinch`。Windows 的默认数据目录是 `%APPDATA%\ReadFinch`，保存配置、加密凭据和本地笔记。首次启动使用默认设置；配置管理提供显式导入和导出。参见 [品牌与应用标识](brand/READFINCH.md)。
 
 ## 自动保存
 
@@ -62,7 +62,7 @@ v6 升级至 v7 时清理六条从未修改的旧示例指令，保留用户调�
 
 schema 严格拒绝未知字段、重复 ID、无效服务引用、不支持的版本、URL 内凭据和冲突快捷键。普通导出不含任何凭据、模型权重、图片、选中文字、历史、日志、本机路径或窗口位置。
 
-v1 中 `shortcuts.selection` 实际直接执行翻译。升级到 v2 时将这个原有组合键移入翻译指令的 `shortcut`，将指令菜单入口留空；不会把原来的翻译键改成菜单键。词典和润色默认增加 `Alt+Shift+D`、`Alt+Shift+W`，若与现有键冲突则不自动启用。v0 先补充阅读字号再迁移。v4 导出的文件需要 TextHop 0.4.0 或更新版本；同步设备也应升级。
+v1 中 `shortcuts.selection` 实际直接执行翻译。升级到 v2 时将这个原有组合键移入翻译指令的 `shortcut`，将指令菜单入口留空；不会把原来的翻译键改成菜单键。词典和润色默认增加 `Alt+Shift+D`、`Alt+Shift+W`，若与现有键冲突则不自动启用。v0 先补充阅读字号再迁移。v4 导出的文件需要 ReadFinch 0.4.0 或更新版本；同步设备也应升级。
 
 v2 的文字和 OpenAI 视觉服务迁移到同一个 `providers` 列表，保留模型、端点、指令引用和默认选择；文字/视觉原 ID 重复时自动分配新 ID。仅本机启动升级时复制相应的 OS 加密凭据，且必须匹配原端点；普通导入或 WebDAV 不传输密钥。旧 Ollama 专用服务不再启用，原默认若指向它则回到内置离线 OCR；原文件在首次保存时保留为 `.bak`。离线 OCR 始终由固定的 `ocr-offline` 引用，不作为可编辑服务商。
 
@@ -93,7 +93,7 @@ v3 → v4 自动将服务商的原文字模型、视觉模型与各指令覆盖�
 
 WebDAV、导入/导出和备份恢复合并在“配置管理”页。普通配置会自动保存；同步、导入和恢复仍需显式点击。
 
-填写 HTTPS 服务器 URL、用户名、应用密码和相对配置路径，例如 `TextHop/config.json`。先在服务器建立父目录。只访问这一份配置资源，不遍历或修改其他服务器文件。同步默认关闭，第一版只提供手动同步。
+填写 HTTPS 服务器 URL、用户名、应用密码和相对配置路径，例如 `ReadFinch/config.json`。先在服务器建立父目录。只访问这一份配置资源，不遍历或修改其他服务器文件。同步默认关闭，第一版只提供手动同步。
 
 “测试连接”读取并校验目标配置；不存在时报告可创建。写入权限需要在实际同步时验证。认证失败、无效 JSON、未知 schema、服务不可达和传输中断会显示错误，保留本机有效配置。
 
@@ -121,4 +121,4 @@ npm start -- --data-dir=./.local/profile-a
 npm start -- --data-dir=./.local/profile-b
 ```
 
-测试 WebDAV：URL `http://127.0.0.1:9876/dav/`，用户名 `texthop`，密码 `fixture`，路径 `TextHop/config.json`。这是开发 fixture，不应对外网开放。两窗口分别修改或删除指令，然后依次同步，检查冲突、选择和 `backups/`。自动化版本见 `tests/sync.test.ts`。
+测试 WebDAV：URL `http://127.0.0.1:9876/dav/`，用户名 `readfinch`，密码 `fixture`，路径 `ReadFinch/config.json`。这是开发 fixture，不应对外网开放。两窗口分别修改或删除指令，然后依次同步，检查冲突、选择和 `backups/`。自动化版本见 `tests/sync.test.ts`。
