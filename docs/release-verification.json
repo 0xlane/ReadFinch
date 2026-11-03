@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-03T11:47:43.973Z",
+  "version": "1.0.0",
+  "repositoryVisibility": "public",
+  "releaseUrl": "https://github.com/0xlane/ReadFinch/releases/tag/v1.0.0",
+  "stable": true,
+  "signatureVerified": true,
+  "updatePackageCount": 6,
+  "releasePackageCount": 8,
+  "githubAssetDigestsVerified": true,
+  "sourceCommit": "160743e",
+  "assets": [
+    {
+      "name": "ReadFinch-1.0.0-linux-amd64.deb",
+      "size": 126539544,
+      "digest": "sha256:822f36d755d0491ba49da35d896ec37a6d2d8e110ac1b3876fdbeacb86a17a0c"
+    },
+    {
+      "name": "ReadFinch-1.0.0-linux-x86_64.AppImage",
+      "size": 165644664,
+      "digest": "sha256:61edc69dc568cfe3c72145983d054bcdb3be764c3723462c8cb9ae7aa14928b3"
+    },
+    {
+      "name": "ReadFinch-1.0.0-macos-arm64.dmg",
+      "size": 160157729,
+      "digest": "sha256:31dc89752dd31bd573f3b36b4caaa1d65353d1b0c224b49216ca41a00ca8ca10"
+    },
+    {
+      "name": "ReadFinch-1.0.0-macos-arm64.zip",
+      "size": 154977393,
+      "digest": "sha256:4e63bfd66b6d88d98e6d0dd8d947a8b4fdae3c6b91616b49647294c96bffd6cd"
+    },
+    {
+      "name": "ReadFinch-1.0.0-macos-x64.dmg",
+      "size": 166103207,
+      "digest": "sha256:325d00eb139ef672500363e31981994f7adf6523bd4ef0a51048574a49916848"
+    },
+    {
+      "name": "ReadFinch-1.0.0-macos-x64.zip",
+      "size": 160895794,
+      "digest": "sha256:853de80724b52cfa6bef7883202b94902234eed5402d12ac592eb4f18e572f39"
+    },
+    {
+      "name": "ReadFinch-1.0.0-windows-x64-portable.exe",
+      "size": 127196508,
+      "digest": "sha256:d58e327e3290ddca6537442d68afb402244de7f88e904e6681036e8fc90159a1"
+    },
+    {
+      "name": "ReadFinch-1.0.0-windows-x64-setup.exe",
+      "size": 150049499,
+      "digest": "sha256:76dfdb76c2c477015631e0c1ca33c5052be0135b4301446b6ce3d961ddd5a9b9"
+    },
+    {
+      "name": "readfinch-update.json",
+      "size": 4398,
+      "digest": "sha256:f3de08fe516c7d8ed0f3e76b110cd737125e93fb90c4902a502e610985b08dff"
+    },
+    {
+      "name": "readfinch-update.json.sig",
+      "size": 89,
+      "digest": "sha256:9cc479f1a2bbfe62aa90e220ee1f908a5cf8615f7c5c41b899cd5aee0ae7db73"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 801,
+      "digest": "sha256:8c2151fb159cb7574bb0de8ee10d3f6480aab167707f99c9296da64e8d136a9e"
+    }
+  ],
+  "scope": "Anonymous public repository and latest-release requests; Ed25519 verification of exact manifest bytes; all eight SHA-256 checksums compared with GitHub asset digests, and update package sizes compared with release metadata."
+}

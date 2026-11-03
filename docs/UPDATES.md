@@ -12,7 +12,7 @@ Both metadata requests and package downloads try GitHub first. Transport failure
 
 ## Publishing
 
-If packaging succeeds but publication fails, the workflow can be dispatched with `build_run_id` and `release_tag` to reuse its successful artifacts. The publishing job verifies that all four package jobs passed, that the run belongs to this repository and the exact tag commit, and that application source has not changed. Only release tooling and documentation fixes can be applied without rebuilding. Published releases are never overwritten. Debian's `amd64` filename is normalized to Electron's `x64` architecture in the update manifest.
+If packaging succeeds but publication fails, the workflow can be dispatched with `build_run_id` and `release_tag` to reuse its successful artifacts. The publishing job verifies that all four package jobs passed, that the run belongs to this repository and the exact tag commit, and that application source has not changed. Only release tooling and documentation fixes can be applied without rebuilding. Published releases are never overwritten. Debian's `amd64` and AppImage's `x86_64` filenames are normalized to Electron's `x64` architecture in the update manifest.
 
 1. Change the version in `package.json` and `package-lock.json` and add `docs/releases/vX.Y.Z.md`.
 2. Run type checks, tests, UI verification, and a secret scan. Update the multilingual README with `npm run docs:readme`.

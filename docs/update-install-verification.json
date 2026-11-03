@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-03T11:48:51.669Z",
+  "from": "0.99.0",
+  "to": "1.0.0",
+  "automaticDefault": true,
+  "source": "github",
+  "events": [
+    {
+      "seconds": 0,
+      "status": "idle"
+    },
+    {
+      "seconds": 19,
+      "status": "checking"
+    },
+    {
+      "seconds": 23,
+      "status": "downloading",
+      "percent": 0
+    },
+    {
+      "seconds": 29,
+      "status": "downloading",
+      "percent": 12.578761092697818
+    },
+    {
+      "seconds": 33,
+      "status": "downloading",
+      "percent": 22.187059085082318
+    },
+    {
+      "seconds": 37,
+      "status": "downloading",
+      "percent": 31.575354343568986
+    },
+    {
+      "seconds": 41,
+      "status": "downloading",
+      "percent": 41.36887654653216
+    },
+    {
+      "seconds": 45,
+      "status": "downloading",
+      "percent": 51.246491666060145
+    },
+    {
+      "seconds": 49,
+      "status": "downloading",
+      "percent": 61.27778407310777
+    },
+    {
+      "seconds": 53,
+      "status": "downloading",
+      "percent": 71.34468139743673
+    },
+    {
+      "seconds": 57,
+      "status": "downloading",
+      "percent": 81.55094473191143
+    },
+    {
+      "seconds": 61,
+      "status": "downloading",
+      "percent": 91.67597154056476
+    },
+    {
+      "seconds": 64,
+      "status": "downloading",
+      "percent": 100
+    },
+    {
+      "seconds": 65,
+      "status": "downloaded"
+    }
+  ],
+  "releaseUrl": "https://github.com/0xlane/ReadFinch/releases/tag/v1.0.0",
+  "scope": "Actual installed application and original user profile. Automatic boot check, unauthenticated public GitHub release, signed manifest, full verified download. No request or updater mocks.",
+  "installedVersion": "1.0.0",
+  "manualCheck": "latest",
+  "profilePreserved": true,
+  "credentialsPreserved": true
+}

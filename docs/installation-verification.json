@@ -1,10 +1,7 @@
 {
-  "date": "2026-11-03T10:54:00.121Z",
-  "version": "0.15.3",
+  "date": "2026-11-03T11:51:31.672Z",
+  "version": "1.0.0",
   "packaged": true,
-  "titles": [
-    "伴读雀"
-  ],
   "name": "ReadFinch",
   "startupEnabled": false,
   "installDirectory": "%LOCALAPPDATA%/Programs/ReadFinch",
@@ -16,9 +13,11 @@
   "bundledOcrReady": true,
   "nativeState": "ready",
   "nativeHelper": "readfinch-selection.exe",
+  "automaticUpdates": true,
+  "manualCheck": "latest",
   "rendererErrors": [],
-  "preserved": "Providers, defaults, appearance and local notebase configuration match the pre-update profile; user data remains in the same directory.",
-  "scope": "Actual current-user NSIS upgrade, default data directory; no isolated profile or credential changes. Installer completed silently with exit code 0.",
-  "uninstallDisplayName": "ReadFinch 0.15.3",
+  "preserved": "Providers, defaults, appearance, selection, shortcuts, commands and local notebook configuration match the pre-update profile. Encrypted credentials are byte-identical.",
+  "scope": "Actual NSIS application updated from 0.99.0 to the public 1.0.0 release through its own updater, restarted and manually checked again. Original profile retained.",
+  "uninstallDisplayName": "ReadFinch 1.0.0",
   "uninstaller": "Uninstall ReadFinch.exe"
 }
