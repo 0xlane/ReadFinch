@@ -1,5 +1,6 @@
 import { iconPosition, type legacyIcons } from "../shared/icons";
 import { t } from "../shared/i18n";
+import targetLanguages from "../shared/target-languages.json";
 import {
   Languages,
   BookOpen,
@@ -120,15 +121,18 @@ export function Logo() {
 }
 export function BrandMark() {
   return (
-    <svg
+    <span
       className="brand-mark"
-      viewBox="0 0 128 128"
-      fill="currentColor"
       aria-hidden="true"
-    >
-      <path d="M46 58H57Q59 58 59 60V77C59 92 48 102 34 103C37 98 38 95 38 92C28 91 22 84 22 76C22 66 32 58 46 58Z" />
-      <path d="M91 27H104Q106 27 106 29V49C106 66 94 77 78 78C82 72 83 69 83 65C72 64 65 57 65 47C65 36 77 27 91 27Z" />
-    </svg>
+      style={{
+        display: "inline-block",
+        width: 21,
+        height: 21,
+        flexShrink: 0,
+        backgroundColor: "currentColor",
+        mask: "url(./brand/mark-symbol.svg) center / contain no-repeat",
+      }}
+    />
   );
 }
 export function Toggle({
@@ -179,16 +183,7 @@ export function Badge({
 }) {
   return <span className={"badge " + tone}>{children}</span>;
 }
-export const languages = [
-  "简体中文",
-  "English",
-  "繁體中文",
-  "日本語",
-  "한국어",
-  "Français",
-  "Deutsch",
-  "Español",
-];
+export const languages = targetLanguages.map((language) => language.name);
 export function LanguageSelect({
   value,
   onChange,

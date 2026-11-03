@@ -71,7 +71,7 @@ const env = { ...process.env, TEXTHOP_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   ...(packaged
-    ? { executablePath: path.resolve("release/win-unpacked/TextHop.exe") }
+    ? { executablePath: path.resolve("release/win-unpacked/ReadFinch.exe") }
     : {}),
   args: [...(packaged ? [] : ["."]), "--settings", "--data-dir=" + dir],
   env,
@@ -410,7 +410,7 @@ try {
   });
   assert.ok(connection);
   assert.equal(requests.at(-1).path, "/v1/audio/speech");
-  assert.equal(requests.at(-1).input, "TextHop");
+  assert.equal(requests.at(-1).input, "ReadFinch");
   assert.deepEqual(errors, []);
   checked(
     "The assigned provider's connection test uses the audio endpoint; there were no renderer errors",

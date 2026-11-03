@@ -69,12 +69,12 @@
 .command-launcher .rf-source:has(.source-editor:focus) {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
 }
-.command-choice-grid {
+.launcher-command-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
 }
-.command-choice {
+.launcher-command {
   min-width: 0;
   min-height: 64px;
   padding: 10px;
@@ -89,17 +89,17 @@
     border-color 120ms,
     box-shadow 120ms;
 }
-.command-choice:not(:disabled):hover,
-.command-choice:focus-visible {
+.launcher-command:not(:disabled):hover,
+.launcher-command:focus-visible {
   background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface));
   border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
   box-shadow: 0 2px 5px #00000006;
 }
-.command-choice:not(:disabled):active {
+.launcher-command:not(:disabled):active {
   background: var(--accent-soft);
   box-shadow: none;
 }
-.command-choice-icon {
+.launcher-command-icon {
   width: 34px;
   height: 34px;
   flex: 0 0 34px;
@@ -109,13 +109,13 @@
   background: color-mix(in srgb, var(--subtle) 70%, var(--surface));
   border-radius: 9px;
 }
-.command-choice-copy {
+.launcher-command-copy {
   min-width: 0;
   flex: 1;
   display: grid;
   gap: 2px;
 }
-.command-choice-name {
+.launcher-command-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -123,14 +123,14 @@
   font-weight: 600;
   line-height: 20px;
 }
-.command-choice-detail {
+.launcher-command-detail {
   display: grid;
   min-width: 0;
   font-size: 11px;
   line-height: 16px;
   color: var(--muted);
 }
-.command-choice-detail > * {
+.launcher-command-detail > * {
   grid-area: 1 / 1;
   min-width: 0;
   overflow: hidden;
@@ -138,7 +138,7 @@
   white-space: nowrap;
   transition: opacity 120ms;
 }
-.command-choice-detail kbd {
+.launcher-command-detail kbd {
   opacity: 0;
   margin: 0;
   padding: 0;
@@ -148,27 +148,27 @@
   font: inherit;
   font-variant-numeric: tabular-nums;
 }
-.command-choice:not(:disabled):is(:hover, :focus-visible)
-  .command-choice-detail[data-shortcut="true"]
-  .command-choice-description {
+.launcher-command:not(:disabled):is(:hover, :focus-visible)
+  .launcher-command-detail[data-shortcut="true"]
+  .launcher-command-description {
   opacity: 0;
 }
-.command-choice:not(:disabled):is(:hover, :focus-visible)
-  .command-choice-detail
+.launcher-command:not(:disabled):is(:hover, :focus-visible)
+  .launcher-command-detail
   kbd {
   opacity: 1;
 }
-.command-choice-arrow {
+.launcher-command-arrow {
   margin-left: -5px;
   color: var(--accent);
   opacity: 0;
   transition: opacity 120ms;
 }
-.command-choice:not(:disabled):is(:hover, :focus-visible)
-  .command-choice-arrow {
+.launcher-command:not(:disabled):is(:hover, :focus-visible)
+  .launcher-command-arrow {
   opacity: 1;
 }
-.command-choice-more {
+.launcher-command-more {
   display: flex;
   width: 100%;
   margin: 8px 0 0;
@@ -178,18 +178,18 @@
   font-size: 11px;
   border-radius: 6px;
 }
-.command-choice-more:hover {
+.launcher-command-more:hover {
   background: var(--subtle);
   color: var(--text);
 }
-.command-choice-more > span {
+.launcher-command-more > span {
   font-size: 10px;
   font-variant-numeric: tabular-nums;
 }
-.command-choice-more[aria-expanded="true"] > svg {
+.launcher-command-more[aria-expanded="true"] > svg {
   transform: rotate(180deg);
 }
-.command-choice-additional {
+.launcher-command-additional {
   margin-top: 8px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
@@ -218,11 +218,11 @@
   height: 26px;
 }
 @media (max-width: 390px) {
-  .command-choice-grid {
+  .launcher-command-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;
   }
-  .command-choice {
+  .launcher-command {
     min-height: 55px;
     padding: 7px 10px;
   }

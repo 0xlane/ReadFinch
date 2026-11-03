@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 const isolated = process.argv.includes("--isolated-shortcuts");
 const executable = path.resolve(
   process.argv.slice(2).find((arg) => !arg.startsWith("--")) ??
-    "release/win-unpacked/TextHop.exe",
+    "release/win-unpacked/ReadFinch.exe",
 );
 const dataDir = path.resolve(".local/packaged-smoke-" + Date.now());
 await mkdir(dataDir, { recursive: true });
@@ -200,7 +200,7 @@ try {
   );
   assert.equal(
     await page.locator(".app-version").innerText(),
-    "TextHop " + packageState.version,
+    "伴读雀 " + packageState.version,
   );
   assert.ok(
     await page

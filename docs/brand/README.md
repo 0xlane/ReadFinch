@@ -1,3 +1,7 @@
+# ReadFinch 品牌
+
+当前品牌与图标见 [ReadFinch · 伴读雀](READFINCH.md)，README banner 见 [图片](../assets/readfinch-banner.png)。下文保留早期 TextHop 设计历史，不代表当前标识。
+
 # TextHop 0.1.1 视觉更新
 
 > 历史记录：0.2.0 已移除本页所示工作台与状态栏，工作界面改为鼠标旁工具条和结果浮窗。当前界面见 [设计说明](../DESIGN.md) 和 [预览](../context-preview.html)。应用与托盘的图标资产仍保留；下文验证仅适用于 0.1.1。

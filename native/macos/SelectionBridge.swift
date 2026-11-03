@@ -4,7 +4,7 @@ import ApplicationServices
 let host = CommandLine.arguments.count > 1 ? Int32(CommandLine.arguments[1]) ?? 0 : 0
 func emit(_ object: [String: Any]) { if let data = try? JSONSerialization.data(withJSONObject: object), let line = String(data:data,encoding:.utf8) { print(line); fflush(stdout) } }
 func attr(_ element: AXUIElement, _ name: CFString) -> CFTypeRef? { var value: CFTypeRef?; return AXUIElementCopyAttributeValue(element,name,&value) == .success ? value : nil }
-guard AXIsProcessTrusted() else { emit(["type":"error","message":"请在系统设置 → 隐私与安全性 → 辅助功能中允许 TextHop，然后重启应用"]); exit(1) }
+guard AXIsProcessTrusted() else { emit(["type":"error","message":"请在系统设置 → 隐私与安全性 → 辅助功能中允许 ReadFinch，然后重启应用"]); exit(1) }
 emit(["type":"ready","message":"macOS Accessibility 已连接；当前提供复制结果"])
 var last = ""
 var selection: [String: Any]? = nil

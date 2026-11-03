@@ -1,5 +1,5 @@
 These UI icon assets are bundled locally from the following public Iconify sets.
-The same three icon sets also supply the complete offline command-icon sheets in ../command-icons. TextHop arranges their glyphs in a grid and namespaces internal SVG IDs. The SVG paths are unmodified. Titles and layout are implemented by TextHop.
+The same three icon sets also supply the complete offline command-icon sheets in ../command-icons. ReadFinch arranges their glyphs in a grid and namespaces internal SVG IDs. The SVG paths are unmodified. Titles and layout are implemented by ReadFinch.
 
 Streamline color, by Streamline (Webalys), CC BY 4.0:
 https://github.com/webalys-hq/streamline-vectors

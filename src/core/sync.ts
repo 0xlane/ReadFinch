@@ -46,7 +46,7 @@ export function davUrl(settings: DavSettings) {
     /[?#\\]/.test(settings.remotePath) ||
     settings.remotePath.startsWith("/")
   )
-    throw Error(t("远程位置须为相对文件路径，例如 TextHop/config.json"));
+    throw Error(t("远程位置须为相对文件路径，例如 ReadFinch/config.json"));
   return new URL(
     settings.remotePath.split("/").map(encodeURIComponent).join("/"),
     base,

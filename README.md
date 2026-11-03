@@ -1,79 +1,174 @@
-# TextHop
+<!-- Generated from docs/readmes/content.json by npm run docs:readme. -->
+<div align="center">
+<a id="readme-top"></a>
 
-TextHop 是一款用于外语阅读和写作的桌面划词工具。在浏览器、PDF 阅读器或编辑器里选中文字，即可通过鼠标旁的工具栏翻译、查词、分析长句或改进措辞。结果浮窗可以固定在原文旁，方便对照阅读。遇到扫描页或图片时，也可以框选区域提取文字，再使用同一组工具。主窗口集中管理设置和本地笔记。
+<img src="docs/assets/readfinch-banner.png" alt="ReadFinch · 伴读雀 — A little help, right beside your words." width="1280">
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/v0.7/suggested-notes-dark.png">
-    <img src="docs/screenshots/v0.7/suggested-notes-light.png" width="480" alt="划词翻译浮窗显示英文原句和中文译文，下方可勾选 chance encounter 和 serendipity 存入生词本">
-  </picture>
-  <br>
-  <em>在译文下勾选生词，可以将释义和原句一起存入本地笔记库。</em>
+# ReadFinch · 伴读雀
+
+**A reading companion, right beside your words.**
+
+Translate a passage, understand a difficult sentence, or polish what you write—without leaving the app you’re using.
+
+A desktop reading and writing companion. · 随选随用的桌面阅读与写作助手。
+
+<p><strong>English</strong> · <a href="docs/readmes/README.zh-CN.md">简体中文</a> · <a href="docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="docs/readmes/README.ja.md">日本語</a> · <a href="docs/readmes/README.ko.md">한국어</a> · <a href="docs/readmes/README.fr.md">Français</a> · <a href="docs/readmes/README.de.md">Deutsch</a> · <a href="docs/readmes/README.es.md">Español</a></p>
+
+<p>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
+<img src="https://img.shields.io/badge/Version-0.12.0-4d443e?style=flat-square" alt="0.12.0">
+<img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
+<img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-## 主要功能
+[Get started](#get-started) · [Features](#features) · [Documentation](#documentation) · [Report an issue](https://github.com/0xlane/ReadFinch/issues)
 
-| 功能 | 使用方式 |
+</div>
+
+## Stay with what you’re reading
+
+Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar to your cursor and opens the answer beside the original. Pin a result for comparison, or collect a useful word for later.
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/reading-en-dark.png">
+  <img src="docs/assets/reading-en-light.png" width="640" alt="ReadFinch shows a selected passage, a streamed translation and words suggested for the local notebook.">
+</picture>
+<br><em>Select → understand → keep. A short path from unfamiliar text to something you can use.</em>
+</p>
+
+<a id="features"></a>
+
+## A little help, wherever your text lives
+
+| What you want to do | How ReadFinch helps |
 | --- | --- |
-| 翻译与精读 | 在浮窗中逐步查看译文。选中一个词可查看读音、释义和例句，选中长句可分析主干与从句。 |
-| 写作改进 | 在原句上查看修改位置，对照修改理由和修订稿，再将改好的文字复制回编辑器。 |
-| 截图识别 | 框选屏幕区域或导入图片，用内置文字识别引擎（OCR）离线提取简体中文和英文。可对照原图校正文字，再翻译、查词或复制。 |
-| 文本朗读 | 朗读选区、译文或词典例句。可按语言选择系统离线音色或在线音色，并调整语速、音高和音量。 |
-| 自定义 AI 指令 | 为常用任务定义提示词、模型、输出字段和结果卡片版式。指令可固定到划词工具栏，也可绑定快捷键。 |
-| 本地笔记库 | 从结果卡片收藏摘录，或从「猜你想存」勾选词条。按笔记库和关键词检索时，可以回看保存时的原文与结果。 |
+| **Read and understand** | Stream translations, look up pronunciations and examples, and break long sentences into understandable parts. |
+| **Write with more confidence** | See changes in context, read the reasoning behind a revision, and take the improved wording back to your editor. |
+| **Read text you cannot select** | Capture an area of the screen or import an image. Built-in OCR extracts Simplified Chinese and English offline; review the text before running a command. |
+| **Listen as you read** | Read selections, translations and examples aloud. Choose system offline voices or compatible online voices by language, with rate, pitch and volume controls. |
+| **Build your own AI commands** | Choose a provider, prompt, icon, shortcut and typed output fields. Arrange results with HTML + Liquid and map fields to a local notebook. |
+| **Keep what matters** | Save a result or accept a vocabulary suggestion. Search local notebooks and revisit the original passage alongside the answer you saved. |
 
-## 安装与运行
+<details>
+<summary><strong>Explore commands and notebooks</strong></summary>
 
-从源码运行需要 Git、Node.js 24 和 npm。Windows 构建使用 .NET Framework 4.8 的 C# 编译器，macOS 构建需要 Xcode 命令行工具提供的 `swiftc`。
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/commands-en-dark.png">
+  <img src="docs/assets/commands-en-light.png" width="860" alt="Custom AI command layout settings, with a live dictionary-card preview.">
+</picture>
+<br><em>Turn structured answers into a readable card. Preview layouts at different widths and in light or dark mode.</em>
+</p>
+
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/notebook-en-dark.png">
+  <img src="docs/assets/notebook-en-light.png" width="860" alt="ReadFinch local notebook with saved vocabulary and the original reading context.">
+</picture>
+<br><em>Your collection stays close: search, revisit and learn from the passages you kept.</em>
+</p>
+
+</details>
+
+### Your provider. Your model. Your choice.
+
+Use presets for OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow and OpenRouter, or connect an OpenAI-compatible Chat Completions endpoint. Each provider entry holds one model; duplicate it to use another. Translation, dictionary, writing and image recognition can use different providers. Model suggestions, connection tests, temperature and custom request headers are available in settings.
+
+### Read in your language
+
+The README translations match the app’s eight preset target languages:
+
+**English · 简体中文 · 繁體中文 · 日本語 · 한국어 · Français · Deutsch · Español**
+
+The **application interface currently supports English and Simplified Chinese**, with automatic system-language selection. Translation quality and additional language support depend on your model. Bundled offline OCR recognizes Simplified Chinese and English.
+
+<a id="get-started"></a>
+
+## Get started
+
+Build locally with **Node.js 24**, npm and Git. Windows builds require the .NET Framework 4.8 C# compiler; macOS builds require Xcode Command Line Tools.
 
 ```sh
-git clone https://github.com/0xlane/TextHop.git
-cd TextHop
+git clone https://github.com/0xlane/ReadFinch.git
+cd ReadFinch
 npm ci
 npm run assets:ocr
 npm run build
 npm start
 ```
 
-`npm run assets:ocr` 为构建准备中英文识别数据。数据随应用一起打包，安装后首次截图即可离线识别。需要生成安装包时，在目标操作系统上运行 `npm run dist`。产物位于 `release/`，Windows 提供安装程序和便携版。
+`assets:ocr` downloads the recognition data **during development**. The data is bundled in the app, so installed copies do not need a language-pack download. Run `npm run dist` on the target operating system to create packages in `release/`.
 
-## 首次使用
+### Your first useful minute
 
-1. **配置文字模型。** 首次启动会打开设置。在「API 提供商」中选择 OpenAI、DeepSeek 等预设，或添加自定义 OpenAI 兼容接口。填写所需的 API Key、选择模型并测试连接。每个提供商对应一个模型，可在「功能提供商」中设为「默认提供商」，也可单独分配给翻译、词典等指令。
-2. **翻译一段文字。** 返回正在阅读的应用，选中一句话，点击划词工具栏上的「翻译」。在浮窗顶部选择目标语言，点击图钉可保留译文，继续对照原文。
-3. **从图片取词。** 在系统托盘菜单中选择「框选屏幕文字（OCR）」，拖框选取区域。识别完成后可直接编辑文字并运行指令。内置 OCR 和系统朗读均可在配置 API 提供商之前使用。
+1. **Connect a provider.** Open API Providers, choose a preset or compatible endpoint, enter the required credentials and model, and test the connection. Assign it as the default or to a specific feature.
+2. **Select a sentence.** Click Translate on the selection toolbar, choose your target language and pin the result if you want to keep reading beside it.
+3. **Try a screenshot.** Use the OCR shortcut below, select a region and review the recognized text. Offline OCR and system speech work before you configure an AI provider.
 
-### 默认快捷键
+### Useful shortcuts
 
-| 操作 | Windows / Linux | macOS |
+| Command | Windows / Linux | macOS |
 | --- | --- | --- |
-| 翻译选区 | `Alt + T` | `Option + T` |
-| 打开词典 | `Alt + Shift + D` | `Option + Shift + D` |
-| 改进写作 | `Alt + Shift + W` | `Option + Shift + W` |
-| 打开选区指令菜单 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 框选屏幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
-| 读取剪贴板文字 | `Ctrl + Shift + V` | `Command + Shift + V` |
+| Translate selection | `Alt + T` | `Option + T` |
+| Open dictionary | `Alt + Shift + D` | `Option + Shift + D` |
+| Improve writing | `Alt + Shift + W` | `Option + Shift + W` |
+| Choose a command | `Ctrl + Shift + Space` | `Command + Shift + Space` |
+| Capture text with OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Read clipboard text | `Ctrl + Shift + V` | `Command + Shift + V` |
 
-所有组合键均可在「设置 → 快捷键」中重新绑定。设置自动保存，界面语言和深浅色外观默认跟随系统。
+Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.
 
-## 平台与权限
+### Desktop integration
 
-- **Windows** 通过 UI Automation 读取前台应用提供的文本选区。
-- **macOS** 读取选区需要在「系统设置 → 隐私与安全性 → 辅助功能」中授权 TextHop。框选屏幕还需要屏幕录制权限。
-- **Linux** 在 X11 下通过 PRIMARY 选区取词，需安装 `xclip`、`xdotool` 和 `xprop`。Wayland 下可复制文字后从剪贴板读取，或通过桌面门户框选屏幕。可用的快捷键和截图方式取决于桌面环境及其门户后端。[平台支持说明](docs/PLATFORMS.md)
+| Platform | How text is acquired |
+| --- | --- |
+| Windows | Reads selections exposed by the foreground app through UI Automation. |
+| macOS | Uses Accessibility for selected text and Screen Recording permission for captures. |
+| Linux | Uses PRIMARY selection on X11 (`xclip`, `xdotool`, `xprop`). Wayland uses clipboard input or the desktop screenshot portal; shortcuts depend on the desktop environment. |
 
-## 数据与配置
+Windows has been exercised on the development machine. macOS and Linux implementations are available, with native desktop acceptance still requiring target-system checks. See the [platform support matrix](docs/PLATFORMS.md).
 
-笔记正文保存在本机 SQLite 数据库中。翻译、自定义指令和「猜你想存」会将任务所需的文字发送给所选 API 提供商。使用在线音色时，语音提供商会收到待朗读文字。若改用视觉模型识别截图，应用会先显示原图和目标提供商，确认后才发送图片。
+## Your text, with clear boundaries
 
-「配置管理」支持文件导入、导出和手动 WebDAV 同步。迁移范围包括提供商设置、指令、快捷键和笔记库字段映射。API Key 和自定义请求头按设备、按提供商保存，迁移到新设备时需单独配置。[配置管理说明](docs/CONFIGURATION.md)
+**Local by default where it matters.** Notebook contents live in SQLite on your device. Offline OCR and system voices run locally. The local notebook page only displays local content.
 
-## 技术文档
+**AI requests go to the provider you choose.** Translation and custom commands send the required text; online speech sends the text to be spoken. Remote image recognition shows the image and destination before you explicitly start the request.
 
-- [应用架构与源码目录](docs/ARCHITECTURE.md)
-- [API 提供商、模型与功能分配](docs/MODELS.md)
-- [离线 OCR 与视觉模型接口](docs/OCR.md)
+**Portable settings.** Import/export files or manually sync configuration over WebDAV. Provider settings, commands, shortcuts and notebook field mappings move together. API keys and custom request headers remain device-specific; configure them separately on another machine. Notebook contents are not included in configuration sync.
 
-## 许可与致谢
+<a id="documentation"></a>
 
-TextHop 采用 GPL-3.0-only 许可证。划词工具栏和指令卡片的交互设计参考了陪读蛙（Read Frog）。[项目许可证](LICENSE) · [陪读蛙项目](https://github.com/mengxi-ream/read-frog) · [第三方组件与资源声明](THIRD_PARTY_NOTICES.md)
+## Go deeper
+
+- [Architecture and source layout](docs/ARCHITECTURE.md)
+- [Providers, models and feature assignments](docs/MODELS.md)
+- [Offline OCR and vision APIs](docs/OCR.md)
+- [Configuration and WebDAV](docs/CONFIGURATION.md)
+- [Platform support and permissions](docs/PLATFORMS.md)
+
+Technical documentation is currently maintained in Chinese.
+
+## Help ReadFinch grow
+
+Bring a reproducible bug report, an interaction improvement, a translation correction or a pull request. Include your operating system and app version, and remove credentials and private text from examples. [Open an issue](https://github.com/0xlane/ReadFinch/issues) · [Contribute code](https://github.com/0xlane/ReadFinch/pulls).
+
+```sh
+npm run typecheck
+npm test
+npm run build
+```
+
+README copy lives in `docs/readmes/content.json`. After editing a translation, run `npm run docs:readme`; the generator checks that coverage matches the target-language list used by the app.
+
+## License and acknowledgements
+
+ReadFinch is licensed under **GPL-3.0-only**. Its selection-toolbar and command-card interactions are inspired by **Read Frog**. ReadFinch is an independent desktop project and is not an official Read Frog release.
+
+[GPL-3.0-only](LICENSE) · [Read Frog](https://github.com/mengxi-ream/read-frog) · [Third-party notices](THIRD_PARTY_NOTICES.md).
+
+<div align="right">
+
+[↑ Back to top](#readme-top)
+
+</div>

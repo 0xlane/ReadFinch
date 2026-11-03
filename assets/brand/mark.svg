@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
-  <title>TextHop — lifted quotation marks</title>
-  <path d="M46 58H57Q59 58 59 60V77C59 92 48 102 34 103C37 98 38 95 38 92C28 91 22 84 22 76C22 66 32 58 46 58Z" fill="#F8F8EE"/>
-  <path d="M91 27H104Q106 27 106 29V49C106 66 94 77 78 78C82 72 83 69 83 65C72 64 65 57 65 47C65 36 77 27 91 27Z" fill="#F8F8EE"/>
+  <title>ReadFinch — 伴读雀</title>
+  <path d="M45 69L19 91Q15 97 23 94L51 83Z" fill="#79716B"/>
+  <path d="M35 75C46 61 54 52 59 40C65 24 77 20 88 24C99 28 104 36 102 46L100 59C99 79 86 95 66 96C52 96 40 88 35 75Z" fill="#FFF0DB"/>
+  <path d="M35 75C46 61 54 52 59 40C65 24 77 20 88 24C96 27 101 32 103 38C93 30 82 31 74 40C66 49 68 56 76 60C61 60 47 68 35 75Z" fill="#B3A598"/>
+  <path d="M35 75C45 65 58 58 69 60C80 63 77 76 67 82C55 90 42 87 34 82C32 80 33 78 35 75Z" fill="#514A44"/>
+  <path d="M43 79C52 78 60 74 66 70C61 80 51 84 43 79Z" fill="#FFF0DB"/>
+  <ellipse cx="83" cy="49" rx="8.4" ry="7.4" transform="rotate(-19 83 49)" fill="#F5AD68"/>
+  <path d="M102 35L114 43Q116 45 113 47L101 51L98 43Z" fill="#EF8847"/>
+  <path d="M98 43H114L101 51Z" fill="#D76B35"/>
+  <circle cx="90.5" cy="37.5" r="3.2" fill="#302B27"/>
+  <circle cx="91.5" cy="36.5" r=".85" fill="#FFF8EE"/>
+  <path d="M62 94L67 102H72M81 93L87 102H92" stroke="#D97942" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 104H98" stroke="#F5AD68" stroke-width="4.5" stroke-linecap="round"/>
 </svg>

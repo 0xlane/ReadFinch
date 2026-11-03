@@ -20,7 +20,7 @@ export async function offlineRecognize(
   onProgress: (n: number) => void,
 ) {
   if (!(await assetsReady(dir)))
-    throw Error("内置 OCR 资源缺失或损坏，请重新安装 TextHop");
+    throw Error("内置 OCR 资源缺失或损坏，请重新安装伴读雀");
   if (signal.aborted) throw Error("已取消");
   let worker: Awaited<ReturnType<typeof createWorker>> | undefined;
   let rejectAbort: (reason: Error) => void = () => {};

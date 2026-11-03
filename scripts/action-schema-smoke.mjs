@@ -46,7 +46,7 @@ const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 const app = await electron.launch({
   ...(packaged
-    ? { executablePath: path.resolve("release/win-unpacked/TextHop.exe") }
+    ? { executablePath: path.resolve("release/win-unpacked/ReadFinch.exe") }
     : {}),
   args: [...(packaged ? [] : ["."]), "--data-dir=" + dir],
   env,

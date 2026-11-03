@@ -6,6 +6,10 @@ const source = await readFile("assets/brand/mark.svg", "utf8");
 const mark = source
   .replace(/^[\s\S]*?<svg[^>]*>/, "")
   .replace(/<\/svg>\s*$/, "");
+const monoSource = await readFile("assets/brand/mark-mono.svg", "utf8");
+const monoMark = monoSource
+  .replace(/^[\s\S]*?<svg[^>]*>/, "")
+  .replace(/<\/svg>\s*$/, "");
 const publicDir = "src/renderer/public";
 await mkdir(`${publicDir}/brand`, { recursive: true });
 function svg(content, viewBox = "0 0 128 128") {
@@ -14,22 +18,20 @@ function svg(content, viewBox = "0 0 128 128") {
 const tile = (paint) =>
   `<rect x="4" y="4" width="120" height="120" rx="29" fill="${paint}"/>`;
 function glyph({ mono, small = false } = {}) {
-  let value = mark;
-  if (mono)
-    value = value.replaceAll("#F8F8EE", mono).replaceAll("#B7E4AA", mono);
+  let value = mono ? monoMark.replaceAll("#F8F8EE", mono) : mark;
   if (small) value = `<g transform="translate(-2 -2) scale(1.04)">${value}</g>`;
   return value;
 }
 const application = svg(`<defs>
-  <linearGradient id="forest" x1="20" y1="4" x2="102" y2="124" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#205A46"/><stop offset=".52" stop-color="#123F32"/><stop offset="1" stop-color="#092B24"/>
+  <linearGradient id="porcelain" x1="20" y1="4" x2="102" y2="124" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#FFFBF5"/><stop offset="1" stop-color="#F3E4D4"/>
   </linearGradient>
-</defs>${tile("url(#forest)")}<rect x="4.75" y="4.75" width="118.5" height="118.5" rx="28.25" stroke="#FFFFFF" stroke-opacity=".11" stroke-width="1.5"/>${glyph()}`);
-const optical = svg(tile("#174734") + glyph({ mono: "#F8F8EE", small: true }));
-const paused = svg(tile("#626E67") + glyph({ mono: "#EEF0E9", small: true }));
-const template = svg(glyph({ mono: "#000000", small: true }), "18 16 94 94");
-const monoLight = svg(glyph({ mono: "#F8F8EE" }));
-const monoDark = svg(glyph({ mono: "#234E3C" }));
+</defs>${tile("url(#porcelain)")}<rect x="4.75" y="4.75" width="118.5" height="118.5" rx="28.25" stroke="#C6AE95" stroke-opacity=".5" stroke-width="1.5"/>${glyph()}`);
+const optical = svg(tile("#FFF0DC") + glyph({ mono: "#403933", small: true }));
+const paused = svg(tile("#E9E6E2") + glyph({ mono: "#827B74", small: true }));
+const template = svg(glyph({ mono: "#000000" }), "12 20 108 90");
+const monoLight = svg(glyph({ mono: "#FFF4E5" }));
+const monoDark = svg(glyph({ mono: "#403933" }));
 const png = (art, size) =>
   new Resvg(art, {
     fitTo: { mode: "width", value: size },
@@ -58,6 +60,10 @@ function ico(frames) {
 await writeFile(`${publicDir}/icon.png`, png(application, 1024));
 await writeFile(`${publicDir}/brand/icon.svg`, application);
 await writeFile(`${publicDir}/brand/mark-light.svg`, monoLight);
+await writeFile(
+  `${publicDir}/brand/mark-symbol.svg`,
+  svg(glyph({ mono: "#000000" })),
+);
 await writeFile(`${publicDir}/brand/mark-dark.svg`, monoDark);
 await writeFile(`${publicDir}/brand/icon-small.svg`, optical);
 await writeFile(`${publicDir}/brand/tray-paused.svg`, paused);

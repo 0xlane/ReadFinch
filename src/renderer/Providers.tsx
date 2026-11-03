@@ -105,7 +105,7 @@ export function Providers(props: ProviderProps) {
           <h2 id="provider-config-title">{t("提供商配置")}</h2>
           <p>
             {t(
-              "添加 TextHop 可以调用的提供商，或接入兼容 Chat Completions 的自定义 API。",
+              "添加伴读雀可以调用的提供商，或接入兼容 Chat Completions 的自定义 API。",
             )}
           </p>
         </div>

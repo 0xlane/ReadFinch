@@ -23,7 +23,7 @@ export function OcrSettings({
   const profiles = ocrProfiles(config);
   const selected =
     profiles.find((p) => p.id === config.defaults.ocrProfileId) ?? profiles[0];
-  const english = /TextHop\s*OCR\s*123/i.test(result);
+  const english = /ReadFinch\s*OCR\s*123/i.test(result);
   const chinese = /你好[\p{P}\s]*世界/u.test(result.replace(/\s+/g, ""));
   return (
     <>
@@ -65,7 +65,7 @@ export function OcrSettings({
           </p>
           {!ready && selected.kind === "offline" && (
             <p role="alert">
-              {t("内置 OCR 资源缺失或损坏，请重新安装 TextHop。")}
+              {t("内置 OCR 资源缺失或损坏，请重新安装 ReadFinch。")}
             </p>
           )}
           <button

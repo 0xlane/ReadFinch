@@ -1,0 +1,906 @@
+{
+  "en": {
+    "tagline": "A reading companion, right beside your words.",
+    "intro": "Translate a passage, understand a difficult sentence, or polish what you write—without leaving the app you’re using.",
+    "nav": [
+      "Get started",
+      "Features",
+      "Documentation",
+      "Report an issue"
+    ],
+    "previewTitle": "Stay with what you’re reading",
+    "previewIntro": "Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar to your cursor and opens the answer beside the original. Pin a result for comparison, or collect a useful word for later.",
+    "readingAlt": "ReadFinch shows a selected passage, a streamed translation and words suggested for the local notebook.",
+    "readingCaption": "Select → understand → keep. A short path from unfamiliar text to something you can use.",
+    "featuresTitle": "A little help, wherever your text lives",
+    "featureHeaders": [
+      "What you want to do",
+      "How ReadFinch helps"
+    ],
+    "features": [
+      [
+        "Read and understand",
+        "Stream translations, look up pronunciations and examples, and break long sentences into understandable parts."
+      ],
+      [
+        "Write with more confidence",
+        "See changes in context, read the reasoning behind a revision, and take the improved wording back to your editor."
+      ],
+      [
+        "Read text you cannot select",
+        "Capture an area of the screen or import an image. Built-in OCR extracts Simplified Chinese and English offline; review the text before running a command."
+      ],
+      [
+        "Listen as you read",
+        "Read selections, translations and examples aloud. Choose system offline voices or compatible online voices by language, with rate, pitch and volume controls."
+      ],
+      [
+        "Build your own AI commands",
+        "Choose a provider, prompt, icon, shortcut and typed output fields. Arrange results with HTML + Liquid and map fields to a local notebook."
+      ],
+      [
+        "Keep what matters",
+        "Save a result or accept a vocabulary suggestion. Search local notebooks and revisit the original passage alongside the answer you saved."
+      ]
+    ],
+    "galleryTitle": "Explore commands and notebooks",
+    "commandsAlt": "Custom AI command layout settings, with a live dictionary-card preview.",
+    "commandsCaption": "Turn structured answers into a readable card. Preview layouts at different widths and in light or dark mode.",
+    "notebookAlt": "ReadFinch local notebook with saved vocabulary and the original reading context.",
+    "notebookCaption": "Your collection stays close: search, revisit and learn from the passages you kept.",
+    "providerTitle": "Your provider. Your model. Your choice.",
+    "providers": "Use presets for OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow and OpenRouter, or connect an OpenAI-compatible Chat Completions endpoint. Each provider entry holds one model; duplicate it to use another. Translation, dictionary, writing and image recognition can use different providers. Model suggestions, connection tests, temperature and custom request headers are available in settings.",
+    "languagesTitle": "Read in your language",
+    "languages": "The README translations match the app’s eight preset target languages:",
+    "languageNote": "The **application interface currently supports English and Simplified Chinese**, with automatic system-language selection. Translation quality and additional language support depend on your model. Bundled offline OCR recognizes Simplified Chinese and English.",
+    "startTitle": "Get started",
+    "buildIntro": "Build locally with **Node.js 24**, npm and Git. Windows builds require the .NET Framework 4.8 C# compiler; macOS builds require Xcode Command Line Tools.",
+    "buildNote": "`assets:ocr` downloads the recognition data **during development**. The data is bundled in the app, so installed copies do not need a language-pack download. Run `npm run dist` on the target operating system to create packages in `release/`.",
+    "firstRunTitle": "Your first useful minute",
+    "steps": [
+      "**Connect a provider.** Open API Providers, choose a preset or compatible endpoint, enter the required credentials and model, and test the connection. Assign it as the default or to a specific feature.",
+      "**Select a sentence.** Click Translate on the selection toolbar, choose your target language and pin the result if you want to keep reading beside it.",
+      "**Try a screenshot.** Use the OCR shortcut below, select a region and review the recognized text. Offline OCR and system speech work before you configure an AI provider."
+    ],
+    "shortcutsTitle": "Useful shortcuts",
+    "shortcutHeaders": [
+      "Command"
+    ],
+    "shortcuts": [
+      "Translate selection",
+      "Open dictionary",
+      "Improve writing",
+      "Choose a command",
+      "Capture text with OCR",
+      "Read clipboard text"
+    ],
+    "shortcutsNote": "Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.",
+    "platformTitle": "Desktop integration",
+    "platformHeaders": [
+      "Platform",
+      "How text is acquired"
+    ],
+    "platforms": [
+      "Reads selections exposed by the foreground app through UI Automation.",
+      "Uses Accessibility for selected text and Screen Recording permission for captures.",
+      "Uses PRIMARY selection on X11 (`xclip`, `xdotool`, `xprop`). Wayland uses clipboard input or the desktop screenshot portal; shortcuts depend on the desktop environment."
+    ],
+    "platformNote": "Windows has been exercised on the development machine. macOS and Linux implementations are available, with native desktop acceptance still requiring target-system checks. See the",
+    "platformLink": "platform support matrix",
+    "dataTitle": "Your text, with clear boundaries",
+    "data": [
+      "**Local by default where it matters.** Notebook contents live in SQLite on your device. Offline OCR and system voices run locally. The local notebook page only displays local content.",
+      "**AI requests go to the provider you choose.** Translation and custom commands send the required text; online speech sends the text to be spoken. Remote image recognition shows the image and destination before you explicitly start the request.",
+      "**Portable settings.** Import/export files or manually sync configuration over WebDAV. Provider settings, commands, shortcuts and notebook field mappings move together. API keys and custom request headers remain device-specific; configure them separately on another machine. Notebook contents are not included in configuration sync."
+    ],
+    "docsTitle": "Go deeper",
+    "docs": [
+      "Architecture and source layout",
+      "Providers, models and feature assignments",
+      "Offline OCR and vision APIs",
+      "Configuration and WebDAV",
+      "Platform support and permissions"
+    ],
+    "docsNote": "Technical documentation is currently maintained in Chinese.",
+    "contributeTitle": "Help ReadFinch grow",
+    "contribute": "Bring a reproducible bug report, an interaction improvement, a translation correction or a pull request. Include your operating system and app version, and remove credentials and private text from examples.",
+    "issueLink": "Open an issue",
+    "prLink": "Contribute code",
+    "translationNote": "README copy lives in `docs/readmes/content.json`. After editing a translation, run `npm run docs:readme`; the generator checks that coverage matches the target-language list used by the app.",
+    "licenseTitle": "License and acknowledgements",
+    "license": "ReadFinch is licensed under **GPL-3.0-only**. Its selection-toolbar and command-card interactions are inspired by **Read Frog**. ReadFinch is an independent desktop project and is not an official Read Frog release.",
+    "noticesLink": "Third-party notices",
+    "top": "Back to top"
+  },
+  "zh-CN": {
+    "tagline": "就在文字旁边，陪你读懂每一句。",
+    "intro": "翻译一段文字、读懂一个长句、改好一句表达——留在正在使用的应用里，就能完成。",
+    "nav": [
+      "开始使用",
+      "功能介绍",
+      "技术文档",
+      "反馈问题"
+    ],
+    "previewTitle": "继续阅读，不必来回切换",
+    "previewIntro": "在浏览器、PDF 阅读器或编辑器里选中文字，伴读雀就会在鼠标旁提供工具栏，并在原文附近展示答案。可以固定结果对照阅读，也可以把值得记住的词留下来。",
+    "readingAlt": "伴读雀在原文旁展示流式译文，并推荐可收藏到本地笔记库的词条。",
+    "readingCaption": "选中 → 理解 → 收藏。从陌生的文字，到可以用起来的知识。",
+    "featuresTitle": "文字在哪里，帮助就在哪里",
+    "featureHeaders": [
+      "想做什么",
+      "伴读雀如何帮你"
+    ],
+    "features": [
+      [
+        "读懂原文",
+        "流式查看译文，查询读音、释义和例句，把长难句拆成容易理解的结构。"
+      ],
+      [
+        "改善表达",
+        "在原句中查看修改位置，对照修改理由与修订稿，再把改好的文字带回编辑器。"
+      ],
+      [
+        "识别无法选中的文字",
+        "框选屏幕或导入图片，用内置 OCR 离线识别简体中文和英文。核对文字后，再运行指令。"
+      ],
+      [
+        "边读边听",
+        "朗读选区、译文与例句。按语言选择系统离线音色或兼容的在线音色，并调整语速、音高和音量。"
+      ],
+      [
+        "定制自己的 AI 指令",
+        "设置提供商、提示词、图标、快捷键和输出字段，以 HTML + Liquid 编排结果卡片，并将字段映射到本地笔记库。"
+      ],
+      [
+        "留下值得记住的内容",
+        "收藏结果，或勾选「猜你想存」推荐的词条。通过本地搜索回看保存时的原文与答案。"
+      ]
+    ],
+    "galleryTitle": "看看指令与笔记库",
+    "commandsAlt": "自定义 AI 指令的版式设置与实时词典卡片预览。",
+    "commandsCaption": "把结构化回答排成易读的卡片，随时检查不同宽度和深浅色下的效果。",
+    "notebookAlt": "伴读雀本地笔记库展示收藏的词条及原文。",
+    "notebookCaption": "把阅读中的发现留在身边，随时搜索、回看和复习。",
+    "providerTitle": "用自己的提供商，选适合的模型",
+    "providers": "内置 OpenAI、DeepSeek、Gemini、阿里云百炼、硅基流动和 OpenRouter 预设，也支持自定义 OpenAI 兼容 Chat Completions 接口。一个提供商条目对应一个模型；需要另一模型时可以复制条目。翻译、词典、写作和图片识别可分别使用不同提供商，并支持模型联想、连接测试、温度和自定义请求头。",
+    "languagesTitle": "用熟悉的语言阅读",
+    "languages": "README 与应用预置的 8 种目标语言保持一致：",
+    "languageNote": "**应用界面目前支持简体中文和英文**，默认跟随系统。翻译质量及其他语言能力取决于所选模型；内置离线 OCR 支持简体中文和英文。",
+    "startTitle": "开始使用",
+    "buildIntro": "本地构建需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 编译器；macOS 需要 Xcode 命令行工具。",
+    "buildNote": "`assets:ocr` 仅在**开发构建阶段**准备识别数据。数据随应用打包，安装后无需下载语言包。在目标操作系统上运行 `npm run dist`，安装包会生成到 `release/`。",
+    "firstRunTitle": "第一次使用",
+    "steps": [
+      "**接入提供商。** 打开「API 提供商」，选择预设或兼容接口，填写所需凭据与模型并测试连接。可设为默认提供商，也可单独分配给某项功能。",
+      "**选中一句话。** 点击划词工具栏的「翻译」，选择目标语言。需要对照时，点图钉固定结果即可。",
+      "**试试截图取词。** 使用下方 OCR 快捷键，框选区域并核对识别文字。内置 OCR 和系统朗读无需先配置 AI 提供商。"
+    ],
+    "shortcutsTitle": "常用快捷键",
+    "shortcutHeaders": [
+      "指令"
+    ],
+    "shortcuts": [
+      "翻译选区",
+      "打开词典",
+      "写作改进",
+      "选择指令",
+      "框选屏幕文字",
+      "读取剪贴板"
+    ],
+    "shortcutsNote": "快捷键可在独立设置页面重新绑定。设置自动保存，外观可跟随系统或手动切换深浅色。开机自启默认关闭，可在托盘菜单中切换。",
+    "platformTitle": "融入桌面使用习惯",
+    "platformHeaders": [
+      "平台",
+      "如何取得文字"
+    ],
+    "platforms": [
+      "通过 UI Automation 读取前台应用提供的文本选区。",
+      "读取选区需要辅助功能授权；截图需要屏幕录制权限。",
+      "X11 使用 PRIMARY 选区，依赖 `xclip`、`xdotool`、`xprop`。Wayland 使用剪贴板或桌面截图门户，快捷键能力取决于桌面环境。"
+    ],
+    "platformNote": "Windows 已在开发机器上验证。macOS 和 Linux 提供对应实现，原生桌面交互仍需在目标系统验收，详见",
+    "platformLink": "平台支持矩阵",
+    "dataTitle": "文字与数据，去向清楚",
+    "data": [
+      "**笔记和离线能力留在本机。** 笔记正文保存在设备上的 SQLite 数据库中；离线 OCR 和系统音色在本地运行。本地笔记库页面只显示本地内容。",
+      "**AI 请求交给你选择的提供商。** 翻译和自定义指令发送所需文字，在线朗读发送待朗读内容。远程图片识别会先展示原图与目标提供商，由你明确开始请求。",
+      "**配置可以迁移。** 支持文件导入、导出和手动 WebDAV 同步，迁移提供商设置、指令、快捷键与笔记字段映射。API Key 和自定义请求头按设备保存，新设备需要单独配置；笔记正文不包含在配置同步中。"
+    ],
+    "docsTitle": "进一步了解",
+    "docs": [
+      "应用架构与源码目录",
+      "提供商、模型与功能分配",
+      "离线 OCR 与视觉接口",
+      "配置管理与 WebDAV",
+      "平台支持与权限"
+    ],
+    "docsNote": "技术文档目前以中文维护。",
+    "contributeTitle": "一起让伴读雀更好用",
+    "contribute": "欢迎提交可复现的问题、交互建议、翻译修订和代码贡献。反馈时请注明操作系统与应用版本，并移除示例中的凭据和私人文字。",
+    "issueLink": "反馈问题",
+    "prLink": "贡献代码",
+    "translationNote": "README 文案维护在 `docs/readmes/content.json`。修改翻译后运行 `npm run docs:readme`，生成器会检查是否覆盖应用目标语言列表。",
+    "licenseTitle": "许可与致谢",
+    "license": "伴读雀采用 **GPL-3.0-only** 许可证。划词工具栏和指令卡片的交互设计受到 **陪读蛙（Read Frog）** 启发。伴读雀是独立桌面项目，并非陪读蛙官方发行版。",
+    "noticesLink": "第三方组件与资源声明",
+    "top": "返回顶部"
+  },
+  "zh-TW": {
+    "tagline": "就在文字旁邊，陪你讀懂每一句。",
+    "intro": "翻譯一段文字、讀懂一個長句、修好一句表達——留在正在使用的應用程式裡，就能完成。",
+    "nav": [
+      "開始使用",
+      "功能介紹",
+      "技術文件",
+      "回報問題"
+    ],
+    "previewTitle": "繼續閱讀，不必來回切換",
+    "previewIntro": "在瀏覽器、PDF 閱讀器或編輯器裡選取文字，伴讀雀就會在游標旁提供工具列，並在原文附近顯示答案。可以釘選結果對照閱讀，也可以留下值得記住的詞彙。",
+    "readingAlt": "伴讀雀在原文旁逐步顯示譯文，並推薦可儲存至本機筆記庫的詞彙。",
+    "readingCaption": "選取 → 理解 → 收藏。讓陌生的文字，成為能夠運用的知識。",
+    "featuresTitle": "文字在哪裡，協助就在哪裡",
+    "featureHeaders": [
+      "想做什麼",
+      "伴讀雀如何協助"
+    ],
+    "features": [
+      [
+        "讀懂原文",
+        "即時查看逐步產生的譯文，查詢發音、釋義和例句，將長句拆解成容易理解的結構。"
+      ],
+      [
+        "改善表達",
+        "在原句中查看修改位置，對照修改理由與修訂稿，再將改好的文字帶回編輯器。"
+      ],
+      [
+        "辨識無法選取的文字",
+        "框選螢幕或匯入圖片，以內建 OCR 離線辨識簡體中文和英文。核對文字後，再執行指令。"
+      ],
+      [
+        "邊讀邊聽",
+        "朗讀選取內容、譯文與例句。依語言選擇系統離線語音或相容的線上語音，並調整語速、音高和音量。"
+      ],
+      [
+        "自訂 AI 指令",
+        "設定供應商、提示詞、圖示、快捷鍵及輸出欄位，以 HTML + Liquid 編排結果卡片，並將欄位對應至本機筆記庫。"
+      ],
+      [
+        "留下值得記住的內容",
+        "收藏結果，或勾選建議儲存的詞彙。透過本機搜尋，回看儲存當時的原文與答案。"
+      ]
+    ],
+    "galleryTitle": "看看指令與筆記庫",
+    "commandsAlt": "自訂 AI 指令的版面設定與即時詞典卡片預覽。",
+    "commandsCaption": "將結構化回答排成易讀的卡片，隨時檢查不同寬度及淺色、深色模式的效果。",
+    "notebookAlt": "伴讀雀本機筆記庫顯示收藏的詞彙與原文。",
+    "notebookCaption": "讓閱讀中的發現留在身邊，隨時搜尋、回顧和複習。",
+    "providerTitle": "使用自己的供應商，選擇適合的模型",
+    "providers": "內建 OpenAI、DeepSeek、Gemini、阿里雲百煉、SiliconFlow 和 OpenRouter 預設，也支援自訂 OpenAI 相容 Chat Completions 介面。每個供應商項目對應一個模型；需要另一模型時可複製項目。翻譯、字典、寫作和圖片辨識可分別使用不同供應商，並支援模型建議、連線測試、溫度及自訂請求標頭。",
+    "languagesTitle": "用熟悉的語言閱讀",
+    "languages": "README 與應用程式預設的 8 種目標語言一致：",
+    "languageNote": "**應用程式介面目前支援簡體中文和英文**，預設跟隨系統語言。翻譯品質及其他語言能力取決於所選模型；內建離線 OCR 支援簡體中文和英文。",
+    "startTitle": "開始使用",
+    "buildIntro": "本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器；macOS 需要 Xcode 命令列工具。",
+    "buildNote": "`assets:ocr` 僅在**開發建置階段**準備辨識資料。資料隨應用程式打包，安裝後無須下載語言套件。在目標作業系統上執行 `npm run dist`，安裝套件會產生於 `release/`。",
+    "firstRunTitle": "第一次使用",
+    "steps": [
+      "**連接供應商。** 開啟 API Providers，選擇預設或相容介面，填入所需憑證與模型並測試連線。可以設為預設供應商，也可指派給特定功能。",
+      "**選取一句話。** 點選工具列上的 Translate，選擇目標語言。需要對照時，點圖釘保留結果即可。",
+      "**試試截圖取字。** 使用下方 OCR 快捷鍵，框選區域並核對辨識文字。內建 OCR 和系統朗讀不需要先設定 AI 供應商。"
+    ],
+    "shortcutsTitle": "常用快捷鍵",
+    "shortcutHeaders": [
+      "指令"
+    ],
+    "shortcuts": [
+      "翻譯選取文字",
+      "開啟字典",
+      "改善寫作",
+      "選擇指令",
+      "框選螢幕文字",
+      "讀取剪貼簿"
+    ],
+    "shortcutsNote": "快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。",
+    "platformTitle": "融入桌面使用習慣",
+    "platformHeaders": [
+      "平台",
+      "如何取得文字"
+    ],
+    "platforms": [
+      "透過 UI Automation 讀取前景應用程式提供的文字選取範圍。",
+      "讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。",
+      "X11 使用 PRIMARY 選取範圍，依賴 `xclip`、`xdotool`、`xprop`。Wayland 使用剪貼簿或桌面截圖入口，快捷鍵能力取決於桌面環境。"
+    ],
+    "platformNote": "Windows 已在開發機器上驗證。macOS 和 Linux 提供對應實作，原生桌面互動仍須在目標系統驗收，詳見",
+    "platformLink": "平台支援矩陣",
+    "dataTitle": "文字與資料，去向清楚",
+    "data": [
+      "**筆記和離線功能留在本機。** 筆記內容儲存於裝置上的 SQLite 資料庫；離線 OCR 和系統語音在本機執行。本機筆記庫頁面只顯示本機內容。",
+      "**AI 請求交給你選擇的供應商。** 翻譯與自訂指令傳送所需文字，線上朗讀傳送待朗讀內容。遠端圖片辨識會先顯示原圖和目標供應商，由你明確開始請求。",
+      "**設定可以移轉。** 支援檔案匯入、匯出及手動 WebDAV 同步，移轉供應商設定、指令、快捷鍵與筆記欄位對應。API Key 和自訂請求標頭依裝置儲存，新裝置須另行設定；筆記內容不包含在設定同步中。"
+    ],
+    "docsTitle": "進一步了解",
+    "docs": [
+      "應用程式架構與原始碼目錄",
+      "供應商、模型與功能指派",
+      "離線 OCR 與視覺介面",
+      "設定管理與 WebDAV",
+      "平台支援與權限"
+    ],
+    "docsNote": "技術文件目前以簡體中文維護。",
+    "contributeTitle": "一起讓伴讀雀更好用",
+    "contribute": "歡迎提出可重現的問題、互動建議、翻譯修訂和程式碼貢獻。回報時請註明作業系統與應用程式版本，並移除範例中的憑證和私人文字。",
+    "issueLink": "回報問題",
+    "prLink": "貢獻程式碼",
+    "translationNote": "README 文案維護於 `docs/readmes/content.json`。修改翻譯後執行 `npm run docs:readme`，產生器會檢查是否涵蓋應用程式的目標語言清單。",
+    "licenseTitle": "授權與致謝",
+    "license": "伴讀雀採用 **GPL-3.0-only** 授權。文字選取工具列和指令卡片的互動設計受到 **陪讀蛙（Read Frog）** 啟發。伴讀雀是獨立桌面專案，並非陪讀蛙官方發行版。",
+    "noticesLink": "第三方元件與資源聲明",
+    "top": "回到頂端"
+  },
+  "ja": {
+    "tagline": "言葉のすぐそばに、読書のパートナー。",
+    "intro": "文章を翻訳する。難しい一文を読み解く。自分の表現を磨く。いま使っているアプリを離れずに。",
+    "nav": [
+      "使い始める",
+      "機能",
+      "ドキュメント",
+      "問題を報告"
+    ],
+    "previewTitle": "読む流れを、そのままに",
+    "previewIntro": "ブラウザー、PDF リーダー、エディターで文字を選択すると、カーソルのそばに小さなツールバーが現れ、原文の近くに結果を表示します。結果を固定して読み比べたり、覚えておきたい単語を保存したりできます。",
+    "readingAlt": "ReadFinch が原文のそばに翻訳を逐次表示し、ローカルノートに保存できる単語を提案している画面。",
+    "readingCaption": "選ぶ → 理解する → 残す。知らない言葉を、自分で使える言葉へ。",
+    "featuresTitle": "文字のある場所で、必要な手助けを",
+    "featureHeaders": [
+      "やりたいこと",
+      "ReadFinch でできること"
+    ],
+    "features": [
+      [
+        "文章を読み解く",
+        "翻訳をストリーミング表示し、発音・意味・例文を調べ、長い文の構造をわかりやすく分解します。"
+      ],
+      [
+        "表現を整える",
+        "原文のどこが変わるかを確認し、修正理由と改善後の文章を読み比べて、エディターに戻せます。"
+      ],
+      [
+        "選択できない文字を読む",
+        "画面の範囲を指定するか、画像を読み込みます。内蔵 OCR が簡体字中国語と英語をオフラインで認識。文字を確認してから指示を実行できます。"
+      ],
+      [
+        "読みながら聴く",
+        "選択範囲、翻訳、例文を読み上げます。言語ごとにシステムのオフライン音声や対応するオンライン音声を選び、速度・高さ・音量を調整できます。"
+      ],
+      [
+        "自分用の AI 指示を作る",
+        "プロバイダー、プロンプト、アイコン、ショートカット、型付き出力フィールドを設定。HTML + Liquid で結果カードを整え、フィールドをローカルノートに対応付けられます。"
+      ],
+      [
+        "大切な内容を残す",
+        "結果を保存するか、おすすめの単語を選びます。ローカルノートを検索して、保存時の原文と回答を一緒に振り返れます。"
+      ]
+    ],
+    "galleryTitle": "AI 指示とノートを見てみる",
+    "commandsAlt": "カスタム AI コマンドのレイアウト設定と辞書カードのライブプレビュー。",
+    "commandsCaption": "構造化された回答を読みやすいカードに。幅やライト・ダークモードを切り替えてレイアウトを確認できます。",
+    "notebookAlt": "保存した単語と原文を表示する ReadFinch のローカルノート。",
+    "notebookCaption": "読書で見つけた言葉を手元に。検索して、読み返して、学び直せます。",
+    "providerTitle": "プロバイダーもモデルも、自分で選ぶ",
+    "providers": "OpenAI、DeepSeek、Gemini、Alibaba Cloud、SiliconFlow、OpenRouter のプリセット、または OpenAI 互換 Chat Completions エンドポイントを利用できます。1 つのプロバイダー項目に 1 つのモデルを設定し、別のモデルには項目を複製します。翻訳、辞書、文章改善、画像認識ごとにプロバイダーを分けられます。モデル候補、接続テスト、temperature、カスタムリクエストヘッダーにも対応しています。",
+    "languagesTitle": "自分の言語で読む",
+    "languages": "README は、アプリに用意されている次の 8 つの出力先言語に対応しています。",
+    "languageNote": "**アプリの表示言語は現在、英語と簡体字中国語に対応**しており、システム言語に合わせて自動選択できます。翻訳の品質や追加言語への対応はモデルによります。内蔵のオフライン OCR は簡体字中国語と英語に対応しています。",
+    "startTitle": "使い始める",
+    "buildIntro": "ローカルでのビルドには **Node.js 24**、npm、Git が必要です。Windows は .NET Framework 4.8 の C# コンパイラー、macOS は Xcode Command Line Tools も必要です。",
+    "buildNote": "`assets:ocr` は**開発時のビルド準備**として認識データをダウンロードします。データはアプリに同梱されるため、インストール後の言語パック取得は不要です。対象 OS 上で `npm run dist` を実行すると、`release/` にパッケージを生成します。",
+    "firstRunTitle": "最初の使い方",
+    "steps": [
+      "**プロバイダーを接続する。** API Providers でプリセットまたは互換エンドポイントを選び、必要な認証情報とモデルを入力して接続をテストします。既定のプロバイダー、または特定機能のプロバイダーに設定できます。",
+      "**一文を選択する。** ツールバーの Translate を押して翻訳先の言語を選びます。読み比べたいときは、ピンで結果を固定できます。",
+      "**スクリーンショットから文字を取る。** 下記の OCR ショートカットで範囲を選び、認識結果を確認します。オフライン OCR とシステム音声は AI プロバイダーの設定前でも使えます。"
+    ],
+    "shortcutsTitle": "便利なショートカット",
+    "shortcutHeaders": [
+      "操作"
+    ],
+    "shortcuts": [
+      "選択範囲を翻訳",
+      "辞書を開く",
+      "文章を改善",
+      "指示を選ぶ",
+      "画面の文字を OCR で取得",
+      "クリップボードの文字を読む"
+    ],
+    "shortcutsNote": "ショートカットは専用設定ページで変更できます。設定は自動保存され、外観はシステム連動またはライト・ダークから選べます。ログイン時の自動起動は初期状態ではオフで、トレイメニューから変更できます。",
+    "platformTitle": "デスクトップとの連携",
+    "platformHeaders": [
+      "プラットフォーム",
+      "文字の取得方法"
+    ],
+    "platforms": [
+      "UI Automation を通じて、前面のアプリが公開する選択テキストを読み取ります。",
+      "選択テキストにはアクセシビリティ、画面キャプチャには画面収録の許可が必要です。",
+      "X11 は PRIMARY 選択を利用します（`xclip`、`xdotool`、`xprop` が必要）。Wayland はクリップボードまたはデスクトップのスクリーンショットポータルを使用し、ショートカットは環境に依存します。"
+    ],
+    "platformNote": "Windows は開発用端末で検証しています。macOS と Linux にも実装がありますが、ネイティブのデスクトップ操作は各 OS での確認が必要です。詳細は",
+    "platformLink": "プラットフォーム対応表",
+    "dataTitle": "文字とデータの行き先を明確に",
+    "data": [
+      "**ノートとオフライン機能は手元に。** ノート本文は端末上の SQLite に保存します。オフライン OCR とシステム音声はローカルで動作し、ローカルノート画面には端末内の内容だけを表示します。",
+      "**AI リクエストは選んだプロバイダーへ。** 翻訳やカスタム指示には必要な文字、オンライン音声には読み上げる文字を送信します。リモート画像認識では、画像と送信先を表示してから、明示的に開始したときだけ送信します。",
+      "**設定は持ち運べます。** ファイルのインポート・エクスポートと手動 WebDAV 同期に対応。プロバイダー設定、指示、ショートカット、ノートのフィールド対応を移行できます。API キーとカスタムヘッダーは端末ごとに設定し直します。ノート本文は設定同期に含まれません。"
+    ],
+    "docsTitle": "詳しく知る",
+    "docs": [
+      "アーキテクチャとソース構成",
+      "プロバイダー・モデル・機能の割り当て",
+      "オフライン OCR と画像認識 API",
+      "設定管理と WebDAV",
+      "プラットフォームと権限"
+    ],
+    "docsNote": "技術ドキュメントは現在、中国語で管理しています。",
+    "contributeTitle": "ReadFinch を一緒に育てる",
+    "contribute": "再現できる不具合報告、操作性の改善案、翻訳の修正、プルリクエストを歓迎します。OS とアプリのバージョンを添え、認証情報や私的な文章は例から取り除いてください。",
+    "issueLink": "問題を報告",
+    "prLink": "コードを寄稿",
+    "translationNote": "README の文面は `docs/readmes/content.json` で管理しています。翻訳を編集したら `npm run docs:readme` を実行してください。アプリの出力先言語一覧と翻訳の対応範囲をチェックします。",
+    "licenseTitle": "ライセンスと謝辞",
+    "license": "ReadFinch は **GPL-3.0-only** ライセンスで提供しています。選択ツールバーと指示カードの操作設計は **Read Frog** に着想を得ています。独立したデスクトッププロジェクトであり、Read Frog の公式リリースではありません。",
+    "noticesLink": "サードパーティーの表記",
+    "top": "先頭へ"
+  },
+  "ko": {
+    "tagline": "글 바로 곁에서 함께하는 읽기 도우미.",
+    "intro": "문장을 번역하고, 어려운 구문을 이해하고, 표현을 다듬으세요. 지금 쓰는 앱을 떠날 필요가 없습니다.",
+    "nav": [
+      "시작하기",
+      "기능",
+      "문서",
+      "문제 신고"
+    ],
+    "previewTitle": "읽던 흐름을 그대로",
+    "previewIntro": "브라우저, PDF 리더, 편집기에서 텍스트를 선택하면 커서 옆에 작은 도구 모음이 나타나고 원문 가까이에 결과가 표시됩니다. 결과를 고정해 비교하며 읽거나, 기억하고 싶은 단어를 저장할 수 있습니다.",
+    "readingAlt": "ReadFinch가 선택한 원문 옆에 번역을 스트리밍하고 로컬 노트에 저장할 단어를 제안하는 화면.",
+    "readingCaption": "선택 → 이해 → 저장. 낯선 글을 이해하고 다시 활용하기까지.",
+    "featuresTitle": "텍스트가 있는 곳에서 필요한 도움을",
+    "featureHeaders": [
+      "하고 싶은 일",
+      "ReadFinch가 돕는 방법"
+    ],
+    "features": [
+      [
+        "글 이해하기",
+        "번역을 스트리밍으로 읽고, 발음·뜻·예문을 찾아보고, 긴 문장의 구조를 이해하기 쉽게 나눕니다."
+      ],
+      [
+        "표현 다듬기",
+        "원문에서 수정 위치를 확인하고, 수정 이유와 개선된 문장을 비교한 다음 편집기로 가져갈 수 있습니다."
+      ],
+      [
+        "선택할 수 없는 글 읽기",
+        "화면 영역을 캡처하거나 이미지를 불러오세요. 내장 OCR이 중국어 간체와 영어를 오프라인으로 인식합니다. 인식된 글을 확인한 뒤 명령을 실행합니다."
+      ],
+      [
+        "읽으면서 듣기",
+        "선택한 글, 번역, 예문을 음성으로 들을 수 있습니다. 언어별로 시스템 오프라인 음성이나 호환 온라인 음성을 고르고 속도·높낮이·음량을 조절합니다."
+      ],
+      [
+        "나만의 AI 명령 만들기",
+        "제공업체, 프롬프트, 아이콘, 단축키, 형식이 지정된 출력 필드를 설정합니다. HTML + Liquid로 결과 카드를 구성하고 필드를 로컬 노트에 연결합니다."
+      ],
+      [
+        "기억할 내용 남기기",
+        "결과를 저장하거나 추천 단어를 선택하세요. 로컬 노트를 검색해 저장 당시의 원문과 답변을 함께 다시 볼 수 있습니다."
+      ]
+    ],
+    "galleryTitle": "AI 명령과 노트 살펴보기",
+    "commandsAlt": "사용자 지정 AI 명령의 레이아웃 설정과 사전 카드 실시간 미리보기.",
+    "commandsCaption": "구조화된 답변을 읽기 쉬운 카드로 꾸미세요. 다양한 너비와 밝은 모드·어두운 모드에서 확인할 수 있습니다.",
+    "notebookAlt": "저장한 단어와 원문을 보여 주는 ReadFinch 로컬 노트.",
+    "notebookCaption": "읽다가 발견한 내용을 가까이 두고, 검색하고 되짚어 보세요.",
+    "providerTitle": "제공업체와 모델을 직접 선택",
+    "providers": "OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow, OpenRouter 프리셋을 사용하거나 OpenAI 호환 Chat Completions 엔드포인트를 연결할 수 있습니다. 제공업체 항목 하나에는 모델 하나를 설정하며, 다른 모델을 쓰려면 항목을 복제합니다. 번역·사전·글쓰기·이미지 인식에 각각 다른 제공업체를 지정할 수 있습니다. 모델 제안, 연결 테스트, temperature, 사용자 지정 요청 헤더도 지원합니다.",
+    "languagesTitle": "익숙한 언어로 읽기",
+    "languages": "README는 앱에 기본 제공되는 다음 8가지 대상 언어와 일치합니다.",
+    "languageNote": "**앱 인터페이스는 현재 영어와 중국어 간체를 지원**하며 시스템 언어에 맞춰 자동으로 선택할 수 있습니다. 번역 품질과 추가 언어 지원은 선택한 모델에 따라 달라집니다. 내장 오프라인 OCR은 중국어 간체와 영어를 인식합니다.",
+    "startTitle": "시작하기",
+    "buildIntro": "로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러가, macOS에서는 Xcode Command Line Tools가 추가로 필요합니다.",
+    "buildNote": "`assets:ocr`는 **개발 빌드 준비 과정에서** 인식 데이터를 다운로드합니다. 데이터가 앱에 포함되므로 설치 후 언어 팩을 내려받을 필요가 없습니다. 대상 운영체제에서 `npm run dist`를 실행하면 `release/`에 패키지가 생성됩니다.",
+    "firstRunTitle": "처음 사용하기",
+    "steps": [
+      "**제공업체 연결.** API Providers에서 프리셋이나 호환 엔드포인트를 고르고, 필요한 인증 정보와 모델을 입력한 뒤 연결을 테스트합니다. 기본 제공업체로 지정하거나 특정 기능에 연결할 수 있습니다.",
+      "**문장 선택.** 선택 도구 모음에서 Translate를 누르고 대상 언어를 고르세요. 원문과 비교하며 읽으려면 압정 버튼으로 결과를 고정합니다.",
+      "**캡처로 글 가져오기.** 아래 OCR 단축키로 영역을 선택하고 인식 결과를 확인하세요. 오프라인 OCR과 시스템 음성은 AI 제공업체 설정 전에도 사용할 수 있습니다."
+    ],
+    "shortcutsTitle": "유용한 단축키",
+    "shortcutHeaders": [
+      "명령"
+    ],
+    "shortcuts": [
+      "선택 영역 번역",
+      "사전 열기",
+      "글쓰기 개선",
+      "명령 선택",
+      "OCR로 화면 글 가져오기",
+      "클립보드 글 읽기"
+    ],
+    "shortcutsNote": "단축키는 전용 설정 페이지에서 바꿀 수 있습니다. 설정은 자동 저장되며, 테마는 시스템 설정을 따르거나 밝게·어둡게 지정할 수 있습니다. 로그인 시 자동 시작은 기본적으로 꺼져 있으며 트레이 메뉴에서 변경합니다.",
+    "platformTitle": "데스크톱 연동",
+    "platformHeaders": [
+      "플랫폼",
+      "텍스트를 가져오는 방법"
+    ],
+    "platforms": [
+      "UI Automation으로 전경 앱이 제공하는 선택 텍스트를 읽습니다.",
+      "선택 텍스트에는 손쉬운 사용 권한이, 화면 캡처에는 화면 기록 권한이 필요합니다.",
+      "X11에서는 PRIMARY 선택 영역을 사용합니다(`xclip`, `xdotool`, `xprop` 필요). Wayland에서는 클립보드 또는 데스크톱 스크린샷 포털을 사용하며 단축키 지원은 데스크톱 환경에 따라 달라집니다."
+    ],
+    "platformNote": "Windows는 개발 컴퓨터에서 검증했습니다. macOS와 Linux 구현도 제공되지만 실제 데스크톱 동작은 해당 시스템에서 확인해야 합니다. 자세한 내용은",
+    "platformLink": "플랫폼 지원표",
+    "dataTitle": "텍스트와 데이터의 경계를 분명하게",
+    "data": [
+      "**노트와 오프라인 기능은 내 기기에.** 노트 본문은 기기의 SQLite 데이터베이스에 저장됩니다. 오프라인 OCR과 시스템 음성은 로컬에서 동작합니다. 로컬 노트 화면에는 로컬 콘텐츠만 표시합니다.",
+      "**AI 요청은 선택한 제공업체로.** 번역과 사용자 지정 명령은 필요한 텍스트를, 온라인 음성은 읽어 줄 텍스트를 보냅니다. 원격 이미지 인식은 이미지와 전송 대상을 먼저 보여 주며, 직접 시작해야 전송합니다.",
+      "**설정은 다른 기기로.** 파일 가져오기·내보내기와 수동 WebDAV 동기화를 지원합니다. 제공업체 설정, 명령, 단축키, 노트 필드 매핑을 함께 옮길 수 있습니다. API 키와 사용자 지정 요청 헤더는 기기별로 저장되므로 새 기기에서 다시 설정해야 합니다. 노트 본문은 설정 동기화에 포함되지 않습니다."
+    ],
+    "docsTitle": "더 알아보기",
+    "docs": [
+      "아키텍처와 소스 구조",
+      "제공업체·모델·기능 할당",
+      "오프라인 OCR과 비전 API",
+      "설정 관리와 WebDAV",
+      "플랫폼 지원과 권한"
+    ],
+    "docsNote": "기술 문서는 현재 중국어로 관리합니다.",
+    "contributeTitle": "ReadFinch를 함께 개선해 주세요",
+    "contribute": "재현 가능한 버그 보고, 사용성 제안, 번역 수정, 풀 리퀘스트를 환영합니다. 운영체제와 앱 버전을 적고, 예제에서 인증 정보와 개인 텍스트를 제거해 주세요.",
+    "issueLink": "문제 신고",
+    "prLink": "코드 기여",
+    "translationNote": "README 문구는 `docs/readmes/content.json`에서 관리합니다. 번역을 수정한 뒤 `npm run docs:readme`를 실행하면 앱의 대상 언어 목록과 번역 범위가 일치하는지 확인합니다.",
+    "licenseTitle": "라이선스와 감사의 말",
+    "license": "ReadFinch는 **GPL-3.0-only** 라이선스로 제공됩니다. 선택 도구 모음과 명령 카드의 상호작용은 **Read Frog**에서 영감을 받았습니다. 독립적인 데스크톱 프로젝트이며 Read Frog의 공식 배포판이 아닙니다.",
+    "noticesLink": "서드파티 고지",
+    "top": "맨 위로"
+  },
+  "fr": {
+    "tagline": "Un compagnon de lecture, juste à côté de vos mots.",
+    "intro": "Traduisez un passage, comprenez une phrase difficile ou améliorez votre rédaction, sans quitter l’application que vous utilisez.",
+    "nav": [
+      "Bien démarrer",
+      "Fonctionnalités",
+      "Documentation",
+      "Signaler un problème"
+    ],
+    "previewTitle": "Gardez le fil de votre lecture",
+    "previewIntro": "Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFinch affiche une petite barre d’outils près du curseur, puis la réponse à côté du texte d’origine. Épinglez un résultat pour comparer ou conservez un mot utile pour plus tard.",
+    "readingAlt": "ReadFinch affiche un passage sélectionné, sa traduction progressive et des mots proposés pour un carnet local.",
+    "readingCaption": "Sélectionner → comprendre → conserver. Du texte inconnu à des connaissances réutilisables.",
+    "featuresTitle": "Un coup de main là où se trouve votre texte",
+    "featureHeaders": [
+      "Votre besoin",
+      "L’aide de ReadFinch"
+    ],
+    "features": [
+      [
+        "Lire et comprendre",
+        "Suivez la traduction à mesure qu’elle s’affiche, consultez la prononciation et les exemples, et décomposez les phrases longues."
+      ],
+      [
+        "Mieux écrire",
+        "Repérez les modifications dans le texte d’origine, comprenez leur raison et reprenez la version améliorée dans votre éditeur."
+      ],
+      [
+        "Lire du texte non sélectionnable",
+        "Capturez une zone de l’écran ou importez une image. L’OCR intégré reconnaît le chinois simplifié et l’anglais hors ligne. Vérifiez le texte avant de lancer une commande."
+      ],
+      [
+        "Écouter en lisant",
+        "Faites lire une sélection, une traduction ou un exemple. Choisissez des voix système hors ligne ou des voix en ligne compatibles par langue, puis réglez le débit, la hauteur et le volume."
+      ],
+      [
+        "Créer vos commandes IA",
+        "Définissez le fournisseur, les prompts, l’icône, le raccourci et les champs de sortie typés. Composez les cartes avec HTML + Liquid et associez les champs à un carnet local."
+      ],
+      [
+        "Garder l’essentiel",
+        "Enregistrez un résultat ou acceptez une suggestion de vocabulaire. Recherchez dans vos carnets locaux et retrouvez le passage d’origine avec la réponse enregistrée."
+      ]
+    ],
+    "galleryTitle": "Découvrir les commandes et les carnets",
+    "commandsAlt": "Réglages de mise en page d’une commande IA personnalisée, avec aperçu d’une fiche de dictionnaire.",
+    "commandsCaption": "Transformez les réponses structurées en fiches lisibles. Vérifiez la mise en page à différentes largeurs, en mode clair ou sombre.",
+    "notebookAlt": "Carnet local ReadFinch affichant du vocabulaire enregistré et son texte d’origine.",
+    "notebookCaption": "Gardez vos découvertes à portée de main pour les retrouver et les relire.",
+    "providerTitle": "Votre fournisseur. Votre modèle. Votre choix.",
+    "providers": "Utilisez les préréglages OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow et OpenRouter, ou connectez une API Chat Completions compatible OpenAI. Chaque entrée de fournisseur contient un modèle ; dupliquez-la pour en utiliser un autre. Traduction, dictionnaire, rédaction et reconnaissance d’image peuvent utiliser des fournisseurs différents. Les réglages proposent des suggestions de modèles, un test de connexion, la température et des en-têtes personnalisés.",
+    "languagesTitle": "Lire dans votre langue",
+    "languages": "Les traductions du README correspondent aux huit langues cibles prédéfinies dans l’application :",
+    "languageNote": "**L’interface de l’application est actuellement disponible en anglais et en chinois simplifié**, avec sélection automatique selon le système. La qualité des traductions et la prise en charge d’autres langues dépendent du modèle. L’OCR hors ligne intégré reconnaît le chinois simplifié et l’anglais.",
+    "startTitle": "Bien démarrer",
+    "buildIntro": "Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, le compilateur C# de .NET Framework 4.8 est nécessaire ; sous macOS, installez les outils de ligne de commande Xcode.",
+    "buildNote": "`assets:ocr` télécharge les données de reconnaissance **pendant la préparation du développement**. Elles sont incluses dans l’application : aucune langue n’est à télécharger après l’installation. Exécutez `npm run dist` sur le système cible pour créer les paquets dans `release/`.",
+    "firstRunTitle": "Vos premiers pas",
+    "steps": [
+      "**Connectez un fournisseur.** Dans API Providers, choisissez un préréglage ou une API compatible, renseignez les identifiants nécessaires et le modèle, puis testez la connexion. Affectez-le par défaut ou à une fonction précise.",
+      "**Sélectionnez une phrase.** Cliquez sur Translate dans la barre d’outils, choisissez la langue cible et épinglez le résultat pour continuer à lire en parallèle.",
+      "**Essayez une capture.** Avec le raccourci OCR ci-dessous, sélectionnez une zone puis vérifiez le texte reconnu. L’OCR hors ligne et les voix système fonctionnent avant toute configuration d’un fournisseur IA."
+    ],
+    "shortcutsTitle": "Raccourcis utiles",
+    "shortcutHeaders": [
+      "Commande"
+    ],
+    "shortcuts": [
+      "Traduire la sélection",
+      "Ouvrir le dictionnaire",
+      "Améliorer la rédaction",
+      "Choisir une commande",
+      "Capturer du texte par OCR",
+      "Lire le presse-papiers"
+    ],
+    "shortcutsNote": "Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.",
+    "platformTitle": "Intégration au bureau",
+    "platformHeaders": [
+      "Plateforme",
+      "Acquisition du texte"
+    ],
+    "platforms": [
+      "Lit les sélections exposées par l’application au premier plan via UI Automation.",
+      "L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran.",
+      "Utilise la sélection PRIMARY sous X11 (`xclip`, `xdotool`, `xprop`). Sous Wayland, utilise le presse-papiers ou le portail de capture du bureau ; les raccourcis dépendent de l’environnement."
+    ],
+    "platformNote": "Windows a été vérifié sur la machine de développement. Des implémentations macOS et Linux sont présentes, mais les interactions natives doivent encore être validées sur les systèmes cibles. Consultez la",
+    "platformLink": "matrice de prise en charge",
+    "dataTitle": "Des limites claires pour vos données",
+    "data": [
+      "**Des notes et des fonctions hors ligne sur votre appareil.** Les carnets sont stockés dans une base SQLite locale. L’OCR hors ligne et les voix système s’exécutent localement. La page des carnets locaux n’affiche que du contenu local.",
+      "**L’IA utilise le fournisseur choisi.** La traduction et les commandes envoient le texte nécessaire ; la synthèse vocale en ligne envoie le texte à lire. La reconnaissance d’image distante affiche d’abord l’image et son destinataire, puis attend votre lancement explicite.",
+      "**Des réglages transférables.** Importez ou exportez un fichier, ou synchronisez manuellement la configuration par WebDAV. Fournisseurs, commandes, raccourcis et correspondances des champs de carnet sont transférés ensemble. Les clés API et les en-têtes personnalisés restent propres à chaque appareil. Le contenu des carnets n’est pas inclus dans la synchronisation des réglages."
+    ],
+    "docsTitle": "Pour aller plus loin",
+    "docs": [
+      "Architecture et organisation du code",
+      "Fournisseurs, modèles et affectation des fonctions",
+      "OCR hors ligne et API de vision",
+      "Configuration et WebDAV",
+      "Plateformes et autorisations"
+    ],
+    "docsNote": "La documentation technique est actuellement maintenue en chinois.",
+    "contributeTitle": "Faisons grandir ReadFinch",
+    "contribute": "Les rapports de bugs reproductibles, suggestions d’ergonomie, corrections de traduction et pull requests sont les bienvenus. Indiquez votre système et la version de l’application, et retirez les identifiants et textes privés de vos exemples.",
+    "issueLink": "Ouvrir un ticket",
+    "prLink": "Contribuer au code",
+    "translationNote": "Les textes du README se trouvent dans `docs/readmes/content.json`. Après une modification, lancez `npm run docs:readme` : le générateur vérifie que les traductions couvrent les langues cibles de l’application.",
+    "licenseTitle": "Licence et remerciements",
+    "license": "ReadFinch est distribué sous licence **GPL-3.0-only**. Les interactions de la barre de sélection et des cartes de commande s’inspirent de **Read Frog**. ReadFinch est un projet de bureau indépendant, pas une version officielle de Read Frog.",
+    "noticesLink": "Mentions des composants tiers",
+    "top": "Retour en haut"
+  },
+  "de": {
+    "tagline": "Dein Lesebegleiter, direkt neben deinen Worten.",
+    "intro": "Eine Passage übersetzen, einen schwierigen Satz verstehen oder einen eigenen Text verbessern – ohne die gerade verwendete App zu verlassen.",
+    "nav": [
+      "Erste Schritte",
+      "Funktionen",
+      "Dokumentation",
+      "Problem melden"
+    ],
+    "previewTitle": "Bleib im Lesefluss",
+    "previewIntro": "Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine Werkzeugleiste am Mauszeiger und öffnet die Antwort neben dem Original. Hefte ein Ergebnis zum Vergleichen an oder merke dir ein nützliches Wort für später.",
+    "readingAlt": "ReadFinch zeigt eine markierte Passage, eine schrittweise erscheinende Übersetzung und Wortvorschläge für ein lokales Notizbuch.",
+    "readingCaption": "Markieren → verstehen → behalten. Von unbekannten Wörtern zu nutzbarem Wissen.",
+    "featuresTitle": "Hilfe dort, wo dein Text ist",
+    "featureHeaders": [
+      "Was du vorhast",
+      "Wie ReadFinch hilft"
+    ],
+    "features": [
+      [
+        "Lesen und verstehen",
+        "Lies Übersetzungen schon während der Ausgabe, schlage Aussprache und Beispiele nach und zerlege lange Sätze in verständliche Teile."
+      ],
+      [
+        "Besser formulieren",
+        "Sieh Änderungen im ursprünglichen Satz, verstehe die Begründungen und übernimm die überarbeitete Fassung in deinen Editor."
+      ],
+      [
+        "Nicht markierbaren Text lesen",
+        "Erfasse einen Bildschirmausschnitt oder importiere ein Bild. Die integrierte OCR erkennt vereinfachtes Chinesisch und Englisch offline. Prüfe den Text, bevor du einen Befehl ausführst."
+      ],
+      [
+        "Beim Lesen zuhören",
+        "Lass dir markierten Text, Übersetzungen und Beispiele vorlesen. Wähle je Sprache lokale Systemstimmen oder kompatible Online-Stimmen und passe Tempo, Tonhöhe und Lautstärke an."
+      ],
+      [
+        "Eigene KI-Befehle erstellen",
+        "Lege Anbieter, Prompts, Symbol, Tastenkürzel und typisierte Ausgabefelder fest. Gestalte Ergebniskarten mit HTML + Liquid und ordne die Felder einem lokalen Notizbuch zu."
+      ],
+      [
+        "Wichtiges behalten",
+        "Speichere ein Ergebnis oder übernimm einen Wortschatzvorschlag. Durchsuche lokale Notizbücher und sieh den ursprünglichen Text zusammen mit der gespeicherten Antwort wieder."
+      ]
+    ],
+    "galleryTitle": "Befehle und Notizbücher entdecken",
+    "commandsAlt": "Layout-Einstellungen eines eigenen KI-Befehls mit Live-Vorschau einer Wörterbuchkarte.",
+    "commandsCaption": "Gestalte strukturierte Antworten als gut lesbare Karten. Prüfe das Layout bei verschiedenen Breiten und im hellen oder dunklen Modus.",
+    "notebookAlt": "Lokales ReadFinch-Notizbuch mit gespeicherten Wörtern und ihrem ursprünglichen Kontext.",
+    "notebookCaption": "Behalte Entdeckungen aus deiner Lektüre griffbereit, um sie wiederzufinden und nachzulesen.",
+    "providerTitle": "Dein Anbieter. Dein Modell. Deine Wahl.",
+    "providers": "Nutze Vorlagen für OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow und OpenRouter oder verbinde einen OpenAI-kompatiblen Chat-Completions-Endpunkt. Jeder Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben und Bilderkennung können verschiedene Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur und eigene Request-Header sind in den Einstellungen verfügbar.",
+    "languagesTitle": "In deiner Sprache lesen",
+    "languages": "Die README-Übersetzungen entsprechen den acht voreingestellten Zielsprachen der App:",
+    "languageNote": "**Die App-Oberfläche ist derzeit auf Englisch und vereinfachtem Chinesisch verfügbar** und kann automatisch der Systemsprache folgen. Übersetzungsqualität und weitere unterstützte Sprachen hängen vom Modell ab. Die integrierte Offline-OCR erkennt vereinfachtes Chinesisch und Englisch.",
+    "startTitle": "Erste Schritte",
+    "buildIntro": "Für einen lokalen Build benötigst du **Node.js 24**, npm und Git. Unter Windows wird der C#-Compiler von .NET Framework 4.8 benötigt, unter macOS die Xcode Command Line Tools.",
+    "buildNote": "`assets:ocr` lädt die Erkennungsdaten **bei der Vorbereitung des Entwicklungs-Builds** herunter. Die Daten werden mit der App ausgeliefert; nach der Installation ist kein Sprachpaket-Download nötig. Mit `npm run dist` auf dem Zielbetriebssystem entstehen Pakete im Verzeichnis `release/`.",
+    "firstRunTitle": "Die ersten Schritte in der App",
+    "steps": [
+      "**Anbieter verbinden.** Wähle unter API Providers eine Vorlage oder einen kompatiblen Endpunkt, trage die benötigten Zugangsdaten und das Modell ein und teste die Verbindung. Weise den Anbieter als Standard oder einer bestimmten Funktion zu.",
+      "**Einen Satz markieren.** Klicke in der Werkzeugleiste auf Translate und wähle die Zielsprache. Mit der Stecknadel bleibt das Ergebnis neben deiner Lektüre stehen.",
+      "**Eine Bildschirmaufnahme ausprobieren.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Offline-OCR und Systemstimmen funktionieren auch ohne eingerichteten KI-Anbieter."
+    ],
+    "shortcutsTitle": "Nützliche Tastenkürzel",
+    "shortcutHeaders": [
+      "Befehl"
+    ],
+    "shortcuts": [
+      "Auswahl übersetzen",
+      "Wörterbuch öffnen",
+      "Text verbessern",
+      "Befehl auswählen",
+      "Bildschirmtext per OCR erfassen",
+      "Text aus der Zwischenablage lesen"
+    ],
+    "shortcutsNote": "Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.",
+    "platformTitle": "Integration in den Desktop",
+    "platformHeaders": [
+      "Plattform",
+      "Texterfassung"
+    ],
+    "platforms": [
+      "Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation.",
+      "Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots.",
+      "Verwendet unter X11 die PRIMARY-Auswahl (`xclip`, `xdotool`, `xprop`). Unter Wayland werden Zwischenablage oder Screenshot-Portal genutzt; Tastenkürzel hängen von der Desktop-Umgebung ab."
+    ],
+    "platformNote": "Windows wurde auf dem Entwicklungsrechner geprüft. Implementierungen für macOS und Linux sind vorhanden; native Desktop-Abläufe müssen weiterhin auf den Zielsystemen geprüft werden. Details stehen in der",
+    "platformLink": "Plattformübersicht",
+    "dataTitle": "Klare Grenzen für deine Daten",
+    "data": [
+      "**Notizen und Offline-Funktionen bleiben auf dem Gerät.** Notizbuchinhalte liegen in einer lokalen SQLite-Datenbank. Offline-OCR und Systemstimmen arbeiten lokal. Die lokale Notizbuchseite zeigt ausschließlich lokale Inhalte.",
+      "**KI-Anfragen gehen an deinen gewählten Anbieter.** Übersetzung und eigene Befehle senden den benötigten Text; Online-Sprachausgabe sendet den vorzulesenden Text. Bei entfernter Bilderkennung werden Bild und Empfänger zuerst angezeigt. Gesendet wird erst, wenn du die Anfrage ausdrücklich startest.",
+      "**Einstellungen lassen sich mitnehmen.** Importiere und exportiere Dateien oder synchronisiere die Konfiguration manuell per WebDAV. Anbieter, Befehle, Tastenkürzel und Feldzuordnungen der Notizbücher werden gemeinsam übertragen. API-Schlüssel und eigene Header bleiben gerätespezifisch und müssen auf einem anderen Gerät separat eingerichtet werden. Notizbuchinhalte gehören nicht zur Konfigurationssynchronisierung."
+    ],
+    "docsTitle": "Mehr erfahren",
+    "docs": [
+      "Architektur und Quellcode-Struktur",
+      "Anbieter, Modelle und Funktionszuordnung",
+      "Offline-OCR und Vision-APIs",
+      "Konfiguration und WebDAV",
+      "Plattformen und Berechtigungen"
+    ],
+    "docsNote": "Die technische Dokumentation wird derzeit auf Chinesisch gepflegt.",
+    "contributeTitle": "ReadFinch gemeinsam verbessern",
+    "contribute": "Reproduzierbare Fehlerberichte, Verbesserungsvorschläge, Übersetzungskorrekturen und Pull Requests sind willkommen. Nenne Betriebssystem und App-Version und entferne Zugangsdaten sowie private Texte aus Beispielen.",
+    "issueLink": "Problem melden",
+    "prLink": "Code beitragen",
+    "translationNote": "Die README-Texte stehen in `docs/readmes/content.json`. Führe nach einer Übersetzungsänderung `npm run docs:readme` aus. Der Generator prüft, ob alle Zielsprachen der App abgedeckt sind.",
+    "licenseTitle": "Lizenz und Danksagung",
+    "license": "ReadFinch steht unter **GPL-3.0-only**. Die Bedienung der Auswahl-Werkzeugleiste und der Befehlskarten ist von **Read Frog** inspiriert. ReadFinch ist ein unabhängiges Desktop-Projekt und keine offizielle Read-Frog-Veröffentlichung.",
+    "noticesLink": "Hinweise zu Drittanbieterkomponenten",
+    "top": "Nach oben"
+  },
+  "es": {
+    "tagline": "Un compañero de lectura, junto a tus palabras.",
+    "intro": "Traduce un pasaje, comprende una frase difícil o mejora lo que escribes, sin salir de la aplicación que estás usando.",
+    "nav": [
+      "Primeros pasos",
+      "Funciones",
+      "Documentación",
+      "Informar de un problema"
+    ],
+    "previewTitle": "Sigue el hilo de tu lectura",
+    "previewIntro": "Selecciona texto en un navegador, lector de PDF o editor. ReadFinch muestra una pequeña barra junto al cursor y abre la respuesta al lado del original. Fija un resultado para compararlo o guarda una palabra útil para más adelante.",
+    "readingAlt": "ReadFinch muestra un pasaje seleccionado, su traducción progresiva y palabras sugeridas para un cuaderno local.",
+    "readingCaption": "Seleccionar → comprender → guardar. De un texto desconocido a algo que puedes aprovechar.",
+    "featuresTitle": "Una ayuda allí donde está tu texto",
+    "featureHeaders": [
+      "Lo que quieres hacer",
+      "Cómo te ayuda ReadFinch"
+    ],
+    "features": [
+      [
+        "Leer y comprender",
+        "Lee las traducciones mientras se generan, consulta pronunciaciones y ejemplos, y descompón las frases largas en partes comprensibles."
+      ],
+      [
+        "Mejorar tu escritura",
+        "Ve los cambios en el texto original, entiende los motivos de la revisión y lleva la versión mejorada a tu editor."
+      ],
+      [
+        "Leer texto que no se puede seleccionar",
+        "Captura una zona de la pantalla o importa una imagen. El OCR integrado reconoce chino simplificado e inglés sin conexión. Revisa el texto antes de ejecutar una instrucción."
+      ],
+      [
+        "Escuchar mientras lees",
+        "Escucha selecciones, traducciones y ejemplos. Elige por idioma voces del sistema sin conexión o voces en línea compatibles, y ajusta la velocidad, el tono y el volumen."
+      ],
+      [
+        "Crear tus propias instrucciones de IA",
+        "Configura el proveedor, los prompts, el icono, el atajo y los campos de salida con tipo. Diseña las tarjetas con HTML + Liquid y vincula los campos a un cuaderno local."
+      ],
+      [
+        "Conservar lo importante",
+        "Guarda un resultado o acepta una sugerencia de vocabulario. Busca en tus cuadernos locales y vuelve al pasaje original junto con la respuesta guardada."
+      ]
+    ],
+    "galleryTitle": "Explora las instrucciones y los cuadernos",
+    "commandsAlt": "Ajustes de diseño de un comando de IA personalizado, con vista previa de una ficha de diccionario.",
+    "commandsCaption": "Convierte las respuestas estructuradas en fichas fáciles de leer. Comprueba el diseño con distintos anchos y en modo claro u oscuro.",
+    "notebookAlt": "Cuaderno local de ReadFinch con vocabulario guardado y su contexto original.",
+    "notebookCaption": "Ten a mano lo que descubres al leer, para encontrarlo y repasarlo.",
+    "providerTitle": "Tu proveedor. Tu modelo. Tú decides.",
+    "providers": "Usa los ajustes predefinidos de OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow y OpenRouter, o conecta un endpoint Chat Completions compatible con OpenAI. Cada entrada de proveedor contiene un modelo; duplícala para usar otro. Traducción, diccionario, escritura y reconocimiento de imágenes pueden utilizar proveedores distintos. Los ajustes incluyen sugerencias de modelos, pruebas de conexión, temperatura y cabeceras personalizadas.",
+    "languagesTitle": "Lee en tu idioma",
+    "languages": "Las traducciones del README coinciden con los ocho idiomas de destino predefinidos de la aplicación:",
+    "languageNote": "**La interfaz de la aplicación está disponible actualmente en inglés y chino simplificado**, con selección automática según el sistema. La calidad de la traducción y los idiomas adicionales dependen del modelo. El OCR integrado sin conexión reconoce chino simplificado e inglés.",
+    "startTitle": "Primeros pasos",
+    "buildIntro": "Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows se requiere el compilador de C# de .NET Framework 4.8; en macOS, las herramientas de línea de comandos de Xcode.",
+    "buildNote": "`assets:ocr` descarga los datos de reconocimiento **al preparar la compilación de desarrollo**. Los datos se incluyen en la aplicación, por lo que no hay que descargar paquetes de idiomas después de instalarla. Ejecuta `npm run dist` en el sistema de destino para generar los paquetes en `release/`.",
+    "firstRunTitle": "Tu primer uso",
+    "steps": [
+      "**Conecta un proveedor.** En API Providers, elige un ajuste predefinido o un endpoint compatible, introduce las credenciales necesarias y el modelo, y prueba la conexión. Puedes asignarlo como predeterminado o a una función concreta.",
+      "**Selecciona una frase.** Pulsa Translate en la barra de selección, elige el idioma de destino y fija el resultado si quieres seguir leyendo junto a él.",
+      "**Prueba una captura.** Utiliza el atajo OCR indicado abajo, selecciona una zona y revisa el texto reconocido. El OCR sin conexión y las voces del sistema funcionan antes de configurar un proveedor de IA."
+    ],
+    "shortcutsTitle": "Atajos útiles",
+    "shortcutHeaders": [
+      "Instrucción"
+    ],
+    "shortcuts": [
+      "Traducir selección",
+      "Abrir diccionario",
+      "Mejorar escritura",
+      "Elegir instrucción",
+      "Capturar texto con OCR",
+      "Leer texto del portapapeles"
+    ],
+    "shortcutsNote": "Puedes cambiar los atajos en su página de ajustes. La configuración se guarda automáticamente y la apariencia sigue al sistema o a tu elección clara u oscura. El inicio al entrar en el sistema está desactivado por defecto y se cambia desde el menú de la bandeja.",
+    "platformTitle": "Integración con el escritorio",
+    "platformHeaders": [
+      "Plataforma",
+      "Cómo se obtiene el texto"
+    ],
+    "platforms": [
+      "Lee las selecciones que expone la aplicación en primer plano mediante UI Automation.",
+      "Requiere permiso de Accesibilidad para leer selecciones y de Grabación de pantalla para las capturas.",
+      "Utiliza la selección PRIMARY en X11 (`xclip`, `xdotool`, `xprop`). En Wayland utiliza el portapapeles o el portal de capturas del escritorio; los atajos dependen del entorno."
+    ],
+    "platformNote": "Windows se ha comprobado en el equipo de desarrollo. Hay implementaciones para macOS y Linux, aunque la interacción nativa todavía requiere validación en los sistemas de destino. Consulta la",
+    "platformLink": "matriz de compatibilidad",
+    "dataTitle": "Límites claros para tus datos",
+    "data": [
+      "**Notas y funciones sin conexión en tu dispositivo.** El contenido de los cuadernos se guarda en una base SQLite local. El OCR sin conexión y las voces del sistema se ejecutan localmente. La página de cuadernos locales solo muestra contenido local.",
+      "**Las solicitudes de IA van al proveedor que elijas.** La traducción y las instrucciones envían el texto necesario; la voz en línea envía el texto que debe leer. El reconocimiento remoto de imágenes muestra primero la imagen y el destino, y solo envía la solicitud cuando la inicias expresamente.",
+      "**Configuración que puedes trasladar.** Importa o exporta archivos, o sincroniza manualmente los ajustes mediante WebDAV. Proveedores, instrucciones, atajos y asignaciones de campos se trasladan juntos. Las claves API y las cabeceras personalizadas son específicas de cada dispositivo y deben configurarse aparte en otro equipo. El contenido de los cuadernos no forma parte de la sincronización de ajustes."
+    ],
+    "docsTitle": "Más información",
+    "docs": [
+      "Arquitectura y estructura del código",
+      "Proveedores, modelos y asignación de funciones",
+      "OCR sin conexión y API de visión",
+      "Configuración y WebDAV",
+      "Plataformas y permisos"
+    ],
+    "docsNote": "La documentación técnica se mantiene actualmente en chino.",
+    "contributeTitle": "Ayuda a mejorar ReadFinch",
+    "contribute": "Son bienvenidos los informes de errores reproducibles, las propuestas de usabilidad, las correcciones de traducción y las pull requests. Indica el sistema operativo y la versión de la aplicación, y elimina las credenciales y el texto privado de los ejemplos.",
+    "issueLink": "Abrir una incidencia",
+    "prLink": "Contribuir código",
+    "translationNote": "Los textos del README están en `docs/readmes/content.json`. Después de editar una traducción, ejecuta `npm run docs:readme`; el generador comprueba que se cubran los idiomas de destino de la aplicación.",
+    "licenseTitle": "Licencia y agradecimientos",
+    "license": "ReadFinch se distribuye bajo **GPL-3.0-only**. Las interacciones de la barra de selección y las tarjetas se inspiran en **Read Frog**. ReadFinch es un proyecto de escritorio independiente y no una versión oficial de Read Frog.",
+    "noticesLink": "Avisos de terceros",
+    "top": "Volver arriba"
+  }
+}

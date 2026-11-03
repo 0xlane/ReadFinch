@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>ReadFinch — finch beside a text selection</title>
+  <defs>
+    <mask id="bird-cutouts">
+      <rect width="128" height="128" fill="white"/>
+      <circle cx="90" cy="37" r="4" fill="black"/>
+      <path d="M42 75C55 73 64 68 71 62C69 77 54 84 42 75Z" fill="black"/>
+    </mask>
+  </defs>
+  <g fill="#000000" mask="url(#bird-cutouts)">
+    <path d="M19 91L35 75C46 61 54 52 59 40C65 24 77 20 88 24C96 27 101 32 103 37L116 44L102 51L100 59C99 79 86 95 66 96C54 96 43 90 37 84L23 95Q15 98 19 91Z"/>
+    <path d="M59 91H65L70 101H64ZM79 91H85L91 101H85Z"/>
+    <rect x="30" y="101" width="71" height="6" rx="3"/>
+  </g>
+</svg>

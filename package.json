@@ -1,9 +1,9 @@
 {
-  "name": "texthop",
-  "productName": "TextHop",
-  "version": "0.11.0",
-  "description": "A thoughtful desktop companion for text, translation and offline OCR",
-  "author": "TextHop contributors",
+  "name": "readfinch",
+  "productName": "ReadFinch",
+  "version": "0.12.0",
+  "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
+  "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
   "private": true,
   "type": "module",
@@ -34,7 +34,8 @@
     "dist": "npm run build && electron-builder",
     "format": "prettier --write src scripts tests vite.config.ts package.json tsconfig.json",
     "fixtures": "node scripts/fixtures-server.mjs",
-    "schema": "tsx scripts/schema.ts"
+    "schema": "tsx scripts/schema.ts",
+    "docs:readme": "node scripts/readmes.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.4",
@@ -123,8 +124,8 @@
       ],
       "category": "public.app-category.productivity",
       "extendInfo": {
-        "NSScreenCaptureUsageDescription": "TextHop captures only the region you choose for OCR.",
-        "NSAppleEventsUsageDescription": "TextHop reads selections after you enable accessibility."
+        "NSScreenCaptureUsageDescription": "ReadFinch captures only the region you choose for OCR.",
+        "NSAppleEventsUsageDescription": "ReadFinch reads selections after you enable accessibility."
       }
     },
     "linux": {
@@ -133,15 +134,23 @@
         "deb"
       ],
       "category": "Utility",
-      "executableName": "texthop",
+      "executableName": "readfinch",
       "desktop": {
         "entry": {
-          "Name": "TextHop",
+          "Name": "ReadFinch",
           "StartupWMClass": "app.texthop.TextHop"
         }
       },
       "syncDesktopName": true
     },
     "icon": "src/renderer/public/icon.png"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xlane/ReadFinch.git"
+  },
+  "homepage": "https://github.com/0xlane/ReadFinch#readme",
+  "bugs": {
+    "url": "https://github.com/0xlane/ReadFinch/issues"
   }
 }

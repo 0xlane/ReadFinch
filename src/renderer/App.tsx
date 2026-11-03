@@ -68,7 +68,7 @@ function SettingsApp({
       <header className="window-titlebar">
         <BrandMark />
         <span>
-          TextHop <span className="muted">{t("设置")}</span>
+          {t("伴读雀")} <span className="muted">{t("设置")}</span>
         </span>
         <div className="grow" />
         <button
@@ -143,7 +143,9 @@ function SettingsApp({
                   : t("划词服务需检查")}
             </span>
           </div>
-          <span className="app-version">TextHop {snapshot.version}</span>
+          <span className="app-version">
+            {t("伴读雀")} {snapshot.version}
+          </span>
         </div>
       </aside>
       <main className="settings-content" ref={content}>
@@ -169,6 +171,9 @@ export function App() {
     setLocale(snapshot.interfaceLocale);
     document.documentElement.lang = snapshot.interfaceLocale;
   }
+  useEffect(() => {
+    document.title = t("伴读雀");
+  }, [snapshot?.interfaceLocale]);
   if (!snapshot)
     return (
       <div className="boot-message" role="status">

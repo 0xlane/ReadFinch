@@ -35,7 +35,7 @@ export function CommandChooser({
     const description = t(descriptions[action.id] ?? "处理选中的文字");
     return (
       <button
-        className="command-choice"
+        className="launcher-command"
         key={action.id}
         data-command={action.id}
         aria-label={label}
@@ -43,18 +43,18 @@ export function CommandChooser({
         disabled={disabled}
         onClick={() => onRun(action)}
       >
-        <span className="command-choice-icon" aria-hidden="true">
+        <span className="launcher-command-icon" aria-hidden="true">
           <ActionIcon icon={action.icon} size={22} />
         </span>
-        <span className="command-choice-copy">
-          <span className="command-choice-name">{label}</span>
-          <span className="command-choice-detail" data-shortcut={!!shortcut}>
-            <span className="command-choice-description">{description}</span>
+        <span className="launcher-command-copy">
+          <span className="launcher-command-name">{label}</span>
+          <span className="launcher-command-detail" data-shortcut={!!shortcut}>
+            <span className="launcher-command-description">{description}</span>
             {shortcut && <kbd>{shortcut}</kbd>}
           </span>
         </span>
         <ChevronRight
-          className="command-choice-arrow"
+          className="launcher-command-arrow"
           size={14}
           aria-hidden="true"
         />
@@ -63,11 +63,11 @@ export function CommandChooser({
   }
   return (
     <section className="command-chooser" aria-label={t("选择指令")}>
-      <div className="command-choice-grid">{primary.map(entry)}</div>
+      <div className="launcher-command-grid">{primary.map(entry)}</div>
       {additional.length > 0 && (
         <>
           <button
-            className="command-choice-more"
+            className="launcher-command-more"
             aria-label={t("更多指令")}
             aria-expanded={expanded}
             aria-controls="additional-commands"
@@ -80,7 +80,7 @@ export function CommandChooser({
           {expanded && (
             <div
               id="additional-commands"
-              className="command-choice-grid command-choice-additional"
+              className="launcher-command-grid launcher-command-additional"
             >
               {additional.map(entry)}
             </div>

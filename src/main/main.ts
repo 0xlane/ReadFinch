@@ -1,3 +1,4 @@
+import { APP_NAME, LEGACY_APP_NAME, APP_ID } from "../shared/brand";
 import { OnlineVoiceIdSchema } from "../shared/tts";
 import {
   app,
@@ -96,10 +97,12 @@ import { Secrets } from "./secrets";
 
 const dataArg = process.argv.find((a) => a.startsWith("--data-dir="));
 if (dataArg) app.setPath("userData", path.resolve(dataArg.slice(11)));
-app.setName("TextHop");
+else
+  app.setPath("userData", path.join(app.getPath("appData"), LEGACY_APP_NAME));
+// Keep the storage/keychain identity so the rename cannot orphan settings or credentials.
+app.setName(LEGACY_APP_NAME);
 app.commandLine.appendSwitch("enable-features", "GlobalShortcutsPortal");
-if (process.platform === "linux")
-  app.setDesktopName("app.texthop.TextHop.desktop");
+if (process.platform === "linux") app.setDesktopName(APP_ID + ".desktop");
 const root = app.getAppPath();
 const resource = app.isPackaged ? process.resourcesPath : root;
 const nativeRoot = path.join(resource, "native");
@@ -149,7 +152,7 @@ let settings: DavSettings = {
   enabled: false,
   url: "",
   username: "",
-  remotePath: "TextHop/config.json",
+  remotePath: "ReadFinch/config.json",
 };
 let shortcutErrors: string[] = [];
 let shortcutRecording = "";
@@ -257,6 +260,7 @@ async function configChanged() {
     cancelSuggestion();
   resultCache.configure(store.config.cache);
   setLocale(interfaceLocale());
+  for (const win of BrowserWindow.getAllWindows()) win.setTitle(t("伴读雀"));
   nativeTheme.themeSource = store.config.appearance.theme;
   applyTheme();
   const selection = native.current;
@@ -332,7 +336,7 @@ function updateTray() {
       ? t("自动划词已开启")
       : native.status;
   tray.setImage(trayIcon());
-  tray.setToolTip(`TextHop · ${description}`);
+  tray.setToolTip(`${t("伴读雀")} · ${description}`);
   const menu = Menu.buildFromTemplate([
     {
       label: t("划词工具栏"),
@@ -387,9 +391,9 @@ function updateTray() {
         updateTray();
       },
     },
-    { label: `TextHop ${app.getVersion()}`, enabled: false },
+    { label: `${t("伴读雀")} ${app.getVersion()}`, enabled: false },
     {
-      label: t("退出 TextHop"),
+      label: t("退出伴读雀"),
       click: () => {
         quitting = true;
         app.quit();
@@ -421,7 +425,7 @@ function createWindow(
     show: false,
     frame: false,
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#202020" : "#ffffff",
-    title: "TextHop",
+    title: t("伴读雀"),
     icon: path.join(
       root,
       "dist/renderer",
@@ -1055,7 +1059,7 @@ async function visionTestImage() {
     await win.loadURL(
       "data:text/html;charset=utf-8," +
         encodeURIComponent(
-          '<html><body style="background:white;color:black;font:32px Arial;padding:18px">TextHop OCR 123<br>你好，世界！</body></html>',
+          '<html><body style="background:white;color:black;font:32px Arial;padding:18px">ReadFinch OCR 123<br>你好，世界！</body></html>',
         ),
     );
     await new Promise((resolve) => setTimeout(resolve, 250));
@@ -1623,7 +1627,7 @@ async function handle(
         await synthesizeSpeech(
           { ...p, headers },
           key,
-          "TextHop",
+          APP_NAME,
           voice,
           1,
           AbortSignal.timeout(p.timeoutMs),
@@ -1632,7 +1636,7 @@ async function handle(
       }
       const result = await complete(
         { ...p, headers },
-        [{ role: "user", content: "Reply with exactly: TextHop OK" }],
+        [{ role: "user", content: "Reply with exactly: ReadFinch OK" }],
         key,
         new AbortController().signal,
         () => {},
@@ -1762,7 +1766,7 @@ async function handle(
       return native.current ?? null;
     case "exportConfig": {
       const result = await dialog.showSaveDialog(win, {
-        defaultPath: "TextHop-config.json",
+        defaultPath: APP_NAME + "-config.json",
         filters: [{ name: "JSON", extensions: ["json"] }],
       });
       if (result.canceled || !result.filePath) return null;
@@ -2028,7 +2032,7 @@ if (!app.requestSingleInstanceLock()) {
     .whenReady()
     .then(boot)
     .catch((error) => {
-      dialog.showErrorBox(t("TextHop 启动失败"), (error as Error).message);
+      dialog.showErrorBox(t("伴读雀启动失败"), (error as Error).message);
       app.quit();
     });
   app.on("second-instance", (_event, argv) => {

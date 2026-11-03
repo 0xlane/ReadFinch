@@ -33,7 +33,7 @@ flowchart LR
 
 框选窗口覆盖完整显示器，包含任务栏所在区域；屏幕快照按原始设备像素显示。选区通过遮罩留空露出同一张原图，不重复缩放或绘制选区背景。图片解码完成后才显示窗口，拖动时隐藏操作提示，尺寸标注使用实际截图像素。Esc 或右键取消，单击后可以重新开始拖选。
 
-Windows 的无边框窗口默认仍可能带有原生框架，并受工作区尺寸限制；TextHop 为截图窗口关闭这些边框，并使用全屏边界。[Electron 窗口选项](https://www.electronjs.org/docs/latest/api/base-window#new-basewindowoptions)
+Windows 的无边框窗口默认仍可能带有原生框架，并受工作区尺寸限制；ReadFinch 为截图窗口关闭这些边框，并使用全屏边界。[Electron 窗口选项](https://www.electronjs.org/docs/latest/api/base-window#new-basewindowoptions)
 
 在 2560×1440、125% 缩放的 Windows 显示器上，回归检查覆盖 2048×1152 的逻辑视口，并将选区预览与原始屏幕快照逐像素比较；预览和裁剪图像均一致。不同缩放比例及多显示器环境仍应单独验证。[框选检查记录](input-flow-verification.json)
 
@@ -65,7 +65,7 @@ npm run test:ocr
 
 1. 到“设置 → API 提供商”添加预设服务商或自定义 OpenAI 兼容接口，填写基础地址与 API Key。
 2. 在提供商表单中选择支持图片输入的模型。然后到截图识别页选择该提供商，或在提供商表单的功能开关中开启 OCR。
-3. 到“截图识别”核对所选提供商，点击“用样例图片测试”。实际发送一张包含 `TextHop OCR 123` 和中文的 PNG，核对返回文字。切换服务或模型后清除之前的测试结果。
+3. 到“截图识别”核对所选提供商，点击“用样例图片测试”。实际发送一张包含 `ReadFinch OCR 123` 和中文的 PNG，核对返回文字。切换服务或模型后清除之前的测试结果。
 4. 日常截图先展示原图与发送目标，点击识别后才发送。内置离线引擎始终可选；删除正在使用的 OCR 模型会恢复默认离线识别。
 
 OCR 没有统一专用模型协议。本版选择 OpenAI 兼容 Chat Completions 的图片输入：`messages[].content` 包含文字指令与 `image_url` data URL。仅支持这种接口的视觉模型；专用文档识别 API、只支持文字的模型不在此适配范围。OpenAI 的[图片输入文档](https://developers.openai.com/api/docs/guides/images-vision)说明了这一格式；[阿里云百炼](https://help.aliyun.com/zh/model-studio/qwen-api-via-openai-chat-completions)、[硅基流动](https://docs.siliconflow.cn/docs/api/chat-completions-post)和 [Gemini 的兼容接口](https://ai.google.dev/gemini-api/docs/openai)也提供相应图片请求格式。具体模型仍须实际测试。

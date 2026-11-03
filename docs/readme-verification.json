@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-03T05:20:43.228Z",
+  "languages": [
+    "zh-CN",
+    "en",
+    "zh-TW",
+    "ja",
+    "ko",
+    "fr",
+    "de",
+    "es"
+  ],
+  "defaultLanguage": "en",
+  "readmes": 8,
+  "localLinksAndImagesChecked": 184,
+  "render": "GitHub Markdown API output inspected in a local browser, light and dark",
+  "scope": "Documentation and icon appearance; this is not a cross-platform desktop acceptance test."
+}

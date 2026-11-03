@@ -14,6 +14,7 @@ import { t } from "../shared/i18n";
 export const LOGIN_ARG = "--autostart";
 const args = () =>
   app.isPackaged ? [LOGIN_ARG] : [app.getAppPath(), LOGIN_ARG];
+// Retain the registration key so existing startup preferences are not duplicated.
 const windowsName = () => (app.isPackaged ? "TextHop" : "TextHop Development");
 const windowsCommand = () => ({
   path:
@@ -85,7 +86,7 @@ export function setLoginEnabled(enabled: boolean) {
   } else if (process.platform === "darwin") {
     app.setLoginItemSettings({ openAtLogin: enabled });
     if (enabled && app.getLoginItemSettings().status === "requires-approval")
-      throw Error(t("请在系统设置的登录项中允许 TextHop。"));
+      throw Error(t("请在系统设置的登录项中允许伴读雀。"));
   } else {
     const file = desktopFile();
     if (!enabled) rmSync(file, { force: true });
@@ -96,7 +97,7 @@ export function setLoginEnabled(enabled: boolean) {
       const entry = [
         "[Desktop Entry]",
         "Type=Application",
-        "Name=TextHop",
+        "Name=ReadFinch",
         "Exec=" + command,
         "Terminal=false",
         "",

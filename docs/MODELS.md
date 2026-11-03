@@ -34,7 +34,7 @@
 
 ## 陪读蛙参考
 
-参考 [Read Frog 1.54.1](https://github.com/mengxi-ream/read-frog) 的 `utils/constants/models.ts`、`translate-model-selector.tsx`、`components/model-suggestion-button.tsx` 和 `provider-editor.tsx`：内置候选、接口补充、自定义模型、功能分配。TextHop 将这些入口整合到统一的可搜索选择器，同一账户可通过复制提供商分别配置模型。未复用其私有布局引擎。
+参考 [Read Frog 1.54.1](https://github.com/mengxi-ream/read-frog) 的 `utils/constants/models.ts`、`translate-model-selector.tsx`、`components/model-suggestion-button.tsx` 和 `provider-editor.tsx`：内置候选、接口补充、自定义模型、功能分配。ReadFinch 将这些入口整合到统一的可搜索选择器，同一账户可通过复制提供商分别配置模型。未复用其私有布局引擎。
 
 ## 配置与验证
 

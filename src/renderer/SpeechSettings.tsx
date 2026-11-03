@@ -13,9 +13,9 @@ import { ProviderSelect } from "./ProviderSelect";
 import { speakText, stopSpeaking, useSpeechStatus, useVoices } from "./speech";
 
 const examples: Record<string, string> = {
-  en: "Hello from TextHop. This is my reading voice.",
-  zh: "你好，欢迎使用 TextHop。这是我的朗读声音。",
-  "zh-Hant": "你好，歡迎使用 TextHop。這是我的朗讀聲音。",
+  en: "Hello from ReadFinch. This is my reading voice.",
+  zh: "你好，欢迎使用伴读雀。这是我的朗读声音。",
+  "zh-Hant": "你好，歡迎使用伴讀雀。這是我的朗讀聲音。",
   ja: "こんにちは。これが私の読み上げ音声です。",
   ko: "안녕하세요. 이것이 저의 읽기 목소리입니다.",
   fr: "Bonjour. Voici ma voix de lecture.",

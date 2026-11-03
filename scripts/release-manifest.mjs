@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { readFile, stat, writeFile } from "node:fs/promises";
 
-const { version } = JSON.parse(await readFile("package.json", "utf8"));
+const { version, productName } = JSON.parse(
+  await readFile("package.json", "utf8"),
+);
 const files = [
-  `release/TextHop ${version}.exe`,
-  `release/TextHop Setup ${version}.exe`,
-  "release/win-unpacked/TextHop.exe",
+  `release/${productName} ${version}.exe`,
+  `release/${productName} Setup ${version}.exe`,
+  `release/win-unpacked/${productName}.exe`,
   "release/win-unpacked/resources/app.asar",
 ];
 const artifacts = [];

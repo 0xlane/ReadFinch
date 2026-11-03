@@ -1,5 +1,16 @@
 # 交付与验证报告
 
+2026-11-03 · **ReadFinch / 伴读雀 0.12.0**
+
+- 公开项目名、应用标题、程序文件名和项目描述改为 ReadFinch / 伴读雀。保留原存储身份和应用 ID，继续使用原配置目录、系统加密凭据与 SQLite 笔记。
+- 图标使用全新朝右的雀鸟轮廓、暖白底、炭灰和杏橙配色。检查了 16–256 像素应用图标、运行/暂停托盘图标和深浅色单色标志。[图标预览](brand/readfinch-icon-preview.png) · [品牌资源](brand/READFINCH.md)
+- 英文为默认 README，另有简体中文、繁體中文、日本語、한국어、Français、Deutsch、Español，与应用预设目标语言共用同一清单。184 个本地链接和图片引用有效，GitHub Markdown 渲染结果已检查深浅色。[文档检查](readme-verification.json)
+- 12 张中英文、深浅色功能截图来自实际 Electron 窗口，使用隔离配置和本机固定响应，不含私人账号或文本。[截图检查](readme-assets-verification.json)
+- 类型检查、80 项现有单元测试、生产构建通过。Windows 打包程序检查了设置、模型选择与功能分配、快捷键、SQLite 笔记、离线图标和随包中英文 OCR；无渲染错误。托盘开机启动交互使用隔离的系统登记模拟通过，未改变系统启动项。[打包检查](packaged-smoke.json)
+- Windows 便携版与 NSIS 安装包已生成；安装/卸载界面和 macOS/Linux 桌面交互不在本次验收范围。
+
+## 0.11.0
+
 2026-11-03 · **TextHop 0.11.0**
 
 - 类型检查、80 项单元测试通过。新增覆盖精简默认配置、翻译始终启用及旧快捷键冲突处理、词典版式迁移与自定义副本保留、配置助手提示词与凭据隔离。
@@ -66,7 +77,7 @@
 
 ## 交付产物
 
-当前 Windows x64 安装程序 `release/TextHop Setup 0.11.0.exe` 与便携程序 `release/TextHop 0.11.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
+当前 Windows x64 安装程序 `release/ReadFinch Setup 0.12.0.exe` 与便携程序 `release/ReadFinch 0.12.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
 
 ## 未完成验收
 
