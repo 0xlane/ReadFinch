@@ -27,6 +27,7 @@ export type JobEvent = {
 };
 export type Snapshot = {
   interfaceLocale: "zh-CN" | "en";
+  systemLanguages: string[];
   toolbarPausedUntil: number;
   version: string;
   config: Config;

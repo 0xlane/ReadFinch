@@ -1,0 +1,4 @@
+LobeHub Icons @lobehub/icons-static-webp 2.6.0; Copyright 2023 LobeHub; MIT (LICENSE.txt).
+Jalapeno Cloud and Tensdaq provider marks: Read Frog GPL-3.0 source, commit 96083134b111e56762f578b143bcd48e85058ba3.
+Source: https://github.com/mengxi-ream/read-frog/tree/96083134b111e56762f578b143bcd48e85058ba3/src/assets/providers
+Brand marks identify API services and do not imply endorsement. Custom endpoint marks use Lucide (ISC).

@@ -1,3 +1,5 @@
+import { isTranslationOnly } from "../shared/provider-presets";
+import { resolveResultLanguage } from "../shared/languages";
 import { t, actionLabel } from "../shared/i18n";
 import { stopSpeaking, useSpeechStatus } from "./speech";
 import { useEffect, useRef, useState } from "react";
@@ -72,6 +74,10 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const [context, setContext] = useState("");
   const [image, setImage] = useState<Capture | null>(null);
   const [target, setTarget] = useState(snapshot.config.defaults.targetLanguage);
+  useEffect(
+    () => setTarget(snapshot.config.defaults.targetLanguage),
+    [snapshot.config.defaults.targetLanguage],
+  );
   const [sourceLanguage, setSourceLanguage] = useState(
     snapshot.config.defaults.sourceLanguage,
   );
@@ -129,7 +135,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const selectedOcr = availableOcr.find((item) => item.id === ocrProfile);
   const configured =
     !!provider &&
-    !!provider.model &&
+    (!!provider.model || isTranslationOnly(provider)) &&
     (!provider.requiresKey ||
       snapshot.credentialIds.includes("text:" + provider.id));
 
@@ -304,6 +310,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     refresh = false,
   ) {
     if (running && kind === "ocr") return;
+    action = cfg.actions.find((current) => current.id === action.id) ?? action;
     if (!text.trim()) {
       setEditing(true);
       return;
@@ -322,11 +329,15 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     setEditing(false);
     setShowImage(false);
     setCopied(false);
-    action = cfg.actions.find((item) => item.id === action.id) ?? action;
+    const resultLanguage = resolveResultLanguage(
+      targetOverride ?? target,
+      cfg.appearance.language,
+      snapshot.systemLanguages,
+    );
     const requested =
       typeof override === "string"
         ? { providerId: override }
-        : override?.model
+        : override?.providerId
           ? override
           : undefined;
     const remembered =
@@ -344,7 +355,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     const selected = cfg.providers.find((item) => item.id === selectedId);
     setProviderId(selectedId);
     if (
-      !binding.model ||
+      (!binding.model && !(selected && isTranslationOnly(selected))) ||
       (selected?.requiresKey &&
         !snapshot.credentialIds.includes("text:" + selected.id))
     ) {
@@ -361,7 +372,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       source: text,
       sourceApp: noteSourceApp(session),
       model: binding.model,
-      targetLanguage: targetOverride ?? target,
+      targetLanguage: resultLanguage,
     };
     const id = crypto.randomUUID();
     currentJob.current = id;
@@ -374,7 +385,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         text,
         context,
         sourceLanguage,
-        targetLanguage: targetOverride ?? target,
+        targetLanguage: resultLanguage,
         providerId: selectedId,
         refresh,
       });
@@ -534,6 +545,11 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           <LanguageSelect
             label={t("目标语言")}
             value={target}
+            followLabel={resolveResultLanguage(
+              "system",
+              cfg.appearance.language,
+              snapshot.systemLanguages,
+            )}
             onChange={(value) => {
               setTarget(value);
               rememberTranslation({ targetLanguage: value });
@@ -946,7 +962,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   </button>
                   <Speak
                     language={
-                      activeAction.id === "translate" ? target : undefined
+                      activeAction.id === "translate"
+                        ? noteDraft.current?.targetLanguage
+                        : undefined
                     }
                     text={copyableResult(
                       result,
@@ -1151,6 +1169,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             config={cfg}
             value={providerId}
             label={t("文字提供商")}
+            purpose={"action:" + (activeAction?.id ?? "")}
             onChange={(id) => {
               const p = cfg.providers.find((p) => p.id === id);
               if (!p) return;

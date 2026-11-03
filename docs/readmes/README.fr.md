@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFi
 
 ### Votre fournisseur. Votre modèle. Votre choix.
 
-Utilisez les préréglages OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow et OpenRouter, ou connectez une API Chat Completions compatible OpenAI. Chaque entrée de fournisseur contient un modèle ; dupliquez-la pour en utiliser un autre. Traduction, dictionnaire, rédaction et reconnaissance d’image peuvent utiliser des fournisseurs différents. Les réglages proposent des suggestions de modèles, un test de connexion, la température et des en-têtes personnalisés.
+Choisissez parmi 33 options de fournisseurs, dont OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter et des services de traduction dédiés. Les API natives, Chat Completions et Responses sont pris en charge. Chaque entrée IA contient un modèle ; dupliquez-la pour en utiliser un autre. Attribuez des fournisseurs différents à la traduction, au dictionnaire, à la rédaction, à l’OCR et à la détection de langue. Suggestions de modèles, tests de connexion, température, en-têtes personnalisés et proxy par fournisseur sont disponibles.
 
 ### Lire dans votre langue
 
@@ -146,8 +146,9 @@ Windows a été vérifié sur la machine de développement. Des implémentations
 - [OCR hors ligne et API de vision](../../docs/OCR.md)
 - [Configuration et WebDAV](../../docs/CONFIGURATION.md)
 - [Plateformes et autorisations](../../docs/PLATFORMS.md)
+- [Langues de l’interface, des traductions et des explications](../../docs/LANGUAGES.md)
 
-La documentation technique est actuellement maintenue en chinois.
+La documentation technique est disponible en chinois ou en anglais.
 
 ## Faisons grandir ReadFinch
 

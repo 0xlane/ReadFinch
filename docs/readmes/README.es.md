@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ Selecciona texto en un navegador, lector de PDF o editor. ReadFinch muestra una 
 
 ### Tu proveedor. Tu modelo. Tú decides.
 
-Usa los ajustes predefinidos de OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow y OpenRouter, o conecta un endpoint Chat Completions compatible con OpenAI. Cada entrada de proveedor contiene un modelo; duplícala para usar otro. Traducción, diccionario, escritura y reconocimiento de imágenes pueden utilizar proveedores distintos. Los ajustes incluyen sugerencias de modelos, pruebas de conexión, temperatura y cabeceras personalizadas.
+Elige entre 33 opciones de proveedor, como OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter y servicios dedicados de traducción. Se admiten API nativas, Chat Completions y Responses. Cada entrada de IA contiene un modelo; duplícala para usar otro. Asigna proveedores distintos a traducción, diccionario, escritura, OCR y detección de idioma. Incluye sugerencias de modelos, pruebas de conexión, temperatura, cabeceras personalizadas y proxy por proveedor.
 
 ### Lee en tu idioma
 
@@ -146,8 +146,9 @@ Windows se ha comprobado en el equipo de desarrollo. Hay implementaciones para m
 - [OCR sin conexión y API de visión](../../docs/OCR.md)
 - [Configuración y WebDAV](../../docs/CONFIGURATION.md)
 - [Plataformas y permisos](../../docs/PLATFORMS.md)
+- [Idiomas de la interfaz, las traducciones y las explicaciones](../../docs/LANGUAGES.md)
 
-La documentación técnica se mantiene actualmente en chino.
+La documentación técnica está disponible en chino o en inglés.
 
 ## Ayuda a mejorar ReadFinch
 

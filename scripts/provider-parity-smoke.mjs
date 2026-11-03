@@ -37,7 +37,7 @@ const server = createServer((req, res) => {
   );
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const env = { ...process.env };
+const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
 delete env.ELECTRON_RUN_AS_NODE;
 async function launch() {
   app = await electron.launch({
@@ -93,29 +93,90 @@ try {
   await api("saveConfig", { config: s.config, revision: s.revision });
   await api("settingsOpen", { tab: "text" });
   assert.equal(await modelField().inputValue(), "gpt-6-luna");
-  const names = {
-    openai: "OpenAI",
-    deepseek: "DeepSeek",
-    qwen: "阿里云百炼",
-    siliconflow: "硅基流动",
-    gemini: "Gemini",
-    openrouter: "OpenRouter",
-  };
-  for (const [preset, expected] of Object.entries(catalog.providers)) {
+  await page.getByRole("button", { name: "添加提供商", exact: true }).click();
+  assert.equal(await page.locator("[data-provider-preset]").count(), 33);
+  for (const theme of ["light", "dark"]) {
+    await api("setTheme", { theme });
+    await page.waitForTimeout(100);
+    assert.ok(
+      await page
+        .getByRole("dialog")
+        .locator("img")
+        .evaluateAll((images) =>
+          images.every((img) => img.complete && img.naturalWidth > 0),
+        ),
+      "Every provider mark is bundled offline",
+    );
+    assert.ok(
+      await page
+        .getByRole("dialog")
+        .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+    );
+    await page
+      .getByRole("dialog")
+      .screenshot({ path: out + "/all-providers-" + theme + ".png" });
+  }
+  await page.getByRole("button", { name: "关闭添加提供商" }).click();
+  await api("setTheme", { theme: "light" });
+  checks.push(
+    "All 33 provider choices have working offline icons and no horizontal overflow in both themes",
+  );
+  for (const [preset, expected] of Object.entries({
+    ...catalog.providers,
+    deepl: null,
+    deeplx: null,
+    "google-translate": null,
+    "microsoft-translate": null,
+  })) {
     const before = (await state()).config.providers.length;
     await page.getByRole("button", { name: "添加提供商", exact: true }).click();
     await page
       .getByRole("dialog")
-      .getByRole("button", { name: names[preset], exact: true })
+      .locator(`[data-provider-preset="${preset}"]`)
       .click();
     s = await saved((c) => c.providers.length === before + 1);
     const p = s.config.providers.at(-1);
     assert.equal(p.preset, preset);
-    assert.equal(p.model, expected.defaultModel);
+    assert.equal(p.model, expected?.defaultModel ?? "");
+    if (!expected) {
+      assert.equal(await modelField().count(), 0);
+      assert.equal(await customField().count(), 0);
+      await page.locator(".provider-disclosure").click();
+      assert.equal(
+        await page
+          .locator(".model-assignment-list")
+          .getByRole("switch")
+          .count(),
+        1,
+      );
+      continue;
+    }
     assert.equal(
       await (p.customModel ? customField() : modelField()).inputValue(),
       expected.defaultModel,
     );
+    if (preset === "azure") {
+      await page
+        .getByLabel("Azure 资源名称", { exact: true })
+        .fill("my-resource");
+      await saved(
+        (c) =>
+          c.providers.at(-1).endpoint ===
+          "https://my-resource.openai.azure.com/openai/v1",
+      );
+      await page.getByLabel("API 模式", { exact: true }).selectOption("chat");
+      await saved(
+        (c) => c.providers.at(-1).providerSettings.apiMode === "chat",
+      );
+    }
+    if (preset === "bedrock") {
+      await page.getByLabel("AWS 区域", { exact: true }).fill("eu-west-1");
+      await saved(
+        (c) =>
+          c.providers.at(-1).endpoint ===
+          "https://bedrock-runtime.eu-west-1.amazonaws.com",
+      );
+    }
   }
   checks.push(
     "Every preset adds and autosaves the upstream default model; no network request on add",
@@ -135,7 +196,9 @@ try {
   );
   assert.equal(await page.getByText("语音模型", { exact: true }).count(), 1);
   await page.mouse.move(1, 1);
-  await page.locator(".provider-editor").screenshot({path:out + "/provider-default-model.png"});
+  await page
+    .locator(".provider-editor")
+    .screenshot({ path: out + "/provider-default-model.png" });
   await input.fill("gpt-4.1-mini");
   await page
     .locator(".model-dropdown")
@@ -253,7 +316,7 @@ try {
   await page.getByRole("button", { name: "添加提供商", exact: true }).click();
   await page
     .getByRole("dialog")
-    .getByRole("button", { name: "自定义接口", exact: true })
+    .locator('[data-provider-preset="custom"]')
     .click();
   await saved((c) => c.providers.at(-1).preset === "custom");
   assert.equal(await customField().inputValue(), "");

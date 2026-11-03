@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-03T09:22:47.982Z",
+  "version": "0.15.0",
+  "checks": [
+    "Native Gemini streaming connection test uses the configured desktop proxy",
+    "Desktop OCR reaches native Gemini with image data and the same proxy",
+    "Command trial works without a model; switching between native and pure providers updates the result and reuses cache"
+  ],
+  "rendererErrors": [],
+  "scope": "Isolated Electron profile, local HTTP origin and proxy; no paid provider credentials."
+}

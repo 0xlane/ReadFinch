@@ -436,6 +436,7 @@ export function SpeechSettings({
             config={config}
             value={value.onlineProviderId}
             label={t("在线朗读提供商")}
+            purpose="tts"
             emptyLabel={t("不使用在线服务")}
             onChange={(onlineProviderId) => update({ onlineProviderId })}
           />

@@ -2,6 +2,8 @@ import { t, actionLabel } from "./i18n";
 import type { Action, Config, TextProfile } from "./config";
 import { OFFLINE_OCR_ID } from "./config";
 import { BUILTIN_MODELS } from "./model-catalog";
+import { supportsImages } from "./model-catalog";
+import { isTranslationOnly, supportsSpeech } from "./provider-presets";
 export { BUILTIN_MODELS, supportsImages } from "./model-catalog";
 
 export type ModelRef = { providerId: string; model: string };
@@ -12,11 +14,14 @@ export type ModelInfo = {
   source: "builtin" | "remote" | "saved";
 };
 export const catalogKey = (
-  provider: Pick<TextProfile, "id" | "endpoint" | "proxy">,
+  provider: Pick<TextProfile, "id" | "endpoint" | "proxy"> &
+    Partial<Pick<TextProfile, "preset" | "providerSettings">>,
 ) =>
   JSON.stringify([
     provider.id,
     provider.endpoint,
+    provider.preset,
+    provider.providerSettings,
     provider.proxy.mode,
     provider.proxy.mode === "custom" ? provider.proxy.address.trim() : "",
   ]);
@@ -111,6 +116,10 @@ export function assignProvider(
   purpose: string,
   providerId: string | null,
 ): Config {
+  if (providerId) {
+    const provider = config.providers.find((p) => p.id === providerId);
+    if (!provider || !providerCanServe(provider, purpose)) return config;
+  }
   if (purpose === "tts")
     return { ...config, tts: { ...config.tts, onlineProviderId: providerId } };
   if (purpose === "noteSuggestion")
@@ -146,4 +155,11 @@ export function assignProvider(
       purpose === "action:" + a.id ? { ...a, providerId } : a,
     ),
   };
+}
+export function providerCanServe(provider: TextProfile, purpose: string) {
+  if (purpose === "action:translate") return true;
+  if (isTranslationOnly(provider)) return false;
+  if (purpose === "ocr") return supportsImages(provider);
+  if (purpose === "tts") return supportsSpeech(provider);
+  return true;
 }

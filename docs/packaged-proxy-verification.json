@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-03T07:35:31.373Z",
-  "version": "0.14.0",
+  "date": "2026-11-03T09:22:57.401Z",
+  "version": "0.15.0",
   "checks": [
     "Custom proxy autosaves and routes model discovery, connection tests, streamed text, vision, language detection and speech",
     "Global follows the app's system session; disabled bypasses it; switching modes retains the custom address",

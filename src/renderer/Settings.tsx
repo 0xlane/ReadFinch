@@ -1,4 +1,5 @@
 import { t, actionLabel } from "../shared/i18n";
+import { resolveResultLanguage } from "../shared/languages";
 import { useEffect, useState, useRef, type ReactNode } from "react";
 import { catalogKey, suggestionAction, assignProvider } from "../shared/models";
 import { ProviderSelect } from "./ProviderSelect";
@@ -332,7 +333,9 @@ export function Settings({
       const key = catalogKey(profile);
       await save();
       await flushCredentials();
-      const result = await window.readfinch.call("listModels", { profileId: id });
+      const result = await window.readfinch.call("listModels", {
+        profileId: id,
+      });
       setCatalogs((current) => ({ ...current, [key]: result }));
       return result;
     },
@@ -521,6 +524,11 @@ export function Settings({
               <Field label={t("默认目标语言")}>
                 <LanguageSelect
                   label={t("默认目标语言")}
+                  followLabel={resolveResultLanguage(
+                    "system",
+                    draft.appearance.language,
+                    snapshot.systemLanguages,
+                  )}
                   value={draft.defaults.targetLanguage}
                   onChange={(v) =>
                     setDraft({
@@ -530,9 +538,19 @@ export function Settings({
                   }
                 />
               </Field>
-              <Field label={t("修改说明与词义语言")}>
+              <Field
+                label={t("修改说明与词义语言")}
+                hint={t(
+                  "词义、语法分析和修改说明使用的语言；写作改进保留原文语言。",
+                )}
+              >
                 <LanguageSelect
                   label={t("解释语言")}
+                  followLabel={resolveResultLanguage(
+                    "system",
+                    draft.appearance.language,
+                    snapshot.systemLanguages,
+                  )}
                   value={draft.defaults.explanationLanguage}
                   onChange={(v) =>
                     setDraft({

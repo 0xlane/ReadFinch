@@ -1,5 +1,6 @@
 import type { TextProfile } from "./config";
 import { BUILTIN_MODELS, defaultProviderModel } from "./model-catalog";
+import { isCustomProvider } from "./provider-presets";
 
 // The active model remains a single ID. Remember the list choice while editing a custom ID.
 export function chooseProviderModel(
@@ -8,7 +9,7 @@ export function chooseProviderModel(
   custom: boolean,
 ): TextProfile {
   const builtin = BUILTIN_MODELS[provider.preset].some((m) => m.id === model);
-  const customModel = provider.preset === "custom" || custom || !builtin;
+  const customModel = isCustomProvider(provider.preset) || custom || !builtin;
   return {
     ...provider,
     model,
@@ -26,7 +27,7 @@ export function toggleCustomModel(
   provider: TextProfile,
   custom: boolean,
 ): TextProfile {
-  if (provider.preset === "custom" || custom)
+  if (isCustomProvider(provider.preset) || custom)
     return chooseProviderModel(provider, provider.model, true);
   const candidates = BUILTIN_MODELS[provider.preset];
   const model =

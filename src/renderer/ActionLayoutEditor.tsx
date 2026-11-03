@@ -30,6 +30,7 @@ import {
   type TemplateId,
 } from "../shared/action-templates";
 import { t } from "../shared/i18n";
+import { localizedSample } from "../shared/action-samples";
 import { SchemaResult } from "./SchemaResult";
 import { ActionDialog } from "./ActionFields";
 import type { LiquidHandle } from "./LiquidEditor";
@@ -44,7 +45,13 @@ function resetSample(action: Action): OutputSample {
         k !== "blank" &&
         fields.some((f) => f.id === definition(k).outputSchema[0].id),
     ) ?? "blank";
-  const sample = definition(kind).sample;
+  const sample = action.sample
+    ? localizedSample(
+        kind,
+        action.sample.targetLanguage,
+        action.sample.explanationLanguage,
+      )
+    : definition(kind).sample;
   return {
     ...sample,
     values: Object.fromEntries(

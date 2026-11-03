@@ -1,7 +1,7 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
@@ -39,10 +39,18 @@
     "models:sync": "node scripts/sync-provider-catalog.mjs"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "5.0.113",
+    "@ai-sdk/anthropic": "4.0.78",
+    "@ai-sdk/azure": "4.0.99",
+    "@ai-sdk/cohere": "4.0.59",
+    "@ai-sdk/google": "4.0.93",
+    "@ai-sdk/open-responses": "2.0.63",
+    "@ai-sdk/provider": "4.0.26",
     "@codemirror/autocomplete": "^6.20.4",
     "@codemirror/lang-liquid": "^6.3.3",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
+    "ai-sdk-ollama": "4.4.0",
     "codemirror": "^6.0.2",
     "diff": "^8.0.2",
     "dompurify": "^3.4.17",

@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-03T08:40:00.358Z",
+  "version": "0.15.0",
+  "scope": "Live public translation endpoints via Electron with system proxy; only the built-in Hello, world! sample was sent. No credentials.",
+  "results": [
+    {
+      "provider": "google-translate",
+      "ok": false,
+      "error": "Error: 无法连接服务，请检查服务地址、代理设置和网络"
+    },
+    {
+      "provider": "microsoft-translate",
+      "ok": true,
+      "result": "连接成功 · 你好，世界！"
+    }
+  ]
+}

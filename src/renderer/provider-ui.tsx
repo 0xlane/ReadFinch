@@ -7,14 +7,33 @@ export function ProviderIcon({ preset }: { preset: ProviderPreset }) {
       className={"provider-icon provider-icon-" + preset}
       aria-hidden="true"
     >
-      {preset === "custom" ? (
-        <SlidersHorizontal size={16} />
-      ) : (
-        <img
-          src={"./provider-icons/" + preset + ".svg"}
-          alt=""
-          draggable={false}
+      {preset === "custom" || preset === "open-responses" ? (
+        <SlidersHorizontal
+          size={16}
+          style={{ color: preset === "open-responses" ? "#5484ec" : undefined }}
         />
+      ) : (
+        <>
+          {["light", "dark"].map((theme) => (
+            <img
+              key={theme}
+              className={"provider-mark-" + theme}
+              src={
+                "./provider-icons/" +
+                preset +
+                "-" +
+                theme +
+                (preset === "jalapenocloud"
+                  ? ".png"
+                  : preset === "tensdaq"
+                    ? ".svg"
+                    : ".webp")
+              }
+              alt=""
+              draggable={false}
+            />
+          ))}
+        </>
       )}
     </span>
   );

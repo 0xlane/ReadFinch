@@ -1,6 +1,10 @@
 import { t } from "../shared/i18n";
 import type { Config } from "../shared/config";
-import { assignProvider, type ModelPurpose } from "../shared/models";
+import {
+  assignProvider,
+  providerCanServe,
+  type ModelPurpose,
+} from "../shared/models";
 import { ProviderSelect } from "./ProviderSelect";
 
 const descriptions: Record<string, string> = {
@@ -25,7 +29,9 @@ export function FeatureProviders({
   purposes: ModelPurpose[];
   onChange: (value: Config) => void;
 }) {
-  const eligible = config.providers.filter((p) => p.enabled && p.model);
+  const eligible = config.providers.filter(
+    (p) => p.enabled && p.model && providerCanServe(p, "languageDetection"),
+  );
   const preferred =
     eligible.find((p) => p.id === config.defaults.textProfileId) ?? eligible[0];
   const llm = config.languageDetection.mode === "llm";
@@ -75,6 +81,7 @@ export function FeatureProviders({
                   config={config}
                   value={purpose.providerId}
                   vision={isOcr}
+                  purpose={purpose.id}
                   emptyLabel={
                     purpose.id === "tts"
                       ? t("不使用在线服务")

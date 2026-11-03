@@ -15,14 +15,24 @@ export function resolveLocale(
 export function setLocale(value: Locale) {
   active = value;
 }
-export function t(source: string, ...args: (string | number | undefined)[]) {
+export function getLocale() {
+  return active;
+}
+export function translate(
+  source: string,
+  locale: Locale,
+  ...args: (string | number | undefined)[]
+) {
   const result =
-    active === "en" && Object.hasOwn(english, source)
+    locale === "en" && Object.hasOwn(english, source)
       ? (english as Record<string, string>)[source]
       : source;
   return args.length
     ? result.replace(/\{(\d+)\}/g, (match, i) => String(args[i] ?? ""))
     : result;
+}
+export function t(source: string, ...args: (string | number | undefined)[]) {
+  return translate(source, active, ...args);
 }
 
 const builtinNames: Record<string, string> = {

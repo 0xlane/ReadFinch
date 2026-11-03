@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine We
 
 ### Dein Anbieter. Dein Modell. Deine Wahl.
 
-Nutze Vorlagen für OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow und OpenRouter oder verbinde einen OpenAI-kompatiblen Chat-Completions-Endpunkt. Jeder Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben und Bilderkennung können verschiedene Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur und eigene Request-Header sind in den Einstellungen verfügbar.
+Wähle aus 33 Anbieteroptionen, darunter OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter und reine Übersetzungsdienste. Native APIs, Chat Completions und Responses werden unterstützt. Jeder KI-Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben, OCR und Spracherkennung können unterschiedliche Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur, eigene Header und individuelle Proxy-Einstellungen sind verfügbar.
 
 ### In deiner Sprache lesen
 
@@ -146,8 +146,9 @@ Windows wurde auf dem Entwicklungsrechner geprüft. Implementierungen für macOS
 - [Offline-OCR und Vision-APIs](../../docs/OCR.md)
 - [Konfiguration und WebDAV](../../docs/CONFIGURATION.md)
 - [Plattformen und Berechtigungen](../../docs/PLATFORMS.md)
+- [Sprachen für Oberfläche, Übersetzung und Erklärungen](../../docs/LANGUAGES.md)
 
-Die technische Dokumentation wird derzeit auf Chinesisch gepflegt.
+Die technische Dokumentation ist auf Chinesisch oder Englisch verfügbar.
 
 ## ReadFinch gemeinsam verbessern
 

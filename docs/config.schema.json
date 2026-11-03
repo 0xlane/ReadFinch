@@ -254,11 +254,37 @@
             "enum": [
               "openai",
               "deepseek",
-              "qwen",
-              "siliconflow",
               "gemini",
+              "anthropic",
+              "xai",
+              "azure",
+              "bedrock",
+              "groq",
+              "deepinfra",
+              "mistral",
+              "togetherai",
+              "cohere",
+              "fireworks",
+              "cerebras",
+              "replicate",
+              "perplexity",
+              "ollama",
+              "qwen",
+              "moonshotai",
+              "huggingface",
+              "custom",
+              "open-responses",
+              "jalapenocloud",
+              "atlascloud",
               "openrouter",
-              "custom"
+              "minimax",
+              "siliconflow",
+              "tensdaq",
+              "volcengine",
+              "deeplx",
+              "deepl",
+              "google-translate",
+              "microsoft-translate"
             ]
           },
           "description": {
@@ -350,6 +376,31 @@
               "mode",
               "address"
             ],
+            "additionalProperties": false
+          },
+          "providerSettings": {
+            "type": "object",
+            "properties": {
+              "region": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]{1,60}$"
+              },
+              "resourceName": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9-]{1,100}$"
+              },
+              "apiVersion": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9.-]{1,60}$"
+              },
+              "apiMode": {
+                "type": "string",
+                "enum": [
+                  "responses",
+                  "chat"
+                ]
+              }
+            },
             "additionalProperties": false
           }
         },
@@ -558,6 +609,10 @@
                 "maxLength": 6000
               },
               "targetLanguage": {
+                "type": "string",
+                "maxLength": 80
+              },
+              "explanationLanguage": {
                 "type": "string",
                 "maxLength": 80
               },

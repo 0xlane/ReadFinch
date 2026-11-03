@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-03T09:21:55.854Z",
+  "version": "0.15.0",
+  "packaged": true,
+  "checks": [
+    "English settings expose English built-in instructions, schema and preview; fresh output preferences follow the app language.",
+    "Switching UI and output languages during streaming preserves the in-flight card and saves its original language/schema to the local notebase.",
+    "Regeneration uses the new UI schema, Japanese explanations and an independent French translation target.",
+    "Explicit output preferences and custom prompts survive locale switches; canonical storage avoids persisting derived translations."
+  ],
+  "rendererErrors": [],
+  "scope": "Isolated Electron profile and local streaming fixture; unit tests cover all eight output languages."
+}

@@ -1,6 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  isCustomProvider,
+  isTranslationOnly,
+  type ProviderPreset,
+} from "../src/shared/provider-presets";
+import {
   createProvider,
   defaultConfig,
   parseConfig,
@@ -26,7 +31,11 @@ test("built-in catalogs work without fetching, merge discovery and saved custom 
     false,
   );
   for (const [preset, entries] of Object.entries(BUILTIN_MODELS))
-    if (preset !== "custom") assert.ok(entries.length >= 1);
+    if (
+      !isCustomProvider(preset as ProviderPreset) &&
+      !isTranslationOnly({ preset: preset as ProviderPreset })
+    )
+      assert.ok(entries.length >= 1, preset);
 });
 test("each provider routes exactly one model to every assigned feature", () => {
   let c = defaultConfig();

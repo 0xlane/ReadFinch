@@ -1,9 +1,10 @@
 {
-  "date": "2026-11-03T06:18:21.639Z",
-  "version": "0.12.1",
+  "date": "2026-11-03T09:22:44.897Z",
+  "version": "0.15.0",
   "referenceCommit": "96083134b111e56762f578b143bcd48e85058ba3",
-  "upstreamTextModels": 85,
+  "upstreamTextModels": 418,
   "checks": [
+    "All 33 provider choices have working offline icons and no horizontal overflow in both themes",
     "Every preset adds and autosaves the upstream default model; no network request on add",
     "The selected ID remains visible; reopening scrolls to it; custom/builtin switching survives restart",
     "Custom mode fetches and searches 120 remote models without truncation or a modal",

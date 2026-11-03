@@ -47,20 +47,20 @@ const modelPath = "src/utils/constants/models.ts",
   defaultPath = "src/utils/constants/providers.ts";
 const models = readConstant(modelPath, "LLM_PROVIDER_MODELS");
 const defaults = readConstant(defaultPath, "DEFAULT_LLM_PROVIDER_MODELS");
-const aliases = {
-  openai: "openai",
-  deepseek: "deepseek",
-  qwen: "alibaba",
-  siliconflow: "siliconflow",
-  gemini: "google",
-  openrouter: "openrouter",
+const localIds = {
+  alibaba: "qwen",
+  google: "gemini",
+  "openai-compatible": "custom",
 };
+const aliases = Object.fromEntries(
+  Object.keys(defaults).map((id) => [localIds[id] ?? id, id]),
+);
 const providers = Object.fromEntries(
   Object.entries(aliases).map(([id, upstream]) => {
     const ids = models[upstream],
       model = defaults[upstream];
     if (
-      !ids.length ||
+      !ids?.length ||
       new Set(ids).size !== ids.length ||
       !ids.includes(model.model)
     )
@@ -69,9 +69,9 @@ const providers = Object.fromEntries(
       id,
       {
         upstream,
-        defaultModel: model.model,
+        defaultModel: model.model === "use-custom-model" ? "" : model.model,
         customModel: model.isCustomModel,
-        models: ids,
+        models: ids.filter((id) => id !== "use-custom-model"),
       },
     ];
   }),

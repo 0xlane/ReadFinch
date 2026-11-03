@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { X } from "lucide-react";
 import {
   providerPreset,
+  PROVIDER_PRESETS,
   type ProviderPreset,
 } from "../shared/provider-presets";
 import { ProviderIcon } from "./provider-ui";
@@ -15,12 +16,22 @@ const groups: {
   {
     title: "内置 LLM 提供商",
     description: "已预填 API 地址和默认模型，添加后可直接调整。",
-    presets: ["openai", "deepseek", "gemini", "qwen"],
+    presets: PROVIDER_PRESETS.filter((p) => p.group === "llm").map((p) => p.id),
   },
   {
     title: "兼容 API 提供商",
-    description: "通过 Chat Completions 接入自定义服务或模型平台。",
-    presets: ["custom", "openrouter", "siliconflow"],
+    description:
+      "兼容 Chat Completions 与 Open Responses 的自定义服务和模型平台。",
+    presets: PROVIDER_PRESETS.filter((p) => p.group === "compatible").map(
+      (p) => p.id,
+    ),
+  },
+  {
+    title: "纯翻译提供商",
+    description: "专注于翻译，不用于词典、写作改进或图片识别。",
+    presets: PROVIDER_PRESETS.filter((p) => p.group === "translation").map(
+      (p) => p.id,
+    ),
   },
 ];
 export function ProviderCatalog({
@@ -73,15 +84,13 @@ export function ProviderCatalog({
           <p>{t(group.description)}</p>
           <div className="provider-catalog">
             {group.presets.map((id) => (
-              <button key={id} onClick={() => onSelect(id)}>
+              <button
+                key={id}
+                data-provider-preset={id}
+                onClick={() => onSelect(id)}
+              >
                 <ProviderIcon preset={id} />
-                <span>
-                  {id === "custom"
-                    ? t("自定义接口")
-                    : id === "gemini"
-                      ? "Gemini"
-                      : t(providerPreset(id).name)}
-                </span>
+                <span>{t(providerPreset(id).name)}</span>
               </button>
             ))}
           </div>

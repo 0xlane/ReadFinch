@@ -13,21 +13,34 @@ import {
   OFFLINE_OCR_ID,
   upgradeProviders,
 } from "../src/shared/config";
-import { PROVIDER_PRESETS } from "../src/shared/provider-presets";
+import {
+  PROVIDER_PRESETS,
+  isTranslationOnly,
+} from "../src/shared/provider-presets";
+import { supportsImages } from "../src/shared/models";
 import { ConfigStore } from "../src/core/store";
 import { legacyConfig } from "./legacy-config";
 
 test("all presets create valid generic providers while offline OCR is always the default", () => {
   for (const preset of PROVIDER_PRESETS) {
     const config = defaultConfig();
-    config.providers = [createProvider(preset.id, "provider")];
-    config.defaults.textProfileId = "provider";
-    assert.equal(parseConfig(config).providers[0].endpoint, preset.endpoint);
+    const provider = createProvider(preset.id, "provider");
+    config.providers.push(provider);
+    if (!isTranslationOnly(provider))
+      config.defaults.textProfileId = "provider";
+    assert.equal(
+      parseConfig(config).providers.at(-1)!.endpoint,
+      preset.endpoint,
+    );
     assert.equal(config.defaults.ocrProfileId, OFFLINE_OCR_ID);
     assert.equal(ocrProfiles(config)[0].id, OFFLINE_OCR_ID);
-    config.providers[0].model = "vision-model";
-    assert.equal(ocrProfiles(config)[1].model, "vision-model");
-    assert.equal(ocrProfiles(config)[1].endpoint, config.providers[0].endpoint);
+    provider.model = "vision-model";
+    const remote = ocrProfiles(config).find((p) => p.id === provider.id);
+    assert.equal(!!remote, supportsImages(provider) !== false);
+    if (remote) {
+      assert.equal(remote.model, "vision-model");
+      assert.equal(remote.endpoint, provider.endpoint);
+    }
     assert.equal(config.defaults.ocrProfileId, OFFLINE_OCR_ID);
   }
 });

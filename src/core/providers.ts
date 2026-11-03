@@ -1,156 +1,35 @@
+import {
+  request,
+  auth,
+  providerAuth,
+  responseJson,
+  ProviderError,
+  httpError,
+  endpointUrl,
+  type Connection,
+} from "./provider-http";
+export {
+  setProviderTransport,
+  request,
+  ProviderError,
+  httpError,
+  endpointUrl,
+} from "./provider-http";
+export type { ProviderTransport } from "./provider-http";
+import {
+  isTranslationOnly,
+  providerProtocol,
+  supportsSpeech,
+} from "../shared/provider-presets";
+import { completeNative, synthesizeAzureSpeech } from "./provider-native";
+import { translateText } from "./provider-translation";
+import { completeReplicate } from "./provider-replicate";
 import { t } from "../shared/i18n";
 import type { TextProfile, OcrProfile, Action } from "../shared/config";
 import { promptVariables } from "../shared/config";
 import { jsonContract } from "../shared/action-output";
 
-type Connection<T> = T & {
-  headers?: Record<string, string>;
-  outputContract?: object;
-};
-
-export type ProviderTransport = (
-  url: string,
-  init: RequestInit,
-  profile: Pick<TextProfile, "id" | "proxy">,
-) => Promise<Response>;
-let transport: ProviderTransport = (url, init, profile) => {
-  if (profile.proxy?.mode === "custom")
-    throw new ProviderError("proxy", t("自定义代理需要桌面应用的网络连接"));
-  return fetch(url, init);
-};
-export function setProviderTransport(value: ProviderTransport) {
-  transport = value;
-}
-
-export class ProviderError extends Error {
-  constructor(
-    readonly code: string,
-    message: string,
-  ) {
-    super(message);
-    this.name = "ProviderError";
-  }
-}
-export function httpError(status: number): ProviderError {
-  const errors: Record<number, [string, string]> = {
-    401: ["auth", t("凭据无效或已过期，请检查 API Key")],
-    403: ["auth", t("服务拒绝访问，请检查权限或额度")],
-    404: ["model", t("模型或接口不存在，请检查模型 ID 和服务地址")],
-    429: ["rate", t("请求过于频繁或额度不足，请稍后重试")],
-    400: [
-      "capability",
-      t("模型不支持此请求，请检查图片能力、模型 ID 或 API 协议"),
-    ],
-    413: ["image", t("图片过大，请缩小选区")],
-  };
-  const [code, message] = errors[status] ?? [
-    "service",
-    t("服务返回 HTTP {0}，请稍后重试", status),
-  ];
-  return new ProviderError(code, message);
-}
-export function endpointUrl(base: string, suffix: string) {
-  return base.replace(/\/+$/, "") + "/" + suffix;
-}
-export async function listModels(
-  profile: Connection<TextProfile>,
-  key: string | undefined,
-  signal: AbortSignal,
-): Promise<string[]> {
-  const res = await request(
-    endpointUrl(profile.endpoint, "models"),
-    { method: "GET", headers: auth(key, profile.requiresKey, profile.headers) },
-    signal,
-    Math.min(profile.timeoutMs, 30000),
-    profile,
-  );
-  if (!res.ok) throw httpError(res.status);
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  if (!res.body)
-    throw new ProviderError(
-      "models",
-      t("服务未返回模型列表，请手动填写模型 ID"),
-    );
-  for await (const chunk of res.body) {
-    size += chunk.length;
-    if (size > 2_000_000) {
-      await res.body.cancel().catch(() => {});
-      throw new ProviderError("models", t("模型列表过大，请手动填写模型 ID"));
-    }
-    chunks.push(chunk);
-  }
-  let body: any;
-  try {
-    body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    throw new ProviderError("models", t("模型列表格式无效，请手动填写模型 ID"));
-  }
-  if (!Array.isArray(body.data))
-    throw new ProviderError(
-      "models",
-      t("此接口不提供兼容的模型列表，请手动填写模型 ID"),
-    );
-  return [
-    ...new Set<string>(
-      body.data
-        .filter(
-          (p: any) =>
-            typeof p?.id === "string" && p.id.length > 0 && p.id.length <= 200,
-        )
-        .slice(0, 2000)
-        .map((p: any) => p.id),
-    ),
-  ].sort();
-}
-export async function request(
-  url: string,
-  init: RequestInit,
-  signal: AbortSignal,
-  timeoutMs: number,
-  profile: Pick<TextProfile, "id" | "proxy">,
-) {
-  const deadline = AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]);
-  try {
-    return await transport(
-      url,
-      {
-        ...init,
-        redirect: "error",
-        signal: deadline,
-      },
-      profile,
-    );
-  } catch (e) {
-    if (signal.aborted) throw new ProviderError("cancelled", t("请求已取消"));
-    if (deadline.aborted || (e as Error).name === "TimeoutError")
-      throw new ProviderError(
-        "timeout",
-        t("请求超时，请检查服务或增加超时时间"),
-      );
-    if (e instanceof ProviderError) throw e;
-    throw new ProviderError(
-      "network",
-      t("无法连接服务，请检查服务地址、代理设置和网络"),
-    );
-  }
-}
-function auth(
-  key: string | undefined,
-  required: boolean,
-  custom?: Record<string, string>,
-) {
-  const headers = new Headers({ "Content-Type": "application/json" });
-  if (key) headers.set("Authorization", "Bearer " + key);
-  for (const [name, value] of Object.entries(custom ?? {}))
-    headers.set(name, value);
-  if (required && !key && !headers.has("Authorization"))
-    throw new ProviderError(
-      "credential",
-      t("此服务尚未配置 API Key，请在设置中添加"),
-    );
-  return headers;
-}
+export { listModels } from "./provider-discovery";
 export async function synthesizeSpeech(
   profile: Connection<TextProfile>,
   key: string | undefined,
@@ -159,6 +38,10 @@ export async function synthesizeSpeech(
   speed: number,
   signal: AbortSignal,
 ) {
+  if (!supportsSpeech(profile))
+    throw new ProviderError("capability", t("此提供商不支持在线语音接口"));
+  if (profile.preset === "azure")
+    return synthesizeAzureSpeech(profile, key, text, voice, speed, signal);
   const res = await request(
     endpointUrl(profile.endpoint, "audio/speech"),
     {
@@ -241,8 +124,18 @@ export async function complete(
   signal: AbortSignal,
   onText: (text: string) => void,
 ): Promise<string> {
+  if (isTranslationOnly(profile)) {
+    if (!profile.translation)
+      throw new ProviderError("capability", t("纯翻译提供商只能用于翻译"));
+    return translateText(profile, profile.translation, key, signal, onText);
+  }
   if (!profile.model.trim())
     throw new ProviderError("model", t("尚未填写模型 ID，请先配置文字服务"));
+  const protocol = providerProtocol(profile);
+  if (protocol === "replicate")
+    return completeReplicate(profile, messages, key, signal, onText);
+  if (protocol !== "chat")
+    return completeNative(profile, messages, key, signal, onText);
   const deadline = AbortSignal.any([
     signal,
     AbortSignal.timeout(profile.timeoutMs),

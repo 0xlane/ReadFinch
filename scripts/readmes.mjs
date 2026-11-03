@@ -185,6 +185,7 @@ ${c.data.map((p) => p).join("\n\n")}
 - [${c.docs[2]}](${local("docs/OCR.md")})
 - [${c.docs[3]}](${local("docs/CONFIGURATION.md")})
 - [${c.docs[4]}](${local("docs/PLATFORMS.md")})
+- [${c.docs[5]}](${local("docs/LANGUAGES.md")})
 
 ${c.docsNote}
 

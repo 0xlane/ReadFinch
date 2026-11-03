@@ -51,6 +51,7 @@ export const LayoutSchema = z.string().max(32768);
 export const SampleSchema = z.strictObject({
   selection: z.string().max(6000),
   targetLanguage: z.string().max(80),
+  explanationLanguage: z.string().max(80).optional(),
   values: z.record(
     fieldId,
     z.union([z.string().max(6000), z.number(), z.null()]),

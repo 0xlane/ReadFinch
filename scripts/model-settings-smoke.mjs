@@ -182,7 +182,7 @@ try {
   await nav("API 提供商");
   await button("添加提供商").click();
   await page.getByRole("dialog").waitFor();
-  assert.equal(await page.locator(".provider-catalog button").count(), 7);
+  assert.equal(await page.locator(".provider-catalog button").count(), 33);
   await shots("catalog");
   await button("关闭添加提供商").click();
   await field("API 基础地址").fill(base + "/v1");
@@ -287,7 +287,10 @@ try {
   assert.equal(detection.body.messages[1].content.length, 500);
   assert.equal(detection.project, "local-fixture");
   assert.equal(requests.at(-1).body.model, "gpt-4.1-mini");
-  assert.match(requests.at(-1).body.messages[1].content, /Source language: fr/);
+  assert.match(
+    requests.at(-1).body.messages[1].content,
+    /(?:Source language: |源语言：)fr/,
+  );
   await job("runAction", {
     actionId: "dictionary",
     text: "word",

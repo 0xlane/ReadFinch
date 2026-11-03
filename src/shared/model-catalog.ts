@@ -1,4 +1,8 @@
-import type { ProviderPreset } from "./provider-presets";
+import {
+  PROVIDER_IDS,
+  isTranslationOnly,
+  type ProviderPreset,
+} from "./provider-presets";
 import type { TextProfile } from "./config";
 import catalog from "./provider-catalog.json";
 
@@ -26,21 +30,32 @@ export const SPEECH_MODELS: readonly BuiltinModel[] = [
   { id: "tts-1", vision: false, kind: "speech" },
   { id: "tts-1-hd", vision: false, kind: "speech" },
 ];
-export const BUILTIN_MODELS = Object.fromEntries([
-  ...Object.entries(catalog.providers).map(([preset, p]) => [
-    preset,
-    p.models.map((id) => ({ id, vision: capabilities[preset + ":" + id] })),
-  ]),
-  ["custom", []],
-]) as Record<ProviderPreset, readonly BuiltinModel[]>;
+export const BUILTIN_MODELS = Object.fromEntries(
+  PROVIDER_IDS.map((preset) => {
+    const p = catalog.providers[preset as keyof typeof catalog.providers];
+    return [
+      preset,
+      (p?.models ?? []).map((id) => ({
+        id,
+        vision: capabilities[preset + ":" + id],
+      })),
+    ];
+  }),
+) as unknown as Record<ProviderPreset, readonly BuiltinModel[]>;
 // Desktop speech is additional to Read Frog's text catalog and shown in its own group.
 BUILTIN_MODELS.openai = [...BUILTIN_MODELS.openai, ...SPEECH_MODELS];
 export function defaultProviderModel(preset: ProviderPreset) {
-  if (preset === "custom") return { model: "", customModel: true };
-  const item = catalog.providers[preset];
+  const item = catalog.providers[preset as keyof typeof catalog.providers];
+  if (!item) return { model: "", customModel: true };
   return { model: item.defaultModel, customModel: item.customModel };
 }
 export function supportsImages(p: TextProfile) {
+  if (
+    isTranslationOnly(p) ||
+    p.preset === "replicate" ||
+    p.preset === "perplexity"
+  )
+    return false;
   const known =
     BUILTIN_MODELS[p.preset].find((m) => m.id === p.model)?.vision ??
     capabilities[p.preset + ":" + p.model];

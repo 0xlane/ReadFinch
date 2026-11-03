@@ -39,6 +39,14 @@
   min-height: 48px;
   border-radius: 12px;
 }
+.command-rail .command-choice > button:first-of-type > span {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.35;
+}
 .command-choice > .command-grip {
   width: 15px;
   margin-right: -9px;

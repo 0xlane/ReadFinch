@@ -60,9 +60,12 @@ export class ConfigStore {
     const moves: CredentialMove[] = [];
     const config = parseConfig(raw, moves);
     this.credentialMoves = moves;
-    return config;
+    return this.normalize(config);
   }
-  constructor(readonly dir: string) {}
+  constructor(
+    readonly dir: string,
+    private readonly normalize: (config: Config) => Config = (config) => config,
+  ) {}
   get file() {
     return path.join(this.dir, "config.json");
   }
@@ -73,6 +76,7 @@ export class ConfigStore {
     return digest(this.value);
   }
   async init() {
+    this.value = this.normalize(this.value);
     await mkdir(this.dir, { recursive: true });
     try {
       this.value = this.readConfig(await readFile(this.file, "utf8"));
@@ -89,14 +93,14 @@ export class ConfigStore {
         );
         this.recovery = "配置损坏，已恢复上次有效备份；原文件已保留。";
       } catch {
-        this.value = defaultConfig();
+        this.value = this.normalize(defaultConfig());
         this.recovery = "配置损坏，已启动默认设置；原文件已保留在数据目录。";
       }
       await atomicWrite(this.file, JSON.stringify(this.value, null, 2));
     }
   }
   async save(input: unknown, expected = this.revision): Promise<Config> {
-    const next = parseConfig(input);
+    const next = parseConfig(this.normalize(parseConfig(input)));
     const serialized = JSON.stringify(next, null, 2) + "\n";
     if (Buffer.byteLength(serialized) > 2_000_000)
       throw Error("配置文件超过 2 MB");

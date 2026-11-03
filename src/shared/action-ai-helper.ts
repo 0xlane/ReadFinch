@@ -1,6 +1,6 @@
 import type { Action } from "./config";
 import { defaultLayout } from "./action-output";
-import { t, type Locale } from "./i18n";
+import { translate, type Locale } from "./i18n";
 
 // Public editor instructions, independently written for ReadFinch's renderer.
 // Accept only the current command and presentation context, never provider credentials.
@@ -9,6 +9,7 @@ export type HelperInput = {
   otherActionNames: readonly string[];
   uiLocale: Locale;
   targetLanguage: string;
+  explanationLanguage?: string;
 };
 
 function fence(value: string, language = "text") {
@@ -36,7 +37,9 @@ export function buildActionHelperPrompt({
   otherActionNames,
   uiLocale,
   targetLanguage,
+  explanationLanguage = targetLanguage,
 }: HelperInput) {
+  const t = (source: string) => translate(source, uiLocale);
   const labels = [
     "添加 AI 指令",
     "空白",
@@ -60,7 +63,7 @@ export function buildActionHelperPrompt({
     "重放",
     "试用指令",
   ]
-    .map((label) => "- " + label + ": " + t(label))
+    .map((label) => "- " + translate(label, uiLocale))
     .join("\n");
   const fieldNames = new Map(action.outputSchema?.map((f) => [f.id, f.name]));
   const mapped = Object.entries(action.noteConnection?.mappings ?? {})
@@ -90,7 +93,7 @@ ReadFinch is a desktop reading assistant. I select text in an application, invok
 2. For a substantial change, propose the fields and the result's appearance briefly so I can adjust them before you write all the settings.
 3. Give complete, paste-ready settings in the order of the editor. I will try them and report the result. When iterating, change only what is needed.
 
-Speak to me in ${uiLocale === "en" ? "English" : "Simplified Chinese"}, unless I use another language. The target language for AI results is currently ${JSON.stringify(targetLanguage)}.
+Speak to me in ${uiLocale === "en" ? "English" : "Simplified Chinese"}, unless I use another language. The target language for translations is currently ${JSON.stringify(targetLanguage)}. Definitions and explanations use ${JSON.stringify(explanationLanguage)}. Keep writing revisions in the source language unless I explicitly ask for translation.
 These are the exact labels in my interface; use the translated labels when directing me:
 ${labels}
 
@@ -117,7 +120,7 @@ Choose a concise name (at most 80 characters) distinct from my other commands. I
 I choose a provider already configured in API providers, or inherit the default provider. Each provider holds one model; it must support structured output. Never ask for or include API keys or request headers. If the task needs stronger reasoning, say so without inventing a configured provider.
 
 ### System prompt
-Describe the role, purpose, constraints, language and handling of unsuitable or missing input. Brief examples can improve reliability. Keep within 16,000 characters. English instructions are appropriate even when the result is Chinese; specify each field's language using the tokens above.
+Describe the role, purpose, constraints, language and handling of unsuitable or missing input. Brief examples can improve reliability. Keep within 16,000 characters. Use the interface language for editable instructions and specify each result field's language with the tokens above. The instruction language does not determine the output language.
 
 ### Prompt
 Keep the inputs explicit. A common starting point is:

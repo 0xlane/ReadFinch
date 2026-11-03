@@ -1,7 +1,8 @@
 import { t } from "../shared/i18n";
 import { ChevronDown, Layers2 } from "lucide-react";
 import type { Config } from "../shared/config";
-import { supportsImages } from "../shared/models";
+import { providerCanServe } from "../shared/models";
+import { isTranslationOnly } from "../shared/provider-presets";
 import { ProviderIcon } from "./provider-ui";
 
 export function ProviderSelect({
@@ -11,17 +12,21 @@ export function ProviderSelect({
   emptyLabel,
   onChange,
   vision = false,
+  purpose = "default",
 }: {
   config: Config;
   value: string | null;
   label: string;
   emptyLabel?: string;
   vision?: boolean;
+  purpose?: string;
   onChange: (id: string | null) => void;
 }) {
   const choices = config.providers.filter(
     (p) =>
-      p.enabled && (vision ? supportsImages(p) : p.model || p.id === value),
+      p.enabled &&
+      providerCanServe(p, vision ? "ocr" : purpose) &&
+      (p.model || isTranslationOnly(p) || p.id === value),
   );
   const selected = choices.find((p) => p.id === value);
   return (

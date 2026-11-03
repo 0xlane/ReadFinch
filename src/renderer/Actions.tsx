@@ -182,6 +182,7 @@ export function Actions({
         )}
         <button
           aria-label={actionLabel(a)}
+          title={actionLabel(a)}
           aria-pressed={a.id === current?.id}
           onClick={() => select(a.id)}
         >
@@ -293,6 +294,7 @@ export function Actions({
                       value={current.providerId}
                       emptyLabel={t("默认提供商")}
                       label={t("翻译提供商")}
+                      purpose="action:translate"
                       onChange={(id) => update({ providerId: id })}
                     />
                   </Field>

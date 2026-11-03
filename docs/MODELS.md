@@ -1,55 +1,88 @@
 # API 提供商与功能分配
 
-一个提供商包含一组连接设置和一个模型。新增预置提供商会自动填入默认模型；模型字段直接展开可搜索列表，打开时保留当前值，并定位到当前选项。选择后自动保存。
+伴读雀提供 **33 种连接选项**：20 种 LLM 提供商、9 种兼容 API 提供商，以及 4 种纯翻译服务。安装后只创建一个 OpenAI 示例，按需添加账户。每个 AI 提供商条目使用一个模型；同一账户需要多个模型时可点击「复制」。
 
-勾选「输入自定义模型 ID」可填写私有模型；切回列表模式会恢复此前选择的内置模型，重启后同样有效。「获取模型列表」在两种模式下都可使用。自定义接口直接填写 ID，不显示没有意义的模式开关。获取失败或返回空列表不会清空已经选择的模型。
+## 提供商范围
 
-同一账号需要第二个模型时，点击表单底部的「复制」。副本具有独立的名称、模型和用途，地址、温度、推理强度、流式偏好、超时、OCR 指令和端点绑定的本机凭据随副本复制。
+- **LLM**：OpenAI、DeepSeek、Gemini、Anthropic、Grok、Azure、Amazon Bedrock、Groq、DeepInfra、Mistral AI、Together.ai、Cohere、Fireworks AI、Cerebras、Replicate、Perplexity、Ollama、阿里云百炼、Moonshot AI、Hugging Face。
+- **兼容 API**：自定义 Chat Complete、自定义 Responses、Jalapeno Cloud、Atlas Cloud、OpenRouter、MiniMax、硅基流动、Tensdaq、Volcengine。
+- **纯翻译**：DeepL、DeepLX、Google 翻译、Microsoft 翻译。它们无需模型 ID，只能分配给翻译；不显示温度、推理强度和流式输出选项。
 
-## 默认值与模型目录
+目录覆盖 Read Frog 的全部 31 种可配置 API 类型，并提供其 Google 与微软翻译选项。Read Frog 的「内置 AI」「高级内置 AI」属于其账号和托管服务，不是可直接复用的第三方 API，伴读雀不使用这些服务或登录入口。
 
-2026-11-03 对照 Read Frog 的 [提供商默认值](https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/utils/constants/providers.ts) 与 [模型目录](https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/utils/constants/models.ts)，同步现有六类预置提供商的 85 个文字模型候选及顺序。
+## 连接设置
+
+| 类型 | 配置方式 |
+| --- | --- |
+| OpenAI 及兼容平台 | Base URL、API Key、模型 ID，使用 Chat Completions |
+| Anthropic | 原生 Messages API，使用 `x-api-key` |
+| Gemini | 原生 GenerateContent API；显式配置以 `/openai` 结尾的兼容地址时使用 Chat Completions |
+| Azure | 资源名称、部署 ID、Responses 或 Chat 模式、API 版本；可覆盖 Base URL |
+| Amazon Bedrock | Bedrock API Key、AWS 区域、模型或推理配置 ID；使用 Converse API |
+| Cohere | 原生 v2 Chat API |
+| 自定义 Responses | 完整 Responses URL、API Key、模型 ID |
+| Replicate | API Token、`owner/name` 或 `owner/name:version`；文字 Predictions，支持轮询、流式与取消 |
+| Ollama | 连接已有服务，默认 `http://127.0.0.1:11434/api`；不下载或管理本地模型 |
+| DeepL | API Key；官方地址遇到 `:fx` 密钥时自动选择 Free API |
+| DeepLX | 完整翻译 URL；可使用 `{{apiKey}}` 占位符引用单独保存的密钥 |
+| Google、微软翻译 | 无需 API Key；可用性和限制取决于服务与网络 |
+
+所有连接统一使用本机加密凭据、请求超时、自定义请求头和每个提供商的代理配置。可选择跟随系统、禁用或自定义代理，模型发现、测试连接、文字与图片请求均遵循该设置。[代理说明](PROXY.md)
+
+支持流式的 LLM 会逐步展示结果；半截响应、取消和错误不会写入成功缓存。结构化指令会按对应协议发送输出 Schema，服务明确拒绝结构化参数时仅在尚未输出内容前重试一次；最终字段仍由本机校验。
+
+## 默认模型与候选
+
+默认值、候选 ID 和顺序取自 Read Frog 提交 [96083134](https://github.com/mengxi-ream/read-frog/tree/96083134b111e56762f578b143bcd48e85058ba3)，共 **418 个文字模型候选**。候选不等于账户已开通该模型，实际可用性由服务端决定。
 
 | 提供商 | 新增时的模型 | 文字候选数 |
 | --- | --- | --- |
-| OpenAI | `gpt-6-luna` | 31 |
-| DeepSeek | `deepseek-v4-flash` | 4 |
-| 阿里云百炼 | `qwen3.8-flash` | 23 |
-| 硅基流动 | `Qwen/Qwen3-Next-80B-A3B-Instruct` | 1 |
+| openrouter | `google/gemma-4-31b-it:free` | 6 |
+| jalapenocloud | `GLM-5.2` | 13 |
+| atlascloud | `deepseek-ai/deepseek-v4-flash` | 17 |
+| 自定义 Chat Complete | 用户填写 | 0 |
+| 自定义 Responses | 用户填写 | 0 |
+| openai | `gpt-6-luna` | 31 |
+| azure | `gpt-5.6-luna` | 28 |
+| deepseek | `deepseek-v4-flash` | 4 |
 | Gemini | `gemini-3.5-flash-lite` | 20 |
-| OpenRouter | `google/gemma-4-31b-it:free` | 6 |
-| 自定义接口 | 用户填写 | 无固定目录 |
+| anthropic | `claude-haiku-5-5` | 17 |
+| xai | `grok-4.3` | 7 |
+| bedrock | `us.amazon.nova-micro-v1:0` | 71 |
+| groq | `openai/gpt-oss-20b` | 18 |
+| deepinfra | `Qwen/Qwen3.5-9B` | 30 |
+| mistral | `mistral-small-latest` | 19 |
+| togetherai | `Qwen/Qwen3.5-9B` | 18 |
+| cohere | `command-a-translate-08-2025` | 8 |
+| fireworks | `accounts/fireworks/models/gpt-oss-120b` | 23 |
+| cerebras | `gpt-oss-120b` | 9 |
+| replicate | `meta/meta-llama-3.1-70b-instruct` | 2 |
+| perplexity | `perplexity/sonar` | 6 |
+| ollama | `gemma3:4b` | 4 |
+| 硅基流动 | `Qwen/Qwen3-Next-80B-A3B-Instruct` | 1 |
+| tensdaq | `Qwen3-30B-A3B-Instruct-2507` | 2 |
+| volcengine | `doubao-seed-1-6-flash-250828` | 3 |
+| minimax | `MiniMax-M2.7` | 9 |
+| 阿里云百炼 | `qwen3.8-flash` | 23 |
+| moonshotai | `kimi-k2.6` | 10 |
+| huggingface | `Qwen/Qwen3.5-9B` | 19 |
 
-硅基流动按上游默认开启自定义输入，同时填好默认 ID。自定义接口没有可假定的模型，因此保持待填写。已有非空模型 ID 不会因为更新目录而被改成新默认值；不再位于内置目录的旧 ID 仍能作为自定义模型使用。
+模型列表直接在输入框下展开，支持搜索、键盘选择和自定义 ID。硅基流动、Tensdaq、Volcengine 按上游开启自定义模式并预填默认值；两个自定义协议入口保留空 ID。已有非空模型不会被目录更新覆盖。
 
-为桌面在线朗读额外保留 `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd`，在 OpenAI 列表的「语音模型」分组显示，不混入上游文字目录。候选仅帮助填写 ID，不保证账户权限、地域、模型可用性或兼容协议；以配置端点的连接测试为准。
+模型发现支持对应服务的列表格式与分页。Azure、Bedrock、Perplexity 使用内置列表或手动输入。发现失败或返回空列表不会清空所选模型；缓存按提供商、协议、地址、原生设置和代理隔离。
 
-目录数据保存于 `src/shared/provider-catalog.json`，包含上游提交与文件路径。运行 `npm run models:sync -- .reference/read-frog <commit>` 可从指定参考提交重新提取；脚本只解析静态数据，不执行参考源码。上游目录之外的图片能力信息单独维护在 `src/shared/model-catalog.ts`；未知能力保持未知，不凭模型名称推断。
+OpenAI 额外提供 `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd` 语音分组。图片能力信息独立维护，未知能力可通过样例测试确认。Replicate 当前仅接入文字预测，纯翻译服务和已知纯文本模型不出现在 OCR 选择中。
 
-接口发现结果按提供商 ID、端点和代理配置隔离，切换地址或代理不会混用旧连接的结果。候选按完整 ID 去重，不再截断到前 100 项；私有 ID、最后选择的内置 ID 随配置迁移，发现缓存不随配置迁移。
-
-高级选项中还可为每个提供商选择全局代理（跟随系统）、禁用代理或自定义代理。模型发现、连接测试、文字与图片请求和在线语音采用同一设置。[代理配置](PROXY.md)
+通过 `npm run models:sync -- .reference/read-frog <commit>` 可重新提取目录。脚本读取静态数据，不执行参考项目代码；上游来源随快照记录。
 
 ## 功能分配
 
-展开「功能提供商」可为翻译、猜你想存、词典、写作改进、OCR、在线朗读、语言检测或自定义指令分配提供商。页面下方的按功能分配入口与这里即时联动。未单独分配的指令继承默认提供商，结果窗口底部可临时切换。
+展开提供商中的「功能提供商」，或使用页面下方的功能分配区域，可为翻译、词典、写作改进、自定义指令、猜你想存、OCR、在线朗读和语言检测选择适用的提供商。两个入口即时联动，未单独指定的指令继承默认 LLM，结果窗口可临时切换。
 
-「猜你想存」使用独立的推荐提供商。推荐词条采用「通用 → 猜你想存」中指定的指令和笔记本。
+OCR 默认使用内置离线引擎；远程识别需选择支持图片的 LLM。语言检测默认在本机完成，LLM 模式最多发送 500 个字符，失败时回到本地检测。在线朗读支持 OpenAI 兼容语音接口与 Azure 语音部署，系统离线语音始终可用。
 
-截图识别默认使用内置离线 OCR。也可选择已添加的提供商，已知纯文本模型不出现在 OCR 列表中。未知模型的图片能力可用内置样例验证；外部识别前先显示本地截图预览。
+## 验证范围
 
-语言检测默认在本机运行。选择 LLM 后可指定提供商，自动检测时最多发送 500 个字符，失败后回到本地检测。
+协议测试覆盖所有 Chat Completions 预设，以及原生 JSON、流式终止与截断、图片输入、翻译语言映射、Replicate 任务处理、模型发现和错误脱敏。桌面回归检查 33 项添加、默认模型、自动保存、复制、功能分配、原生设置、深浅色图标、代理与结果显示。
 
-在线朗读使用 `POST /audio/speech`，采用语音提供商的模型、密钥、自定义请求头和超时。[语音接口说明](https://developers.openai.com/api/docs/guides/text-to-speech)
-
-## 对照范围与桌面差异
-
-- 对齐：现有提供商的新增默认模型、内置模型及排序、内联选择、自定义输入、服务端模型发现、复制、温度、自定义请求头、按功能分配和语言检测。
-- 桌面扩展：离线 OCR、在线语音模型分组、系统语音及本地笔记库；不添加浏览器的网页翻译、字幕或托管 AI 账号入口。
-- 当前连接层使用 OpenAI 兼容 Chat Completions 与语音接口。未把 Read Frog 的原生 Anthropic、Bedrock、Responses 或纯翻译服务适配器作为已支持服务展示，也未加入 Ollama 原生模型管理。上游模型目录本身不等于相应原生协议已实现。
-
-## 配置与验证
-
-schema v13 记住自定义模式之前选择的内置模型。升级只补全旧版未配置的预置模型，不修改非空模型、账户、用途、端点或凭据。
-
-[提供商回归](provider-parity-verification.json)检查新增默认值、选项数量、切换与重启、120 个接口模型、空结果与重试、深浅色和内联定位。[原设置回归](settings-verification.json)覆盖复制凭据、功能分配、温度、请求头、OCR 与语言检测。网络场景使用本机固定服务，不代表对真实供应商的调用验收。
+测试使用隔离配置与本地 HTTP 服务，不代表拥有或逐一验收了所有供应商的付费账户。[桌面验证记录](provider-parity-verification.json)

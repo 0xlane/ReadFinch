@@ -24,7 +24,12 @@ import {
   defaultProviderModel,
   supportsImages,
 } from "./model-catalog";
-import { PROVIDER_PRESETS, providerPreset } from "./provider-presets";
+import {
+  PROVIDER_PRESETS,
+  providerPreset,
+  isTranslationOnly,
+  supportsSpeech,
+} from "./provider-presets";
 export const OCR_INSTRUCTION =
   "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.";
 export const OFFLINE_OCR_ID = "ocr-offline";
@@ -104,6 +109,23 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
   temperature: z.number().min(0).max(2).nullable().default(null),
   reasoningEffort: z.enum(reasoningEfforts).optional(),
   proxy: ProxySchema.default(defaultProxy),
+  providerSettings: z
+    .strictObject({
+      region: z
+        .string()
+        .regex(/^[a-z0-9-]{1,60}$/)
+        .optional(),
+      resourceName: z
+        .string()
+        .regex(/^[a-zA-Z0-9-]{1,100}$/)
+        .optional(),
+      apiVersion: z
+        .string()
+        .regex(/^[a-zA-Z0-9.-]{1,60}$/)
+        .optional(),
+      apiMode: z.enum(["responses", "chat"]).optional(),
+    })
+    .optional(),
 });
 const LegacyOcrProfileSchema = z
   .object({
@@ -240,6 +262,33 @@ export const ConfigSchema = z
     const enabled = new Set(
       c.providers.filter((p) => p.enabled).map((p) => p.id),
     );
+    const llmIds = new Set(
+      c.providers
+        .filter((p) => p.enabled && !isTranslationOnly(p))
+        .map((p) => p.id),
+    );
+    if (
+      !llmIds.has(c.defaults.textProfileId) ||
+      (c.noteSuggestion.providerId &&
+        !llmIds.has(c.noteSuggestion.providerId)) ||
+      (c.languageDetection.mode === "llm" &&
+        !llmIds.has(c.languageDetection.providerId)) ||
+      c.actions.some(
+        (a) =>
+          a.id !== "translate" && a.providerId && !llmIds.has(a.providerId),
+      )
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "纯翻译提供商只能用于翻译，其他功能请选择 LLM 提供商",
+      });
+    if (
+      c.tts.onlineProviderId &&
+      !c.providers.some(
+        (p) => p.id === c.tts.onlineProviderId && supportsSpeech(p),
+      )
+    )
+      ctx.addIssue({ code: "custom", message: "此提供商不支持在线语音接口" });
     if (c.tts.onlineProviderId && !enabled.has(c.tts.onlineProviderId))
       ctx.addIssue({
         code: "custom",
@@ -313,7 +362,15 @@ export function createProvider(
     temperature: null,
     proxy: defaultProxy(),
     instruction: OCR_INSTRUCTION,
-    requiresKey: true,
+    requiresKey: preset.requiresKey,
+    ...(preset.id === "azure"
+      ? {
+          providerSettings: { apiMode: "responses" as const, apiVersion: "v1" },
+        }
+      : {}),
+    ...(preset.id === "bedrock"
+      ? { providerSettings: { region: "us-east-1" } }
+      : {}),
     timeoutMs: 60000,
     stream: true,
   };
@@ -444,8 +501,8 @@ function baseConfig(): Config {
       textProfileId: "text-default",
       ocrProfileId: "ocr-offline",
       sourceLanguage: "auto",
-      targetLanguage: "简体中文",
-      explanationLanguage: "简体中文",
+      targetLanguage: "system",
+      explanationLanguage: "system",
     },
     appearance: { theme: "system", fontSize: 15, language: "system" },
     selection: {
@@ -466,7 +523,7 @@ export function defaultConfig(): Config {
   const config = baseConfig();
   config.actions = config.actions.map((a) =>
     builtinId(a.id)
-      ? { ...a, ...definition(a.id), pinned: a.id !== "polish" }
+      ? { ...a, ...definition(a.id, "zh-CN"), pinned: a.id !== "polish" }
       : a,
   );
   return config;

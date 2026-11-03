@@ -2,21 +2,13 @@
   "en": {
     "tagline": "A reading companion, right beside your words.",
     "intro": "Translate a passage, understand a difficult sentence, or polish what you write—without leaving the app you’re using.",
-    "nav": [
-      "Get started",
-      "Features",
-      "Documentation",
-      "Report an issue"
-    ],
+    "nav": ["Get started", "Features", "Documentation", "Report an issue"],
     "previewTitle": "Stay with what you’re reading",
     "previewIntro": "Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar to your cursor and opens the answer beside the original. Pin a result for comparison, or collect a useful word for later.",
     "readingAlt": "ReadFinch shows a selected passage, a streamed translation and words suggested for the local notebook.",
     "readingCaption": "Select → understand → keep. A short path from unfamiliar text to something you can use.",
     "featuresTitle": "A little help, wherever your text lives",
-    "featureHeaders": [
-      "What you want to do",
-      "How ReadFinch helps"
-    ],
+    "featureHeaders": ["What you want to do", "How ReadFinch helps"],
     "features": [
       [
         "Read and understand",
@@ -49,7 +41,7 @@
     "notebookAlt": "ReadFinch local notebook with saved vocabulary and the original reading context.",
     "notebookCaption": "Your collection stays close: search, revisit and learn from the passages you kept.",
     "providerTitle": "Your provider. Your model. Your choice.",
-    "providers": "Use presets for OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow and OpenRouter, or connect an OpenAI-compatible Chat Completions endpoint. Each provider entry holds one model; duplicate it to use another. Translation, dictionary, writing and image recognition can use different providers. Model suggestions, connection tests, temperature and custom request headers are available in settings.",
+    "providers": "Choose from 33 provider options, including OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter and dedicated translation services. Native APIs, Chat Completions and Responses are supported. Each AI provider entry holds one model; duplicate it to use another. Assign different providers to translation, dictionary, writing, OCR and language detection. Settings include model suggestions, connection tests, temperature, custom headers and per-provider proxy controls.",
     "languagesTitle": "Read in your language",
     "languages": "The README translations match the app’s eight preset target languages:",
     "languageNote": "The **application interface currently supports English and Simplified Chinese**, with automatic system-language selection. Translation quality and additional language support depend on your model. Bundled offline OCR recognizes Simplified Chinese and English.",
@@ -63,9 +55,7 @@
       "**Try a screenshot.** Use the OCR shortcut below, select a region and review the recognized text. Offline OCR and system speech work before you configure an AI provider."
     ],
     "shortcutsTitle": "Useful shortcuts",
-    "shortcutHeaders": [
-      "Command"
-    ],
+    "shortcutHeaders": ["Command"],
     "shortcuts": [
       "Translate selection",
       "Open dictionary",
@@ -76,10 +66,7 @@
     ],
     "shortcutsNote": "Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.",
     "platformTitle": "Desktop integration",
-    "platformHeaders": [
-      "Platform",
-      "How text is acquired"
-    ],
+    "platformHeaders": ["Platform", "How text is acquired"],
     "platforms": [
       "Reads selections exposed by the foreground app through UI Automation.",
       "Uses Accessibility for selected text and Screen Recording permission for captures.",
@@ -99,9 +86,10 @@
       "Providers, models and feature assignments",
       "Offline OCR and vision APIs",
       "Configuration and WebDAV",
-      "Platform support and permissions"
+      "Platform support and permissions",
+      "Interface, translation and explanation languages"
     ],
-    "docsNote": "Technical documentation is currently maintained in Chinese.",
+    "docsNote": "Technical documentation is available in Chinese or English.",
     "contributeTitle": "Help ReadFinch grow",
     "contribute": "Bring a reproducible bug report, an interaction improvement, a translation correction or a pull request. Include your operating system and app version, and remove credentials and private text from examples.",
     "issueLink": "Open an issue",
@@ -115,21 +103,13 @@
   "zh-CN": {
     "tagline": "就在文字旁边，陪你读懂每一句。",
     "intro": "翻译一段文字、读懂一个长句、改好一句表达——留在正在使用的应用里，就能完成。",
-    "nav": [
-      "开始使用",
-      "功能介绍",
-      "技术文档",
-      "反馈问题"
-    ],
+    "nav": ["开始使用", "功能介绍", "技术文档", "反馈问题"],
     "previewTitle": "继续阅读，不必来回切换",
     "previewIntro": "在浏览器、PDF 阅读器或编辑器里选中文字，伴读雀就会在鼠标旁提供工具栏，并在原文附近展示答案。可以固定结果对照阅读，也可以把值得记住的词留下来。",
     "readingAlt": "伴读雀在原文旁展示流式译文，并推荐可收藏到本地笔记库的词条。",
     "readingCaption": "选中 → 理解 → 收藏。从陌生的文字，到可以用起来的知识。",
     "featuresTitle": "文字在哪里，帮助就在哪里",
-    "featureHeaders": [
-      "想做什么",
-      "伴读雀如何帮你"
-    ],
+    "featureHeaders": ["想做什么", "伴读雀如何帮你"],
     "features": [
       [
         "读懂原文",
@@ -162,7 +142,7 @@
     "notebookAlt": "伴读雀本地笔记库展示收藏的词条及原文。",
     "notebookCaption": "把阅读中的发现留在身边，随时搜索、回看和复习。",
     "providerTitle": "用自己的提供商，选适合的模型",
-    "providers": "内置 OpenAI、DeepSeek、Gemini、阿里云百炼、硅基流动和 OpenRouter 预设，也支持自定义 OpenAI 兼容 Chat Completions 接口。一个提供商条目对应一个模型；需要另一模型时可以复制条目。翻译、词典、写作和图片识别可分别使用不同提供商，并支持模型联想、连接测试、温度和自定义请求头。",
+    "providers": "支持 33 种提供商选项，涵盖 OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter 与纯翻译服务，支持原生 API、Chat Completions 和 Responses。一个 AI 提供商条目对应一个模型，可复制条目使用其他模型。翻译、词典、写作、OCR 和语言检测可分别分配提供商，并支持模型联想、连接测试、温度、自定义请求头及独立代理。",
     "languagesTitle": "用熟悉的语言阅读",
     "languages": "README 与应用预置的 8 种目标语言保持一致：",
     "languageNote": "**应用界面目前支持简体中文和英文**，默认跟随系统。翻译质量及其他语言能力取决于所选模型；内置离线 OCR 支持简体中文和英文。",
@@ -176,9 +156,7 @@
       "**试试截图取词。** 使用下方 OCR 快捷键，框选区域并核对识别文字。内置 OCR 和系统朗读无需先配置 AI 提供商。"
     ],
     "shortcutsTitle": "常用快捷键",
-    "shortcutHeaders": [
-      "指令"
-    ],
+    "shortcutHeaders": ["指令"],
     "shortcuts": [
       "翻译选区",
       "打开词典",
@@ -189,10 +167,7 @@
     ],
     "shortcutsNote": "快捷键可在独立设置页面重新绑定。设置自动保存，外观可跟随系统或手动切换深浅色。开机自启默认关闭，可在托盘菜单中切换。",
     "platformTitle": "融入桌面使用习惯",
-    "platformHeaders": [
-      "平台",
-      "如何取得文字"
-    ],
+    "platformHeaders": ["平台", "如何取得文字"],
     "platforms": [
       "通过 UI Automation 读取前台应用提供的文本选区。",
       "读取选区需要辅助功能授权；截图需要屏幕录制权限。",
@@ -212,9 +187,10 @@
       "提供商、模型与功能分配",
       "离线 OCR 与视觉接口",
       "配置管理与 WebDAV",
-      "平台支持与权限"
+      "平台支持与权限",
+      "界面、翻译与解释语言"
     ],
-    "docsNote": "技术文档目前以中文维护。",
+    "docsNote": "技术文档使用中文或英文。",
     "contributeTitle": "一起让伴读雀更好用",
     "contribute": "欢迎提交可复现的问题、交互建议、翻译修订和代码贡献。反馈时请注明操作系统与应用版本，并移除示例中的凭据和私人文字。",
     "issueLink": "反馈问题",
@@ -228,21 +204,13 @@
   "zh-TW": {
     "tagline": "就在文字旁邊，陪你讀懂每一句。",
     "intro": "翻譯一段文字、讀懂一個長句、修好一句表達——留在正在使用的應用程式裡，就能完成。",
-    "nav": [
-      "開始使用",
-      "功能介紹",
-      "技術文件",
-      "回報問題"
-    ],
+    "nav": ["開始使用", "功能介紹", "技術文件", "回報問題"],
     "previewTitle": "繼續閱讀，不必來回切換",
     "previewIntro": "在瀏覽器、PDF 閱讀器或編輯器裡選取文字，伴讀雀就會在游標旁提供工具列，並在原文附近顯示答案。可以釘選結果對照閱讀，也可以留下值得記住的詞彙。",
     "readingAlt": "伴讀雀在原文旁逐步顯示譯文，並推薦可儲存至本機筆記庫的詞彙。",
     "readingCaption": "選取 → 理解 → 收藏。讓陌生的文字，成為能夠運用的知識。",
     "featuresTitle": "文字在哪裡，協助就在哪裡",
-    "featureHeaders": [
-      "想做什麼",
-      "伴讀雀如何協助"
-    ],
+    "featureHeaders": ["想做什麼", "伴讀雀如何協助"],
     "features": [
       [
         "讀懂原文",
@@ -275,7 +243,7 @@
     "notebookAlt": "伴讀雀本機筆記庫顯示收藏的詞彙與原文。",
     "notebookCaption": "讓閱讀中的發現留在身邊，隨時搜尋、回顧和複習。",
     "providerTitle": "使用自己的供應商，選擇適合的模型",
-    "providers": "內建 OpenAI、DeepSeek、Gemini、阿里雲百煉、SiliconFlow 和 OpenRouter 預設，也支援自訂 OpenAI 相容 Chat Completions 介面。每個供應商項目對應一個模型；需要另一模型時可複製項目。翻譯、字典、寫作和圖片辨識可分別使用不同供應商，並支援模型建議、連線測試、溫度及自訂請求標頭。",
+    "providers": "支援 33 種供應商選項，涵蓋 OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter 與純翻譯服務，支援原生 API、Chat Completions 和 Responses。每個 AI 供應商項目對應一個模型，可複製項目使用其他模型。翻譯、字典、寫作、OCR 和語言偵測可分別指定供應商，並支援模型建議、連線測試、溫度、自訂請求標頭及獨立代理設定。",
     "languagesTitle": "用熟悉的語言閱讀",
     "languages": "README 與應用程式預設的 8 種目標語言一致：",
     "languageNote": "**應用程式介面目前支援簡體中文和英文**，預設跟隨系統語言。翻譯品質及其他語言能力取決於所選模型；內建離線 OCR 支援簡體中文和英文。",
@@ -289,9 +257,7 @@
       "**試試截圖取字。** 使用下方 OCR 快捷鍵，框選區域並核對辨識文字。內建 OCR 和系統朗讀不需要先設定 AI 供應商。"
     ],
     "shortcutsTitle": "常用快捷鍵",
-    "shortcutHeaders": [
-      "指令"
-    ],
+    "shortcutHeaders": ["指令"],
     "shortcuts": [
       "翻譯選取文字",
       "開啟字典",
@@ -302,10 +268,7 @@
     ],
     "shortcutsNote": "快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。",
     "platformTitle": "融入桌面使用習慣",
-    "platformHeaders": [
-      "平台",
-      "如何取得文字"
-    ],
+    "platformHeaders": ["平台", "如何取得文字"],
     "platforms": [
       "透過 UI Automation 讀取前景應用程式提供的文字選取範圍。",
       "讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。",
@@ -325,9 +288,10 @@
       "供應商、模型與功能指派",
       "離線 OCR 與視覺介面",
       "設定管理與 WebDAV",
-      "平台支援與權限"
+      "平台支援與權限",
+      "介面、翻譯與解釋語言"
     ],
-    "docsNote": "技術文件目前以簡體中文維護。",
+    "docsNote": "技術文件使用中文或英文。",
     "contributeTitle": "一起讓伴讀雀更好用",
     "contribute": "歡迎提出可重現的問題、互動建議、翻譯修訂和程式碼貢獻。回報時請註明作業系統與應用程式版本，並移除範例中的憑證和私人文字。",
     "issueLink": "回報問題",
@@ -341,21 +305,13 @@
   "ja": {
     "tagline": "言葉のすぐそばに、読書のパートナー。",
     "intro": "文章を翻訳する。難しい一文を読み解く。自分の表現を磨く。いま使っているアプリを離れずに。",
-    "nav": [
-      "使い始める",
-      "機能",
-      "ドキュメント",
-      "問題を報告"
-    ],
+    "nav": ["使い始める", "機能", "ドキュメント", "問題を報告"],
     "previewTitle": "読む流れを、そのままに",
     "previewIntro": "ブラウザー、PDF リーダー、エディターで文字を選択すると、カーソルのそばに小さなツールバーが現れ、原文の近くに結果を表示します。結果を固定して読み比べたり、覚えておきたい単語を保存したりできます。",
     "readingAlt": "ReadFinch が原文のそばに翻訳を逐次表示し、ローカルノートに保存できる単語を提案している画面。",
     "readingCaption": "選ぶ → 理解する → 残す。知らない言葉を、自分で使える言葉へ。",
     "featuresTitle": "文字のある場所で、必要な手助けを",
-    "featureHeaders": [
-      "やりたいこと",
-      "ReadFinch でできること"
-    ],
+    "featureHeaders": ["やりたいこと", "ReadFinch でできること"],
     "features": [
       [
         "文章を読み解く",
@@ -388,7 +344,7 @@
     "notebookAlt": "保存した単語と原文を表示する ReadFinch のローカルノート。",
     "notebookCaption": "読書で見つけた言葉を手元に。検索して、読み返して、学び直せます。",
     "providerTitle": "プロバイダーもモデルも、自分で選ぶ",
-    "providers": "OpenAI、DeepSeek、Gemini、Alibaba Cloud、SiliconFlow、OpenRouter のプリセット、または OpenAI 互換 Chat Completions エンドポイントを利用できます。1 つのプロバイダー項目に 1 つのモデルを設定し、別のモデルには項目を複製します。翻訳、辞書、文章改善、画像認識ごとにプロバイダーを分けられます。モデル候補、接続テスト、temperature、カスタムリクエストヘッダーにも対応しています。",
+    "providers": "OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter、翻訳専用サービスなど、33 種類のプロバイダー設定に対応。ネイティブ API、Chat Completions、Responses を利用できます。AI プロバイダーの項目ごとにモデルを 1 つ設定し、別のモデルには項目を複製します。翻訳、辞書、文章改善、OCR、言語検出にそれぞれ異なるプロバイダーを割り当てられます。モデル候補、接続テスト、temperature、カスタムヘッダー、個別のプロキシ設定も利用できます。",
     "languagesTitle": "自分の言語で読む",
     "languages": "README は、アプリに用意されている次の 8 つの出力先言語に対応しています。",
     "languageNote": "**アプリの表示言語は現在、英語と簡体字中国語に対応**しており、システム言語に合わせて自動選択できます。翻訳の品質や追加言語への対応はモデルによります。内蔵のオフライン OCR は簡体字中国語と英語に対応しています。",
@@ -402,9 +358,7 @@
       "**スクリーンショットから文字を取る。** 下記の OCR ショートカットで範囲を選び、認識結果を確認します。オフライン OCR とシステム音声は AI プロバイダーの設定前でも使えます。"
     ],
     "shortcutsTitle": "便利なショートカット",
-    "shortcutHeaders": [
-      "操作"
-    ],
+    "shortcutHeaders": ["操作"],
     "shortcuts": [
       "選択範囲を翻訳",
       "辞書を開く",
@@ -415,10 +369,7 @@
     ],
     "shortcutsNote": "ショートカットは専用設定ページで変更できます。設定は自動保存され、外観はシステム連動またはライト・ダークから選べます。ログイン時の自動起動は初期状態ではオフで、トレイメニューから変更できます。",
     "platformTitle": "デスクトップとの連携",
-    "platformHeaders": [
-      "プラットフォーム",
-      "文字の取得方法"
-    ],
+    "platformHeaders": ["プラットフォーム", "文字の取得方法"],
     "platforms": [
       "UI Automation を通じて、前面のアプリが公開する選択テキストを読み取ります。",
       "選択テキストにはアクセシビリティ、画面キャプチャには画面収録の許可が必要です。",
@@ -438,9 +389,10 @@
       "プロバイダー・モデル・機能の割り当て",
       "オフライン OCR と画像認識 API",
       "設定管理と WebDAV",
-      "プラットフォームと権限"
+      "プラットフォームと権限",
+      "画面・翻訳・解説の言語"
     ],
-    "docsNote": "技術ドキュメントは現在、中国語で管理しています。",
+    "docsNote": "技術文書は中国語または英語で提供しています。",
     "contributeTitle": "ReadFinch を一緒に育てる",
     "contribute": "再現できる不具合報告、操作性の改善案、翻訳の修正、プルリクエストを歓迎します。OS とアプリのバージョンを添え、認証情報や私的な文章は例から取り除いてください。",
     "issueLink": "問題を報告",
@@ -454,21 +406,13 @@
   "ko": {
     "tagline": "글 바로 곁에서 함께하는 읽기 도우미.",
     "intro": "문장을 번역하고, 어려운 구문을 이해하고, 표현을 다듬으세요. 지금 쓰는 앱을 떠날 필요가 없습니다.",
-    "nav": [
-      "시작하기",
-      "기능",
-      "문서",
-      "문제 신고"
-    ],
+    "nav": ["시작하기", "기능", "문서", "문제 신고"],
     "previewTitle": "읽던 흐름을 그대로",
     "previewIntro": "브라우저, PDF 리더, 편집기에서 텍스트를 선택하면 커서 옆에 작은 도구 모음이 나타나고 원문 가까이에 결과가 표시됩니다. 결과를 고정해 비교하며 읽거나, 기억하고 싶은 단어를 저장할 수 있습니다.",
     "readingAlt": "ReadFinch가 선택한 원문 옆에 번역을 스트리밍하고 로컬 노트에 저장할 단어를 제안하는 화면.",
     "readingCaption": "선택 → 이해 → 저장. 낯선 글을 이해하고 다시 활용하기까지.",
     "featuresTitle": "텍스트가 있는 곳에서 필요한 도움을",
-    "featureHeaders": [
-      "하고 싶은 일",
-      "ReadFinch가 돕는 방법"
-    ],
+    "featureHeaders": ["하고 싶은 일", "ReadFinch가 돕는 방법"],
     "features": [
       [
         "글 이해하기",
@@ -501,7 +445,7 @@
     "notebookAlt": "저장한 단어와 원문을 보여 주는 ReadFinch 로컬 노트.",
     "notebookCaption": "읽다가 발견한 내용을 가까이 두고, 검색하고 되짚어 보세요.",
     "providerTitle": "제공업체와 모델을 직접 선택",
-    "providers": "OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow, OpenRouter 프리셋을 사용하거나 OpenAI 호환 Chat Completions 엔드포인트를 연결할 수 있습니다. 제공업체 항목 하나에는 모델 하나를 설정하며, 다른 모델을 쓰려면 항목을 복제합니다. 번역·사전·글쓰기·이미지 인식에 각각 다른 제공업체를 지정할 수 있습니다. 모델 제안, 연결 테스트, temperature, 사용자 지정 요청 헤더도 지원합니다.",
+    "providers": "OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter 및 번역 전용 서비스를 포함한 33가지 제공업체 옵션을 지원합니다. 네이티브 API, Chat Completions, Responses를 사용할 수 있습니다. AI 제공업체 항목 하나에 모델 하나를 설정하고, 다른 모델은 항목을 복제해 사용합니다. 번역·사전·글쓰기·OCR·언어 감지에 각각 제공업체를 지정할 수 있으며, 모델 제안·연결 테스트·temperature·사용자 지정 헤더·개별 프록시 설정도 지원합니다.",
     "languagesTitle": "익숙한 언어로 읽기",
     "languages": "README는 앱에 기본 제공되는 다음 8가지 대상 언어와 일치합니다.",
     "languageNote": "**앱 인터페이스는 현재 영어와 중국어 간체를 지원**하며 시스템 언어에 맞춰 자동으로 선택할 수 있습니다. 번역 품질과 추가 언어 지원은 선택한 모델에 따라 달라집니다. 내장 오프라인 OCR은 중국어 간체와 영어를 인식합니다.",
@@ -515,9 +459,7 @@
       "**캡처로 글 가져오기.** 아래 OCR 단축키로 영역을 선택하고 인식 결과를 확인하세요. 오프라인 OCR과 시스템 음성은 AI 제공업체 설정 전에도 사용할 수 있습니다."
     ],
     "shortcutsTitle": "유용한 단축키",
-    "shortcutHeaders": [
-      "명령"
-    ],
+    "shortcutHeaders": ["명령"],
     "shortcuts": [
       "선택 영역 번역",
       "사전 열기",
@@ -528,10 +470,7 @@
     ],
     "shortcutsNote": "단축키는 전용 설정 페이지에서 바꿀 수 있습니다. 설정은 자동 저장되며, 테마는 시스템 설정을 따르거나 밝게·어둡게 지정할 수 있습니다. 로그인 시 자동 시작은 기본적으로 꺼져 있으며 트레이 메뉴에서 변경합니다.",
     "platformTitle": "데스크톱 연동",
-    "platformHeaders": [
-      "플랫폼",
-      "텍스트를 가져오는 방법"
-    ],
+    "platformHeaders": ["플랫폼", "텍스트를 가져오는 방법"],
     "platforms": [
       "UI Automation으로 전경 앱이 제공하는 선택 텍스트를 읽습니다.",
       "선택 텍스트에는 손쉬운 사용 권한이, 화면 캡처에는 화면 기록 권한이 필요합니다.",
@@ -551,9 +490,10 @@
       "제공업체·모델·기능 할당",
       "오프라인 OCR과 비전 API",
       "설정 관리와 WebDAV",
-      "플랫폼 지원과 권한"
+      "플랫폼 지원과 권한",
+      "인터페이스·번역·설명 언어"
     ],
-    "docsNote": "기술 문서는 현재 중국어로 관리합니다.",
+    "docsNote": "기술 문서는 중국어 또는 영어로 제공됩니다.",
     "contributeTitle": "ReadFinch를 함께 개선해 주세요",
     "contribute": "재현 가능한 버그 보고, 사용성 제안, 번역 수정, 풀 리퀘스트를 환영합니다. 운영체제와 앱 버전을 적고, 예제에서 인증 정보와 개인 텍스트를 제거해 주세요.",
     "issueLink": "문제 신고",
@@ -578,10 +518,7 @@
     "readingAlt": "ReadFinch affiche un passage sélectionné, sa traduction progressive et des mots proposés pour un carnet local.",
     "readingCaption": "Sélectionner → comprendre → conserver. Du texte inconnu à des connaissances réutilisables.",
     "featuresTitle": "Un coup de main là où se trouve votre texte",
-    "featureHeaders": [
-      "Votre besoin",
-      "L’aide de ReadFinch"
-    ],
+    "featureHeaders": ["Votre besoin", "L’aide de ReadFinch"],
     "features": [
       [
         "Lire et comprendre",
@@ -614,7 +551,7 @@
     "notebookAlt": "Carnet local ReadFinch affichant du vocabulaire enregistré et son texte d’origine.",
     "notebookCaption": "Gardez vos découvertes à portée de main pour les retrouver et les relire.",
     "providerTitle": "Votre fournisseur. Votre modèle. Votre choix.",
-    "providers": "Utilisez les préréglages OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow et OpenRouter, ou connectez une API Chat Completions compatible OpenAI. Chaque entrée de fournisseur contient un modèle ; dupliquez-la pour en utiliser un autre. Traduction, dictionnaire, rédaction et reconnaissance d’image peuvent utiliser des fournisseurs différents. Les réglages proposent des suggestions de modèles, un test de connexion, la température et des en-têtes personnalisés.",
+    "providers": "Choisissez parmi 33 options de fournisseurs, dont OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter et des services de traduction dédiés. Les API natives, Chat Completions et Responses sont pris en charge. Chaque entrée IA contient un modèle ; dupliquez-la pour en utiliser un autre. Attribuez des fournisseurs différents à la traduction, au dictionnaire, à la rédaction, à l’OCR et à la détection de langue. Suggestions de modèles, tests de connexion, température, en-têtes personnalisés et proxy par fournisseur sont disponibles.",
     "languagesTitle": "Lire dans votre langue",
     "languages": "Les traductions du README correspondent aux huit langues cibles prédéfinies dans l’application :",
     "languageNote": "**L’interface de l’application est actuellement disponible en anglais et en chinois simplifié**, avec sélection automatique selon le système. La qualité des traductions et la prise en charge d’autres langues dépendent du modèle. L’OCR hors ligne intégré reconnaît le chinois simplifié et l’anglais.",
@@ -628,9 +565,7 @@
       "**Essayez une capture.** Avec le raccourci OCR ci-dessous, sélectionnez une zone puis vérifiez le texte reconnu. L’OCR hors ligne et les voix système fonctionnent avant toute configuration d’un fournisseur IA."
     ],
     "shortcutsTitle": "Raccourcis utiles",
-    "shortcutHeaders": [
-      "Commande"
-    ],
+    "shortcutHeaders": ["Commande"],
     "shortcuts": [
       "Traduire la sélection",
       "Ouvrir le dictionnaire",
@@ -641,10 +576,7 @@
     ],
     "shortcutsNote": "Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.",
     "platformTitle": "Intégration au bureau",
-    "platformHeaders": [
-      "Plateforme",
-      "Acquisition du texte"
-    ],
+    "platformHeaders": ["Plateforme", "Acquisition du texte"],
     "platforms": [
       "Lit les sélections exposées par l’application au premier plan via UI Automation.",
       "L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran.",
@@ -664,9 +596,10 @@
       "Fournisseurs, modèles et affectation des fonctions",
       "OCR hors ligne et API de vision",
       "Configuration et WebDAV",
-      "Plateformes et autorisations"
+      "Plateformes et autorisations",
+      "Langues de l’interface, des traductions et des explications"
     ],
-    "docsNote": "La documentation technique est actuellement maintenue en chinois.",
+    "docsNote": "La documentation technique est disponible en chinois ou en anglais.",
     "contributeTitle": "Faisons grandir ReadFinch",
     "contribute": "Les rapports de bugs reproductibles, suggestions d’ergonomie, corrections de traduction et pull requests sont les bienvenus. Indiquez votre système et la version de l’application, et retirez les identifiants et textes privés de vos exemples.",
     "issueLink": "Ouvrir un ticket",
@@ -680,21 +613,13 @@
   "de": {
     "tagline": "Dein Lesebegleiter, direkt neben deinen Worten.",
     "intro": "Eine Passage übersetzen, einen schwierigen Satz verstehen oder einen eigenen Text verbessern – ohne die gerade verwendete App zu verlassen.",
-    "nav": [
-      "Erste Schritte",
-      "Funktionen",
-      "Dokumentation",
-      "Problem melden"
-    ],
+    "nav": ["Erste Schritte", "Funktionen", "Dokumentation", "Problem melden"],
     "previewTitle": "Bleib im Lesefluss",
     "previewIntro": "Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine Werkzeugleiste am Mauszeiger und öffnet die Antwort neben dem Original. Hefte ein Ergebnis zum Vergleichen an oder merke dir ein nützliches Wort für später.",
     "readingAlt": "ReadFinch zeigt eine markierte Passage, eine schrittweise erscheinende Übersetzung und Wortvorschläge für ein lokales Notizbuch.",
     "readingCaption": "Markieren → verstehen → behalten. Von unbekannten Wörtern zu nutzbarem Wissen.",
     "featuresTitle": "Hilfe dort, wo dein Text ist",
-    "featureHeaders": [
-      "Was du vorhast",
-      "Wie ReadFinch hilft"
-    ],
+    "featureHeaders": ["Was du vorhast", "Wie ReadFinch hilft"],
     "features": [
       [
         "Lesen und verstehen",
@@ -727,7 +652,7 @@
     "notebookAlt": "Lokales ReadFinch-Notizbuch mit gespeicherten Wörtern und ihrem ursprünglichen Kontext.",
     "notebookCaption": "Behalte Entdeckungen aus deiner Lektüre griffbereit, um sie wiederzufinden und nachzulesen.",
     "providerTitle": "Dein Anbieter. Dein Modell. Deine Wahl.",
-    "providers": "Nutze Vorlagen für OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow und OpenRouter oder verbinde einen OpenAI-kompatiblen Chat-Completions-Endpunkt. Jeder Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben und Bilderkennung können verschiedene Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur und eigene Request-Header sind in den Einstellungen verfügbar.",
+    "providers": "Wähle aus 33 Anbieteroptionen, darunter OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter und reine Übersetzungsdienste. Native APIs, Chat Completions und Responses werden unterstützt. Jeder KI-Anbietereintrag enthält ein Modell; für ein weiteres Modell duplizierst du den Eintrag. Übersetzung, Wörterbuch, Schreiben, OCR und Spracherkennung können unterschiedliche Anbieter verwenden. Modellvorschläge, Verbindungstests, Temperatur, eigene Header und individuelle Proxy-Einstellungen sind verfügbar.",
     "languagesTitle": "In deiner Sprache lesen",
     "languages": "Die README-Übersetzungen entsprechen den acht voreingestellten Zielsprachen der App:",
     "languageNote": "**Die App-Oberfläche ist derzeit auf Englisch und vereinfachtem Chinesisch verfügbar** und kann automatisch der Systemsprache folgen. Übersetzungsqualität und weitere unterstützte Sprachen hängen vom Modell ab. Die integrierte Offline-OCR erkennt vereinfachtes Chinesisch und Englisch.",
@@ -741,9 +666,7 @@
       "**Eine Bildschirmaufnahme ausprobieren.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Offline-OCR und Systemstimmen funktionieren auch ohne eingerichteten KI-Anbieter."
     ],
     "shortcutsTitle": "Nützliche Tastenkürzel",
-    "shortcutHeaders": [
-      "Befehl"
-    ],
+    "shortcutHeaders": ["Befehl"],
     "shortcuts": [
       "Auswahl übersetzen",
       "Wörterbuch öffnen",
@@ -754,10 +677,7 @@
     ],
     "shortcutsNote": "Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.",
     "platformTitle": "Integration in den Desktop",
-    "platformHeaders": [
-      "Plattform",
-      "Texterfassung"
-    ],
+    "platformHeaders": ["Plattform", "Texterfassung"],
     "platforms": [
       "Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation.",
       "Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots.",
@@ -777,9 +697,10 @@
       "Anbieter, Modelle und Funktionszuordnung",
       "Offline-OCR und Vision-APIs",
       "Konfiguration und WebDAV",
-      "Plattformen und Berechtigungen"
+      "Plattformen und Berechtigungen",
+      "Sprachen für Oberfläche, Übersetzung und Erklärungen"
     ],
-    "docsNote": "Die technische Dokumentation wird derzeit auf Chinesisch gepflegt.",
+    "docsNote": "Die technische Dokumentation ist auf Chinesisch oder Englisch verfügbar.",
     "contributeTitle": "ReadFinch gemeinsam verbessern",
     "contribute": "Reproduzierbare Fehlerberichte, Verbesserungsvorschläge, Übersetzungskorrekturen und Pull Requests sind willkommen. Nenne Betriebssystem und App-Version und entferne Zugangsdaten sowie private Texte aus Beispielen.",
     "issueLink": "Problem melden",
@@ -804,10 +725,7 @@
     "readingAlt": "ReadFinch muestra un pasaje seleccionado, su traducción progresiva y palabras sugeridas para un cuaderno local.",
     "readingCaption": "Seleccionar → comprender → guardar. De un texto desconocido a algo que puedes aprovechar.",
     "featuresTitle": "Una ayuda allí donde está tu texto",
-    "featureHeaders": [
-      "Lo que quieres hacer",
-      "Cómo te ayuda ReadFinch"
-    ],
+    "featureHeaders": ["Lo que quieres hacer", "Cómo te ayuda ReadFinch"],
     "features": [
       [
         "Leer y comprender",
@@ -840,7 +758,7 @@
     "notebookAlt": "Cuaderno local de ReadFinch con vocabulario guardado y su contexto original.",
     "notebookCaption": "Ten a mano lo que descubres al leer, para encontrarlo y repasarlo.",
     "providerTitle": "Tu proveedor. Tu modelo. Tú decides.",
-    "providers": "Usa los ajustes predefinidos de OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow y OpenRouter, o conecta un endpoint Chat Completions compatible con OpenAI. Cada entrada de proveedor contiene un modelo; duplícala para usar otro. Traducción, diccionario, escritura y reconocimiento de imágenes pueden utilizar proveedores distintos. Los ajustes incluyen sugerencias de modelos, pruebas de conexión, temperatura y cabeceras personalizadas.",
+    "providers": "Elige entre 33 opciones de proveedor, como OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter y servicios dedicados de traducción. Se admiten API nativas, Chat Completions y Responses. Cada entrada de IA contiene un modelo; duplícala para usar otro. Asigna proveedores distintos a traducción, diccionario, escritura, OCR y detección de idioma. Incluye sugerencias de modelos, pruebas de conexión, temperatura, cabeceras personalizadas y proxy por proveedor.",
     "languagesTitle": "Lee en tu idioma",
     "languages": "Las traducciones del README coinciden con los ocho idiomas de destino predefinidos de la aplicación:",
     "languageNote": "**La interfaz de la aplicación está disponible actualmente en inglés y chino simplificado**, con selección automática según el sistema. La calidad de la traducción y los idiomas adicionales dependen del modelo. El OCR integrado sin conexión reconoce chino simplificado e inglés.",
@@ -854,9 +772,7 @@
       "**Prueba una captura.** Utiliza el atajo OCR indicado abajo, selecciona una zona y revisa el texto reconocido. El OCR sin conexión y las voces del sistema funcionan antes de configurar un proveedor de IA."
     ],
     "shortcutsTitle": "Atajos útiles",
-    "shortcutHeaders": [
-      "Instrucción"
-    ],
+    "shortcutHeaders": ["Instrucción"],
     "shortcuts": [
       "Traducir selección",
       "Abrir diccionario",
@@ -867,10 +783,7 @@
     ],
     "shortcutsNote": "Puedes cambiar los atajos en su página de ajustes. La configuración se guarda automáticamente y la apariencia sigue al sistema o a tu elección clara u oscura. El inicio al entrar en el sistema está desactivado por defecto y se cambia desde el menú de la bandeja.",
     "platformTitle": "Integración con el escritorio",
-    "platformHeaders": [
-      "Plataforma",
-      "Cómo se obtiene el texto"
-    ],
+    "platformHeaders": ["Plataforma", "Cómo se obtiene el texto"],
     "platforms": [
       "Lee las selecciones que expone la aplicación en primer plano mediante UI Automation.",
       "Requiere permiso de Accesibilidad para leer selecciones y de Grabación de pantalla para las capturas.",
@@ -890,9 +803,10 @@
       "Proveedores, modelos y asignación de funciones",
       "OCR sin conexión y API de visión",
       "Configuración y WebDAV",
-      "Plataformas y permisos"
+      "Plataformas y permisos",
+      "Idiomas de la interfaz, las traducciones y las explicaciones"
     ],
-    "docsNote": "La documentación técnica se mantiene actualmente en chino.",
+    "docsNote": "La documentación técnica está disponible en chino o en inglés.",
     "contributeTitle": "Ayuda a mejorar ReadFinch",
     "contribute": "Son bienvenidos los informes de errores reproducibles, las propuestas de usabilidad, las correcciones de traducción y las pull requests. Indica el sistema operativo y la versión de la aplicación, y elimina las credenciales y el texto privado de los ejemplos.",
     "issueLink": "Abrir una incidencia",

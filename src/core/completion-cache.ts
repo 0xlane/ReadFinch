@@ -47,6 +47,9 @@ export class CompletionCache {
     }
     const id = digest([
       profile.id,
+      profile.preset,
+      profile.providerSettings ?? null,
+      profile.translation ?? null,
       profile.endpoint,
       profile.proxy,
       profile.model,

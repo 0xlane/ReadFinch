@@ -23,13 +23,14 @@ Local SVG paths are sourced without modification from the following public Iconi
 
 ## Provider marks
 
-The six bundled provider SVGs come from [LobeHub Icons](https://github.com/lobehub/lobe-icons), package `@lobehub/icons-static-svg` 1.102.0. Copyright 2023 LobeHub. The MIT license is included in `dist/renderer/provider-icons/LICENSE.txt`.
+The bundled provider marks come from [LobeHub Icons](https://github.com/lobehub/lobe-icons), package `@lobehub/icons-static-webp` 2.6.0 (light and dark variants), and the retained SVG package 1.102.0. Copyright 2023 LobeHub. The MIT license is included in `dist/renderer/provider-icons/LICENSE.txt`. Jalapeno Cloud and Tensdaq marks are sourced from the pinned Read Frog GPL-3.0 tree identified above; their provenance is recorded in `provider-icons/NOTICE.txt`. These marks identify supported services and do not imply endorsement.
 
 ## Runtime dependencies and assets
 
 - franc 6.2.0 and its language-model dependencies retain their MIT notices.
 - Electron: MIT (Chromium and bundled components retain their own notices in the Electron distribution).
 - React and React DOM: MIT.
+- Vercel AI SDK provider adapters for Anthropic, Google, Azure, Amazon Bedrock, Cohere and Open Responses: Apache-2.0. `ai-sdk-ollama`: MIT. Their exact versions and transitive dependency licenses are retained in the package lock and installed packages.
 - Lucide: ISC.
 - Zod: MIT.
 - LiquidJS (MIT) evaluates local HTML + Liquid layouts. DOMPurify (Apache-2.0 or MPL-2.0) sanitizes the resulting markup.

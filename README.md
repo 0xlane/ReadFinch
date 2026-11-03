@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar
 
 ### Your provider. Your model. Your choice.
 
-Use presets for OpenAI, DeepSeek, Gemini, Alibaba Cloud, SiliconFlow and OpenRouter, or connect an OpenAI-compatible Chat Completions endpoint. Each provider entry holds one model; duplicate it to use another. Translation, dictionary, writing and image recognition can use different providers. Model suggestions, connection tests, temperature and custom request headers are available in settings.
+Choose from 33 provider options, including OpenAI, Anthropic, Gemini, DeepSeek, Azure, Amazon Bedrock, OpenRouter and dedicated translation services. Native APIs, Chat Completions and Responses are supported. Each AI provider entry holds one model; duplicate it to use another. Assign different providers to translation, dictionary, writing, OCR and language detection. Settings include model suggestions, connection tests, temperature, custom headers and per-provider proxy controls.
 
 ### Read in your language
 
@@ -146,8 +146,9 @@ Windows has been exercised on the development machine. macOS and Linux implement
 - [Offline OCR and vision APIs](docs/OCR.md)
 - [Configuration and WebDAV](docs/CONFIGURATION.md)
 - [Platform support and permissions](docs/PLATFORMS.md)
+- [Interface, translation and explanation languages](docs/LANGUAGES.md)
 
-Technical documentation is currently maintained in Chinese.
+Technical documentation is available in Chinese or English.
 
 ## Help ReadFinch grow
 

@@ -1,3 +1,4 @@
+import { isTranslationOnly } from "../shared/provider-presets";
 import { APP_NAME, APP_ID } from "../shared/brand";
 import { OnlineVoiceIdSchema } from "../shared/tts";
 import {
@@ -56,6 +57,12 @@ import {
 } from "../shared/notes";
 import { resolveLocale, setLocale, t } from "../shared/i18n";
 import {
+  canonicalizeBuiltinConfig,
+  localizeBuiltinConfig,
+  matchingBuiltinOutput,
+} from "../shared/action-language";
+import { resolveResultLanguage } from "../shared/languages";
+import {
   editToolbar,
   toolbarEnabled,
   toolbarItems,
@@ -108,7 +115,7 @@ const root = app.getAppPath();
 const resource = app.isPackaged ? process.resourcesPath : root;
 const nativeRoot = path.join(resource, "native");
 const dataDir = app.getPath("userData");
-const store = new ConfigStore(dataDir);
+const store = new ConfigStore(dataDir, canonicalizeBuiltinConfig);
 const localNotes = new LocalNotes(path.join(dataDir, "local-notes.sqlite"));
 const secrets = new Secrets(dataDir);
 const native = new SelectionService(nativeRoot);
@@ -198,6 +205,13 @@ function interfaceLocale() {
     app.getPreferredSystemLanguages(),
   );
 }
+function runtimeConfig() {
+  return localizeBuiltinConfig(
+    store.config,
+    interfaceLocale(),
+    app.getPreferredSystemLanguages(),
+  );
+}
 const dav = new DavSync(
   store,
   () => settings,
@@ -234,7 +248,8 @@ async function snapshot(): Promise<Snapshot> {
     version: app.getVersion(),
     toolbarPausedUntil,
     interfaceLocale: interfaceLocale(),
-    config: store.config,
+    systemLanguages: app.getPreferredSystemLanguages(),
+    config: runtimeConfig(),
     revision: store.revision,
     credentialIds,
     secureStorage: secrets.available,
@@ -257,7 +272,7 @@ async function snapshot(): Promise<Snapshot> {
 async function configChanged() {
   if (
     pendingSuggestion &&
-    suggestionBinding(store.config)?.key !== pendingSuggestion.bindingKey
+    suggestionBinding(runtimeConfig())?.key !== pendingSuggestion.bindingKey
   )
     cancelSuggestion();
   resultCache.configure(store.config.cache);
@@ -1075,9 +1090,11 @@ async function saveActionNotes(
   create = false,
   suggestion?: PendingSuggestion,
 ) {
-  let config = store.config;
+  let config = runtimeConfig();
   const revision = store.revision;
   let action = config.actions.find((a) => a.id === inputs[0]?.actionId);
+  if (action)
+    action = matchingBuiltinOutput(action, inputs[0]?.outputView?.outputSchema);
   if (!action) throw Error(t("指令已变更，请重新运行"));
   if (
     inputs.some(
@@ -1089,6 +1106,10 @@ async function saveActionNotes(
     throw Error(t("指令已变更，请重新运行"));
   const creating = !action.noteConnection;
   if (creating) {
+    config = {
+      ...config,
+      actions: config.actions.map((a) => (a.id === action!.id ? action! : a)),
+    };
     if (!create) throw Error(t("请先连接可用的本地笔记库"));
     config = createNotebase(config, action);
     action = config.actions.find((a) => a.id === inputs[0].actionId)!;
@@ -1205,7 +1226,7 @@ async function handle(
       if (
         !run?.translated ||
         run.id !== id ||
-        suggestionBinding(store.config)?.key !== run.bindingKey ||
+        suggestionBinding(runtimeConfig())?.key !== run.bindingKey ||
         indexes.some((index) => !run.notes[index])
       )
         throw Error(t("推荐已过期，请重新翻译。"));
@@ -1450,7 +1471,7 @@ async function handle(
           refresh: z.boolean().optional(),
         })
         .parse(arg);
-      const cfg = store.config;
+      const cfg = runtimeConfig();
       const action = cfg.actions.find(
         (a) => a.id === input.actionId && a.enabled,
       );
@@ -1461,9 +1482,21 @@ async function handle(
           (input.providerId ?? action.providerId ?? cfg.defaults.textProfileId),
       );
       if (!provider) throw Error(t("文字服务不存在"));
+      if (isTranslationOnly(provider) && action.id !== "translate")
+        throw Error(t("纯翻译提供商只能用于翻译"));
       if (!provider.enabled)
         throw Error(t("此 API 提供商已停用，请选择其他模型"));
       return beginJob(win, input.id, "text", async (signal, emit) => {
+        const targetLanguage = resolveResultLanguage(
+          input.targetLanguage,
+          cfg.appearance.language,
+          app.getPreferredSystemLanguages(),
+        );
+        const explanationLanguage = resolveResultLanguage(
+          cfg.defaults.explanationLanguage,
+          cfg.appearance.language,
+          app.getPreferredSystemLanguages(),
+        );
         let sourceLanguage = input.sourceLanguage;
         if (
           sourceLanguage === "auto" &&
@@ -1490,19 +1523,24 @@ async function handle(
         if (
           win === panel &&
           action.id === "translate" &&
-          provider.model.trim() &&
+          (provider.model.trim() || isTranslationOnly(provider)) &&
           (!provider.requiresKey ||
             key ||
             new Headers(headers).has("Authorization"))
         )
-          startSuggestions(store.config, { ...input, sourceLanguage });
+          startSuggestions(cfg, {
+            ...input,
+            sourceLanguage,
+            targetLanguage,
+            explanationLanguage,
+          });
         const variables = {
           text: input.text,
           context: input.context,
           sourceApp: win === panel ? noteSourceApp(interaction) : "",
-          targetLanguage: input.targetLanguage,
+          targetLanguage,
           sourceLanguage,
-          explanationLanguage: cfg.defaults.explanationLanguage,
+          explanationLanguage,
         };
         const outputContract = action.outputSchema
           ? jsonContract(action.outputSchema, (s) =>
@@ -1510,7 +1548,20 @@ async function handle(
             )
           : undefined;
         const answer = await cachedComplete(
-          { ...provider, headers, outputContract },
+          {
+            ...provider,
+            headers,
+            outputContract,
+            ...(action.id === "translate"
+              ? {
+                  translation: {
+                    text: input.text,
+                    sourceLanguage,
+                    targetLanguage,
+                  },
+                }
+              : {}),
+          },
           actionMessages(action, variables),
           key,
           signal,
@@ -1637,7 +1688,23 @@ async function handle(
         return t("语音接口已返回音频");
       }
       const result = await complete(
-        { ...p, headers },
+        {
+          ...p,
+          headers,
+          ...(isTranslationOnly(p)
+            ? {
+                translation: {
+                  text: "Hello, world!",
+                  sourceLanguage: "en",
+                  targetLanguage: resolveResultLanguage(
+                    store.config.defaults.targetLanguage,
+                    store.config.appearance.language,
+                    app.getPreferredSystemLanguages(),
+                  ),
+                },
+              }
+            : {}),
+        },
         [{ role: "user", content: "Reply with exactly: ReadFinch OK" }],
         key,
         new AbortController().signal,

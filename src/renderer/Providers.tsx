@@ -10,7 +10,8 @@ import {
   type TextProfile,
 } from "../shared/config";
 import { modelPurposes, type ModelPurpose } from "../shared/models";
-import { providerPreset } from "../shared/provider-presets";
+import { providerPreset, isTranslationOnly } from "../shared/provider-presets";
+import { ProviderSpecificSettings } from "./ProviderSpecificSettings";
 import { Field } from "./ui";
 import { ProviderIcon, ProviderSwitch } from "./provider-ui";
 import { ProviderModels } from "./ProviderModels";
@@ -62,7 +63,7 @@ export function Providers(props: ProviderProps) {
     if (id) select(id);
   }
   const remaining = config.providers.filter((p) => p.id !== provider.id);
-  const fallback = remaining.find((p) => p.enabled);
+  const fallback = remaining.find((p) => p.enabled && !isTranslationOnly(p));
   function remove() {
     if (!fallback) return;
     const id = provider.id;
@@ -106,7 +107,7 @@ export function Providers(props: ProviderProps) {
           <h2 id="provider-config-title">{t("提供商配置")}</h2>
           <p>
             {t(
-              "添加伴读雀可以调用的提供商，或接入兼容 Chat Completions 的自定义 API。",
+              "接入常用 AI 与翻译服务，也可添加兼容 Chat Completions 或 Responses 的自定义 API。",
             )}
           </p>
         </div>
@@ -124,7 +125,8 @@ export function Providers(props: ProviderProps) {
               const bindings = purposes.filter(
                 (use) => use.providerId === item.id,
               );
-              const assigned = item.model ? bindings : [];
+              const assigned =
+                item.model || isTranslationOnly(item) ? bindings : [];
               return (
                 <div
                   className="provider-list-item"
@@ -236,6 +238,7 @@ function ProviderEditor({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const model = provider.model;
   const preset = providerPreset(provider.preset);
+  const translationOnly = isTranslationOnly(provider);
   function change(patch: Partial<TextProfile>) {
     onChange({
       ...config,
@@ -247,8 +250,14 @@ function ProviderEditor({
   const testButton = (
     <button
       className="provider-small-button"
-      disabled={busy || !model || !provider.enabled}
-      title={model ? t("使用 ") + model + t(" 测试连接") : t("请先选择模型")}
+      disabled={busy || (!model && !translationOnly) || !provider.enabled}
+      title={
+        translationOnly
+          ? t("测试翻译接口")
+          : model
+            ? t("使用 ") + model + t(" 测试连接")
+            : t("请先选择模型")
+      }
       onClick={() => test(provider.id, model)}
     >
       {t("测试连接")}
@@ -297,7 +306,14 @@ function ProviderEditor({
           {testButton}
         </div>
       )}
-      <Field label="Base URL">
+      <ProviderSpecificSettings provider={provider} change={change} />
+      <Field
+        label={
+          provider.preset === "open-responses" || provider.preset === "deeplx"
+            ? t("接口 URL")
+            : "Base URL"
+        }
+      >
         <input
           type="url"
           aria-label={t("API 基础地址")}
@@ -320,22 +336,24 @@ function ProviderEditor({
           <ChevronRight size={15} />
           {t("高级选项")}
         </summary>
-        <Field label={t("温度")} hint={t("留空使用提供商默认值。")}>
-          <input
-            type="number"
-            step="0.01"
-            min={0}
-            max={2}
-            placeholder={t("默认")}
-            value={provider.temperature ?? ""}
-            onChange={(e) =>
-              change({
-                temperature:
-                  e.target.value === "" ? null : Number(e.target.value),
-              })
-            }
-          />
-        </Field>
+        {!translationOnly && (
+          <Field label={t("温度")} hint={t("留空使用提供商默认值。")}>
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              max={2}
+              placeholder={t("默认")}
+              value={provider.temperature ?? ""}
+              onChange={(e) =>
+                change({
+                  temperature:
+                    e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+            />
+          </Field>
+        )}
         <ProviderProxySettings
           value={provider.proxy}
           onChange={(proxy) => change({ proxy })}
@@ -354,14 +372,16 @@ function ProviderEditor({
           />
           {t("需要 API Key")}
         </label>
-        <label>
-          <ProviderSwitch
-            label={t("流式输出")}
-            checked={provider.stream}
-            onChange={(stream) => change({ stream })}
-          />
-          {t("流式输出")}
-        </label>
+        {!translationOnly && (
+          <label>
+            <ProviderSwitch
+              label={t("流式输出")}
+              checked={provider.stream}
+              onChange={(stream) => change({ stream })}
+            />
+            {t("流式输出")}
+          </label>
+        )}
         <Field label={t("请求超时（秒）")}>
           <input
             type="number"

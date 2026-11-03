@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 ### 用自己的提供商，选适合的模型
 
-内置 OpenAI、DeepSeek、Gemini、阿里云百炼、硅基流动和 OpenRouter 预设，也支持自定义 OpenAI 兼容 Chat Completions 接口。一个提供商条目对应一个模型；需要另一模型时可以复制条目。翻译、词典、写作和图片识别可分别使用不同提供商，并支持模型联想、连接测试、温度和自定义请求头。
+支持 33 种提供商选项，涵盖 OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter 与纯翻译服务，支持原生 API、Chat Completions 和 Responses。一个 AI 提供商条目对应一个模型，可复制条目使用其他模型。翻译、词典、写作、OCR 和语言检测可分别分配提供商，并支持模型联想、连接测试、温度、自定义请求头及独立代理。
 
 ### 用熟悉的语言阅读
 
@@ -146,8 +146,9 @@ Windows 已在开发机器上验证。macOS 和 Linux 提供对应实现，原�
 - [离线 OCR 与视觉接口](../../docs/OCR.md)
 - [配置管理与 WebDAV](../../docs/CONFIGURATION.md)
 - [平台支持与权限](../../docs/PLATFORMS.md)
+- [界面、翻译与解释语言](../../docs/LANGUAGES.md)
 
-技术文档目前以中文维护。
+技术文档使用中文或英文。
 
 ## 一起让伴读雀更好用
 

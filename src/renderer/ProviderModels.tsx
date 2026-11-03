@@ -8,6 +8,7 @@ import {
 } from "../shared/config";
 import {
   assignProvider,
+  providerCanServe,
   modelOptions,
   supportsImages,
   type ModelPurpose,
@@ -15,6 +16,7 @@ import {
 import { ModelPicker, type ModelCatalogAccess } from "./ModelPicker";
 import { ProviderSwitch } from "./provider-ui";
 import { Field } from "./ui";
+import { isTranslationOnly } from "../shared/provider-presets";
 
 export function ProviderModels({
   config,
@@ -30,6 +32,7 @@ export function ProviderModels({
 }) {
   const [expanded, setExpanded] = useState(false);
   const model = provider.model;
+  const translationOnly = isTranslationOnly(provider);
   const capability = modelOptions(config, provider.id).find(
     (option) => option.id === model,
   )?.vision;
@@ -38,49 +41,55 @@ export function ProviderModels({
   const count = purposes.filter(assigned).length;
   return (
     <div className="provider-model-control">
-      <ModelPicker
-        config={config}
-        label={t("模型")}
-        placeholder={t("选择或输入模型 ID")}
-        provider={provider}
-        onChange={(updated) => {
-          const changed = {
-            ...config,
-            providers: config.providers.map((p) =>
-              p.id === provider.id ? updated : p,
-            ),
-          };
-          onChange(
-            config.defaults.ocrProfileId === provider.id &&
-              !supportsImages(updated)
-              ? assignProvider(changed, "ocr", null)
-              : changed,
-          );
-        }}
-        {...catalog}
-      />
-      <Field label={t("推理强度")}>
-        <select
-          aria-label={t("推理强度")}
-          value={provider.reasoningEffort ?? ""}
-          onChange={(e) => {
-            const effort = reasoningEfforts.find(
-              (item) => item === e.currentTarget.value,
-            );
-            onChange({
-              ...config,
-              providers: config.providers.map((p) =>
-                p.id === provider.id ? { ...p, reasoningEffort: effort } : p,
-              ),
-            });
-          }}
-        >
-          <option value="">{t("提供商默认")}</option>
-          {reasoningEfforts.map((effort) => (
-            <option key={effort}>{effort}</option>
-          ))}
-        </select>
-      </Field>
+      {!translationOnly && (
+        <>
+          <ModelPicker
+            config={config}
+            label={t("模型")}
+            placeholder={t("选择或输入模型 ID")}
+            provider={provider}
+            onChange={(updated) => {
+              const changed = {
+                ...config,
+                providers: config.providers.map((p) =>
+                  p.id === provider.id ? updated : p,
+                ),
+              };
+              onChange(
+                config.defaults.ocrProfileId === provider.id &&
+                  !supportsImages(updated)
+                  ? assignProvider(changed, "ocr", null)
+                  : changed,
+              );
+            }}
+            {...catalog}
+          />
+          <Field label={t("推理强度")}>
+            <select
+              aria-label={t("推理强度")}
+              value={provider.reasoningEffort ?? ""}
+              onChange={(e) => {
+                const effort = reasoningEfforts.find(
+                  (item) => item === e.currentTarget.value,
+                );
+                onChange({
+                  ...config,
+                  providers: config.providers.map((p) =>
+                    p.id === provider.id
+                      ? { ...p, reasoningEffort: effort }
+                      : p,
+                  ),
+                });
+              }}
+            >
+              <option value="">{t("提供商默认")}</option>
+              {reasoningEfforts.map((effort) => (
+                <option key={effort}>{effort}</option>
+              ))}
+            </select>
+          </Field>
+        </>
+      )}
       <button
         className="provider-disclosure"
         aria-expanded={expanded}
@@ -100,45 +109,57 @@ export function ProviderModels({
           id="model-features"
           aria-label={t("模型用途")}
         >
-          {!model ? (
+          {!model && !translationOnly ? (
             <p>{t("选择模型后即可分配功能。")}</p>
           ) : (
             <>
-              {purposes.map((purpose) => {
-                const checked = assigned(purpose);
-                const textOnly = purpose.id === "ocr" && capability === false;
-                return (
-                  <label
-                    key={purpose.id}
-                    title={textOnly ? t("此模型仅支持文字输入") : undefined}
-                  >
-                    <ProviderSwitch
-                      label={t("将 ") + model + t(" 用于 ") + purpose.name}
-                      checked={checked}
-                      disabled={
-                        !provider.enabled ||
-                        textOnly ||
-                        (checked && purpose.id === "default")
-                      }
-                      title={
-                        checked && purpose.id === "default"
-                          ? t("在其他模型上开启此项可更换默认模型")
-                          : undefined
-                      }
-                      onChange={(on) =>
-                        onChange(
-                          assignProvider(
-                            config,
-                            purpose.id,
-                            on ? provider.id : null,
-                          ),
-                        )
-                      }
-                    />
-                    <span>{purpose.name}</span>
-                  </label>
-                );
-              })}
+              {purposes
+                .filter(
+                  (purpose) =>
+                    providerCanServe(provider, purpose.id) ||
+                    (purpose.id === "ocr" && !translationOnly),
+                )
+                .map((purpose) => {
+                  const checked = assigned(purpose);
+                  const textOnly =
+                    purpose.id === "ocr" && !supportsImages(provider);
+                  return (
+                    <label
+                      key={purpose.id}
+                      title={textOnly ? t("此模型仅支持文字输入") : undefined}
+                    >
+                      <ProviderSwitch
+                        label={
+                          t("将 ") +
+                          (model || provider.name) +
+                          t(" 用于 ") +
+                          purpose.name
+                        }
+                        checked={checked}
+                        disabled={
+                          !provider.enabled ||
+                          textOnly ||
+                          (checked && purpose.id === "default")
+                        }
+                        title={
+                          checked && purpose.id === "default"
+                            ? t("在其他模型上开启此项可更换默认模型")
+                            : undefined
+                        }
+                        onChange={(on) =>
+                          onChange(
+                            assignProvider(
+                              config,
+                              purpose.id,
+                              on ? provider.id : null,
+                            ),
+                          )
+                        }
+                      />
+                      <span>{purpose.name}</span>
+                    </label>
+                  );
+                })}
               <p>{t("未单独指定的指令使用默认模型。")}</p>
             </>
           )}

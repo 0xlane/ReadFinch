@@ -16,7 +16,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.14.0-4d443e?style=flat-square" alt="0.14.0">
+<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
@@ -73,7 +73,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 ### プロバイダーもモデルも、自分で選ぶ
 
-OpenAI、DeepSeek、Gemini、Alibaba Cloud、SiliconFlow、OpenRouter のプリセット、または OpenAI 互換 Chat Completions エンドポイントを利用できます。1 つのプロバイダー項目に 1 つのモデルを設定し、別のモデルには項目を複製します。翻訳、辞書、文章改善、画像認識ごとにプロバイダーを分けられます。モデル候補、接続テスト、temperature、カスタムリクエストヘッダーにも対応しています。
+OpenAI、Anthropic、Gemini、DeepSeek、Azure、Amazon Bedrock、OpenRouter、翻訳専用サービスなど、33 種類のプロバイダー設定に対応。ネイティブ API、Chat Completions、Responses を利用できます。AI プロバイダーの項目ごとにモデルを 1 つ設定し、別のモデルには項目を複製します。翻訳、辞書、文章改善、OCR、言語検出にそれぞれ異なるプロバイダーを割り当てられます。モデル候補、接続テスト、temperature、カスタムヘッダー、個別のプロキシ設定も利用できます。
 
 ### 自分の言語で読む
 
@@ -146,8 +146,9 @@ Windows は開発用端末で検証しています。macOS と Linux にも実�
 - [オフライン OCR と画像認識 API](../../docs/OCR.md)
 - [設定管理と WebDAV](../../docs/CONFIGURATION.md)
 - [プラットフォームと権限](../../docs/PLATFORMS.md)
+- [画面・翻訳・解説の言語](../../docs/LANGUAGES.md)
 
-技術ドキュメントは現在、中国語で管理しています。
+技術文書は中国語または英語で提供しています。
 
 ## ReadFinch を一緒に育てる
 

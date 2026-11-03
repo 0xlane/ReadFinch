@@ -3,6 +3,7 @@ import { Check, Copy, Sparkles } from "lucide-react";
 import type { Action, Config } from "../shared/config";
 import { buildActionHelperPrompt } from "../shared/action-ai-helper";
 import { resolveLocale, t } from "../shared/i18n";
+import { resolveResultLanguage } from "../shared/languages";
 
 export function ActionAIHelper({
   action,
@@ -48,6 +49,7 @@ export function ActionAIHelper({
     setError("");
     try {
       // Build on click, so unsaved edits are included. No credentials enter this input.
+      const state = await window.readfinch.call("snapshot");
       const text = buildActionHelperPrompt({
         action,
         otherActionNames: config.actions
@@ -55,9 +57,18 @@ export function ActionAIHelper({
           .map((a) => a.name),
         uiLocale: resolveLocale(
           config.appearance.language,
-          navigator.languages,
+          state.systemLanguages,
         ),
-        targetLanguage: config.defaults.targetLanguage,
+        targetLanguage: resolveResultLanguage(
+          config.defaults.targetLanguage,
+          config.appearance.language,
+          state.systemLanguages,
+        ),
+        explanationLanguage: resolveResultLanguage(
+          config.defaults.explanationLanguage,
+          config.appearance.language,
+          state.systemLanguages,
+        ),
       });
       await window.readfinch.call("clipboardWrite", { text });
       setCopied(true);

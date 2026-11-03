@@ -2,6 +2,10 @@ import { t } from "../shared/i18n";
 import { useEffect, useId, useRef, useState, Fragment } from "react";
 import { Check, ChevronDown, Image, RefreshCw, Volume2 } from "lucide-react";
 import type { Config, TextProfile } from "../shared/config";
+import {
+  isCustomProvider,
+  canDiscoverModels,
+} from "../shared/provider-presets";
 import { catalogKey, modelOptions } from "../shared/models";
 import {
   chooseProviderModel,
@@ -41,7 +45,7 @@ export function ModelPicker({
   const key = catalogKey(provider);
   const currentKey = useRef(key);
   currentKey.current = key;
-  const customOnly = provider.preset === "custom";
+  const customOnly = isCustomProvider(provider.preset);
   const custom = customOnly || provider.customModel;
   const options = modelOptions(config, provider.id, catalogs[key] ?? []);
   const ordered = [
@@ -100,7 +104,9 @@ export function ModelPicker({
     setError("");
     setEmpty(false);
     setBusy(false);
-    return () => { currentKey.current = ""; };
+    return () => {
+      currentKey.current = "";
+    };
   }, [key]);
   useEffect(() => {
     if (!open) return;
@@ -173,7 +179,7 @@ export function ModelPicker({
               <Image size={12} /> {t("图片输入")}
             </span>
           )}
-          {fetchModels && (
+          {fetchModels && canDiscoverModels(provider) && (
             <button
               type="button"
               className="model-fetch-button"
