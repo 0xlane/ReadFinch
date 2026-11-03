@@ -1,7 +1,7 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "0.15.3",
+  "version": "1.0.0",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
@@ -29,6 +29,7 @@
     "test:ocr": "node --require ./scripts/block-network.cjs --import tsx scripts/verify-ocr.ts",
     "test:native": "node scripts/native-smoke.mjs",
     "test:selection": "node scripts/selection-compatibility-smoke.mjs",
+    "test:updates": "node scripts/update-ui-smoke.mjs",
     "test:packaged": "node scripts/packaged-smoke.mjs",
     "assets:ocr": "node scripts/download-ocr.mjs",
     "native:build": "node scripts/build-native.mjs",
@@ -56,6 +57,7 @@
     "codemirror": "^6.0.2",
     "diff": "^8.0.2",
     "dompurify": "^3.4.17",
+    "electron-updater": "6.8.11",
     "franc": "6.2.0",
     "liquidjs": "^10.30.1",
     "lucide-react": "^0.468.0",
@@ -83,6 +85,14 @@
   },
   "build": {
     "appId": "app.readfinch.ReadFinch",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "0xlane",
+        "repo": "ReadFinch",
+        "releaseType": "release"
+      }
+    ],
     "asar": true,
     "directories": {
       "output": "release"
@@ -125,12 +135,19 @@
       ]
     },
     "nsis": {
+      "artifactName": "ReadFinch-${version}-windows-${arch}-setup.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "shortcutName": "ReadFinch",
       "uninstallDisplayName": "ReadFinch ${version}"
     },
+    "portable": {
+      "artifactName": "ReadFinch-${version}-windows-${arch}-portable.${ext}"
+    },
     "mac": {
+      "artifactName": "ReadFinch-${version}-macos-${arch}.${ext}",
+      "identity": "-",
+      "hardenedRuntime": false,
       "target": [
         "dmg",
         "zip"
@@ -142,6 +159,8 @@
       }
     },
     "linux": {
+      "maintainer": "ReadFinch contributors",
+      "artifactName": "ReadFinch-${version}-linux-${arch}.${ext}",
       "target": [
         "AppImage",
         "deb"

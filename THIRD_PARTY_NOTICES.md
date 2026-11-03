@@ -40,5 +40,6 @@ The bundled provider marks come from [LobeHub Icons](https://github.com/lobehub/
 - Tesseract.js and Tesseract.js-core: Apache-2.0. Upstream engine components retain their included license files.
 - `eng.traineddata` and `chi_sim.traineddata`: tesseract-ocr/tessdata_fast 4.1.0, Apache-2.0. https://github.com/tesseract-ocr/tessdata_fast
 - react-markdown, remark-gfm and diff: MIT. Transitive dependency licenses are shipped with their packages.
+- electron-updater: MIT. It provides the Windows NSIS and Linux AppImage update installation engine; its license and runtime dependencies are included in the distribution.
 
 Exact installed runtime dependency versions are recorded in package-lock.json; static reference icon package versions are recorded above and in their bundled notice. Other UI icons are Lucide and the original ReadFinch mark. No remotely hosted fonts or stock illustrations are loaded.

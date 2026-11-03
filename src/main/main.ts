@@ -108,6 +108,8 @@ import {
   startsInTray,
 } from "./login-startup";
 import { Secrets } from "./secrets";
+import { DesktopUpdates } from "./updates";
+import { projectLinks, type UpdateState } from "../shared/updates";
 
 const dataArg = process.argv.find((a) => a.startsWith("--data-dir="));
 if (dataArg) app.setPath("userData", path.resolve(dataArg.slice(11)));
@@ -126,6 +128,9 @@ const secrets = new Secrets(dataDir);
 const native = new SelectionService(nativeRoot);
 const jobs = new JobGate();
 const resultCache = new CompletionCache();
+const updates = new DesktopUpdates((state) => {
+  broadcast("update", state);
+});
 setProviderTransport(providerFetch);
 const cachedComplete = resultCache.run.bind(resultCache);
 let main: BrowserWindow;
@@ -252,6 +257,7 @@ async function snapshot(): Promise<Snapshot> {
   }
   return {
     version: app.getVersion(),
+    updates: updates.state,
     toolbarPausedUntil,
     interfaceLocale: interfaceLocale(),
     systemLanguages: app.getPreferredSystemLanguages(),
@@ -414,6 +420,8 @@ function updateTray() {
         updateTray();
       },
     },
+    { label: t("软件更新"), click: () => openSettings("updates") },
+    { label: t("关于伴读雀"), click: () => openSettings("about") },
     { label: `${t("伴读雀")} ${app.getVersion()}`, enabled: false },
     {
       label: t("退出伴读雀"),
@@ -1143,6 +1151,25 @@ async function handle(
   switch (method) {
     case "snapshot":
       return snapshot();
+    case "updateCheck":
+    case "updateDownload":
+    case "updateInstall":
+    case "updatePreference": {
+      if (win !== main) throw Error(t("仅可从设置窗口管理更新"));
+      if (method === "updatePreference")
+        return updates.setAutomatic(z.boolean().parse(arg?.automatic));
+      if (method === "updateInstall") return updates.service!.install();
+      if (method === "updateDownload") return updates.service!.download();
+      return updates.service!.check();
+    }
+    case "openProjectLink": {
+      if (win !== main) throw Error(t("仅可从设置窗口打开项目链接"));
+      const link = z
+        .enum(["repository", "issues", "releases", "license", "credits"])
+        .parse(arg?.link);
+      await shell.openExternal(projectLinks[link]);
+      return;
+    }
     case "setTheme": {
       const theme = z.enum(["light", "dark", "system"]).parse(arg.theme);
       const config = store.config;
@@ -1188,6 +1215,8 @@ async function handle(
             "shortcuts",
             "config",
             "notes",
+            "about",
+            "updates",
           ])
           .parse(arg.tab),
         undefined,
@@ -1962,6 +1991,7 @@ async function boot() {
   const atLogin = startsInTray(process.argv);
   const firstLaunch = !existsSync(store.file);
   await store.init();
+  await updates.init();
   if (existsSync(path.join(dataDir, "local-notes.sqlite"))) {
     const cfg = store.config,
       missing = localNotes.legacyBooks(cfg);
@@ -2081,6 +2111,9 @@ async function boot() {
         clearSelection() {
           native.invalidate();
         },
+        updateView(value: Partial<UpdateState>) {
+          broadcast("update", { ...updates.state, ...value });
+        },
         image(dataUrl: string, source: "capture" | "image" = "capture") {
           openImage(
             imageCapture(nativeImage.createFromDataURL(dataUrl)),
@@ -2135,6 +2168,7 @@ app.on("before-quit", () => {
   if (pill && !pill.isDestroyed()) pill.destroy();
   cancelSuggestion();
   jobs.cancelAll();
+  updates.stop();
   native.stop();
   globalShortcut.unregisterAll();
 });

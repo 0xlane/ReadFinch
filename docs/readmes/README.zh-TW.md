@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[開始使用](#get-started) · [功能介紹](#features) · [技術文件](#documentation) · [回報問題](https://github.com/0xlane/ReadFinch/issues)
+[下載最新版](https://github.com/0xlane/ReadFinch/releases/latest) · [開始使用](#get-started) · [功能介紹](#features) · [技術文件](#documentation) · [回報問題](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ README 與應用程式預設的 8 種目標語言一致：
 <a id="get-started"></a>
 
 ## 開始使用
+
+**[下載最新版](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+從 GitHub Releases 下載適合目前系統的安裝套件。Windows 建議使用 setup.exe 安裝版，也可選擇免安裝的 portable.exe。macOS 請依晶片選擇 arm64（Apple 晶片）或 x64（Intel）。
+
+預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在軟體更新頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。
+
+### 從原始碼建置
 
 本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器；macOS 需要 Xcode 命令列工具。
 

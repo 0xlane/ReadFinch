@@ -1,0 +1,102 @@
+name: Publish release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Package ${{ matrix.platform }} ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            command: --win nsis portable --x64
+          - os: macos-15
+            platform: macos
+            arch: arm64
+            command: --mac dmg zip --arm64
+          - os: macos-15-intel
+            platform: macos
+            arch: x64
+            command: --mac dmg zip --x64
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x64
+            command: --linux AppImage deb --x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run assets:ocr
+      - run: npm run build
+      - run: npm run test:ocr
+      - name: Build platform packages
+        run: npx electron-builder ${{ matrix.command }} --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.platform }}-${{ matrix.arch }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+
+  publish:
+    name: Verify, sign and publish
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: release-assets
+          merge-multiple: true
+      - name: Verify complete packages and sign the update manifest
+        env:
+          UPDATE_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_SIGNING_PRIVATE_KEY }}
+        run: node --import tsx scripts/publish-manifest.mjs release-assets
+      - name: Publish complete stable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --verify-tag --draft --title "ReadFinch ${tag#v} · 伴读雀" --notes-file "docs/releases/$tag.md"
+          fi
+          draft=$(gh release view "$tag" --json isDraft --jq .isDraft)
+          if [ "$draft" != "true" ]; then
+            echo "This version is already published. Create a new version instead of replacing installed update assets."
+            exit 1
+          fi
+          gh release upload "$tag" release-assets/* --clobber
+          gh release edit "$tag" --draft=false --latest

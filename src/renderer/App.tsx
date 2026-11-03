@@ -15,6 +15,8 @@ import {
   Circle,
   Keyboard,
   LibraryBig,
+  Info,
+  RefreshCw,
 } from "lucide-react";
 import type { SettingsLocation, Snapshot } from "../shared/api";
 import { Settings } from "./Settings";
@@ -92,9 +94,44 @@ function SettingsApp({
         </button>
       </header>
       <aside className="settings-sidebar">
-        <div className="sidebar-label">{t("偏好设置")}</div>
-        <nav aria-label={t("设置分类")}>
-          {navigation.map(([id, label, Icon]) => (
+        <div className="sidebar-scroll">
+          <div className="sidebar-label">{t("偏好设置")}</div>
+          <nav aria-label={t("设置分类")}>
+            {navigation.map(([id, label, Icon]) => (
+              <button
+                key={id}
+                aria-label={t(label)}
+                title={t(label)}
+                aria-current={tab === id ? "page" : undefined}
+                className={tab === id ? "selected" : ""}
+                onClick={() => setLocation({ tab: id, request: 0 })}
+              >
+                <Icon size={17} />
+                <span>{t(label)}</span>
+              </button>
+            ))}
+          </nav>
+          <div className="sidebar-label library-label">{t("资料库")}</div>
+          <nav aria-label={t("资料库")}>
+            <button
+              aria-label={t("本地笔记库")}
+              title={t("本地笔记库")}
+              aria-current={tab === "notes" ? "page" : undefined}
+              className={tab === "notes" ? "selected" : ""}
+              onClick={() => setLocation({ tab: "notes", request: 0 })}
+            >
+              <LibraryBig size={17} />
+              <span>{t("本地笔记库")}</span>
+            </button>
+          </nav>
+        </div>
+        <nav className="sidebar-system" aria-label={t("应用信息")}>
+          {(
+            [
+              ["updates", "软件更新", RefreshCw],
+              ["about", "关于", Info],
+            ] as const
+          ).map(([id, label, Icon]) => (
             <button
               key={id}
               aria-label={t(label)}
@@ -105,21 +142,12 @@ function SettingsApp({
             >
               <Icon size={17} />
               <span>{t(label)}</span>
+              {id === "updates" &&
+                ["available", "downloaded"].includes(
+                  snapshot.updates.status,
+                ) && <span className="sidebar-update-dot" />}
             </button>
           ))}
-        </nav>
-        <div className="sidebar-label library-label">{t("资料库")}</div>
-        <nav aria-label={t("资料库")}>
-          <button
-            aria-label={t("本地笔记库")}
-            title={t("本地笔记库")}
-            aria-current={tab === "notes" ? "page" : undefined}
-            className={tab === "notes" ? "selected" : ""}
-            onClick={() => setLocation({ tab: "notes", request: 0 })}
-          >
-            <LibraryBig size={17} />
-            <span>{t("本地笔记库")}</span>
-          </button>
         </nav>
         <div className="sidebar-bottom">
           <div className="native-state" title={t(snapshot.nativeStatus)}>

@@ -2,13 +2,21 @@
   "en": {
     "tagline": "A reading companion, right beside your words.",
     "intro": "Translate a passage, understand a difficult sentence, or polish what you write—without leaving the app you’re using.",
-    "nav": ["Get started", "Features", "Documentation", "Report an issue"],
+    "nav": [
+      "Get started",
+      "Features",
+      "Documentation",
+      "Report an issue"
+    ],
     "previewTitle": "Stay with what you’re reading",
     "previewIntro": "Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar to your cursor and opens the answer beside the original. Pin a result for comparison, or collect a useful word for later.",
     "readingAlt": "ReadFinch shows a selected passage, a streamed translation and words suggested for the local notebook.",
     "readingCaption": "Select → understand → keep. A short path from unfamiliar text to something you can use.",
     "featuresTitle": "A little help, wherever your text lives",
-    "featureHeaders": ["What you want to do", "How ReadFinch helps"],
+    "featureHeaders": [
+      "What you want to do",
+      "How ReadFinch helps"
+    ],
     "features": [
       [
         "Read and understand",
@@ -55,7 +63,9 @@
       "**Try a screenshot.** Use the OCR shortcut below, select a region and review the recognized text. Offline OCR and system speech work before you configure an AI provider."
     ],
     "shortcutsTitle": "Useful shortcuts",
-    "shortcutHeaders": ["Command"],
+    "shortcutHeaders": [
+      "Command"
+    ],
     "shortcuts": [
       "Translate selection",
       "Open dictionary",
@@ -66,7 +76,10 @@
     ],
     "shortcutsNote": "Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.",
     "platformTitle": "Desktop integration",
-    "platformHeaders": ["Platform", "How text is acquired"],
+    "platformHeaders": [
+      "Platform",
+      "How text is acquired"
+    ],
     "platforms": [
       "Reads selections exposed by the foreground app through UI Automation.",
       "Uses Accessibility for selected text and Screen Recording permission for captures.",
@@ -98,18 +111,30 @@
     "licenseTitle": "License and acknowledgements",
     "license": "ReadFinch is licensed under **GPL-3.0-only**. Its selection-toolbar and command-card interactions are inspired by **Read Frog**. ReadFinch is an independent desktop project and is not an official Read Frog release.",
     "noticesLink": "Third-party notices",
-    "top": "Back to top"
+    "top": "Back to top",
+    "downloadLabel": "Download latest",
+    "downloadIntro": "Download a package for your operating system from GitHub Releases. On Windows, choose setup.exe for installation or portable.exe to run without installing. On macOS, choose arm64 for Apple silicon or x64 for Intel.",
+    "updatesInfo": "Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use Software updates to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.",
+    "buildTitle": "Build from source"
   },
   "zh-CN": {
     "tagline": "就在文字旁边，陪你读懂每一句。",
     "intro": "翻译一段文字、读懂一个长句、改好一句表达——留在正在使用的应用里，就能完成。",
-    "nav": ["开始使用", "功能介绍", "技术文档", "反馈问题"],
+    "nav": [
+      "开始使用",
+      "功能介绍",
+      "技术文档",
+      "反馈问题"
+    ],
     "previewTitle": "继续阅读，不必来回切换",
     "previewIntro": "在浏览器、PDF 阅读器或编辑器里选中文字，伴读雀就会在鼠标旁提供工具栏，并在原文附近展示答案。可以固定结果对照阅读，也可以把值得记住的词留下来。",
     "readingAlt": "伴读雀在原文旁展示流式译文，并推荐可收藏到本地笔记库的词条。",
     "readingCaption": "选中 → 理解 → 收藏。从陌生的文字，到可以用起来的知识。",
     "featuresTitle": "文字在哪里，帮助就在哪里",
-    "featureHeaders": ["想做什么", "伴读雀如何帮你"],
+    "featureHeaders": [
+      "想做什么",
+      "伴读雀如何帮你"
+    ],
     "features": [
       [
         "读懂原文",
@@ -156,7 +181,9 @@
       "**试试截图取词。** 使用下方 OCR 快捷键，框选区域并核对识别文字。内置 OCR 和系统朗读无需先配置 AI 提供商。"
     ],
     "shortcutsTitle": "常用快捷键",
-    "shortcutHeaders": ["指令"],
+    "shortcutHeaders": [
+      "指令"
+    ],
     "shortcuts": [
       "翻译选区",
       "打开词典",
@@ -167,7 +194,10 @@
     ],
     "shortcutsNote": "快捷键可在独立设置页面重新绑定。设置自动保存，外观可跟随系统或手动切换深浅色。开机自启默认关闭，可在托盘菜单中切换。",
     "platformTitle": "融入桌面使用习惯",
-    "platformHeaders": ["平台", "如何取得文字"],
+    "platformHeaders": [
+      "平台",
+      "如何取得文字"
+    ],
     "platforms": [
       "通过 UI Automation 读取前台应用提供的文本选区。",
       "读取选区需要辅助功能授权；截图需要屏幕录制权限。",
@@ -199,18 +229,30 @@
     "licenseTitle": "许可与致谢",
     "license": "伴读雀采用 **GPL-3.0-only** 许可证。划词工具栏和指令卡片的交互设计受到 **陪读蛙（Read Frog）** 启发。伴读雀是独立桌面项目，并非陪读蛙官方发行版。",
     "noticesLink": "第三方组件与资源声明",
-    "top": "返回顶部"
+    "top": "返回顶部",
+    "downloadLabel": "下载最新版",
+    "downloadIntro": "从 GitHub Releases 下载适合当前系统的安装包。Windows 推荐 setup.exe 安装版，也可选择无需安装的 portable.exe。macOS 请根据芯片选择 arm64（Apple 芯片）或 x64（Intel）。",
+    "updatesInfo": "默认开启自动更新。Windows 安装版和 Linux AppImage 在后台下载、退出时安装；其他安装方式提供校验后的下载包，由用户手动安装。可在“软件更新”页关闭自动更新或手动检查。下载优先使用 GitHub，失败时回退到 gh-proxy。",
+    "buildTitle": "从源码构建"
   },
   "zh-TW": {
     "tagline": "就在文字旁邊，陪你讀懂每一句。",
     "intro": "翻譯一段文字、讀懂一個長句、修好一句表達——留在正在使用的應用程式裡，就能完成。",
-    "nav": ["開始使用", "功能介紹", "技術文件", "回報問題"],
+    "nav": [
+      "開始使用",
+      "功能介紹",
+      "技術文件",
+      "回報問題"
+    ],
     "previewTitle": "繼續閱讀，不必來回切換",
     "previewIntro": "在瀏覽器、PDF 閱讀器或編輯器裡選取文字，伴讀雀就會在游標旁提供工具列，並在原文附近顯示答案。可以釘選結果對照閱讀，也可以留下值得記住的詞彙。",
     "readingAlt": "伴讀雀在原文旁逐步顯示譯文，並推薦可儲存至本機筆記庫的詞彙。",
     "readingCaption": "選取 → 理解 → 收藏。讓陌生的文字，成為能夠運用的知識。",
     "featuresTitle": "文字在哪裡，協助就在哪裡",
-    "featureHeaders": ["想做什麼", "伴讀雀如何協助"],
+    "featureHeaders": [
+      "想做什麼",
+      "伴讀雀如何協助"
+    ],
     "features": [
       [
         "讀懂原文",
@@ -257,7 +299,9 @@
       "**試試截圖取字。** 使用下方 OCR 快捷鍵，框選區域並核對辨識文字。內建 OCR 和系統朗讀不需要先設定 AI 供應商。"
     ],
     "shortcutsTitle": "常用快捷鍵",
-    "shortcutHeaders": ["指令"],
+    "shortcutHeaders": [
+      "指令"
+    ],
     "shortcuts": [
       "翻譯選取文字",
       "開啟字典",
@@ -268,7 +312,10 @@
     ],
     "shortcutsNote": "快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。",
     "platformTitle": "融入桌面使用習慣",
-    "platformHeaders": ["平台", "如何取得文字"],
+    "platformHeaders": [
+      "平台",
+      "如何取得文字"
+    ],
     "platforms": [
       "透過 UI Automation 讀取前景應用程式提供的文字選取範圍。",
       "讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。",
@@ -300,18 +347,30 @@
     "licenseTitle": "授權與致謝",
     "license": "伴讀雀採用 **GPL-3.0-only** 授權。文字選取工具列和指令卡片的互動設計受到 **陪讀蛙（Read Frog）** 啟發。伴讀雀是獨立桌面專案，並非陪讀蛙官方發行版。",
     "noticesLink": "第三方元件與資源聲明",
-    "top": "回到頂端"
+    "top": "回到頂端",
+    "downloadLabel": "下載最新版",
+    "downloadIntro": "從 GitHub Releases 下載適合目前系統的安裝套件。Windows 建議使用 setup.exe 安裝版，也可選擇免安裝的 portable.exe。macOS 請依晶片選擇 arm64（Apple 晶片）或 x64（Intel）。",
+    "updatesInfo": "預設啟用自動更新。Windows 安裝版和 Linux AppImage 在背景下載、退出時安裝；其他套件提供驗證後的下載，由使用者手動安裝。可在軟體更新頁關閉自動更新或手動檢查。優先從 GitHub 下載，失敗時改用 gh-proxy。",
+    "buildTitle": "從原始碼建置"
   },
   "ja": {
     "tagline": "言葉のすぐそばに、読書のパートナー。",
     "intro": "文章を翻訳する。難しい一文を読み解く。自分の表現を磨く。いま使っているアプリを離れずに。",
-    "nav": ["使い始める", "機能", "ドキュメント", "問題を報告"],
+    "nav": [
+      "使い始める",
+      "機能",
+      "ドキュメント",
+      "問題を報告"
+    ],
     "previewTitle": "読む流れを、そのままに",
     "previewIntro": "ブラウザー、PDF リーダー、エディターで文字を選択すると、カーソルのそばに小さなツールバーが現れ、原文の近くに結果を表示します。結果を固定して読み比べたり、覚えておきたい単語を保存したりできます。",
     "readingAlt": "ReadFinch が原文のそばに翻訳を逐次表示し、ローカルノートに保存できる単語を提案している画面。",
     "readingCaption": "選ぶ → 理解する → 残す。知らない言葉を、自分で使える言葉へ。",
     "featuresTitle": "文字のある場所で、必要な手助けを",
-    "featureHeaders": ["やりたいこと", "ReadFinch でできること"],
+    "featureHeaders": [
+      "やりたいこと",
+      "ReadFinch でできること"
+    ],
     "features": [
       [
         "文章を読み解く",
@@ -358,7 +417,9 @@
       "**スクリーンショットから文字を取る。** 下記の OCR ショートカットで範囲を選び、認識結果を確認します。オフライン OCR とシステム音声は AI プロバイダーの設定前でも使えます。"
     ],
     "shortcutsTitle": "便利なショートカット",
-    "shortcutHeaders": ["操作"],
+    "shortcutHeaders": [
+      "操作"
+    ],
     "shortcuts": [
       "選択範囲を翻訳",
       "辞書を開く",
@@ -369,7 +430,10 @@
     ],
     "shortcutsNote": "ショートカットは専用設定ページで変更できます。設定は自動保存され、外観はシステム連動またはライト・ダークから選べます。ログイン時の自動起動は初期状態ではオフで、トレイメニューから変更できます。",
     "platformTitle": "デスクトップとの連携",
-    "platformHeaders": ["プラットフォーム", "文字の取得方法"],
+    "platformHeaders": [
+      "プラットフォーム",
+      "文字の取得方法"
+    ],
     "platforms": [
       "UI Automation を通じて、前面のアプリが公開する選択テキストを読み取ります。",
       "選択テキストにはアクセシビリティ、画面キャプチャには画面収録の許可が必要です。",
@@ -401,18 +465,30 @@
     "licenseTitle": "ライセンスと謝辞",
     "license": "ReadFinch は **GPL-3.0-only** ライセンスで提供しています。選択ツールバーと指示カードの操作設計は **Read Frog** に着想を得ています。独立したデスクトッププロジェクトであり、Read Frog の公式リリースではありません。",
     "noticesLink": "サードパーティーの表記",
-    "top": "先頭へ"
+    "top": "先頭へ",
+    "downloadLabel": "最新版をダウンロード",
+    "downloadIntro": "GitHub Releases からお使いの OS 向けパッケージをダウンロードしてください。Windows は setup.exe、インストール不要なら portable.exe を選びます。macOS は Apple シリコン用の arm64 または Intel 用の x64 を選択してください。",
+    "updatesInfo": "自動更新は初期設定で有効です。Windows インストール版と Linux AppImage はバックグラウンドでダウンロードし、終了時に更新します。その他のパッケージは検証済みファイルを手動でインストールします。ソフトウェア更新ページで設定変更や手動確認ができます。GitHub に接続できない場合は gh-proxy を試します。",
+    "buildTitle": "ソースからビルド"
   },
   "ko": {
     "tagline": "글 바로 곁에서 함께하는 읽기 도우미.",
     "intro": "문장을 번역하고, 어려운 구문을 이해하고, 표현을 다듬으세요. 지금 쓰는 앱을 떠날 필요가 없습니다.",
-    "nav": ["시작하기", "기능", "문서", "문제 신고"],
+    "nav": [
+      "시작하기",
+      "기능",
+      "문서",
+      "문제 신고"
+    ],
     "previewTitle": "읽던 흐름을 그대로",
     "previewIntro": "브라우저, PDF 리더, 편집기에서 텍스트를 선택하면 커서 옆에 작은 도구 모음이 나타나고 원문 가까이에 결과가 표시됩니다. 결과를 고정해 비교하며 읽거나, 기억하고 싶은 단어를 저장할 수 있습니다.",
     "readingAlt": "ReadFinch가 선택한 원문 옆에 번역을 스트리밍하고 로컬 노트에 저장할 단어를 제안하는 화면.",
     "readingCaption": "선택 → 이해 → 저장. 낯선 글을 이해하고 다시 활용하기까지.",
     "featuresTitle": "텍스트가 있는 곳에서 필요한 도움을",
-    "featureHeaders": ["하고 싶은 일", "ReadFinch가 돕는 방법"],
+    "featureHeaders": [
+      "하고 싶은 일",
+      "ReadFinch가 돕는 방법"
+    ],
     "features": [
       [
         "글 이해하기",
@@ -459,7 +535,9 @@
       "**캡처로 글 가져오기.** 아래 OCR 단축키로 영역을 선택하고 인식 결과를 확인하세요. 오프라인 OCR과 시스템 음성은 AI 제공업체 설정 전에도 사용할 수 있습니다."
     ],
     "shortcutsTitle": "유용한 단축키",
-    "shortcutHeaders": ["명령"],
+    "shortcutHeaders": [
+      "명령"
+    ],
     "shortcuts": [
       "선택 영역 번역",
       "사전 열기",
@@ -470,7 +548,10 @@
     ],
     "shortcutsNote": "단축키는 전용 설정 페이지에서 바꿀 수 있습니다. 설정은 자동 저장되며, 테마는 시스템 설정을 따르거나 밝게·어둡게 지정할 수 있습니다. 로그인 시 자동 시작은 기본적으로 꺼져 있으며 트레이 메뉴에서 변경합니다.",
     "platformTitle": "데스크톱 연동",
-    "platformHeaders": ["플랫폼", "텍스트를 가져오는 방법"],
+    "platformHeaders": [
+      "플랫폼",
+      "텍스트를 가져오는 방법"
+    ],
     "platforms": [
       "UI Automation으로 전경 앱이 제공하는 선택 텍스트를 읽습니다.",
       "선택 텍스트에는 손쉬운 사용 권한이, 화면 캡처에는 화면 기록 권한이 필요합니다.",
@@ -502,7 +583,11 @@
     "licenseTitle": "라이선스와 감사의 말",
     "license": "ReadFinch는 **GPL-3.0-only** 라이선스로 제공됩니다. 선택 도구 모음과 명령 카드의 상호작용은 **Read Frog**에서 영감을 받았습니다. 독립적인 데스크톱 프로젝트이며 Read Frog의 공식 배포판이 아닙니다.",
     "noticesLink": "서드파티 고지",
-    "top": "맨 위로"
+    "top": "맨 위로",
+    "downloadLabel": "최신 버전 다운로드",
+    "downloadIntro": "GitHub Releases에서 운영체제에 맞는 패키지를 다운로드하세요. Windows에서는 설치용 setup.exe 또는 무설치용 portable.exe를 선택하세요. macOS에서는 Apple Silicon용 arm64 또는 Intel용 x64를 선택하세요.",
+    "updatesInfo": "자동 업데이트는 기본으로 켜져 있습니다. Windows 설치 버전과 Linux AppImage는 백그라운드에서 다운로드하고 종료할 때 설치합니다. 다른 패키지는 검증된 파일을 직접 설치합니다. 소프트웨어 업데이트 페이지에서 설정을 변경하거나 수동으로 확인할 수 있습니다. GitHub 연결에 실패하면 gh-proxy를 사용합니다.",
+    "buildTitle": "소스에서 빌드"
   },
   "fr": {
     "tagline": "Un compagnon de lecture, juste à côté de vos mots.",
@@ -518,7 +603,10 @@
     "readingAlt": "ReadFinch affiche un passage sélectionné, sa traduction progressive et des mots proposés pour un carnet local.",
     "readingCaption": "Sélectionner → comprendre → conserver. Du texte inconnu à des connaissances réutilisables.",
     "featuresTitle": "Un coup de main là où se trouve votre texte",
-    "featureHeaders": ["Votre besoin", "L’aide de ReadFinch"],
+    "featureHeaders": [
+      "Votre besoin",
+      "L’aide de ReadFinch"
+    ],
     "features": [
       [
         "Lire et comprendre",
@@ -565,7 +653,9 @@
       "**Essayez une capture.** Avec le raccourci OCR ci-dessous, sélectionnez une zone puis vérifiez le texte reconnu. L’OCR hors ligne et les voix système fonctionnent avant toute configuration d’un fournisseur IA."
     ],
     "shortcutsTitle": "Raccourcis utiles",
-    "shortcutHeaders": ["Commande"],
+    "shortcutHeaders": [
+      "Commande"
+    ],
     "shortcuts": [
       "Traduire la sélection",
       "Ouvrir le dictionnaire",
@@ -576,7 +666,10 @@
     ],
     "shortcutsNote": "Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.",
     "platformTitle": "Intégration au bureau",
-    "platformHeaders": ["Plateforme", "Acquisition du texte"],
+    "platformHeaders": [
+      "Plateforme",
+      "Acquisition du texte"
+    ],
     "platforms": [
       "Lit les sélections exposées par l’application au premier plan via UI Automation.",
       "L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran.",
@@ -608,18 +701,30 @@
     "licenseTitle": "Licence et remerciements",
     "license": "ReadFinch est distribué sous licence **GPL-3.0-only**. Les interactions de la barre de sélection et des cartes de commande s’inspirent de **Read Frog**. ReadFinch est un projet de bureau indépendant, pas une version officielle de Read Frog.",
     "noticesLink": "Mentions des composants tiers",
-    "top": "Retour en haut"
+    "top": "Retour en haut",
+    "downloadLabel": "Télécharger la dernière version",
+    "downloadIntro": "Téléchargez le paquet adapté à votre système depuis GitHub Releases. Sous Windows, choisissez setup.exe pour installer l’application ou portable.exe pour une utilisation sans installation. Sous macOS, choisissez arm64 pour Apple Silicon ou x64 pour Intel.",
+    "updatesInfo": "Les mises à jour automatiques sont activées par défaut. Les installations Windows et les AppImages Linux téléchargent les mises à jour en arrière-plan et les installent à la fermeture. Les autres paquets proposent un téléchargement vérifié à installer manuellement. La page de mise à jour permet de modifier ce réglage ou de lancer une vérification. En cas d’échec de GitHub, le téléchargement passe par gh-proxy.",
+    "buildTitle": "Compiler depuis les sources"
   },
   "de": {
     "tagline": "Dein Lesebegleiter, direkt neben deinen Worten.",
     "intro": "Eine Passage übersetzen, einen schwierigen Satz verstehen oder einen eigenen Text verbessern – ohne die gerade verwendete App zu verlassen.",
-    "nav": ["Erste Schritte", "Funktionen", "Dokumentation", "Problem melden"],
+    "nav": [
+      "Erste Schritte",
+      "Funktionen",
+      "Dokumentation",
+      "Problem melden"
+    ],
     "previewTitle": "Bleib im Lesefluss",
     "previewIntro": "Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine Werkzeugleiste am Mauszeiger und öffnet die Antwort neben dem Original. Hefte ein Ergebnis zum Vergleichen an oder merke dir ein nützliches Wort für später.",
     "readingAlt": "ReadFinch zeigt eine markierte Passage, eine schrittweise erscheinende Übersetzung und Wortvorschläge für ein lokales Notizbuch.",
     "readingCaption": "Markieren → verstehen → behalten. Von unbekannten Wörtern zu nutzbarem Wissen.",
     "featuresTitle": "Hilfe dort, wo dein Text ist",
-    "featureHeaders": ["Was du vorhast", "Wie ReadFinch hilft"],
+    "featureHeaders": [
+      "Was du vorhast",
+      "Wie ReadFinch hilft"
+    ],
     "features": [
       [
         "Lesen und verstehen",
@@ -666,7 +771,9 @@
       "**Eine Bildschirmaufnahme ausprobieren.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Offline-OCR und Systemstimmen funktionieren auch ohne eingerichteten KI-Anbieter."
     ],
     "shortcutsTitle": "Nützliche Tastenkürzel",
-    "shortcutHeaders": ["Befehl"],
+    "shortcutHeaders": [
+      "Befehl"
+    ],
     "shortcuts": [
       "Auswahl übersetzen",
       "Wörterbuch öffnen",
@@ -677,7 +784,10 @@
     ],
     "shortcutsNote": "Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.",
     "platformTitle": "Integration in den Desktop",
-    "platformHeaders": ["Plattform", "Texterfassung"],
+    "platformHeaders": [
+      "Plattform",
+      "Texterfassung"
+    ],
     "platforms": [
       "Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation.",
       "Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots.",
@@ -709,7 +819,11 @@
     "licenseTitle": "Lizenz und Danksagung",
     "license": "ReadFinch steht unter **GPL-3.0-only**. Die Bedienung der Auswahl-Werkzeugleiste und der Befehlskarten ist von **Read Frog** inspiriert. ReadFinch ist ein unabhängiges Desktop-Projekt und keine offizielle Read-Frog-Veröffentlichung.",
     "noticesLink": "Hinweise zu Drittanbieterkomponenten",
-    "top": "Nach oben"
+    "top": "Nach oben",
+    "downloadLabel": "Neueste Version herunterladen",
+    "downloadIntro": "Laden Sie das Paket für Ihr Betriebssystem von GitHub Releases herunter. Unter Windows wählen Sie setup.exe zur Installation oder portable.exe für die portable Version. Für macOS wählen Sie arm64 für Apple Silicon oder x64 für Intel.",
+    "updatesInfo": "Automatische Updates sind standardmäßig aktiviert. Windows-Installationen und Linux-AppImages laden Updates im Hintergrund und installieren sie beim Beenden. Andere Pakete bieten einen geprüften Download zur manuellen Installation. Auf der Update-Seite können Sie diese Einstellung ändern oder manuell prüfen. Ist GitHub nicht erreichbar, wird gh-proxy verwendet.",
+    "buildTitle": "Aus dem Quellcode erstellen"
   },
   "es": {
     "tagline": "Un compañero de lectura, junto a tus palabras.",
@@ -725,7 +839,10 @@
     "readingAlt": "ReadFinch muestra un pasaje seleccionado, su traducción progresiva y palabras sugeridas para un cuaderno local.",
     "readingCaption": "Seleccionar → comprender → guardar. De un texto desconocido a algo que puedes aprovechar.",
     "featuresTitle": "Una ayuda allí donde está tu texto",
-    "featureHeaders": ["Lo que quieres hacer", "Cómo te ayuda ReadFinch"],
+    "featureHeaders": [
+      "Lo que quieres hacer",
+      "Cómo te ayuda ReadFinch"
+    ],
     "features": [
       [
         "Leer y comprender",
@@ -772,7 +889,9 @@
       "**Prueba una captura.** Utiliza el atajo OCR indicado abajo, selecciona una zona y revisa el texto reconocido. El OCR sin conexión y las voces del sistema funcionan antes de configurar un proveedor de IA."
     ],
     "shortcutsTitle": "Atajos útiles",
-    "shortcutHeaders": ["Instrucción"],
+    "shortcutHeaders": [
+      "Instrucción"
+    ],
     "shortcuts": [
       "Traducir selección",
       "Abrir diccionario",
@@ -783,7 +902,10 @@
     ],
     "shortcutsNote": "Puedes cambiar los atajos en su página de ajustes. La configuración se guarda automáticamente y la apariencia sigue al sistema o a tu elección clara u oscura. El inicio al entrar en el sistema está desactivado por defecto y se cambia desde el menú de la bandeja.",
     "platformTitle": "Integración con el escritorio",
-    "platformHeaders": ["Plataforma", "Cómo se obtiene el texto"],
+    "platformHeaders": [
+      "Plataforma",
+      "Cómo se obtiene el texto"
+    ],
     "platforms": [
       "Lee las selecciones que expone la aplicación en primer plano mediante UI Automation.",
       "Requiere permiso de Accesibilidad para leer selecciones y de Grabación de pantalla para las capturas.",
@@ -815,6 +937,10 @@
     "licenseTitle": "Licencia y agradecimientos",
     "license": "ReadFinch se distribuye bajo **GPL-3.0-only**. Las interacciones de la barra de selección y las tarjetas se inspiran en **Read Frog**. ReadFinch es un proyecto de escritorio independiente y no una versión oficial de Read Frog.",
     "noticesLink": "Avisos de terceros",
-    "top": "Volver arriba"
+    "top": "Volver arriba",
+    "downloadLabel": "Descargar la última versión",
+    "downloadIntro": "Descarga el paquete para tu sistema desde GitHub Releases. En Windows, elige setup.exe para instalar la aplicación o portable.exe para usarla sin instalación. En macOS, elige arm64 para Apple Silicon o x64 para Intel.",
+    "updatesInfo": "Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página correspondiente. Si GitHub no responde, se utiliza gh-proxy.",
+    "buildTitle": "Compilar desde el código fuente"
   }
 }

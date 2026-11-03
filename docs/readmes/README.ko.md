@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[시작하기](#get-started) · [기능](#features) · [문서](#documentation) · [문제 신고](https://github.com/0xlane/ReadFinch/issues)
+[최신 버전 다운로드](https://github.com/0xlane/ReadFinch/releases/latest) · [시작하기](#get-started) · [기능](#features) · [문서](#documentation) · [문제 신고](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ README는 앱에 기본 제공되는 다음 8가지 대상 언어와 일치합�
 <a id="get-started"></a>
 
 ## 시작하기
+
+**[최신 버전 다운로드](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+GitHub Releases에서 운영체제에 맞는 패키지를 다운로드하세요. Windows에서는 설치용 setup.exe 또는 무설치용 portable.exe를 선택하세요. macOS에서는 Apple Silicon용 arm64 또는 Intel용 x64를 선택하세요.
+
+자동 업데이트는 기본으로 켜져 있습니다. Windows 설치 버전과 Linux AppImage는 백그라운드에서 다운로드하고 종료할 때 설치합니다. 다른 패키지는 검증된 파일을 직접 설치합니다. 소프트웨어 업데이트 페이지에서 설정을 변경하거나 수동으로 확인할 수 있습니다. GitHub 연결에 실패하면 gh-proxy를 사용합니다.
+
+### 소스에서 빌드
 
 로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러가, macOS에서는 Xcode Command Line Tools가 추가로 필요합니다.
 

@@ -34,6 +34,7 @@ import type {
 import { Field, Toggle, Badge, LanguageSelect } from "./ui";
 import { LocalNotebook } from "./LocalNotebook";
 import { Actions } from "./Actions";
+import { About, UpdateSettings } from "./About";
 type Tab = SettingsTab;
 const cacheDurations = [
   [5, "5 分钟"],
@@ -364,7 +365,18 @@ export function Settings({
     notes: [t("本地笔记库"), ""],
     shortcuts: [t("快捷键"), t("为取词、截图和每个指令设置全局快捷键。")],
     config: [t("配置管理"), t("导入、导出、恢复备份与 WebDAV 同步。")],
+    about: [t("关于伴读雀"), ""],
+    updates: [t("软件更新"), ""],
   };
+  if (tab === "about")
+    return (
+      <About
+        version={snapshot.version}
+        platform={snapshot.updates.platform}
+        arch={snapshot.updates.arch}
+      />
+    );
+  if (tab === "updates") return <UpdateSettings state={snapshot.updates} />;
   if (tab === "notes")
     return (
       <LocalNotebook

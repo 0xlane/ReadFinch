@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[Primeros pasos](#get-started) · [Funciones](#features) · [Documentación](#documentation) · [Informar de un problema](https://github.com/0xlane/ReadFinch/issues)
+[Descargar la última versión](https://github.com/0xlane/ReadFinch/releases/latest) · [Primeros pasos](#get-started) · [Funciones](#features) · [Documentación](#documentation) · [Informar de un problema](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ Las traducciones del README coinciden con los ocho idiomas de destino predefinid
 <a id="get-started"></a>
 
 ## Primeros pasos
+
+**[Descargar la última versión](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+Descarga el paquete para tu sistema desde GitHub Releases. En Windows, elige setup.exe para instalar la aplicación o portable.exe para usarla sin instalación. En macOS, elige arm64 para Apple Silicon o x64 para Intel.
+
+Las actualizaciones automáticas están activadas de forma predeterminada. Las instalaciones de Windows y las AppImages de Linux descargan en segundo plano e instalan al salir. Los demás paquetes ofrecen una descarga verificada para instalar manualmente. Puedes cambiar esta opción o comprobar las actualizaciones en la página correspondiente. Si GitHub no responde, se utiliza gh-proxy.
+
+### Compilar desde el código fuente
 
 Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows se requiere el compilador de C# de .NET Framework 4.8; en macOS, las herramientas de línea de comandos de Xcode.
 

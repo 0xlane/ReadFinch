@@ -19,7 +19,13 @@ await build({
   format: "cjs",
   outdir: "dist/main",
   outExtension: { ".js": ".cjs" },
-  external: ["electron", "tesseract.js"],
+  external: [
+    "electron",
+    "tesseract.js",
+    "electron-updater",
+    "electron-updater/*",
+    "builder-util-runtime",
+  ],
   sourcemap: true,
 });
 await viteBuild();

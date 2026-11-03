@@ -1,0 +1,25 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem in ReadFinch / 反馈可复现的问题
+title: "[Bug] "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: ReadFinch version / 伴读雀版本
+      description: Find it in About / 可在“关于”页查看
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Operating system / 操作系统
+      placeholder: Windows 11 x64 / macOS arm64 / Ubuntu x64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and observed behavior / 复现步骤与实际表现
+      description: Describe what you expected and what happened. Do not include API keys, passwords, or private text. / 请描述预期与实际表现，不要填写密钥、密码或私人文本。
+    validations:
+      required: true

@@ -85,7 +85,7 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[${c.nav[0]}](#get-started) · [${c.nav[1]}](#features) · [${c.nav[2]}](#documentation) · [${c.nav[3]}](${repo}/issues)
+[${c.downloadLabel}](${repo}/releases/latest) · [${c.nav[0]}](#get-started) · [${c.nav[1]}](#features) · [${c.nav[2]}](#documentation) · [${c.nav[3]}](${repo}/issues)
 
 </div>
 
@@ -136,6 +136,14 @@ ${c.languageNote}
 <a id="get-started"></a>
 
 ## ${c.startTitle}
+
+**[${c.downloadLabel}](${repo}/releases/latest)**
+
+${c.downloadIntro}
+
+${c.updatesInfo}
+
+### ${c.buildTitle}
 
 ${c.buildIntro}
 

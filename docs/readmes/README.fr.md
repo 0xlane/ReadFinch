@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[Bien démarrer](#get-started) · [Fonctionnalités](#features) · [Documentation](#documentation) · [Signaler un problème](https://github.com/0xlane/ReadFinch/issues)
+[Télécharger la dernière version](https://github.com/0xlane/ReadFinch/releases/latest) · [Bien démarrer](#get-started) · [Fonctionnalités](#features) · [Documentation](#documentation) · [Signaler un problème](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ Les traductions du README correspondent aux huit langues cibles prédéfinies da
 <a id="get-started"></a>
 
 ## Bien démarrer
+
+**[Télécharger la dernière version](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+Téléchargez le paquet adapté à votre système depuis GitHub Releases. Sous Windows, choisissez setup.exe pour installer l’application ou portable.exe pour une utilisation sans installation. Sous macOS, choisissez arm64 pour Apple Silicon ou x64 pour Intel.
+
+Les mises à jour automatiques sont activées par défaut. Les installations Windows et les AppImages Linux téléchargent les mises à jour en arrière-plan et les installent à la fermeture. Les autres paquets proposent un téléchargement vérifié à installer manuellement. La page de mise à jour permet de modifier ce réglage ou de lancer une vérification. En cas d’échec de GitHub, le téléchargement passe par gh-proxy.
+
+### Compiler depuis les sources
 
 Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, le compilateur C# de .NET Framework 4.8 est nécessaire ; sous macOS, installez les outils de ligne de commande Xcode.
 

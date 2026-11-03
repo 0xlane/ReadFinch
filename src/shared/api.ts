@@ -1,5 +1,6 @@
 import type { SpeechConfig } from "./tts";
 import type { ThinkingSnapshot } from "./completion";
+import type { UpdateState, ProjectLink } from "./updates";
 import type {
   LocalNote,
   NoteInput,
@@ -32,6 +33,7 @@ export type Snapshot = {
   systemLanguages: string[];
   toolbarPausedUntil: number;
   version: string;
+  updates: UpdateState;
   config: Config;
   revision: string;
   credentialIds: string[];
@@ -61,7 +63,9 @@ export type SettingsTab =
   | "actions"
   | "shortcuts"
   | "config"
-  | "notes";
+  | "notes"
+  | "about"
+  | "updates";
 export type SettingsLocation = {
   tab: SettingsTab;
   request: number;
@@ -102,6 +106,11 @@ export type SyncResult = {
 };
 export type CallMap = {
   snapshot: { arg: void; result: Snapshot };
+  updateCheck: { arg: void; result: UpdateState };
+  updateDownload: { arg: void; result: UpdateState };
+  updateInstall: { arg: void; result: UpdateState };
+  updatePreference: { arg: { automatic: boolean }; result: UpdateState };
+  openProjectLink: { arg: { link: ProjectLink }; result: void };
   saveNote: { arg: { note: NoteInput; create?: boolean }; result: string };
   saveSuggestions: {
     arg: { id: string; indexes: number[]; create?: boolean };
@@ -234,6 +243,7 @@ export type CallMap = {
   openData: { arg: void; result: void };
 };
 export type EventMap = {
+  update: UpdateState;
   noteSuggestions: SuggestionCardData;
   notesChanged: void;
   actionShortcut: { actionId: string };

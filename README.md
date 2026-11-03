@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[Get started](#get-started) · [Features](#features) · [Documentation](#documentation) · [Report an issue](https://github.com/0xlane/ReadFinch/issues)
+[Download latest](https://github.com/0xlane/ReadFinch/releases/latest) · [Get started](#get-started) · [Features](#features) · [Documentation](#documentation) · [Report an issue](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ The **application interface currently supports English and Simplified Chinese**,
 <a id="get-started"></a>
 
 ## Get started
+
+**[Download latest](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+Download a package for your operating system from GitHub Releases. On Windows, choose setup.exe for installation or portable.exe to run without installing. On macOS, choose arm64 for Apple silicon or x64 for Intel.
+
+Automatic updates are enabled by default. Windows installations and Linux AppImages download in the background and install when you quit. Other packages provide a verified download for manual installation. Use Software updates to change this preference or check manually. GitHub is tried first, with gh-proxy as a fallback.
+
+### Build from source
 
 Build locally with **Node.js 24**, npm and Git. Windows builds require the .NET Framework 4.8 C# compiler; macOS builds require Xcode Command Line Tools.
 

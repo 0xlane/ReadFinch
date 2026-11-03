@@ -16,12 +16,12 @@ A desktop reading and writing companion. · 随选随用的桌面阅读与写作
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-0.15.0-4d443e?style=flat-square" alt="0.15.0">
+<img src="https://img.shields.io/badge/Version-1.0.0-4d443e?style=flat-square" alt="1.0.0">
 <img src="https://img.shields.io/badge/Offline_OCR-中文_+_English-a9643f?style=flat-square" alt="Offline OCR: Simplified Chinese and English">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
-[使い始める](#get-started) · [機能](#features) · [ドキュメント](#documentation) · [問題を報告](https://github.com/0xlane/ReadFinch/issues)
+[最新版をダウンロード](https://github.com/0xlane/ReadFinch/releases/latest) · [使い始める](#get-started) · [機能](#features) · [ドキュメント](#documentation) · [問題を報告](https://github.com/0xlane/ReadFinch/issues)
 
 </div>
 
@@ -86,6 +86,14 @@ README は、アプリに用意されている次の 8 つの出力先言語に�
 <a id="get-started"></a>
 
 ## 使い始める
+
+**[最新版をダウンロード](https://github.com/0xlane/ReadFinch/releases/latest)**
+
+GitHub Releases からお使いの OS 向けパッケージをダウンロードしてください。Windows は setup.exe、インストール不要なら portable.exe を選びます。macOS は Apple シリコン用の arm64 または Intel 用の x64 を選択してください。
+
+自動更新は初期設定で有効です。Windows インストール版と Linux AppImage はバックグラウンドでダウンロードし、終了時に更新します。その他のパッケージは検証済みファイルを手動でインストールします。ソフトウェア更新ページで設定変更や手動確認ができます。GitHub に接続できない場合は gh-proxy を試します。
+
+### ソースからビルド
 
 ローカルでのビルドには **Node.js 24**、npm、Git が必要です。Windows は .NET Framework 4.8 の C# コンパイラー、macOS は Xcode Command Line Tools も必要です。
 

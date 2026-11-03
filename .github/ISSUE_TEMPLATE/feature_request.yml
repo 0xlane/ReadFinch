@@ -1,0 +1,11 @@
+name: Feature request / 功能建议
+description: Suggest an improvement to ReadFinch / 提出功能或体验改进建议
+title: "[Feature] "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Your use case / 使用场景
+      description: Explain what you are trying to do and how ReadFinch could help. / 请说明你想完成什么，以及希望伴读雀如何帮助你。
+    validations:
+      required: true
