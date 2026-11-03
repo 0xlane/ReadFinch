@@ -8,10 +8,12 @@ const directory = path.resolve(process.argv[2] ?? "release-assets");
 const { version } = JSON.parse(await readFile("package.json", "utf8"));
 if (!/^\d+\.\d+\.\d+$/.test(version))
   throw Error("Only stable versions can be published by this workflow.");
-if (
-  process.env.GITHUB_REF_TYPE === "tag" &&
-  process.env.GITHUB_REF_NAME !== "v" + version
-)
+const releaseTag =
+  process.env.RELEASE_TAG ??
+  (process.env.GITHUB_REF_TYPE === "tag"
+    ? process.env.GITHUB_REF_NAME
+    : undefined);
+if (releaseTag && releaseTag !== "v" + version)
   throw Error("Release tag does not match package.json.");
 const privateKey = process.env.UPDATE_SIGNING_PRIVATE_KEY;
 if (!privateKey)
@@ -29,7 +31,9 @@ if (
 const files = [],
   checksums = [];
 const assetPattern = new RegExp(
-  `^ReadFinch-${version.replaceAll(".", "\\.")}-(windows|macos|linux)-(x64|arm64)(?:-(setup|portable))?\.(exe|dmg|zip|deb|AppImage)$`,
+  "^ReadFinch-" +
+    version.replaceAll(".", "\\.") +
+    "-(windows|macos|linux)-(x64|arm64|amd64)(?:-(setup|portable))?\\.(exe|dmg|zip|deb|AppImage)$",
 );
 for (const name of (await readdir(directory)).sort()) {
   const match = assetPattern.exec(name);
@@ -45,7 +49,10 @@ for (const name of (await readdir(directory)).sort()) {
     sha256.update(bytes);
   }
   checksums.push(sha256.digest("hex") + "  " + name);
-  const [, platform, arch, variant, extension] = match;
+  const [, platform, artifactArch, variant, extension] = match;
+  if (artifactArch === "amd64" && (platform !== "linux" || extension !== "deb"))
+    throw Error("Debian architecture alias used by an unexpected artifact.");
+  const arch = artifactArch === "amd64" ? "x64" : artifactArch;
   if (extension === "zip") continue; // macOS zip is offered as an alternative download.
   files.push({
     platform:
