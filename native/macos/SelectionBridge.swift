@@ -39,19 +39,22 @@ DispatchQueue.global(qos: .userInitiated).async {
   }
   commands.push(["op":"quit"])
 }
-var ticks = 0
-while true {
-  let pending = commands.drain()
-  for command in pending {
-    if command["op"] as? String == "quit" { exit(0) }
-    if command["op"] as? String == "invalidate" { invalidate() }
-    if command["op"] as? String == "refresh" {
-      poll(force:true)
-      emit(["type":"selectionSnapshot","id":command["id"] as? String ?? "","selection":selection as Any? ?? NSNull()])
+@MainActor func runCommandLoop() async throws {
+  var ticks = 0
+  while true {
+    let pending = commands.drain()
+    for command in pending {
+      if command["op"] as? String == "quit" { exit(0) }
+      if command["op"] as? String == "invalidate" { invalidate() }
+      if command["op"] as? String == "refresh" {
+        poll(force:true)
+        emit(["type":"selectionSnapshot","id":command["id"] as? String ?? "","selection":selection as Any? ?? NSNull()])
+      }
     }
+    poll()
+    ticks += 1
+    if ticks % 5 == 0 { emit(["type":"heartbeat"]) }
+    try await Task.sleep(nanoseconds: 200_000_000)
   }
-  poll()
-  ticks += 1
-  if ticks % 5 == 0 { emit(["type":"heartbeat"]) }
-  Thread.sleep(forTimeInterval:0.2)
 }
+try await runCommandLoop()
