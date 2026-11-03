@@ -24,7 +24,7 @@ test("all presets create valid generic providers while offline OCR is always the
     config.defaults.textProfileId = "provider";
     assert.equal(parseConfig(config).providers[0].endpoint, preset.endpoint);
     assert.equal(config.defaults.ocrProfileId, OFFLINE_OCR_ID);
-    assert.equal(ocrProfiles(config).length, 1);
+    assert.equal(ocrProfiles(config)[0].id, OFFLINE_OCR_ID);
     config.providers[0].model = "vision-model";
     assert.equal(ocrProfiles(config)[1].model, "vision-model");
     assert.equal(ocrProfiles(config)[1].endpoint, config.providers[0].endpoint);
@@ -99,7 +99,7 @@ test("local upgrade preserves original config until saving and supplies only end
   await writeFile(file, JSON.stringify(old));
   const store = new ConfigStore(dir);
   await store.init();
-  assert.equal(store.config.schemaVersion, 12);
+  assert.equal(store.config.schemaVersion, 13);
   assert.equal(JSON.parse(await readFile(file, "utf8")).schemaVersion, 2);
   assert.ok(
     store.credentialMoves.some(

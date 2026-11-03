@@ -4,7 +4,7 @@
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 12
+      "const": 13
     },
     "tts": {
       "type": "object",
@@ -297,6 +297,10 @@
           "customModel": {
             "default": false,
             "type": "boolean"
+          },
+          "builtinModel": {
+            "type": "string",
+            "maxLength": 200
           },
           "temperature": {
             "default": null,
@@ -758,6 +762,6 @@
     "shortcuts"
   ],
   "additionalProperties": false,
-  "$id": "https://texthop.local/schema/config-v12.json",
+  "$id": "https://readfinch.local/schema/config-v13.json",
   "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
 }

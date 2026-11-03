@@ -1,5 +1,15 @@
 # 交付与验证报告
 
+2026-11-03 · **ReadFinch / 伴读雀 0.12.1**
+
+- 对照 Read Frog 提交 `96083134b111e56762f578b143bcd48e85058ba3`，同步现有六类提供商的默认模型和 85 个文字模型候选及顺序。新增时自动填入，旧版非空模型保持原值。数据由静态解析脚本提取，上游来源随目录保存。[对照范围](MODELS.md)
+- 模型列表在输入框处展开，保留当前值并定位选项；自定义模式可获取、搜索服务端模型，切回后恢复上次内置选择，重启后仍保留。已验证 120 个服务端候选、失败重试、空结果、深浅色、自定义接口与无横向溢出。[开发版检查](provider-parity-verification.json) · [打包版检查](packaged-provider-parity.json) · [默认模型截图](screenshots/v0.12.1/provider-default-model.png)
+- 类型检查、83 项单元测试和生产构建通过。复制凭据、功能分配、请求头、温度、语言检测及四项旧配置升级流程通过回归。[设置检查](settings-verification.json) · [升级检查](upgrade-verification.json)
+- Windows 打包程序通过设置、模型与功能分配、快捷键、笔记、离线图标及随包中英文 OCR 检查，无渲染错误。网络用例使用隔离配置和本机固定响应，不代表真实提供商调用验收。[打包检查](packaged-smoke.json)
+- Windows 便携版与 NSIS 安装包已生成；安装/卸载界面和 macOS/Linux 桌面交互未在本次验收中执行。
+
+## 0.12.0
+
 2026-11-03 · **ReadFinch / 伴读雀 0.12.0**
 
 - 公开项目名、应用标题、程序文件名和项目描述改为 ReadFinch / 伴读雀。保留原存储身份和应用 ID，继续使用原配置目录、系统加密凭据与 SQLite 笔记。
@@ -77,7 +87,7 @@
 
 ## 交付产物
 
-当前 Windows x64 安装程序 `release/ReadFinch Setup 0.12.0.exe` 与便携程序 `release/ReadFinch 0.12.0.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
+当前 Windows x64 安装程序 `release/ReadFinch Setup 0.12.1.exe` 与便携程序 `release/ReadFinch 0.12.1.exe` 均包含中英文离线 OCR。可直接运行目录位于 `release/win-unpacked`。大小与 SHA-256 见 [发布清单](release-manifest.json)，运行检查见 [打包验证](packaged-smoke.json)。
 
 ## 未完成验收
 

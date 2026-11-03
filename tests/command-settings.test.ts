@@ -34,7 +34,10 @@ test("v11 migration enables translation without stealing a previously active sho
   assert.equal(result.actions[0].enabled, true);
   assert.equal(result.actions[0].shortcut, "");
   assert.equal(result.actions[1].shortcut, before.actions[1].shortcut);
-  assert.deepEqual(result.providers, before.providers);
+  assert.deepEqual(
+    result.providers.map(({ builtinModel, ...p }) => p),
+    before.providers,
+  );
   assert.deepEqual(config, before, "migration must not mutate caller data");
 });
 

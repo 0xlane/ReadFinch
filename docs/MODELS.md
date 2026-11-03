@@ -1,43 +1,53 @@
 # API 提供商与功能分配
 
-一个提供商包含一组连接设置和一个模型。点击模型输入框，候选列表在字段旁展开，可直接搜索内置 ID 或获取该端点的模型列表。勾选「输入自定义模型 ID」即可直接填写私有模型，也可在搜索结果中选择使用输入的完整 ID。选择结果自动保存。
+一个提供商包含一组连接设置和一个模型。新增预置提供商会自动填入默认模型；模型字段直接展开可搜索列表，打开时保留当前值，并定位到当前选项。选择后自动保存。
 
-同一账号需要第二个模型时，点击表单底部的「复制」。副本具有独立的名称、模型和用途。地址、温度、流式偏好、超时、OCR 指令和端点绑定的本机凭据随副本复制。
+勾选「输入自定义模型 ID」可填写私有模型；切回列表模式会恢复此前选择的内置模型，重启后同样有效。「获取模型列表」在两种模式下都可使用。自定义接口直接填写 ID，不显示没有意义的模式开关。获取失败或返回空列表不会清空已经选择的模型。
 
-展开「功能提供商」可将这个提供商用于翻译、猜你想存、词典、润色、OCR、在线朗读、语言检测或自定义动作。页面下方同时提供按功能分配的入口，两处修改即时联动。动作可继承默认提供商。结果窗口底部可临时选择其他提供商。
+同一账号需要第二个模型时，点击表单底部的「复制」。副本具有独立的名称、模型和用途，地址、温度、推理强度、流式偏好、超时、OCR 指令和端点绑定的本机凭据随副本复制。
 
-「猜你想存」使用独立的推荐提供商。翻译模型可以和它不同。推荐的词条采用「通用 → 猜你想存」中指定的指令与笔记本。切换翻译目标语言会重新生成对应语言的释义。
+## 默认值与模型目录
 
-截图识别默认使用内置离线 OCR。也可在「截图识别」选择已添加的提供商，已知纯文本模型不出现在列表中。自定义模型的图片输入能力可用中英文样例验证。使用外部服务识别截图前会先显示本地预览。
+2026-11-03 对照 Read Frog 的 [提供商默认值](https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/utils/constants/providers.ts) 与 [模型目录](https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/utils/constants/models.ts)，同步现有六类预置提供商的 85 个文字模型候选及顺序。
 
-语言检测默认使用本地基础检测。选择 LLM 后可指定提供商，在翻译时自动识别源语言会发送最多 500 个字符，失败后回到本地检测。朗读优先采用明确指定的语言，其余情况在本机判断。
-
-在线朗读使用 `POST /audio/speech`。在「功能提供商」中分配语音模型，也可以从「文本转语音」选择同一提供商。请求使用该提供商的模型、密钥、自定义请求头与超时。默认音色列表可搜索，也可补充服务认可的音色 ID。「测试连接」会在分配后向该语音模型发送一段短文本。[语音接口说明](https://developers.openai.com/api/docs/guides/text-to-speech)
-
-## 内置候选
-
-文字与视觉目录核对于 2026-10-31，语音目录核对于 2026-11-03。目录提供 18 个起始候选，不以枚举限制用户可填写的模型 ID。账户权限、地域、服务状态仍需连接测试确认。目录元数据不表示本应用已调用真实供应商进行效果验收。
-
-| 服务商 | 内置 ID | 官方依据 |
+| 提供商 | 新增时的模型 | 文字候选数 |
 | --- | --- | --- |
-| OpenAI | `gpt-5.4-mini`、`gpt-4.1-mini`、`gpt-4o-mini` | [GPT-5.4 mini](https://developers.openai.com/api/docs/models/gpt-5.4-mini)、[GPT-4.1 mini](https://developers.openai.com/api/docs/models/gpt-4.1-mini)、[GPT-4o mini](https://developers.openai.com/api/docs/models/gpt-4o-mini) |
-| OpenAI 语音 | `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd` | [语音模型与可用音色](https://developers.openai.com/api/docs/guides/text-to-speech) |
-| DeepSeek | `deepseek-flash`、`deepseek-v4-pro` | [模型与能力](https://api-docs.deepseek.com/quick_start/pricing/) |
-| 百炼 | `qwen3.7-plus`、`qwen3.8-max`、`qwen3.8-flash` | [模型目录](https://help.aliyun.com/zh/model-studio/models) |
-| 硅基流动 | `Qwen/Qwen3.5-397B-A17B`、`Qwen/Qwen2.5-VL-72B-Instruct` | [多模态输入与请求示例](https://docs.siliconflow.cn/docs/userguide/capabilities/multimodal-vision) |
-| Gemini | `gemini-3.5-flash-lite`、`gemini-3.8-flash` | [3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite)、[3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) |
-| OpenRouter | `openai/gpt-4.1-mini`、`google/gemini-3.8-flash`、`deepseek/deepseek-v4-pro` | [GPT-4.1 mini](https://openrouter.ai/openai/gpt-4.1-mini)、[Gemini 3.8 Flash](https://openrouter.ai/google/gemini-3.8-flash)、[DeepSeek V4 Pro](https://openrouter.ai/deepseek/deepseek-v4-pro) |
+| OpenAI | `gpt-6-luna` | 31 |
+| DeepSeek | `deepseek-v4-flash` | 4 |
+| 阿里云百炼 | `qwen3.8-flash` | 23 |
+| 硅基流动 | `Qwen/Qwen3-Next-80B-A3B-Instruct` | 1 |
+| Gemini | `gemini-3.5-flash-lite` | 20 |
+| OpenRouter | `google/gemma-4-31b-it:free` | 6 |
+| 自定义接口 | 用户填写 | 无固定目录 |
 
-候选合并顺序：内置目录、接口发现、已配置模型和动作引用；按完整 ID 去重。接口发现缓存按服务商 ID 与端点隔离，改地址后不会显示旧端点发现的模型。已保存的自定义 ID 会随配置迁移，发现缓存不作为可迁移配置。
+硅基流动按上游默认开启自定义输入，同时填好默认 ID。自定义接口没有可假定的模型，因此保持待填写。已有非空模型 ID 不会因为更新目录而被改成新默认值；不再位于内置目录的旧 ID 仍能作为自定义模型使用。
 
-新增或更新候选时修改 `src/shared/models.ts`，核查官方 ID 与图片输入能力，更新本表日期；保留未知能力，不凭名称推断。API Key 和端点不写入目录。
+为桌面在线朗读额外保留 `gpt-4o-mini-tts`、`tts-1`、`tts-1-hd`，在 OpenAI 列表的「语音模型」分组显示，不混入上游文字目录。候选仅帮助填写 ID，不保证账户权限、地域、模型可用性或兼容协议；以配置端点的连接测试为准。
 
-## 陪读蛙参考
+目录数据保存于 `src/shared/provider-catalog.json`，包含上游提交与文件路径。运行 `npm run models:sync -- .reference/read-frog <commit>` 可从指定参考提交重新提取；脚本只解析静态数据，不执行参考源码。上游目录之外的图片能力信息单独维护在 `src/shared/model-catalog.ts`；未知能力保持未知，不凭模型名称推断。
 
-参考 [Read Frog 1.54.1](https://github.com/mengxi-ream/read-frog) 的 `utils/constants/models.ts`、`translate-model-selector.tsx`、`components/model-suggestion-button.tsx` 和 `provider-editor.tsx`：内置候选、接口补充、自定义模型、功能分配。ReadFinch 将这些入口整合到统一的可搜索选择器，同一账户可通过复制提供商分别配置模型。未复用其私有布局引擎。
+接口发现结果按提供商 ID 和端点隔离，切换地址不会混用旧端点结果。候选按完整 ID 去重，不再截断到前 100 项；私有 ID、最后选择的内置 ID 随配置迁移，发现缓存不随配置迁移。
+
+## 功能分配
+
+展开「功能提供商」可为翻译、猜你想存、词典、写作改进、OCR、在线朗读、语言检测或自定义指令分配提供商。页面下方的按功能分配入口与这里即时联动。未单独分配的指令继承默认提供商，结果窗口底部可临时切换。
+
+「猜你想存」使用独立的推荐提供商。推荐词条采用「通用 → 猜你想存」中指定的指令和笔记本。
+
+截图识别默认使用内置离线 OCR。也可选择已添加的提供商，已知纯文本模型不出现在 OCR 列表中。未知模型的图片能力可用内置样例验证；外部识别前先显示本地截图预览。
+
+语言检测默认在本机运行。选择 LLM 后可指定提供商，自动检测时最多发送 500 个字符，失败后回到本地检测。
+
+在线朗读使用 `POST /audio/speech`，采用语音提供商的模型、密钥、自定义请求头和超时。[语音接口说明](https://developers.openai.com/api/docs/guides/text-to-speech)
+
+## 对照范围与桌面差异
+
+- 对齐：现有提供商的新增默认模型、内置模型及排序、内联选择、自定义输入、服务端模型发现、复制、温度、自定义请求头、按功能分配和语言检测。
+- 桌面扩展：离线 OCR、在线语音模型分组、系统语音及本地笔记库；不添加浏览器的网页翻译、字幕或托管 AI 账号入口。
+- 当前连接层使用 OpenAI 兼容 Chat Completions 与语音接口。未把 Read Frog 的原生 Anthropic、Bedrock、Responses 或纯翻译服务适配器作为已支持服务展示，也未加入 Ollama 原生模型管理。上游模型目录本身不等于相应原生协议已实现。
 
 ## 配置与验证
 
-schema v6 将旧模型库拆为独立提供商，并保留已绑定的动作、OCR、语言检测和本机端点凭据。配置文件只包含模型和非敏感偏好。
+schema v13 记住自定义模式之前选择的内置模型。升级只补全旧版未配置的预置模型，不修改非空模型、账户、用途、端点或凭据。
 
-[设置验证](settings-verification.json)覆盖候选搜索、复制账户、双向绑定、温度、自定义请求头、OCR 提供商和界面语言切换。文字与视觉服务使用本机 HTTP 测试端点。
+[提供商回归](provider-parity-verification.json)检查新增默认值、选项数量、切换与重启、120 个接口模型、空结果与重试、深浅色和内联定位。[原设置回归](settings-verification.json)覆盖复制凭据、功能分配、温度、请求头、OCR 与语言检测。网络场景使用本机固定服务，不代表对真实供应商的调用验收。

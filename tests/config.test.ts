@@ -32,7 +32,10 @@ test("schema rejects secrets, invalid references, duplicate IDs, invalid version
     (c: any) => (c.ocrProfiles = []),
     (c: any) => (c.providers[0].kind = "ollama"),
     (c: any) => (c.defaults.ocrProfileId = "missing"),
-    (c: any) => (c.defaults.ocrProfileId = c.providers[0].id),
+    (c: any) => {
+      c.providers[0].model = "";
+      c.defaults.ocrProfileId = c.providers[0].id;
+    },
   ]) {
     const c = defaultConfig();
     mutate(c);
@@ -44,7 +47,7 @@ test("v0 migration adds font size, unknown fields remain rejected", () => {
   old.schemaVersion = 0;
   delete old.appearance.fontSize;
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 12);
+  assert.equal(next.schemaVersion, 13);
   assert.equal(next.appearance.fontSize, 15);
 });
 test("substitution is single-pass and preserves source tokens literally", () => {

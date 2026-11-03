@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-03T06:07:33.793Z",
+  "version": "0.12.1",
+  "referenceCommit": "96083134b111e56762f578b143bcd48e85058ba3",
+  "upstreamTextModels": 85,
+  "checks": [
+    "Every preset adds and autosaves the upstream default model; no network request on add",
+    "The selected ID remains visible; reopening scrolls to it; custom/builtin switching survives restart",
+    "Custom mode fetches and searches 120 remote models without truncation or a modal",
+    "Discovery errors and empty responses preserve the current model and allow retry",
+    "Custom endpoints require an explicit ID and have no misleading builtin-mode checkbox"
+  ],
+  "rendererErrors": [],
+  "scope": "Isolated Electron windows and local HTTP fixtures; no real provider credentials or external model calls."
+}

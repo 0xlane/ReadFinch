@@ -8,6 +8,7 @@ export type ModelRef = { providerId: string; model: string };
 export type ModelInfo = {
   id: string;
   vision?: boolean;
+  kind?: "speech";
   source: "builtin" | "remote" | "saved";
 };
 export const catalogKey = (provider: Pick<TextProfile, "id" | "endpoint">) =>

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 12,
+  "schemaVersion": 13,
   "tts": {
     "onlineProviderId": null,
     "customVoices": [],
@@ -30,7 +30,7 @@
       "enabled": true,
       "preset": "openai",
       "endpoint": "https://api.openai.com/v1",
-      "model": "",
+      "model": "gpt-6-luna",
       "customModel": false,
       "temperature": null,
       "instruction": "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.",

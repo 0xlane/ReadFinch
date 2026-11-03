@@ -43,6 +43,8 @@ test("v7 upgrades to suggestions using Dictionary and the default provider; inde
   const { noteSuggestion, ...old } = defaultConfig();
   const c = parseConfig({ ...old, schemaVersion: 7 });
   assert.deepEqual(c.noteSuggestion, noteSuggestion);
+  assert.equal(suggestionBinding(c)?.action.id, "dictionary");
+  c.providers[0].model = "";
   assert.equal(suggestionBinding(c), undefined);
   c.providers[0].model = "translator";
   assert.equal(suggestionBinding(c)?.action.id, "dictionary");

@@ -14,7 +14,7 @@ const groups: {
 }[] = [
   {
     title: "内置 LLM 提供商",
-    description: "已预填 API 地址，添加后即可选择模型。",
+    description: "已预填 API 地址和默认模型，添加后可直接调整。",
     presets: ["openai", "deepseek", "gemini", "qwen"],
   },
   {

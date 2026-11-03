@@ -1,8 +1,12 @@
 import { t } from "../shared/i18n";
-import { useEffect, useId, useRef, useState } from "react";
-import { Check, ChevronDown, Image, RefreshCw } from "lucide-react";
+import { useEffect, useId, useRef, useState, Fragment } from "react";
+import { Check, ChevronDown, Image, RefreshCw, Volume2 } from "lucide-react";
 import type { Config, TextProfile } from "../shared/config";
 import { catalogKey, modelOptions } from "../shared/models";
+import {
+  chooseProviderModel,
+  toggleCustomModel,
+} from "../shared/provider-model";
 
 export type ModelCatalogAccess = {
   catalogs?: Record<string, string[]>;
@@ -19,7 +23,7 @@ export function ModelPicker({
 }: ModelCatalogAccess & {
   config: Config;
   provider: TextProfile;
-  onChange: (model: string, custom: boolean) => void;
+  onChange: (provider: TextProfile) => void;
   label: string;
   placeholder: string;
 }) {
@@ -29,46 +33,79 @@ export function ModelPicker({
   const [open, setOpen] = useState(false);
   const [above, setAbove] = useState(false);
   const [query, setQuery] = useState("");
+  const [editing, setEditing] = useState(false);
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const choices = modelOptions(
-    config,
-    provider.id,
-    catalogs[catalogKey(provider)] ?? [],
-  )
-    .filter((m) => m.id.toLowerCase().includes(query.toLowerCase()))
-    .slice(0, 100);
+  const [empty, setEmpty] = useState(false);
+  const key = catalogKey(provider);
+  const currentKey = useRef(key);
+  currentKey.current = key;
+  const customOnly = provider.preset === "custom";
+  const custom = customOnly || provider.customModel;
+  const options = modelOptions(config, provider.id, catalogs[key] ?? []);
+  const ordered = [
+    ...options.filter((m) => m.kind !== "speech"),
+    ...options.filter((m) => m.kind === "speech"),
+  ];
+  const choices = ordered.filter((m) =>
+    m.id.toLowerCase().includes(query.trim().toLowerCase()),
+  );
   const manual = query.trim();
   const canAdd =
-    !!manual && !/\s/.test(manual) && !choices.some((m) => m.id === manual);
+    !custom &&
+    !!manual &&
+    !/\s/.test(manual) &&
+    !choices.some((m) => m.id === manual);
   const count = choices.length + Number(canAdd);
   const active = Math.min(index, count - 1);
+  const capability = options.find((m) => m.id === provider.model)?.vision;
   function place() {
-    const rect = input.current!.getBoundingClientRect(),
-      top = input.current!.closest("main")?.getBoundingClientRect().top ?? 0;
+    const rect = input.current!.getBoundingClientRect();
+    const top =
+      input.current!.closest("main")?.getBoundingClientRect().top ?? 0;
     setAbove(
-      innerHeight - rect.bottom < 170 &&
+      innerHeight - rect.bottom < 220 &&
         rect.top - top > innerHeight - rect.bottom,
     );
+  }
+  function close() {
+    setOpen(false);
+    setEditing(false);
+    setQuery("");
   }
   function show() {
     if (open) return;
     place();
     setOpen(true);
     setQuery("");
-    setIndex(0);
+    setEditing(false);
+    setIndex(
+      Math.max(
+        0,
+        ordered.findIndex((m) => m.id === provider.model),
+      ),
+    );
   }
-  function choose(model: string, custom = false) {
-    onChange(model, custom);
-    setOpen(false);
+  function choose(model: string, manualChoice = false) {
+    onChange(chooseProviderModel(provider, model, custom || manualChoice));
+    close();
     setError("");
-    input.current?.focus();
+    setEmpty(false);
+    input.current?.focus({ preventScroll: true });
   }
+  useEffect(() => {
+    currentKey.current = key;
+    close();
+    setError("");
+    setEmpty(false);
+    setBusy(false);
+    return () => { currentKey.current = ""; };
+  }, [key]);
   useEffect(() => {
     if (!open) return;
     const outside = (e: PointerEvent) => {
-      if (!root.current?.contains(e.target as Node)) setOpen(false);
+      if (!root.current?.contains(e.target as Node)) close();
     };
     document.addEventListener("pointerdown", outside);
     document.addEventListener("scroll", place, true);
@@ -79,16 +116,45 @@ export function ModelPicker({
       window.removeEventListener("resize", place);
     };
   }, [open]);
+  useEffect(() => {
+    if (!open || active < 0) return;
+    const frame = requestAnimationFrame(() => {
+      const row = document.getElementById(id + "-" + active);
+      const list = row?.parentElement?.closest(
+        '[role="listbox"]',
+      ) as HTMLElement | null;
+      if (!row || !list) return;
+      if (row.offsetTop < list.scrollTop) list.scrollTop = row.offsetTop;
+      else if (
+        row.offsetTop + row.offsetHeight >
+        list.scrollTop + list.clientHeight
+      )
+        list.scrollTop = row.offsetTop + row.offsetHeight - list.clientHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, active, id, query]);
   async function refresh() {
     if (!fetchModels || busy) return;
+    const scope = key;
     setBusy(true);
     setError("");
+    setEmpty(false);
     try {
-      await fetchModels(provider.id);
+      const models = await fetchModels(provider.id);
+      if (currentKey.current !== scope) return;
+      setEmpty(models.length === 0);
+      if (models.length) {
+        input.current?.focus({ preventScroll: true });
+        place();
+        setQuery("");
+        setEditing(false);
+        setIndex(0);
+        setOpen(true);
+      }
     } catch (e) {
-      setError((e as Error).message);
+      if (currentKey.current === scope) setError((e as Error).message);
     } finally {
-      setBusy(false);
+      if (currentKey.current === scope) setBusy(false);
     }
   }
   return (
@@ -96,165 +162,189 @@ export function ModelPicker({
       className="model-input-field"
       ref={root}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+        if (!e.currentTarget.contains(e.relatedTarget)) close();
       }}
     >
-      <div className="model-anchor">
-        {provider.customModel ? (
-          <input
-            ref={input}
-            aria-label={t("自定义模型 ID")}
-            placeholder={t("输入自定义模型 ID")}
-            maxLength={200}
-            value={provider.model}
-            onChange={(e) => onChange(e.target.value, true)}
-            onBlur={(e) => onChange(e.target.value.trim(), true)}
-          />
-        ) : (
-          <>
-            <input
-              role="combobox"
-              aria-label={label}
-              maxLength={200}
-              aria-autocomplete="list"
-              aria-expanded={open}
-              aria-controls={id}
-              aria-activedescendant={
-                open && active >= 0 ? id + "-" + active : undefined
-              }
-              ref={input}
-              placeholder={open ? t("搜索模型") : placeholder}
-              value={open ? query : provider.model}
-              onFocus={show}
-              onClick={show}
-              onChange={(e) => {
-                show();
-                setQuery(e.target.value);
-                setIndex(0);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  setOpen(false);
-                  return;
-                }
-                if (e.key === "Enter" && open && active >= 0) {
-                  e.preventDefault();
-                  choose(choices[active]?.id ?? manual, !choices[active]);
-                }
-                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                  e.preventDefault();
-                  show();
-                  const next = open
-                    ? Math.max(
-                        0,
-                        Math.min(
-                          count - 1,
-                          active + (e.key === "ArrowDown" ? 1 : -1),
-                        ),
-                      )
-                    : 0;
-                  setIndex(next);
-                  const row = document.getElementById(id + "-" + next);
-                  if (row?.parentElement) {
-                    const list = row.parentElement;
-                    if (row.offsetTop < list.scrollTop)
-                      list.scrollTop = row.offsetTop;
-                    else if (
-                      row.offsetTop + row.offsetHeight >
-                      list.scrollTop + list.clientHeight
-                    )
-                      list.scrollTop =
-                        row.offsetTop + row.offsetHeight - list.clientHeight;
-                  }
-                }
-              }}
-            />
+      <div className="provider-field-heading">
+        <span>{label}</span>
+        <div className="provider-model-tools">
+          {capability && (
+            <span>
+              <Image size={12} /> {t("图片输入")}
+            </span>
+          )}
+          {fetchModels && (
             <button
               type="button"
-              className="model-chevron"
-              aria-label={t(open ? "收起模型列表" : "展开模型列表")}
+              className="model-fetch-button"
+              disabled={busy}
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => {
-                if (open) setOpen(false);
-                else {
-                  input.current?.focus();
-                  show();
-                }
-              }}
+              onClick={() => void refresh()}
             >
-              <ChevronDown size={15} />
+              <RefreshCw size={13} className={busy ? "spin" : ""} />
+              {t(busy ? "获取中…" : error ? "重试获取模型" : "获取模型列表")}
             </button>
-            {open && (
-              <div className="model-dropdown" data-above={above}>
-                <div role="listbox" id={id} aria-label={t("模型候选")}>
-                  {choices.map((m, i) => (
-                    <button
-                      type="button"
-                      role="option"
-                      key={m.id}
-                      id={id + "-" + i}
-                      tabIndex={-1}
-                      aria-selected={m.id === provider.model}
-                      data-active={i === active}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onMouseEnter={() => setIndex(i)}
-                      onClick={() => choose(m.id)}
-                    >
-                      <span>{m.id}</span>
-                      {m.vision && (
-                        <Image size={13} aria-label={t("图片输入")} />
-                      )}
-                      {m.id === provider.model && <Check size={14} />}
-                    </button>
-                  ))}
-                  {canAdd && (
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={false}
-                      tabIndex={-1}
-                      id={id + "-" + choices.length}
-                      data-active={active === choices.length}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onMouseEnter={() => setIndex(choices.length)}
-                      onClick={() => choose(manual, true)}
-                    >
-                      <span>{t("使用自定义 ID「{0}」", manual)}</span>
-                    </button>
-                  )}
-                  {!count && (
-                    <p>{t("没有匹配的模型，可在下方启用自定义 ID。")}</p>
-                  )}
-                </div>
-                {fetchModels && (
-                  <button
-                    className="model-refresh"
-                    disabled={busy}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => void refresh()}
-                  >
-                    <RefreshCw size={13} className={busy ? "spin" : ""} />
-                    {t("获取模型列表")}
-                  </button>
-                )}
-              </div>
-            )}
-          </>
-        )}
+          )}
+        </div>
       </div>
-      <label className="custom-model-check">
+      <div className="model-anchor">
         <input
-          type="checkbox"
-          checked={provider.customModel}
+          ref={input}
+          role="combobox"
+          aria-label={custom ? t("自定义模型 ID") : label}
+          maxLength={200}
+          aria-autocomplete="list"
+          aria-expanded={open}
+          aria-controls={id}
+          aria-activedescendant={
+            open && active >= 0 ? id + "-" + active : undefined
+          }
+          placeholder={
+            custom ? t("输入自定义模型 ID") : open ? t("搜索模型") : placeholder
+          }
+          value={
+            custom ? provider.model : open && editing ? query : provider.model
+          }
+          onFocus={(e) => {
+            if (!custom) {
+              show();
+              e.currentTarget.select();
+            }
+          }}
+          onClick={() => {
+            if (!custom) show();
+          }}
           onChange={(e) => {
-            setOpen(false);
-            setError("");
-            onChange(provider.model, e.target.checked);
+            if (custom)
+              onChange(chooseProviderModel(provider, e.target.value, true));
+            else show();
+            setQuery(e.target.value);
+            setEditing(true);
+            setIndex(0);
+          }}
+          onBlur={(e) => {
+            if (custom && e.target.value !== e.target.value.trim())
+              onChange(
+                chooseProviderModel(provider, e.target.value.trim(), true),
+              );
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              close();
+              return;
+            }
+            if (e.key === "Enter" && open && active >= 0) {
+              e.preventDefault();
+              const option = choices[active];
+              choose(
+                option?.id ?? manual,
+                !option || option.source !== "builtin",
+              );
+            }
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              if (!open) show();
+              else
+                setIndex(
+                  Math.max(
+                    0,
+                    Math.min(
+                      count - 1,
+                      active + (e.key === "ArrowDown" ? 1 : -1),
+                    ),
+                  ),
+                );
+            }
+            if (open && (e.key === "Home" || e.key === "End")) {
+              e.preventDefault();
+              setIndex(e.key === "Home" ? 0 : Math.max(0, count - 1));
+            }
           }}
         />
-        {t("输入自定义模型 ID")}
-      </label>
+        <button
+          type="button"
+          className="model-chevron"
+          aria-label={t(open ? "收起模型列表" : "展开模型列表")}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            if (open) close();
+            else {
+              input.current?.focus({ preventScroll: true });
+              show();
+            }
+          }}
+        >
+          <ChevronDown size={15} />
+        </button>
+        {open && (
+          <div className="model-dropdown" data-above={above}>
+            <div role="listbox" id={id} aria-label={t("模型候选")}>
+              {choices.map((m, i) => (
+                <Fragment key={m.id}>
+                  {m.kind === "speech" && choices[i - 1]?.kind !== "speech" && (
+                    <div className="model-group-label">{t("语音模型")}</div>
+                  )}
+                  <button
+                    type="button"
+                    role="option"
+                    id={id + "-" + i}
+                    tabIndex={-1}
+                    aria-selected={m.id === provider.model}
+                    data-active={i === active}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseEnter={() => setIndex(i)}
+                    onClick={() => choose(m.id, m.source !== "builtin")}
+                  >
+                    <span>{m.id}</span>
+                    {m.vision && <Image size={13} aria-label={t("图片输入")} />}
+                    {m.kind === "speech" && (
+                      <Volume2 size={13} aria-label={t("语音模型")} />
+                    )}
+                    {m.id === provider.model && <Check size={14} />}
+                  </button>
+                </Fragment>
+              ))}
+              {canAdd && (
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={false}
+                  tabIndex={-1}
+                  id={id + "-" + choices.length}
+                  data-active={active === choices.length}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onMouseEnter={() => setIndex(choices.length)}
+                  onClick={() => choose(manual, true)}
+                >
+                  <span>{t("使用自定义 ID「{0}」", manual)}</span>
+                </button>
+              )}
+              {!count && <p>{t("没有匹配的模型，可直接输入自定义 ID。")}</p>}
+            </div>
+          </div>
+        )}
+      </div>
+      {!customOnly && (
+        <label className="custom-model-check">
+          <input
+            type="checkbox"
+            checked={custom}
+            onChange={(e) => {
+              close();
+              setError("");
+              setEmpty(false);
+              onChange(toggleCustomModel(provider, e.target.checked));
+            }}
+          />
+          {t("输入自定义模型 ID")}
+        </label>
+      )}
+      {empty && (
+        <p className="model-fetch-note" role="status">
+          {t("接口未返回模型，可直接输入自定义 ID。")}
+        </p>
+      )}
       {error && (
         <p className="model-fetch-error" role="alert">
           {error}

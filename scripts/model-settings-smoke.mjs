@@ -4,7 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 
-const output = "docs/screenshots/v0.11",
+const output = "docs/screenshots/v0.12.1",
   dataDir = path.resolve(".local/models-" + Date.now());
 await mkdir(output, { recursive: true });
 await mkdir(dataDir, { recursive: true });
@@ -48,8 +48,16 @@ const server = createServer(async (req, res) => {
             content: body.messages?.[0]?.content?.includes?.("BCP 47")
               ? "fr"
               : image
-                ? "TextHop OCR 123\n你好，世界！"
-                : body.response_format?.json_schema ? JSON.stringify(Object.fromEntries(body.response_format.json_schema.schema.required.map(name=>[name,null]))) : "模型连接测试成功。",
+                ? "ReadFinch OCR 123\n你好，世界！"
+                : body.response_format?.json_schema
+                  ? JSON.stringify(
+                      Object.fromEntries(
+                        body.response_format.json_schema.schema.required.map(
+                          (name) => [name, null],
+                        ),
+                      ),
+                    )
+                  : "模型连接测试成功。",
           },
         },
       ],

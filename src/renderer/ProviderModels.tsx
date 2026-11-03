@@ -1,6 +1,6 @@
 import { t } from "../shared/i18n";
 import { useState } from "react";
-import { ChevronRight, Image } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   reasoningEfforts,
   type Config,
@@ -38,25 +38,12 @@ export function ProviderModels({
   const count = purposes.filter(assigned).length;
   return (
     <div className="provider-model-control">
-      <div className="provider-field-heading">
-        <span>{t("模型")}</span>
-        {model && (
-          <div className="provider-model-tools">
-            {capability && (
-              <span>
-                <Image size={12} /> {t("图片输入")}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
       <ModelPicker
         config={config}
         label={t("模型")}
         placeholder={t("选择或输入模型 ID")}
         provider={provider}
-        onChange={(model, customModel) => {
-          const updated = { ...provider, model, customModel };
+        onChange={(updated) => {
           const changed = {
             ...config,
             providers: config.providers.map((p) =>

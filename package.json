@@ -1,7 +1,7 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
@@ -35,7 +35,8 @@
     "format": "prettier --write src scripts tests vite.config.ts package.json tsconfig.json",
     "fixtures": "node scripts/fixtures-server.mjs",
     "schema": "tsx scripts/schema.ts",
-    "docs:readme": "node scripts/readmes.mjs"
+    "docs:readme": "node scripts/readmes.mjs",
+    "models:sync": "node scripts/sync-provider-catalog.mjs"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.4",

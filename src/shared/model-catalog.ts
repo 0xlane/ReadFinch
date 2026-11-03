@@ -1,46 +1,48 @@
 import type { ProviderPreset } from "./provider-presets";
 import type { TextProfile } from "./config";
-// Reviewed 2026-10-31 (text and vision) and 2026-11-03 (speech). Sources and review policy: docs/MODELS.md.
-// This is a suggestion catalog, not an enum restricting custom model IDs.
-export const BUILTIN_MODELS: Record<
-  ProviderPreset,
-  readonly { id: string; vision?: boolean }[]
-> = {
-  openai: [
-    { id: "gpt-5.4-mini", vision: true },
-    { id: "gpt-4.1-mini", vision: true },
-    { id: "gpt-4o-mini", vision: true },
-    { id: "gpt-4o-mini-tts", vision: false },
-    { id: "tts-1", vision: false },
-    { id: "tts-1-hd", vision: false },
-  ],
-  deepseek: [
-    { id: "deepseek-flash", vision: true },
-    { id: "deepseek-v4-pro", vision: false },
-  ],
-  qwen: [
-    { id: "qwen3.7-plus", vision: true },
-    { id: "qwen3.8-max", vision: true },
-    { id: "qwen3.8-flash" },
-  ],
-  siliconflow: [
-    { id: "Qwen/Qwen3.5-397B-A17B", vision: true },
-    { id: "Qwen/Qwen2.5-VL-72B-Instruct", vision: true },
-  ],
-  gemini: [
-    { id: "gemini-3.5-flash-lite", vision: true },
-    { id: "gemini-3.8-flash", vision: true },
-  ],
-  openrouter: [
-    { id: "openai/gpt-4.1-mini", vision: true },
-    { id: "google/gemini-3.8-flash", vision: true },
-    { id: "deepseek/deepseek-v4-pro", vision: false },
-  ],
-  custom: [],
+import catalog from "./provider-catalog.json";
+
+// The list and ordering mirror the pinned Read Frog catalog. Capability metadata is
+// independent: unknown means "test this endpoint", never a promise of vision support.
+const capabilities: Record<string, boolean> = {
+  "openai:gpt-5.4-mini": true,
+  "openai:gpt-4.1-mini": true,
+  "openai:gpt-4o-mini": true,
+  "deepseek:deepseek-flash": true,
+  "deepseek:deepseek-v4-pro": false,
+  "qwen:qwen3.7-plus": true,
+  "qwen:qwen3.8-max": true,
+  "siliconflow:Qwen/Qwen3.5-397B-A17B": true,
+  "siliconflow:Qwen/Qwen2.5-VL-72B-Instruct": true,
+  "gemini:gemini-3.5-flash-lite": true,
+  "gemini:gemini-3.8-flash": true,
+  "openrouter:openai/gpt-4.1-mini": true,
+  "openrouter:google/gemini-3.8-flash": true,
+  "openrouter:deepseek/deepseek-v4-pro": false,
 };
+export type BuiltinModel = { id: string; vision?: boolean; kind?: "speech" };
+export const SPEECH_MODELS: readonly BuiltinModel[] = [
+  { id: "gpt-4o-mini-tts", vision: false, kind: "speech" },
+  { id: "tts-1", vision: false, kind: "speech" },
+  { id: "tts-1-hd", vision: false, kind: "speech" },
+];
+export const BUILTIN_MODELS = Object.fromEntries([
+  ...Object.entries(catalog.providers).map(([preset, p]) => [
+    preset,
+    p.models.map((id) => ({ id, vision: capabilities[preset + ":" + id] })),
+  ]),
+  ["custom", []],
+]) as Record<ProviderPreset, readonly BuiltinModel[]>;
+// Desktop speech is additional to Read Frog's text catalog and shown in its own group.
+BUILTIN_MODELS.openai = [...BUILTIN_MODELS.openai, ...SPEECH_MODELS];
+export function defaultProviderModel(preset: ProviderPreset) {
+  if (preset === "custom") return { model: "", customModel: true };
+  const item = catalog.providers[preset];
+  return { model: item.defaultModel, customModel: item.customModel };
+}
 export function supportsImages(p: TextProfile) {
-  return (
-    Boolean(p.model.trim()) &&
-    BUILTIN_MODELS[p.preset].find((m) => m.id === p.model)?.vision !== false
-  );
+  const known =
+    BUILTIN_MODELS[p.preset].find((m) => m.id === p.model)?.vision ??
+    capabilities[p.preset + ":" + p.model];
+  return Boolean(p.model.trim()) && known !== false;
 }

@@ -94,7 +94,7 @@ test("v1 upgrade preserves the old direct translation key, other preferences, an
   old.textProfiles[0].model = "personal-model";
   old.appearance.theme = "dark";
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 12);
+  assert.equal(next.schemaVersion, 13);
   assert.equal(
     next.actions.find((a) => a.id === "translate")!.shortcut,
     "Ctrl+Alt+F9",

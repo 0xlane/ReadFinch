@@ -18,7 +18,11 @@ import {
   NoteConnectionSchema,
   migrateNoteConnections,
 } from "./notebases";
-import { BUILTIN_MODELS, supportsImages } from "./model-catalog";
+import {
+  BUILTIN_MODELS,
+  defaultProviderModel,
+  supportsImages,
+} from "./model-catalog";
 import { PROVIDER_PRESETS, providerPreset } from "./provider-presets";
 export const OCR_INSTRUCTION =
   "Extract all visible text exactly as written. Preserve language, punctuation, indentation, line breaks, paths and code. Do not translate, explain, correct or invent missing text. Return only the extracted text.";
@@ -95,6 +99,7 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
   visionModel: true,
 }).extend({
   customModel: z.boolean().default(false),
+  builtinModel: z.string().max(200).optional(),
   temperature: z.number().min(0).max(2).nullable().default(null),
   reasoningEffort: z.enum(reasoningEfforts).optional(),
 });
@@ -141,7 +146,7 @@ export const ActionSchema = z
   .strict();
 export const ConfigSchema = z
   .object({
-    schemaVersion: z.literal(12),
+    schemaVersion: z.literal(13),
     tts: SpeechConfigSchema,
     localNotebases: z.array(LocalNotebaseSchema).max(1000),
     noteSuggestion: z.strictObject({
@@ -302,8 +307,7 @@ export function createProvider(
     enabled: true,
     preset: preset.id,
     endpoint: preset.endpoint,
-    model: "",
-    customModel: preset.id === "custom",
+    ...defaultProviderModel(preset.id),
     temperature: null,
     instruction: OCR_INSTRUCTION,
     requiresKey: true,
@@ -399,7 +403,7 @@ const retiredDefaults = [
 ];
 function baseConfig(): Config {
   return {
-    schemaVersion: 12,
+    schemaVersion: 13,
     tts: defaultSpeech(),
     localNotebases: [],
     noteSuggestion: { enabled: true, actionId: null, providerId: null },
@@ -1006,7 +1010,7 @@ export function parseConfig(
     candidate &&
     typeof candidate === "object" &&
     "schemaVersion" in candidate &&
-    candidate.schemaVersion === 12 &&
+    (candidate.schemaVersion === 12 || candidate.schemaVersion === 13) &&
     "actions" in candidate &&
     Array.isArray(candidate.actions)
   ) {
@@ -1017,6 +1021,48 @@ export function parseConfig(
           ? { ...a, enabled: true }
           : a,
       ),
+    };
+  }
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 12 &&
+    "providers" in candidate &&
+    Array.isArray(candidate.providers)
+  ) {
+    candidate = {
+      ...candidate,
+      schemaVersion: 13,
+      providers: candidate.providers.map((p) => {
+        if (
+          !p ||
+          !PROVIDER_PRESETS.some((item) => item.id === p.preset) ||
+          (p.customModel !== undefined && typeof p.customModel !== "boolean")
+        )
+          return p;
+        const initial = defaultProviderModel(p.preset);
+        // Fill only the old unconfigured preset. Never change a chosen model or private ID.
+        const model =
+          p.model === "" && !p.customModel ? initial.model : p.model;
+        const listed = BUILTIN_MODELS[
+          p.preset as keyof typeof BUILTIN_MODELS
+        ].some((m) => m.id === model);
+        return {
+          ...p,
+          model,
+          customModel:
+            p.preset === "custom" ||
+            Boolean(p.customModel) ||
+            Boolean(model && !listed),
+          builtinModel:
+            p.builtinModel === undefined
+              ? !p.customModel && listed
+                ? model
+                : initial.model
+              : p.builtinModel,
+        };
+      }),
     };
   }
   const result = ConfigSchema.safeParse(candidate);
