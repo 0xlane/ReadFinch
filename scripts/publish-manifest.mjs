@@ -33,7 +33,7 @@ const files = [],
 const assetPattern = new RegExp(
   "^ReadFinch-" +
     version.replaceAll(".", "\\.") +
-    "-(windows|macos|linux)-(x64|arm64|amd64)(?:-(setup|portable))?\\.(exe|dmg|zip|deb|AppImage)$",
+    "-(windows|macos|linux)-(x64|arm64|amd64|x86_64)(?:-(setup|portable))?\\.(exe|dmg|zip|deb|AppImage)$",
 );
 for (const name of (await readdir(directory)).sort()) {
   const match = assetPattern.exec(name);
@@ -52,7 +52,14 @@ for (const name of (await readdir(directory)).sort()) {
   const [, platform, artifactArch, variant, extension] = match;
   if (artifactArch === "amd64" && (platform !== "linux" || extension !== "deb"))
     throw Error("Debian architecture alias used by an unexpected artifact.");
-  const arch = artifactArch === "amd64" ? "x64" : artifactArch;
+  if (
+    artifactArch === "x86_64" &&
+    (platform !== "linux" || extension !== "AppImage")
+  )
+    throw Error("AppImage architecture alias used by an unexpected artifact.");
+  const arch = ["amd64", "x86_64"].includes(artifactArch)
+    ? "x64"
+    : artifactArch;
   if (extension === "zip") continue; // macOS zip is offered as an alternative download.
   files.push({
     platform:
