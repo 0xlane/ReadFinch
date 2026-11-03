@@ -1,7 +1,7 @@
 {
   "en": {
     "tagline": "A reading companion, right beside your words.",
-    "intro": "ReadFinch is an open-source desktop reading and writing companion. Translate selected text, look up words, improve writing and save notes across apps, with offline and online OCR for text in images.",
+    "intro": "ReadFinch is an open-source desktop reading and writing companion. Translate selected text, look up words, improve writing and save notes across apps, with OCR for text you cannot select.",
     "nav": [
       "Get started",
       "Features",
@@ -28,7 +28,7 @@
       ],
       [
         "Read text you cannot select",
-        "Capture a screen region or import an image. Use built-in offline OCR or a configured online vision provider, then review the text before running a command."
+        "Capture a screen region or import an image to extract text, then translate it, look up words or run a custom command."
       ],
       [
         "Listen as you read",
@@ -60,7 +60,7 @@
     "steps": [
       "**Connect a provider.** Open API Providers, choose a preset or compatible endpoint, enter the required credentials and model, and test the connection. Assign it as the default or to a specific feature.",
       "**Select a sentence.** Click Translate on the selection toolbar, choose your target language and pin the result if you want to keep reading beside it.",
-      "**Capture text from an image.** Use the OCR shortcut below and select a region. Offline OCR works immediately; for online recognition, choose a configured vision provider in Screenshot OCR. Review the text before continuing."
+      "**Capture text from an image.** Use the OCR shortcut below and select a region. Review the recognized text, then choose a command."
     ],
     "shortcutsTitle": "Useful shortcuts",
     "shortcutHeaders": [
@@ -89,7 +89,7 @@
     "platformLink": "platform support matrix",
     "dataTitle": "Data and privacy",
     "data": [
-      "**Local notes and offline recognition.** Notebook contents stay on your device. Built-in OCR processes images locally, and system offline voices do not need an online speech provider.",
+      "**On your device.** Notebook contents stay on your device. Built-in OCR processes images locally, and system offline voices do not need an online speech provider.",
       "**Requests use your chosen provider.** Translation and AI commands send the text needed for the request; online speech sends the text to read aloud. Online OCR sends the captured region or imported image to the selected vision provider. Provider accounts, availability and usage charges are managed by the respective service.",
       "**Portable settings.** Import/export files or manually sync configuration over WebDAV. Provider settings, commands, shortcuts and notebook field mappings move together. API keys and custom request headers remain device-specific; configure them separately on another machine. Notebook contents are not included in configuration sync."
     ],
@@ -97,7 +97,7 @@
     "docs": [
       "Architecture and source layout",
       "Providers, models and feature assignments",
-      "Offline and online OCR",
+      "Screenshot and image recognition (OCR)",
       "Configuration and WebDAV",
       "Platform support and permissions",
       "Interface, translation and explanation languages",
@@ -125,28 +125,11 @@
       "`*-setup.exe` to install, or `*-portable.exe` to run without installing.",
       "`arm64` for Apple silicon or `x64` for Intel; available as `.dmg` and `.zip`.",
       "`.AppImage` to run directly, or `amd64.deb` for Debian and Ubuntu."
-    ],
-    "ocrTitle": "Offline and online OCR",
-    "ocrIntro": "Capture a screen region or import an image, review the recognized text, then translate it, look it up or run a custom command.",
-    "ocrHeaders": [
-      "Mode",
-      "How it works"
-    ],
-    "ocrModes": [
-      [
-        "Offline · default",
-        "The bundled engine recognizes Simplified Chinese and English on your device. No API account, network connection or language-pack download is required."
-      ],
-      [
-        "Online · optional",
-        "Use a configured vision provider to extract text. Supported languages and recognition quality depend on its model; the captured region or imported image is sent to that provider."
-      ]
-    ],
-    "ocrSetup": "For online OCR, add an image-capable model in **API Providers**, then select that provider in **Screenshot OCR**. The built-in offline engine remains available, and offline failures never automatically upload an image."
+    ]
   },
   "zh-CN": {
     "tagline": "就在文字旁边，陪你读懂每一句。",
-    "intro": "伴读雀是一款开源的桌面阅读与写作助手。在不同应用中选中文字，即可翻译、查词、改进写作或保存笔记；无法选中的图片文字，也可以通过离线或在线 OCR 识别。",
+    "intro": "伴读雀是一款开源的桌面阅读与写作助手，支持跨应用划词翻译、查词、写作改进、朗读和本地笔记，也能从截图与图片中提取文字。",
     "nav": [
       "开始使用",
       "功能介绍",
@@ -173,7 +156,7 @@
       ],
       [
         "识别无法选中的文字",
-        "框选屏幕或导入图片，选择内置离线 OCR 或已配置的在线视觉提供商。核对识别文字后，再运行指令。"
+        "框选屏幕或导入图片，提取其中的文字，继续翻译、查词或执行自定义指令。"
       ],
       [
         "边读边听",
@@ -205,7 +188,7 @@
     "steps": [
       "**接入提供商。** 打开「API 提供商」，选择预设或兼容接口，填写所需凭据与模型并测试连接。可设为默认提供商，也可单独分配给某项功能。",
       "**选中一句话。** 点击划词工具栏的「翻译」，选择目标语言。需要对照时，点图钉固定结果即可。",
-      "**从图片中取词。** 使用下方 OCR 快捷键框选区域。离线 OCR 开箱即用；在线识别需在「截图识别」选择已配置的视觉提供商。核对识别文字后再继续。"
+      "**从图片中取词。** 使用下方 OCR 快捷键框选区域，核对识别出的文字后，选择需要的指令。"
     ],
     "shortcutsTitle": "常用快捷键",
     "shortcutHeaders": [
@@ -234,7 +217,7 @@
     "platformLink": "平台支持矩阵",
     "dataTitle": "数据与隐私",
     "data": [
-      "**笔记与离线识别留在本机。** 笔记正文保存在当前设备；内置 OCR 在本地处理图片，系统离线语音无需在线朗读服务。",
+      "**本机数据处理。** 笔记正文保存在当前设备；内置 OCR 在本地处理图片，系统离线语音无需在线朗读服务。",
       "**请求发送给你选择的提供商。** 翻译和 AI 指令发送请求所需的文字，在线朗读发送待朗读内容；在线 OCR 将框选区域或导入的图片发送给所选视觉提供商。服务账户、可用性和调用费用由对应提供商管理。",
       "**配置可以迁移。** 支持文件导入、导出和手动 WebDAV 同步，迁移提供商设置、指令、快捷键与笔记字段映射。API Key 和自定义请求头按设备保存，新设备需要单独配置；笔记正文不包含在配置同步中。"
     ],
@@ -242,7 +225,7 @@
     "docs": [
       "应用架构与源码目录",
       "提供商、模型与功能分配",
-      "离线与在线 OCR",
+      "截图与图片识别（OCR）",
       "配置管理与 WebDAV",
       "平台支持与权限",
       "界面、翻译与解释语言",
@@ -270,28 +253,11 @@
       "`*-setup.exe` 为安装版，`*-portable.exe` 为免安装便携版。",
       "Apple 芯片选择 `arm64`，Intel 选择 `x64`，提供 `.dmg` 和 `.zip`。",
       "`.AppImage` 可直接运行，`amd64.deb` 适用于 Debian、Ubuntu。"
-    ],
-    "ocrTitle": "离线与在线 OCR",
-    "ocrIntro": "框选屏幕区域或导入图片，核对识别出的文字后，即可继续翻译、查词或执行自定义指令。",
-    "ocrHeaders": [
-      "识别方式",
-      "使用说明"
-    ],
-    "ocrModes": [
-      [
-        "离线识别 · 默认",
-        "内置引擎在本机识别简体中文和英文，无需 API 账户、网络连接或额外下载语言包。"
-      ],
-      [
-        "在线识别 · 可选",
-        "使用已配置的视觉提供商提取文字。支持的语言与识别效果取决于模型；框选区域或导入的图片会发送给该提供商。"
-      ]
-    ],
-    "ocrSetup": "使用在线 OCR 时，先在「API 提供商」中配置支持图片输入的模型，再到「截图识别」选择该提供商。内置离线引擎始终可选，离线识别失败也不会自动上传图片。"
+    ]
   },
   "zh-TW": {
     "tagline": "就在文字旁邊，陪你讀懂每一句。",
-    "intro": "伴讀雀是一款開源的桌面閱讀與寫作助手。在不同應用程式中選取文字，即可翻譯、查詞、改善寫作或儲存筆記；無法選取的圖片文字，也能透過離線或線上 OCR 辨識。",
+    "intro": "伴讀雀是一款開源的桌面閱讀與寫作助手，支援跨應用程式選詞翻譯、查詞、寫作改善、朗讀與本機筆記，也能從截圖和圖片中擷取文字。",
     "nav": [
       "開始使用",
       "功能介紹",
@@ -318,7 +284,7 @@
       ],
       [
         "辨識無法選取的文字",
-        "框選螢幕或匯入圖片，選擇內建離線 OCR 或已設定的線上視覺供應商。核對辨識文字後，再執行指令。"
+        "框選螢幕或匯入圖片，擷取其中的文字，繼續翻譯、查詞或執行自訂指令。"
       ],
       [
         "邊讀邊聽",
@@ -350,7 +316,7 @@
     "steps": [
       "**連接供應商。** 開啟 API Providers，選擇預設或相容介面，填入所需憑證與模型並測試連線。可以設為預設供應商，也可指派給特定功能。",
       "**選取一句話。** 點選工具列上的 Translate，選擇目標語言。需要對照時，點圖釘保留結果即可。",
-      "**從圖片取詞。** 使用下方 OCR 快捷鍵框選區域。離線 OCR 安裝後即可使用；線上辨識需在截圖辨識設定中選擇已設定的視覺供應商。核對文字後再繼續。"
+      "**從圖片取詞。** 使用下方 OCR 快捷鍵框選區域，核對辨識出的文字後，選擇需要的指令。"
     ],
     "shortcutsTitle": "常用快捷鍵",
     "shortcutHeaders": [
@@ -379,7 +345,7 @@
     "platformLink": "平台支援矩陣",
     "dataTitle": "資料與隱私",
     "data": [
-      "**筆記與離線辨識保留在本機。** 筆記內容儲存在目前裝置；內建 OCR 在本機處理圖片，系統離線語音不需要線上朗讀服務。",
+      "**本機資料處理。** 筆記內容儲存在目前裝置；內建 OCR 在本機處理圖片，系統離線語音不需要線上朗讀服務。",
       "**請求傳送至你選擇的供應商。** 翻譯與 AI 指令傳送請求所需的文字，線上朗讀傳送待朗讀內容；線上 OCR 將框選區域或匯入的圖片傳送給所選視覺供應商。服務帳戶、可用性及使用費用由各供應商管理。",
       "**設定可以移轉。** 支援檔案匯入、匯出及手動 WebDAV 同步，移轉供應商設定、指令、快捷鍵與筆記欄位對應。API Key 和自訂請求標頭依裝置儲存，新裝置須另行設定；筆記內容不包含在設定同步中。"
     ],
@@ -387,7 +353,7 @@
     "docs": [
       "應用程式架構與原始碼目錄",
       "供應商、模型與功能指派",
-      "離線與線上 OCR",
+      "截圖與圖片辨識（OCR）",
       "設定管理與 WebDAV",
       "平台支援與權限",
       "介面、翻譯與解釋語言",
@@ -415,28 +381,11 @@
       "`*-setup.exe` 為安裝版，`*-portable.exe` 為免安裝可攜版。",
       "Apple 晶片選擇 `arm64`，Intel 選擇 `x64`，提供 `.dmg` 與 `.zip`。",
       "`.AppImage` 可直接執行，`amd64.deb` 適用於 Debian、Ubuntu。"
-    ],
-    "ocrTitle": "離線與線上 OCR",
-    "ocrIntro": "框選螢幕區域或匯入圖片，核對辨識出的文字後，即可繼續翻譯、查詞或執行自訂指令。",
-    "ocrHeaders": [
-      "辨識方式",
-      "使用說明"
-    ],
-    "ocrModes": [
-      [
-        "離線辨識 · 預設",
-        "內建引擎在本機辨識簡體中文和英文，不需要 API 帳戶、網路連線或額外下載語言套件。"
-      ],
-      [
-        "線上辨識 · 選用",
-        "透過已設定的視覺供應商擷取文字。支援的語言與辨識效果取決於模型；框選區域或匯入的圖片會傳送給該供應商。"
-      ]
-    ],
-    "ocrSetup": "使用線上 OCR 時，先在 API Providers 中設定支援圖片輸入的模型，再到 Screenshot OCR 選擇該供應商。內建離線引擎始終可用，離線辨識失敗也不會自動上傳圖片。"
+    ]
   },
   "ja": {
     "tagline": "言葉のすぐそばに、読書のパートナー。",
-    "intro": "ReadFinch は、デスクトップでの読書と文章作成を支援するオープンソースアプリです。さまざまなアプリで選択した文章を翻訳し、単語を調べ、文章を推敲し、ノートに保存できます。選択できない画像内の文字には、オフライン・オンラインの OCR を利用できます。",
+    "intro": "ReadFinch は、デスクトップでの読書と文章作成を支援するオープンソースアプリです。さまざまなアプリで選択した文章を翻訳し、単語を調べ、文章を推敲し、ノートに保存できます。選択できない画像内の文字は OCR で取り込めます。",
     "nav": [
       "使い始める",
       "機能",
@@ -463,7 +412,7 @@
       ],
       [
         "選択できない文字を読む",
-        "画面の一部や読み込んだ画像から、内蔵のオフライン OCR または設定済みのオンライン画像認識サービスで文字を抽出。結果を確認してから指示を実行できます。"
+        "画面の一部をキャプチャするか画像を読み込み、文字を抽出して翻訳・辞書・カスタム指示に利用できます。"
       ],
       [
         "読みながら聴く",
@@ -495,7 +444,7 @@
     "steps": [
       "**プロバイダーを接続する。** API Providers でプリセットまたは互換エンドポイントを選び、必要な認証情報とモデルを入力して接続をテストします。既定のプロバイダー、または特定機能のプロバイダーに設定できます。",
       "**一文を選択する。** ツールバーの Translate を押して翻訳先の言語を選びます。読み比べたいときは、ピンで結果を固定できます。",
-      "**画像から文字を取得する。** 下記の OCR ショートカットで範囲を選びます。オフライン OCR はすぐに使えます。オンラインで認識する場合は Screenshot OCR で設定済みの画像対応プロバイダーを選択し、結果を確認してから次に進みます。"
+      "**画像から文字を取得する。** 下記の OCR ショートカットで範囲を選び、認識結果を確認してから指示を選択します。"
     ],
     "shortcutsTitle": "便利なショートカット",
     "shortcutHeaders": [
@@ -524,7 +473,7 @@
     "platformLink": "プラットフォーム対応表",
     "dataTitle": "データとプライバシー",
     "data": [
-      "**ノートとオフライン認識は端末内で。** ノートの内容は端末に保存されます。内蔵 OCR は画像をローカルで処理し、システムのオフライン音声にオンラインサービスは不要です。",
+      "**端末内のデータ処理。** ノートの内容は端末に保存されます。内蔵 OCR は画像をローカルで処理し、システムのオフライン音声にオンラインサービスは不要です。",
       "**選択したプロバイダーへの送信。** 翻訳や AI 指示では処理に必要な文章を、オンライン読み上げでは読み上げる文章を送信します。オンライン OCR は選択した画面領域または読み込んだ画像を画像対応プロバイダーに送信します。アカウント、サービスの提供状況、利用料金は各プロバイダーが管理します。",
       "**設定は持ち運べます。** ファイルのインポート・エクスポートと手動 WebDAV 同期に対応。プロバイダー設定、指示、ショートカット、ノートのフィールド対応を移行できます。API キーとカスタムヘッダーは端末ごとに設定し直します。ノート本文は設定同期に含まれません。"
     ],
@@ -532,7 +481,7 @@
     "docs": [
       "アーキテクチャとソース構成",
       "プロバイダー・モデル・機能の割り当て",
-      "オフライン・オンライン OCR",
+      "スクリーンショットと画像の文字認識（OCR）",
       "設定管理と WebDAV",
       "プラットフォームと権限",
       "画面・翻訳・解説の言語",
@@ -560,28 +509,11 @@
       "インストール版は `*-setup.exe`、インストール不要のポータブル版は `*-portable.exe`。",
       "Apple シリコンは `arm64`、Intel は `x64`。`.dmg` と `.zip` を提供しています。",
       "直接実行する `.AppImage`、または Debian・Ubuntu 向けの `amd64.deb`。"
-    ],
-    "ocrTitle": "オフライン・オンライン OCR",
-    "ocrIntro": "画面の一部をキャプチャするか画像を読み込み、認識結果を確認してから、翻訳・辞書・カスタム指示に利用できます。",
-    "ocrHeaders": [
-      "方式",
-      "動作"
-    ],
-    "ocrModes": [
-      [
-        "オフライン · 既定",
-        "内蔵エンジンで簡体字中国語と英語を端末上で認識します。API アカウント、ネット接続、言語パックの追加ダウンロードは不要です。"
-      ],
-      [
-        "オンライン · 任意",
-        "設定済みの画像対応プロバイダーで文字を抽出します。対応言語と認識精度はモデルによって異なり、選択した画面領域または読み込んだ画像をそのプロバイダーに送信します。"
-      ]
-    ],
-    "ocrSetup": "オンライン OCR を使うには、API Providers で画像入力に対応するモデルを設定し、Screenshot OCR でそのプロバイダーを選択します。内蔵のオフラインエンジンも引き続き利用でき、オフライン認識に失敗しても画像が自動送信されることはありません。"
+    ]
   },
   "ko": {
     "tagline": "글 바로 곁에서 함께하는 읽기 도우미.",
-    "intro": "ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입니다. 여러 앱에서 선택한 글을 번역하고, 단어를 찾고, 표현을 다듬어 노트에 저장할 수 있습니다. 선택할 수 없는 이미지 속 글자는 오프라인 또는 온라인 OCR로 인식합니다.",
+    "intro": "ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입니다. 여러 앱에서 선택한 글을 번역하고, 단어를 찾고, 표현을 다듬어 노트에 저장할 수 있습니다. 선택할 수 없는 이미지 속 글자는 OCR로 가져올 수 있습니다.",
     "nav": [
       "시작하기",
       "기능",
@@ -608,7 +540,7 @@
       ],
       [
         "선택할 수 없는 글 읽기",
-        "화면 영역을 캡처하거나 이미지를 가져와 내장 오프라인 OCR 또는 설정한 온라인 비전 제공업체로 인식합니다. 글자를 확인한 뒤 명령을 실행할 수 있습니다."
+        "화면 영역을 캡처하거나 이미지를 가져와 글자를 추출하고, 번역·사전·사용자 지정 명령으로 이어서 사용할 수 있습니다."
       ],
       [
         "읽으면서 듣기",
@@ -640,7 +572,7 @@
     "steps": [
       "**제공업체 연결.** API Providers에서 프리셋이나 호환 엔드포인트를 고르고, 필요한 인증 정보와 모델을 입력한 뒤 연결을 테스트합니다. 기본 제공업체로 지정하거나 특정 기능에 연결할 수 있습니다.",
       "**문장 선택.** 선택 도구 모음에서 Translate를 누르고 대상 언어를 고르세요. 원문과 비교하며 읽으려면 압정 버튼으로 결과를 고정합니다.",
-      "**이미지에서 글 가져오기.** 아래 OCR 단축키로 영역을 선택하세요. 오프라인 OCR은 바로 사용할 수 있습니다. 온라인 인식은 Screenshot OCR에서 설정한 비전 제공업체를 선택한 뒤 사용합니다. 인식된 글자를 확인하고 계속 진행하세요."
+      "**이미지에서 글 가져오기.** 아래 OCR 단축키로 영역을 선택하고, 인식된 글자를 확인한 뒤 사용할 명령을 선택하세요."
     ],
     "shortcutsTitle": "유용한 단축키",
     "shortcutHeaders": [
@@ -669,7 +601,7 @@
     "platformLink": "플랫폼 지원표",
     "dataTitle": "데이터와 개인정보",
     "data": [
-      "**노트와 오프라인 인식은 기기 안에서.** 노트 내용은 현재 기기에 저장됩니다. 내장 OCR은 이미지를 로컬에서 처리하고, 시스템 오프라인 음성은 온라인 음성 제공업체가 필요하지 않습니다.",
+      "**기기 내 데이터 처리.** 노트 내용은 현재 기기에 저장됩니다. 내장 OCR은 이미지를 로컬에서 처리하고, 시스템 오프라인 음성은 온라인 음성 제공업체가 필요하지 않습니다.",
       "**선택한 제공업체로 요청을 보냅니다.** 번역과 AI 명령은 요청에 필요한 글을, 온라인 음성은 읽을 글을 전송합니다. 온라인 OCR은 캡처한 영역이나 가져온 이미지를 선택한 비전 제공업체로 보냅니다. 서비스 계정, 가용성, 사용 요금은 각 제공업체가 관리합니다.",
       "**설정은 다른 기기로.** 파일 가져오기·내보내기와 수동 WebDAV 동기화를 지원합니다. 제공업체 설정, 명령, 단축키, 노트 필드 매핑을 함께 옮길 수 있습니다. API 키와 사용자 지정 요청 헤더는 기기별로 저장되므로 새 기기에서 다시 설정해야 합니다. 노트 본문은 설정 동기화에 포함되지 않습니다."
     ],
@@ -677,7 +609,7 @@
     "docs": [
       "아키텍처와 소스 구조",
       "제공업체·모델·기능 할당",
-      "오프라인 및 온라인 OCR",
+      "화면 캡처 및 이미지 문자 인식(OCR)",
       "설정 관리와 WebDAV",
       "플랫폼 지원과 권한",
       "인터페이스·번역·설명 언어",
@@ -705,28 +637,11 @@
       "설치 버전은 `*-setup.exe`, 설치 없이 실행하는 휴대용 버전은 `*-portable.exe`입니다.",
       "Apple Silicon은 `arm64`, Intel은 `x64`를 선택하세요. `.dmg`와 `.zip`을 제공합니다.",
       "바로 실행하는 `.AppImage` 또는 Debian·Ubuntu용 `amd64.deb`를 선택하세요."
-    ],
-    "ocrTitle": "오프라인 및 온라인 OCR",
-    "ocrIntro": "화면 영역을 캡처하거나 이미지를 가져온 뒤 인식된 글자를 확인하고, 번역·사전·사용자 지정 명령으로 이어서 사용할 수 있습니다.",
-    "ocrHeaders": [
-      "방식",
-      "작동 방식"
-    ],
-    "ocrModes": [
-      [
-        "오프라인 · 기본",
-        "내장 엔진이 기기에서 중국어 간체와 영어를 인식합니다. API 계정, 인터넷 연결, 추가 언어 팩 다운로드가 필요하지 않습니다."
-      ],
-      [
-        "온라인 · 선택 사항",
-        "설정한 비전 제공업체로 글자를 추출합니다. 지원 언어와 인식 품질은 모델에 따라 다르며, 캡처한 영역이나 가져온 이미지를 해당 제공업체로 보냅니다."
-      ]
-    ],
-    "ocrSetup": "온라인 OCR을 사용하려면 API Providers에서 이미지 입력을 지원하는 모델을 설정한 다음 Screenshot OCR에서 해당 제공업체를 선택하세요. 내장 오프라인 엔진도 계속 사용할 수 있으며, 오프라인 인식에 실패해도 이미지가 자동으로 업로드되지 않습니다."
+    ]
   },
   "fr": {
     "tagline": "Un compagnon de lecture, juste à côté de vos mots.",
-    "intro": "ReadFinch est une application de bureau open source dédiée à la lecture et à l’écriture. Traduisez une sélection, consultez un mot, améliorez un texte et enregistrez des notes depuis vos applications. Pour le texte contenu dans une image, utilisez l’OCR hors ligne ou en ligne.",
+    "intro": "ReadFinch est une application de bureau open source dédiée à la lecture et à l’écriture. Traduisez une sélection, consultez un mot, améliorez un texte et enregistrez des notes depuis vos applications. L’OCR permet de récupérer le texte que vous ne pouvez pas sélectionner.",
     "nav": [
       "Bien démarrer",
       "Fonctionnalités",
@@ -753,7 +668,7 @@
       ],
       [
         "Lire du texte non sélectionnable",
-        "Capturez une zone de l’écran ou importez une image. Utilisez l’OCR intégré hors ligne ou un fournisseur de vision en ligne, puis vérifiez le texte avant de lancer une commande."
+        "Capturez une zone de l’écran ou importez une image pour en extraire le texte, puis traduisez-le, consultez le dictionnaire ou lancez une commande personnalisée."
       ],
       [
         "Écouter en lisant",
@@ -785,7 +700,7 @@
     "steps": [
       "**Connectez un fournisseur.** Dans API Providers, choisissez un préréglage ou une API compatible, renseignez les identifiants nécessaires et le modèle, puis testez la connexion. Affectez-le par défaut ou à une fonction précise.",
       "**Sélectionnez une phrase.** Cliquez sur Translate dans la barre d’outils, choisissez la langue cible et épinglez le résultat pour continuer à lire en parallèle.",
-      "**Récupérez du texte dans une image.** Utilisez le raccourci OCR ci-dessous pour sélectionner une zone. L’OCR hors ligne fonctionne immédiatement ; pour la reconnaissance en ligne, choisissez un fournisseur de vision configuré dans Screenshot OCR. Vérifiez le texte avant de continuer."
+      "**Récupérez du texte dans une image.** Utilisez le raccourci OCR ci-dessous pour sélectionner une zone, vérifiez le texte reconnu, puis choisissez une commande."
     ],
     "shortcutsTitle": "Raccourcis utiles",
     "shortcutHeaders": [
@@ -814,7 +729,7 @@
     "platformLink": "matrice de prise en charge",
     "dataTitle": "Données et confidentialité",
     "data": [
-      "**Notes et reconnaissance hors ligne sur votre appareil.** Le contenu des carnets reste sur votre appareil. L’OCR intégré traite les images localement et les voix système hors ligne ne nécessitent pas de service vocal en ligne.",
+      "**Sur votre appareil.** Le contenu des carnets reste sur votre appareil. L’OCR intégré traite les images localement et les voix système hors ligne ne nécessitent pas de service vocal en ligne.",
       "**Les requêtes vont au fournisseur choisi.** La traduction et les commandes IA envoient le texte nécessaire à la requête ; la synthèse vocale en ligne envoie le texte à lire. L’OCR en ligne transmet la zone capturée ou l’image importée au fournisseur de vision sélectionné. Les comptes, la disponibilité et les frais d’utilisation relèvent de chaque service.",
       "**Des réglages transférables.** Importez ou exportez un fichier, ou synchronisez manuellement la configuration par WebDAV. Fournisseurs, commandes, raccourcis et correspondances des champs de carnet sont transférés ensemble. Les clés API et les en-têtes personnalisés restent propres à chaque appareil. Le contenu des carnets n’est pas inclus dans la synchronisation des réglages."
     ],
@@ -822,7 +737,7 @@
     "docs": [
       "Architecture et organisation du code",
       "Fournisseurs, modèles et affectation des fonctions",
-      "OCR hors ligne et en ligne",
+      "Reconnaissance de texte dans les captures et images (OCR)",
       "Configuration et WebDAV",
       "Plateformes et autorisations",
       "Langues de l’interface, des traductions et des explications",
@@ -850,28 +765,11 @@
       "`*-setup.exe` pour installer, ou `*-portable.exe` pour utiliser la version sans installation.",
       "`arm64` pour les puces Apple ou `x64` pour Intel ; formats `.dmg` et `.zip`.",
       "`.AppImage` pour une exécution directe, ou `amd64.deb` pour Debian et Ubuntu."
-    ],
-    "ocrTitle": "OCR hors ligne et en ligne",
-    "ocrIntro": "Capturez une zone de l’écran ou importez une image, vérifiez le texte reconnu, puis traduisez-le, consultez le dictionnaire ou exécutez une commande personnalisée.",
-    "ocrHeaders": [
-      "Mode",
-      "Fonctionnement"
-    ],
-    "ocrModes": [
-      [
-        "Hors ligne · par défaut",
-        "Le moteur intégré reconnaît le chinois simplifié et l’anglais sur votre appareil. Aucun compte API, accès réseau ni téléchargement de pack linguistique n’est nécessaire."
-      ],
-      [
-        "En ligne · facultatif",
-        "Un fournisseur de vision configuré extrait le texte. Les langues et la qualité de reconnaissance dépendent de son modèle ; la zone capturée ou l’image importée lui est envoyée."
-      ]
-    ],
-    "ocrSetup": "Pour l’OCR en ligne, configurez un modèle acceptant les images dans API Providers, puis sélectionnez ce fournisseur dans Screenshot OCR. Le moteur hors ligne reste disponible et un échec de reconnaissance locale ne provoque jamais l’envoi automatique de l’image."
+    ]
   },
   "de": {
     "tagline": "Dein Lesebegleiter, direkt neben deinen Worten.",
-    "intro": "ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze markierten Text, schlage Wörter nach, überarbeite Formulierungen und speichere Notizen aus verschiedenen Apps. Für Text in Bildern stehen Offline- und Online-OCR bereit.",
+    "intro": "ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze markierten Text, schlage Wörter nach, überarbeite Formulierungen und speichere Notizen aus verschiedenen Apps. Nicht markierbaren Text kannst du per OCR aus Bildern übernehmen.",
     "nav": [
       "Erste Schritte",
       "Funktionen",
@@ -898,7 +796,7 @@
       ],
       [
         "Nicht markierbaren Text lesen",
-        "Erfasse einen Bildschirmausschnitt oder importiere ein Bild. Nutze die integrierte Offline-OCR oder einen eingerichteten Online-Vision-Anbieter und prüfe den Text vor dem nächsten Befehl."
+        "Erfasse einen Bildschirmausschnitt oder importiere ein Bild, um Text zu erkennen. Übersetze ihn anschließend, schlage Wörter nach oder führe einen eigenen KI-Befehl aus."
       ],
       [
         "Beim Lesen zuhören",
@@ -930,7 +828,7 @@
     "steps": [
       "**Anbieter verbinden.** Wähle unter API Providers eine Vorlage oder einen kompatiblen Endpunkt, trage die benötigten Zugangsdaten und das Modell ein und teste die Verbindung. Weise den Anbieter als Standard oder einer bestimmten Funktion zu.",
       "**Einen Satz markieren.** Klicke in der Werkzeugleiste auf Translate und wähle die Zielsprache. Mit der Stecknadel bleibt das Ergebnis neben deiner Lektüre stehen.",
-      "**Text aus einem Bild erfassen.** Nutze das OCR-Tastenkürzel unten und markiere einen Bereich. Offline-OCR funktioniert sofort; für Online-Erkennung wählst du unter Screenshot OCR einen eingerichteten Vision-Anbieter. Prüfe den Text, bevor du fortfährst."
+      "**Text aus einem Bild erfassen.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Wähle anschließend einen Befehl."
     ],
     "shortcutsTitle": "Nützliche Tastenkürzel",
     "shortcutHeaders": [
@@ -959,7 +857,7 @@
     "platformLink": "Plattformübersicht",
     "dataTitle": "Daten und Datenschutz",
     "data": [
-      "**Notizen und Offline-Erkennung auf deinem Gerät.** Notizbuchinhalte bleiben auf deinem Gerät. Die integrierte OCR verarbeitet Bilder lokal, und Offline-Systemstimmen benötigen keinen Online-Sprachdienst.",
+      "**Auf deinem Gerät.** Notizbuchinhalte bleiben auf deinem Gerät. Die integrierte OCR verarbeitet Bilder lokal, und Offline-Systemstimmen benötigen keinen Online-Sprachdienst.",
       "**Anfragen gehen an den gewählten Anbieter.** Übersetzungen und KI-Befehle senden den für die Anfrage nötigen Text; Online-Sprachausgabe sendet den vorzulesenden Text. Online-OCR überträgt den Bildschirmausschnitt oder das importierte Bild an den gewählten Vision-Anbieter. Konten, Verfügbarkeit und Nutzungsgebühren verwaltet der jeweilige Dienst.",
       "**Einstellungen lassen sich mitnehmen.** Importiere und exportiere Dateien oder synchronisiere die Konfiguration manuell per WebDAV. Anbieter, Befehle, Tastenkürzel und Feldzuordnungen der Notizbücher werden gemeinsam übertragen. API-Schlüssel und eigene Header bleiben gerätespezifisch und müssen auf einem anderen Gerät separat eingerichtet werden. Notizbuchinhalte gehören nicht zur Konfigurationssynchronisierung."
     ],
@@ -967,7 +865,7 @@
     "docs": [
       "Architektur und Quellcode-Struktur",
       "Anbieter, Modelle und Funktionszuordnung",
-      "Offline- und Online-OCR",
+      "Texterkennung in Screenshots und Bildern (OCR)",
       "Konfiguration und WebDAV",
       "Plattformen und Berechtigungen",
       "Sprachen für Oberfläche, Übersetzung und Erklärungen",
@@ -995,28 +893,11 @@
       "`*-setup.exe` zum Installieren oder `*-portable.exe` für die Nutzung ohne Installation.",
       "`arm64` für Apple-Chips oder `x64` für Intel; als `.dmg` und `.zip` verfügbar.",
       "`.AppImage` zum direkten Start oder `amd64.deb` für Debian und Ubuntu."
-    ],
-    "ocrTitle": "Offline- und Online-OCR",
-    "ocrIntro": "Erfasse einen Bildschirmausschnitt oder importiere ein Bild, prüfe den erkannten Text und übersetze ihn anschließend, schlage ihn nach oder nutze einen eigenen KI-Befehl.",
-    "ocrHeaders": [
-      "Modus",
-      "Funktionsweise"
-    ],
-    "ocrModes": [
-      [
-        "Offline · Standard",
-        "Die integrierte Engine erkennt vereinfachtes Chinesisch und Englisch auf deinem Gerät. Dafür sind weder API-Konto noch Netzwerkverbindung oder zusätzliche Sprachpakete nötig."
-      ],
-      [
-        "Online · optional",
-        "Ein eingerichteter Vision-Anbieter liest den Text aus. Unterstützte Sprachen und Erkennungsqualität hängen vom Modell ab; der Bildschirmausschnitt oder das importierte Bild wird an diesen Anbieter gesendet."
-      ]
-    ],
-    "ocrSetup": "Richte für Online-OCR unter API Providers ein Modell mit Bildeingabe ein und wähle den Anbieter unter Screenshot OCR. Die integrierte Offline-Engine bleibt verfügbar. Wenn die Offline-Erkennung fehlschlägt, wird kein Bild automatisch hochgeladen."
+    ]
   },
   "es": {
     "tagline": "Un compañero de lectura, junto a tus palabras.",
-    "intro": "ReadFinch es una aplicación de escritorio de código abierto para leer y escribir. Traduce texto seleccionado, consulta palabras, mejora tu escritura y guarda notas desde distintas aplicaciones. Para el texto de las imágenes, ofrece OCR sin conexión y en línea.",
+    "intro": "ReadFinch es una aplicación de escritorio de código abierto para leer y escribir. Traduce texto seleccionado, consulta palabras, mejora tu escritura y guarda notas desde distintas aplicaciones. El OCR permite extraer el texto que no puedes seleccionar.",
     "nav": [
       "Primeros pasos",
       "Funciones",
@@ -1043,7 +924,7 @@
       ],
       [
         "Leer texto que no se puede seleccionar",
-        "Captura una zona de la pantalla o importa una imagen. Usa el OCR integrado sin conexión o un proveedor de visión en línea y revisa el texto antes de ejecutar una instrucción."
+        "Captura una zona de la pantalla o importa una imagen para extraer el texto y después traducirlo, consultar palabras o ejecutar una instrucción personalizada."
       ],
       [
         "Escuchar mientras lees",
@@ -1075,7 +956,7 @@
     "steps": [
       "**Conecta un proveedor.** En API Providers, elige un ajuste predefinido o un endpoint compatible, introduce las credenciales necesarias y el modelo, y prueba la conexión. Puedes asignarlo como predeterminado o a una función concreta.",
       "**Selecciona una frase.** Pulsa Translate en la barra de selección, elige el idioma de destino y fija el resultado si quieres seguir leyendo junto a él.",
-      "**Obtén texto de una imagen.** Usa el atajo OCR indicado abajo para seleccionar una zona. El OCR sin conexión funciona de inmediato; para el reconocimiento en línea, elige un proveedor de visión configurado en Screenshot OCR. Revisa el texto antes de continuar."
+      "**Obtén texto de una imagen.** Usa el atajo OCR indicado abajo para seleccionar una zona, revisa el texto reconocido y elige una instrucción."
     ],
     "shortcutsTitle": "Atajos útiles",
     "shortcutHeaders": [
@@ -1104,7 +985,7 @@
     "platformLink": "matriz de compatibilidad",
     "dataTitle": "Datos y privacidad",
     "data": [
-      "**Notas y reconocimiento sin conexión en tu dispositivo.** El contenido de los cuadernos se guarda en tu dispositivo. El OCR integrado procesa las imágenes localmente y las voces del sistema sin conexión no necesitan un servicio de voz en línea.",
+      "**En tu dispositivo.** El contenido de los cuadernos se guarda en tu dispositivo. El OCR integrado procesa las imágenes localmente y las voces del sistema sin conexión no necesitan un servicio de voz en línea.",
       "**Las solicitudes van al proveedor elegido.** Las traducciones y las instrucciones de IA envían el texto necesario para la solicitud; la síntesis de voz en línea envía el texto que se va a leer. El OCR en línea transmite la zona capturada o la imagen importada al proveedor de visión seleccionado. Cada servicio gestiona sus cuentas, disponibilidad y tarifas de uso.",
       "**Configuración que puedes trasladar.** Importa o exporta archivos, o sincroniza manualmente los ajustes mediante WebDAV. Proveedores, instrucciones, atajos y asignaciones de campos se trasladan juntos. Las claves API y las cabeceras personalizadas son específicas de cada dispositivo y deben configurarse aparte en otro equipo. El contenido de los cuadernos no forma parte de la sincronización de ajustes."
     ],
@@ -1112,7 +993,7 @@
     "docs": [
       "Arquitectura y estructura del código",
       "Proveedores, modelos y asignación de funciones",
-      "OCR sin conexión y en línea",
+      "Reconocimiento de texto en capturas e imágenes (OCR)",
       "Configuración y WebDAV",
       "Plataformas y permisos",
       "Idiomas de la interfaz, las traducciones y las explicaciones",
@@ -1140,23 +1021,6 @@
       "`*-setup.exe` para instalar, o `*-portable.exe` para usar sin instalación.",
       "`arm64` para chips de Apple o `x64` para Intel; disponible en `.dmg` y `.zip`.",
       "`.AppImage` para ejecutar directamente, o `amd64.deb` para Debian y Ubuntu."
-    ],
-    "ocrTitle": "OCR sin conexión y en línea",
-    "ocrIntro": "Captura una zona de la pantalla o importa una imagen, revisa el texto reconocido y después tradúcelo, consúltalo en el diccionario o ejecuta una instrucción personalizada.",
-    "ocrHeaders": [
-      "Modo",
-      "Funcionamiento"
-    ],
-    "ocrModes": [
-      [
-        "Sin conexión · predeterminado",
-        "El motor integrado reconoce chino simplificado e inglés en tu dispositivo. No necesita cuenta de API, conexión a la red ni descarga de paquetes de idiomas."
-      ],
-      [
-        "En línea · opcional",
-        "Un proveedor de visión configurado extrae el texto. Los idiomas y la calidad del reconocimiento dependen de su modelo; la zona capturada o la imagen importada se envía a ese proveedor."
-      ]
-    ],
-    "ocrSetup": "Para usar OCR en línea, configura un modelo que admita imágenes en API Providers y selecciona ese proveedor en Screenshot OCR. El motor sin conexión sigue disponible; si el reconocimiento local falla, la imagen nunca se sube automáticamente."
+    ]
   }
 }

@@ -79,7 +79,6 @@ ${c.intro}
 <p>
 <a href="${local("LICENSE")}"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-${version}-4d443e?style=flat-square" alt="${version}">
-<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="${escape(c.ocrTitle)}">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -118,16 +117,6 @@ ${picture("notebook", 860, c.notebookAlt)}
 </p>
 
 </details>
-
-### ${c.ocrTitle}
-
-${c.ocrIntro}
-
-| ${c.ocrHeaders[0]} | ${c.ocrHeaders[1]} |
-| --- | --- |
-${c.ocrModes.map(([name, body]) => "| **" + name + "** | " + body + " |").join("\n")}
-
-${c.ocrSetup}
 
 ### ${c.providerTitle}
 

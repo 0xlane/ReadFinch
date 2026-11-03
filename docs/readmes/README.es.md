@@ -8,14 +8,13 @@
 
 **Un compañero de lectura, junto a tus palabras.**
 
-ReadFinch es una aplicación de escritorio de código abierto para leer y escribir. Traduce texto seleccionado, consulta palabras, mejora tu escritura y guarda notas desde distintas aplicaciones. Para el texto de las imágenes, ofrece OCR sin conexión y en línea.
+ReadFinch es una aplicación de escritorio de código abierto para leer y escribir. Traduce texto seleccionado, consulta palabras, mejora tu escritura y guarda notas desde distintas aplicaciones. El OCR permite extraer el texto que no puedes seleccionar.
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <a href="../../docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <a href="../../docs/readmes/README.fr.md">Français</a> · <a href="../../docs/readmes/README.de.md">Deutsch</a> · <strong>Español</strong></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
-<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="OCR sin conexión y en línea">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -43,7 +42,7 @@ Selecciona texto en un navegador, lector de PDF o editor. ReadFinch muestra una 
 | --- | --- |
 | **Leer y comprender** | Lee las traducciones mientras se generan, consulta pronunciaciones y ejemplos, y descompón las frases largas en partes comprensibles. |
 | **Mejorar tu escritura** | Ve los cambios en el texto original, entiende los motivos de la revisión y lleva la versión mejorada a tu editor. |
-| **Leer texto que no se puede seleccionar** | Captura una zona de la pantalla o importa una imagen. Usa el OCR integrado sin conexión o un proveedor de visión en línea y revisa el texto antes de ejecutar una instrucción. |
+| **Leer texto que no se puede seleccionar** | Captura una zona de la pantalla o importa una imagen para extraer el texto y después traducirlo, consultar palabras o ejecutar una instrucción personalizada. |
 | **Escuchar mientras lees** | Escucha selecciones, traducciones y ejemplos con voces del sistema sin conexión o síntesis de voz en línea. Elige y prueba voces por idioma; los ajustes de reproducción dependen del servicio de voz. |
 | **Crear tus propias instrucciones de IA** | Configura el proveedor, los prompts, el icono, el atajo y los campos de salida con tipo. Diseña las tarjetas con HTML + Liquid y vincula los campos a un cuaderno local. |
 | **Conservar lo importante** | Guarda un resultado o acepta una sugerencia de vocabulario. Busca en tus cuadernos locales y vuelve al pasaje original junto con la respuesta guardada. |
@@ -68,17 +67,6 @@ Selecciona texto en un navegador, lector de PDF o editor. ReadFinch muestra una 
 </p>
 
 </details>
-
-### OCR sin conexión y en línea
-
-Captura una zona de la pantalla o importa una imagen, revisa el texto reconocido y después tradúcelo, consúltalo en el diccionario o ejecuta una instrucción personalizada.
-
-| Modo | Funcionamiento |
-| --- | --- |
-| **Sin conexión · predeterminado** | El motor integrado reconoce chino simplificado e inglés en tu dispositivo. No necesita cuenta de API, conexión a la red ni descarga de paquetes de idiomas. |
-| **En línea · opcional** | Un proveedor de visión configurado extrae el texto. Los idiomas y la calidad del reconocimiento dependen de su modelo; la zona capturada o la imagen importada se envía a ese proveedor. |
-
-Para usar OCR en línea, configura un modelo que admita imágenes en API Providers y selecciona ese proveedor en Screenshot OCR. El motor sin conexión sigue disponible; si el reconocimiento local falla, la imagen nunca se sube automáticamente.
 
 ### Un proveedor para cada función
 
@@ -112,7 +100,7 @@ La búsqueda automática de actualizaciones está activada por defecto. En About
 
 1. **Conecta un proveedor.** En API Providers, elige un ajuste predefinido o un endpoint compatible, introduce las credenciales necesarias y el modelo, y prueba la conexión. Puedes asignarlo como predeterminado o a una función concreta.
 2. **Selecciona una frase.** Pulsa Translate en la barra de selección, elige el idioma de destino y fija el resultado si quieres seguir leyendo junto a él.
-3. **Obtén texto de una imagen.** Usa el atajo OCR indicado abajo para seleccionar una zona. El OCR sin conexión funciona de inmediato; para el reconocimiento en línea, elige un proveedor de visión configurado en Screenshot OCR. Revisa el texto antes de continuar.
+3. **Obtén texto de una imagen.** Usa el atajo OCR indicado abajo para seleccionar una zona, revisa el texto reconocido y elige una instrucción.
 
 ### Atajos útiles
 
@@ -139,7 +127,7 @@ La detección automática requiere que la aplicación activa permita leer el tex
 
 ## Datos y privacidad
 
-**Notas y reconocimiento sin conexión en tu dispositivo.** El contenido de los cuadernos se guarda en tu dispositivo. El OCR integrado procesa las imágenes localmente y las voces del sistema sin conexión no necesitan un servicio de voz en línea.
+**En tu dispositivo.** El contenido de los cuadernos se guarda en tu dispositivo. El OCR integrado procesa las imágenes localmente y las voces del sistema sin conexión no necesitan un servicio de voz en línea.
 
 **Las solicitudes van al proveedor elegido.** Las traducciones y las instrucciones de IA envían el texto necesario para la solicitud; la síntesis de voz en línea envía el texto que se va a leer. El OCR en línea transmite la zona capturada o la imagen importada al proveedor de visión seleccionado. Cada servicio gestiona sus cuentas, disponibilidad y tarifas de uso.
 
@@ -151,7 +139,7 @@ La detección automática requiere que la aplicación activa permita leer el tex
 
 - [Arquitectura y estructura del código](../../docs/ARCHITECTURE.md)
 - [Proveedores, modelos y asignación de funciones](../../docs/MODELS.md)
-- [OCR sin conexión y en línea](../../docs/OCR.md)
+- [Reconocimiento de texto en capturas e imágenes (OCR)](../../docs/OCR.md)
 - [Configuración y WebDAV](../../docs/CONFIGURATION.md)
 - [Plataformas y permisos](../../docs/PLATFORMS.md)
 - [Idiomas de la interfaz, las traducciones y las explicaciones](../../docs/LANGUAGES.md)

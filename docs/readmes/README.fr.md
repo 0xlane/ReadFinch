@@ -8,14 +8,13 @@
 
 **Un compagnon de lecture, juste à côté de vos mots.**
 
-ReadFinch est une application de bureau open source dédiée à la lecture et à l’écriture. Traduisez une sélection, consultez un mot, améliorez un texte et enregistrez des notes depuis vos applications. Pour le texte contenu dans une image, utilisez l’OCR hors ligne ou en ligne.
+ReadFinch est une application de bureau open source dédiée à la lecture et à l’écriture. Traduisez une sélection, consultez un mot, améliorez un texte et enregistrez des notes depuis vos applications. L’OCR permet de récupérer le texte que vous ne pouvez pas sélectionner.
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <a href="../../docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <strong>Français</strong> · <a href="../../docs/readmes/README.de.md">Deutsch</a> · <a href="../../docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
-<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="OCR hors ligne et en ligne">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -43,7 +42,7 @@ Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFi
 | --- | --- |
 | **Lire et comprendre** | Suivez la traduction à mesure qu’elle s’affiche, consultez la prononciation et les exemples, et décomposez les phrases longues. |
 | **Mieux écrire** | Repérez les modifications dans le texte d’origine, comprenez leur raison et reprenez la version améliorée dans votre éditeur. |
-| **Lire du texte non sélectionnable** | Capturez une zone de l’écran ou importez une image. Utilisez l’OCR intégré hors ligne ou un fournisseur de vision en ligne, puis vérifiez le texte avant de lancer une commande. |
+| **Lire du texte non sélectionnable** | Capturez une zone de l’écran ou importez une image pour en extraire le texte, puis traduisez-le, consultez le dictionnaire ou lancez une commande personnalisée. |
 | **Écouter en lisant** | Écoutez sélections, traductions et exemples avec les voix système hors ligne ou la synthèse vocale en ligne. Choisissez et essayez une voix par langue ; les réglages de lecture dépendent du service vocal. |
 | **Créer vos commandes IA** | Définissez le fournisseur, les prompts, l’icône, le raccourci et les champs de sortie typés. Composez les cartes avec HTML + Liquid et associez les champs à un carnet local. |
 | **Garder l’essentiel** | Enregistrez un résultat ou acceptez une suggestion de vocabulaire. Recherchez dans vos carnets locaux et retrouvez le passage d’origine avec la réponse enregistrée. |
@@ -68,17 +67,6 @@ Sélectionnez du texte dans un navigateur, un lecteur PDF ou un éditeur. ReadFi
 </p>
 
 </details>
-
-### OCR hors ligne et en ligne
-
-Capturez une zone de l’écran ou importez une image, vérifiez le texte reconnu, puis traduisez-le, consultez le dictionnaire ou exécutez une commande personnalisée.
-
-| Mode | Fonctionnement |
-| --- | --- |
-| **Hors ligne · par défaut** | Le moteur intégré reconnaît le chinois simplifié et l’anglais sur votre appareil. Aucun compte API, accès réseau ni téléchargement de pack linguistique n’est nécessaire. |
-| **En ligne · facultatif** | Un fournisseur de vision configuré extrait le texte. Les langues et la qualité de reconnaissance dépendent de son modèle ; la zone capturée ou l’image importée lui est envoyée. |
-
-Pour l’OCR en ligne, configurez un modèle acceptant les images dans API Providers, puis sélectionnez ce fournisseur dans Screenshot OCR. Le moteur hors ligne reste disponible et un échec de reconnaissance locale ne provoque jamais l’envoi automatique de l’image.
 
 ### Un fournisseur pour chaque fonction
 
@@ -112,7 +100,7 @@ La recherche automatique de mises à jour est activée par défaut. Vous pouvez 
 
 1. **Connectez un fournisseur.** Dans API Providers, choisissez un préréglage ou une API compatible, renseignez les identifiants nécessaires et le modèle, puis testez la connexion. Affectez-le par défaut ou à une fonction précise.
 2. **Sélectionnez une phrase.** Cliquez sur Translate dans la barre d’outils, choisissez la langue cible et épinglez le résultat pour continuer à lire en parallèle.
-3. **Récupérez du texte dans une image.** Utilisez le raccourci OCR ci-dessous pour sélectionner une zone. L’OCR hors ligne fonctionne immédiatement ; pour la reconnaissance en ligne, choisissez un fournisseur de vision configuré dans Screenshot OCR. Vérifiez le texte avant de continuer.
+3. **Récupérez du texte dans une image.** Utilisez le raccourci OCR ci-dessous pour sélectionner une zone, vérifiez le texte reconnu, puis choisissez une commande.
 
 ### Raccourcis utiles
 
@@ -139,7 +127,7 @@ La détection automatique dépend de l’accès au texte sélectionné fourni pa
 
 ## Données et confidentialité
 
-**Notes et reconnaissance hors ligne sur votre appareil.** Le contenu des carnets reste sur votre appareil. L’OCR intégré traite les images localement et les voix système hors ligne ne nécessitent pas de service vocal en ligne.
+**Sur votre appareil.** Le contenu des carnets reste sur votre appareil. L’OCR intégré traite les images localement et les voix système hors ligne ne nécessitent pas de service vocal en ligne.
 
 **Les requêtes vont au fournisseur choisi.** La traduction et les commandes IA envoient le texte nécessaire à la requête ; la synthèse vocale en ligne envoie le texte à lire. L’OCR en ligne transmet la zone capturée ou l’image importée au fournisseur de vision sélectionné. Les comptes, la disponibilité et les frais d’utilisation relèvent de chaque service.
 
@@ -151,7 +139,7 @@ La détection automatique dépend de l’accès au texte sélectionné fourni pa
 
 - [Architecture et organisation du code](../../docs/ARCHITECTURE.md)
 - [Fournisseurs, modèles et affectation des fonctions](../../docs/MODELS.md)
-- [OCR hors ligne et en ligne](../../docs/OCR.md)
+- [Reconnaissance de texte dans les captures et images (OCR)](../../docs/OCR.md)
 - [Configuration et WebDAV](../../docs/CONFIGURATION.md)
 - [Plateformes et autorisations](../../docs/PLATFORMS.md)
 - [Langues de l’interface, des traductions et des explications](../../docs/LANGUAGES.md)

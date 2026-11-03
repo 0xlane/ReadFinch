@@ -8,14 +8,13 @@
 
 **Dein Lesebegleiter, direkt neben deinen Worten.**
 
-ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze markierten Text, schlage Wörter nach, überarbeite Formulierungen und speichere Notizen aus verschiedenen Apps. Für Text in Bildern stehen Offline- und Online-OCR bereit.
+ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze markierten Text, schlage Wörter nach, überarbeite Formulierungen und speichere Notizen aus verschiedenen Apps. Nicht markierbaren Text kannst du per OCR aus Bildern übernehmen.
 
 <p><a href="../../README.md">English</a> · <a href="../../docs/readmes/README.zh-CN.md">简体中文</a> · <a href="../../docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="../../docs/readmes/README.ja.md">日本語</a> · <a href="../../docs/readmes/README.ko.md">한국어</a> · <a href="../../docs/readmes/README.fr.md">Français</a> · <strong>Deutsch</strong> · <a href="../../docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
-<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="Offline- und Online-OCR">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -43,7 +42,7 @@ Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine We
 | --- | --- |
 | **Lesen und verstehen** | Lies Übersetzungen schon während der Ausgabe, schlage Aussprache und Beispiele nach und zerlege lange Sätze in verständliche Teile. |
 | **Besser formulieren** | Sieh Änderungen im ursprünglichen Satz, verstehe die Begründungen und übernimm die überarbeitete Fassung in deinen Editor. |
-| **Nicht markierbaren Text lesen** | Erfasse einen Bildschirmausschnitt oder importiere ein Bild. Nutze die integrierte Offline-OCR oder einen eingerichteten Online-Vision-Anbieter und prüfe den Text vor dem nächsten Befehl. |
+| **Nicht markierbaren Text lesen** | Erfasse einen Bildschirmausschnitt oder importiere ein Bild, um Text zu erkennen. Übersetze ihn anschließend, schlage Wörter nach oder führe einen eigenen KI-Befehl aus. |
 | **Beim Lesen zuhören** | Lass dir markierten Text, Übersetzungen und Beispiele mit Offline-Systemstimmen oder Online-Sprachausgabe vorlesen. Wähle und teste Stimmen je Sprache; die Wiedergabeeinstellungen hängen vom Sprachdienst ab. |
 | **Eigene KI-Befehle erstellen** | Lege Anbieter, Prompts, Symbol, Tastenkürzel und typisierte Ausgabefelder fest. Gestalte Ergebniskarten mit HTML + Liquid und ordne die Felder einem lokalen Notizbuch zu. |
 | **Wichtiges behalten** | Speichere ein Ergebnis oder übernimm einen Wortschatzvorschlag. Durchsuche lokale Notizbücher und sieh den ursprünglichen Text zusammen mit der gespeicherten Antwort wieder. |
@@ -68,17 +67,6 @@ Markiere Text im Browser, PDF-Reader oder Editor. ReadFinch zeigt eine kleine We
 </p>
 
 </details>
-
-### Offline- und Online-OCR
-
-Erfasse einen Bildschirmausschnitt oder importiere ein Bild, prüfe den erkannten Text und übersetze ihn anschließend, schlage ihn nach oder nutze einen eigenen KI-Befehl.
-
-| Modus | Funktionsweise |
-| --- | --- |
-| **Offline · Standard** | Die integrierte Engine erkennt vereinfachtes Chinesisch und Englisch auf deinem Gerät. Dafür sind weder API-Konto noch Netzwerkverbindung oder zusätzliche Sprachpakete nötig. |
-| **Online · optional** | Ein eingerichteter Vision-Anbieter liest den Text aus. Unterstützte Sprachen und Erkennungsqualität hängen vom Modell ab; der Bildschirmausschnitt oder das importierte Bild wird an diesen Anbieter gesendet. |
-
-Richte für Online-OCR unter API Providers ein Modell mit Bildeingabe ein und wähle den Anbieter unter Screenshot OCR. Die integrierte Offline-Engine bleibt verfügbar. Wenn die Offline-Erkennung fehlschlägt, wird kein Bild automatisch hochgeladen.
 
 ### Anbieter für jede Funktion
 
@@ -112,7 +100,7 @@ Die automatische Suche nach Updates ist standardmäßig aktiviert. Unter About k
 
 1. **Anbieter verbinden.** Wähle unter API Providers eine Vorlage oder einen kompatiblen Endpunkt, trage die benötigten Zugangsdaten und das Modell ein und teste die Verbindung. Weise den Anbieter als Standard oder einer bestimmten Funktion zu.
 2. **Einen Satz markieren.** Klicke in der Werkzeugleiste auf Translate und wähle die Zielsprache. Mit der Stecknadel bleibt das Ergebnis neben deiner Lektüre stehen.
-3. **Text aus einem Bild erfassen.** Nutze das OCR-Tastenkürzel unten und markiere einen Bereich. Offline-OCR funktioniert sofort; für Online-Erkennung wählst du unter Screenshot OCR einen eingerichteten Vision-Anbieter. Prüfe den Text, bevor du fortfährst.
+3. **Text aus einem Bild erfassen.** Nutze das OCR-Tastenkürzel unten, markiere einen Bereich und prüfe den erkannten Text. Wähle anschließend einen Befehl.
 
 ### Nützliche Tastenkürzel
 
@@ -139,7 +127,7 @@ Die automatische Auswahl setzt voraus, dass die aktive App ihren markierten Text
 
 ## Daten und Datenschutz
 
-**Notizen und Offline-Erkennung auf deinem Gerät.** Notizbuchinhalte bleiben auf deinem Gerät. Die integrierte OCR verarbeitet Bilder lokal, und Offline-Systemstimmen benötigen keinen Online-Sprachdienst.
+**Auf deinem Gerät.** Notizbuchinhalte bleiben auf deinem Gerät. Die integrierte OCR verarbeitet Bilder lokal, und Offline-Systemstimmen benötigen keinen Online-Sprachdienst.
 
 **Anfragen gehen an den gewählten Anbieter.** Übersetzungen und KI-Befehle senden den für die Anfrage nötigen Text; Online-Sprachausgabe sendet den vorzulesenden Text. Online-OCR überträgt den Bildschirmausschnitt oder das importierte Bild an den gewählten Vision-Anbieter. Konten, Verfügbarkeit und Nutzungsgebühren verwaltet der jeweilige Dienst.
 
@@ -151,7 +139,7 @@ Die automatische Auswahl setzt voraus, dass die aktive App ihren markierten Text
 
 - [Architektur und Quellcode-Struktur](../../docs/ARCHITECTURE.md)
 - [Anbieter, Modelle und Funktionszuordnung](../../docs/MODELS.md)
-- [Offline- und Online-OCR](../../docs/OCR.md)
+- [Texterkennung in Screenshots und Bildern (OCR)](../../docs/OCR.md)
 - [Konfiguration und WebDAV](../../docs/CONFIGURATION.md)
 - [Plattformen und Berechtigungen](../../docs/PLATFORMS.md)
 - [Sprachen für Oberfläche, Übersetzung und Erklärungen](../../docs/LANGUAGES.md)

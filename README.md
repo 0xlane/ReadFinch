@@ -8,14 +8,13 @@
 
 **A reading companion, right beside your words.**
 
-ReadFinch is an open-source desktop reading and writing companion. Translate selected text, look up words, improve writing and save notes across apps, with offline and online OCR for text in images.
+ReadFinch is an open-source desktop reading and writing companion. Translate selected text, look up words, improve writing and save notes across apps, with OCR for text you cannot select.
 
 <p><strong>English</strong> · <a href="docs/readmes/README.zh-CN.md">简体中文</a> · <a href="docs/readmes/README.zh-TW.md">繁體中文</a> · <a href="docs/readmes/README.ja.md">日本語</a> · <a href="docs/readmes/README.ko.md">한국어</a> · <a href="docs/readmes/README.fr.md">Français</a> · <a href="docs/readmes/README.de.md">Deutsch</a> · <a href="docs/readmes/README.es.md">Español</a></p>
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
 <img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
-<img src="https://img.shields.io/badge/OCR-Offline_+_Online-a9643f?style=flat-square" alt="Offline and online OCR">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -43,7 +42,7 @@ Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar
 | --- | --- |
 | **Read and understand** | Stream translations, look up pronunciations and examples, and break long sentences into understandable parts. |
 | **Write with more confidence** | See changes in context, read the reasoning behind a revision, and take the improved wording back to your editor. |
-| **Read text you cannot select** | Capture a screen region or import an image. Use built-in offline OCR or a configured online vision provider, then review the text before running a command. |
+| **Read text you cannot select** | Capture a screen region or import an image to extract text, then translate it, look up words or run a custom command. |
 | **Listen as you read** | Read selections, translations and examples aloud with system offline voices or online text to speech. Choose voices by language and preview them; playback controls depend on the voice service. |
 | **Build your own AI commands** | Choose a provider, prompt, icon, shortcut and typed output fields. Arrange results with HTML + Liquid and map fields to a local notebook. |
 | **Keep what matters** | Save a result or accept a vocabulary suggestion. Search local notebooks and revisit the original passage alongside the answer you saved. |
@@ -68,17 +67,6 @@ Select text in a browser, PDF reader or editor. ReadFinch brings a small toolbar
 </p>
 
 </details>
-
-### Offline and online OCR
-
-Capture a screen region or import an image, review the recognized text, then translate it, look it up or run a custom command.
-
-| Mode | How it works |
-| --- | --- |
-| **Offline · default** | The bundled engine recognizes Simplified Chinese and English on your device. No API account, network connection or language-pack download is required. |
-| **Online · optional** | Use a configured vision provider to extract text. Supported languages and recognition quality depend on its model; the captured region or imported image is sent to that provider. |
-
-For online OCR, add an image-capable model in **API Providers**, then select that provider in **Screenshot OCR**. The built-in offline engine remains available, and offline failures never automatically upload an image.
 
 ### Providers for each feature
 
@@ -112,7 +100,7 @@ Automatic update checks are enabled by default and can be configured in **About*
 
 1. **Connect a provider.** Open API Providers, choose a preset or compatible endpoint, enter the required credentials and model, and test the connection. Assign it as the default or to a specific feature.
 2. **Select a sentence.** Click Translate on the selection toolbar, choose your target language and pin the result if you want to keep reading beside it.
-3. **Capture text from an image.** Use the OCR shortcut below and select a region. Offline OCR works immediately; for online recognition, choose a configured vision provider in Screenshot OCR. Review the text before continuing.
+3. **Capture text from an image.** Use the OCR shortcut below and select a region. Review the recognized text, then choose a command.
 
 ### Useful shortcuts
 
@@ -139,7 +127,7 @@ Automatic selection depends on the foreground app exposing its text. Use OCR or 
 
 ## Data and privacy
 
-**Local notes and offline recognition.** Notebook contents stay on your device. Built-in OCR processes images locally, and system offline voices do not need an online speech provider.
+**On your device.** Notebook contents stay on your device. Built-in OCR processes images locally, and system offline voices do not need an online speech provider.
 
 **Requests use your chosen provider.** Translation and AI commands send the text needed for the request; online speech sends the text to read aloud. Online OCR sends the captured region or imported image to the selected vision provider. Provider accounts, availability and usage charges are managed by the respective service.
 
@@ -151,7 +139,7 @@ Automatic selection depends on the foreground app exposing its text. Use OCR or 
 
 - [Architecture and source layout](docs/ARCHITECTURE.md)
 - [Providers, models and feature assignments](docs/MODELS.md)
-- [Offline and online OCR](docs/OCR.md)
+- [Screenshot and image recognition (OCR)](docs/OCR.md)
 - [Configuration and WebDAV](docs/CONFIGURATION.md)
 - [Platform support and permissions](docs/PLATFORMS.md)
 - [Interface, translation and explanation languages](docs/LANGUAGES.md)
