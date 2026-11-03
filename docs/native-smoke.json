@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-03T10:49:37.887Z",
+  "platform": "win32",
+  "automaticSelection": true,
+  "pillPreservedFocus": true,
+  "standardEditReplacement": true,
+  "staleReplacementRejected": true,
+  "desktopCapture": true,
+  "regionCrop": true,
+  "ocrText": "Small changes, lasting impact.\n你好，世界! 每一小步，都能带来改变。\nC:\\Projects\\ReadFinch\\src\\main.ts\n\nconst total = 42; // Hello 1\n\nHR\n",
+  "scaleFactor": 1.25,
+  "errors": []
+}

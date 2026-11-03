@@ -1,7 +1,7 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
@@ -28,6 +28,7 @@
     "test:upgrade": "node scripts/upgrade-smoke.mjs",
     "test:ocr": "node --require ./scripts/block-network.cjs --import tsx scripts/verify-ocr.ts",
     "test:native": "node scripts/native-smoke.mjs",
+    "test:selection": "node scripts/selection-compatibility-smoke.mjs",
     "test:packaged": "node scripts/packaged-smoke.mjs",
     "assets:ocr": "node scripts/download-ocr.mjs",
     "native:build": "node scripts/build-native.mjs",

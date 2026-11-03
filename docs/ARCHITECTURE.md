@@ -4,6 +4,8 @@
 
 Electron 45 + TypeScript + React。Electron 提供跨平台窗口、非激活浮标、全局快捷键、屏幕源、剪贴板、系统加密和桌面分发。Windows 使用独立 .NET Framework 辅助进程读取 UI Automation，避免被某个应用阻塞时冻结主进程。macOS 使用 Swift/AX；Linux 分开处理 X11 与 Wayland。
 
+Windows 选区读取保留标准 Edit 控件的原位替换校验。其余界面从焦点控件、鼠标命中控件及其上层文档寻找 TextPattern；嵌入网页可能由其他进程提供，因此通过原生窗口的父子关系限定前台窗口，不要求提供者与窗口进程 ID 相同。鼠标移向工具栏时可以重新查询上次成功的文档，但不复用旧文字。取消选区、密码框、窗口切换和过长结果都不会留下可用选区。仅插入光标不视为选中文本。`npm run test:selection` 使用独立 Electron 桌面样例验证实际 UIA 读取和工具栏，`-- --packaged` 验证安装包产物；未提供 UIA 文本选区的应用仍需剪贴板或 OCR。
+
 Tesseract.js 的 WASM 与语言包提供统一离线 OCR。选择它基于当前机器上的混合文字、深色和小字号样例，以及与 Windows OCR 的实测比较；并不意味着它对所有文档或系统最优。
 
 ## 边界

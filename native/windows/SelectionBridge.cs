@@ -20,6 +20,8 @@ class SelectionBridge {
   [DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h,int msg,out int a,out int b);
   [DllImport("user32.dll")] static extern int GetWindowLong(IntPtr h,int index);
   [DllImport("user32.dll")] static extern bool IsWindow(IntPtr h);
+  [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr h,uint flags);
+  [DllImport("user32.dll")] static extern bool IsChild(IntPtr parent,IntPtr child);
   [DllImport("user32.dll")] static extern bool GetGUIThreadInfo(uint thread,ref GuiInfo info);
   [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
   [StructLayout(LayoutKind.Sequential)] struct Point {public int X,Y;}
@@ -29,11 +31,84 @@ class SelectionBridge {
   static JavaScriptSerializer json=new JavaScriptSerializer(){MaxJsonLength=2000000};
   static ConcurrentQueue<string> commands=new ConcurrentQueue<string>();
   static Saved saved;static uint host;static string lastKey="";static bool running=true;
+  static AutomationElement lastTextElement;static IntPtr lastTextWindow;
   static void Emit(object value){Console.WriteLine(json.Serialize(value));Console.Out.Flush();}
   static void Invalidate(){if(saved!=null){saved=null;lastKey="";Emit(new{type="invalid"});}}
   static string WindowText(IntPtr h){var b=new StringBuilder(500001);SendMessage(h,13,(IntPtr)b.Capacity,b);return b.ToString();}
   static string ProcessName(uint pid){try{return Process.GetProcessById((int)pid).ProcessName;}catch{return "unknown";}}
   static bool Own(uint pid){return pid==host||pid==(uint)Process.GetCurrentProcess().Id;}
+  // Embedded Chromium/WebView documents may be provided by a renderer process.
+  // Validate their native-window ancestry instead of requiring the foreground PID.
+  static bool BelongsToWindow(AutomationElement element,IntPtr foreground){
+    var node=element;
+    for(int depth=0;node!=null&&depth<24;depth++){
+      if(node.Current.IsPassword)return false;
+      IntPtr handle=(IntPtr)node.Current.NativeWindowHandle;
+      if(handle!=IntPtr.Zero)
+        return handle==foreground||IsChild(foreground,handle)||GetAncestor(handle,2)==foreground;
+      node=TreeWalker.RawViewWalker.GetParent(node);
+    }
+    return false;
+  }
+  static bool ReadTextElement(AutomationElement element,IntPtr foreground,ref Point anchor,out string text,out string key){
+    text="";key="";
+    try{
+      if(element==null||element.Current.IsPassword)return false;
+      object pattern;if(!element.TryGetCurrentPattern(TextPattern.Pattern,out pattern))return false;
+      if(!BelongsToWindow(element,foreground))return false;
+      var ranges=((TextPattern)pattern).GetSelection();
+      if(ranges==null||ranges.Length==0||ranges.Length>64)return false;
+      var parts=new List<string>();var positions=new StringBuilder();int length=0;
+      foreach(var range in ranges){
+        string part=range.GetText(100001-length);
+        if(String.IsNullOrEmpty(part))continue;
+        length+=part.Length+(parts.Count>0?1:0);if(length>100000)return false;
+        parts.Add(part);
+        var rectangles=range.GetBoundingRectangles();
+        if(rectangles.Length>0){
+          var first=rectangles[0];var last=rectangles[rectangles.Length-1];
+          if(!Double.IsNaN(last.Right)&&!Double.IsInfinity(last.Right)&&!Double.IsNaN(last.Bottom)&&!Double.IsInfinity(last.Bottom)){
+            anchor.X=(int)last.Right;anchor.Y=(int)last.Bottom;
+            positions.Append((int)first.Left).Append(',').Append((int)first.Top).Append(',').Append(anchor.X).Append(',').Append(anchor.Y).Append(';');
+          }
+        }
+      }
+      text=String.Join("\n",parts.ToArray());if(String.IsNullOrWhiteSpace(text))return false;
+      key=foreground+":"+String.Join(",",element.GetRuntimeId())+":"+positions+":"+text;
+      lastTextElement=element;lastTextWindow=foreground;return true;
+    }catch{return false;}
+  }
+  static bool ReadTextPath(AutomationElement start,IntPtr foreground,HashSet<string> visited,ref Point anchor,out string text,out string key){
+    text="";key="";
+    try{
+      if(start==null||!BelongsToWindow(start,foreground))return false;
+      var node=start;
+      for(int depth=0;node!=null&&depth<24;depth++){
+        if(node.Current.IsPassword)return false;
+        string identity=String.Join(",",node.GetRuntimeId());
+        if(visited.Add(identity)&&ReadTextElement(node,foreground,ref anchor,out text,out key))return true;
+        IntPtr handle=(IntPtr)node.Current.NativeWindowHandle;
+        if(handle==foreground)break;
+        node=TreeWalker.RawViewWalker.GetParent(node);
+      }
+    }catch{}
+    text="";key="";return false;
+  }
+  static bool ReadUiaSelection(IntPtr foreground,ref Point anchor,out string text,out string key){
+    text="";key="";
+    AutomationElement focused=null;
+    try{focused=AutomationElement.FocusedElement;if(focused!=null&&focused.Current.IsPassword)return false;}catch{}
+    var visited=new HashSet<string>();
+    if(ReadTextPath(focused,foreground,visited,ref anchor,out text,out key))return true;
+    try{
+      var pointed=AutomationElement.FromPoint(new System.Windows.Point(anchor.X,anchor.Y));
+      if(ReadTextPath(pointed,foreground,visited,ref anchor,out text,out key))return true;
+    }catch{}
+    // Moving from the selected text to the non-activating toolbar must not lose
+    // the document. Re-query the last provider, never reuse its previous text.
+    if(lastTextWindow==foreground&&ReadTextElement(lastTextElement,foreground,ref anchor,out text,out key))return true;
+    lastTextElement=null;lastTextWindow=IntPtr.Zero;return false;
+  }
   static void Poll(bool force=false){
     IntPtr foreground=GetForegroundWindow();uint pid;uint thread=GetWindowThreadProcessId(foreground,out pid);
     if(Own(pid)){if(force)Invalidate();return;}
@@ -47,10 +122,7 @@ class SelectionBridge {
       SendMessage(target,0xB0,out start,out end);if(end>start){full=WindowText(target);if(end<=full.Length){text=full.Substring(start,end-start);replace=(style&0x800)==0;key=target+":"+start+":"+end+":"+full;if(info.caret!=IntPtr.Zero){anchor.X=info.caretRect.R;anchor.Y=info.caretRect.B;ClientToScreen(info.caret,ref anchor);}}}
     }
     if(text.Length==0){
-      var el=AutomationElement.FocusedElement;if(el==null||el.Current.ProcessId!=(int)pid||el.Current.IsPassword){Invalidate();return;}
-      object pattern;if(el.TryGetCurrentPattern(TextPattern.Pattern,out pattern)){
-        var ranges=((TextPattern)pattern).GetSelection();if(ranges.Length==1){text=ranges[0].GetText(100001);key=pid+":"+String.Join(",",el.GetRuntimeId())+":"+text;var rectangles=ranges[0].GetBoundingRectangles();if(rectangles.Length>0){var rect=rectangles[rectangles.Length-1];anchor.X=(int)rect.Right;anchor.Y=(int)rect.Bottom;}}
-      }
+      if(!ReadUiaSelection(foreground,ref anchor,out text,out key)){Invalidate();return;}
     }
     if(GetForegroundWindow()!=foreground||String.IsNullOrWhiteSpace(text)||text.Length>100000){Invalidate();return;}
     if(key==lastKey)return;

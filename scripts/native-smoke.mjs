@@ -37,6 +37,16 @@ const errors = [];
 let previousSelection;
 try {
   const main = await app.firstWindow();
+  async function waitSelection(predicate) {
+    for (let i = 0; i < 50; i++) {
+      const value = await main.evaluate(() =>
+        window.readfinch.call("selectionGet"),
+      );
+      if (predicate(value)) return value;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw Error("Native selection did not reach the expected fixture state");
+  }
   main.on("pageerror", (e) => errors.push(e.message));
   await main.getByRole("heading", { name: "通用", exact: true }).waitFor();
   target = spawn(targetFile, [], {
@@ -117,20 +127,11 @@ try {
     "Small steps make a big difference.",
   );
   await panel.screenshot({ path: "docs/screenshots/native-panel.png" });
-  // Read the observed selection token in an isolated test window, from the bridge event.
-  await panel.evaluate(() => {
-    window.__testSelection = null;
-    window.readfinch.on(
-      "interaction",
-      (value) => (window.__testSelection = value.selection),
-    );
-  });
-  await command("change");
-  await command("select");
-  await new Promise((r) => setTimeout(r, 500));
-  await pill.getByRole("button", { name: "翻译", exact: true }).click();
-  await panel.waitForFunction(() => !!window.__testSelection);
-  previousSelection = await panel.evaluate(() => window.__testSelection);
+  // Read the real bridge token. No synthetic selections are injected. The
+  // toolbar and panel are already verified; replacement checks use this token.
+  previousSelection = await main.evaluate(() =>
+    window.readfinch.call("selectionGet"),
+  );
   assert.equal(previousSelection.canReplace, true);
   await panel.evaluate(
     async (token) =>
@@ -144,14 +145,15 @@ try {
     (await command("status")).text,
     /^Small changes, lasting impact\./,
   );
+  await waitSelection((selection) => !selection);
   await command("select");
-  await new Promise((r) => setTimeout(r, 500));
-  await pill.getByRole("button", { name: "翻译", exact: true }).click();
-  await panel.waitForFunction(
-    (old) => window.__testSelection?.token !== old,
-    previousSelection.token,
+  const fresh = await waitSelection(
+    (selection) =>
+      selection?.app === "NativeTarget" &&
+      selection?.canReplace &&
+      selection.token !== previousSelection.token,
   );
-  const stale = await panel.evaluate(() => window.__testSelection.token);
+  const stale = fresh.token;
   await command("change");
   await new Promise((r) => setTimeout(r, 350));
   const rejected = await panel.evaluate(async (token) => {
@@ -171,9 +173,14 @@ try {
   await command("clear");
   await new Promise((r) => setTimeout(r, 200));
   const targetRect = await command("status");
-  assert.equal(targetRect.foreground, targetRect.hwnd, "The sample editor must be in front before OCR capture");
+  assert.equal(
+    targetRect.foreground,
+    targetRect.hwnd,
+    "The sample editor must be in front before OCR capture",
+  );
   await main.evaluate(() => window.readfinch.call("capture"));
   const overlay = await waitWindow("capture");
+  await overlay.locator(".capture-overlay > img").waitFor();
   const display = await app.evaluate(({ screen }) => {
     const d = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
     return { bounds: d.bounds, scaleFactor: d.scaleFactor };
@@ -190,13 +197,21 @@ try {
   await overlay.mouse.up();
   await panel.waitForFunction(
     () =>
-      document
-        .querySelector(".source-editor")
-        ?.value.includes("lasting impact"),
+      (
+        document.querySelector(".source-editor")?.value ||
+        document.querySelector(".rf-source-text")?.textContent ||
+        ""
+      ).includes("lasting impact"),
+    undefined,
     { timeout: 30000 },
   );
   await panel.screenshot({ path: "docs/screenshots/native-capture-ocr.png" });
-  const text = await panel.getByLabel("原文", { exact: true }).inputValue();
+  const text = await panel.evaluate(
+    () =>
+      document.querySelector(".source-editor")?.value ||
+      document.querySelector(".rf-source-text")?.textContent ||
+      "",
+  );
   assert.match(text, /世界/);
   assert.equal(errors.length, 0, errors.join("\n"));
   await writeFile(

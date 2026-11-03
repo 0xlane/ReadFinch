@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-03T10:52:12.377Z",
+  "version": "0.15.3",
+  "packaged": true,
+  "platform": "win32",
+  "source": "Real Windows UI Automation from a separate Electron fixture; no synthetic selection hooks, clipboard writes, or external services.",
+  "limitation": "Equivalent embedded-web desktop scenarios; this test does not automate or certify the ChatGPT application.",
+  "cases": [
+    {
+      "name": "Document selection with a focused button",
+      "passed": true
+    },
+    {
+      "name": "Automatic toolbar preserves target focus",
+      "passed": true
+    },
+    {
+      "name": "Identical text in a different paragraph updates the selection",
+      "passed": true
+    },
+    {
+      "name": "Clearing selection invalidates the cached document",
+      "passed": true
+    },
+    {
+      "name": "Empty composer caret does not show the toolbar",
+      "passed": true
+    },
+    {
+      "name": "Cross-site embedded document with a focused child button",
+      "passed": true
+    },
+    {
+      "name": "Clearing an embedded selection invalidates it",
+      "passed": true
+    },
+    {
+      "name": "Outer document can be selected again",
+      "passed": true
+    },
+    {
+      "name": "Toolbar content reappears after clearing and reselecting",
+      "passed": true
+    },
+    {
+      "name": "Password focus suppresses selection reads",
+      "passed": true
+    },
+    {
+      "name": "No stale selection after leaving the password field",
+      "passed": true
+    }
+  ],
+  "rendererErrors": []
+}
