@@ -5,8 +5,8 @@
 | 能力            | Windows x64（历史验证）                         | macOS                                    | Linux X11                                   | KDE Plasma / Wayland                                             |
 | --------------- | ----------------------------------------------- | ---------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
 | 应用构建、主 UI | 已测                                            | x64 本机构建、设置与主要流程已测                                | 实现/待测                                   | 实现/待测                                                        |
-| 自动选区        | 标准 Edit、UIA 嵌入网页和 Java Swing 选区已测                | NSTextView AXSelectedText、清除选区和密码框已测，需辅助功能权限 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
-| 不抢焦点浮标    | showInactive + focusable:false，前台样例已测    | 本机前台样例已测                                | 实现/待测                                   | 不提供自动浮标                                                   |
+| 自动选区        | 标准 Edit、UIA 嵌入网页和 Java Swing 选区已测                | NSTextView 真机选区、AX 范围、网页标记及密码框逻辑已测；第三方应用待测 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
+| 不抢焦点浮标    | showInactive + focusable:false，前台样例已测    | 本机前台焦点、Space 配置及菜单交互已测                                | 实现/待测                                   | 不提供自动浮标                                                   |
 | 全局快捷键      | 注册、录入/自动保存、冲突及动作回调已测；真实前台按键取词待测 | 注册、录入、冲突及真实 Option+T 已测                         | 实现/待测                                   | GlobalShortcuts portal，需桌面确认/支持；可用托盘入口             |
 | 区域截图        | 截图、取消/恢复、125% 缩放裁剪与前台中英文样例已测 | 本机 2× Retina 截图、裁剪像素与取消恢复已测，需录屏权限             | 同路径，待测                                | Screenshot portal 的交互区域选择；需 python3-gi 与门户后端，待测 |
 | 图片导入/预览   | 解码、OCR、可编辑文本已测                       | 图片输入、预览、OCR 和可编辑文本已测                                | 实现/待测                                   | 实现/待测                                                        |
@@ -28,7 +28,9 @@ Windows 单物理屏已验证 125% 下的选区与 OCR，并在 100% 和 150% �
 
 ### 在 IntelliJ IDEA 编辑器中划词
 
-在 IDEA 的代码编辑器中选中一个标识符即可使用工具栏。若选区没有反应，在 **Settings → Appearance & Behavior → Appearance** 启用 **Support screen readers**，然后重启 IDEA。如果 IDE 使用的 Java 运行时尚未启用 Java Access Bridge，在 **Help → Edit Custom VM Options** 单独添加一行 `-Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge` 后重启。该选项仅作用于配置它的 IDE。伴读雀的 Windows 包已包含读取选区所需的客户端。[JetBrains 无障碍设置](https://www.jetbrains.com/help/idea/accessibility.html) · [Java Access Bridge](https://docs.oracle.com/en/java/javase/21/access/enabling-and-testing-java-access-bridge.html)
+在 IDEA 的代码编辑器中选中一个标识符即可使用工具栏。若编辑器选区没有反应，可在 **Settings → Appearance & Behavior → Appearance** 启用 **Support screen readers**，然后重启 IDEA。macOS 还需在系统设置中授予伴读雀辅助功能权限。[JetBrains 无障碍设置](https://www.jetbrains.com/help/idea/accessibility.html)
+
+Windows 安装包含 Java Access Bridge 客户端。如果 Windows 上的 Java 运行时尚未启用此接口，可在 IDEA 的 **Help → Edit Custom VM Options** 单独添加一行 `-Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge` 后重启。该选项仅作用于配置它的 IDE。[Java Access Bridge](https://docs.oracle.com/en/java/javase/21/access/enabling-and-testing-java-access-bridge.html)
 
 ## macOS 权限检查
 
