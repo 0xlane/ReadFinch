@@ -3,6 +3,7 @@ import { resultLanguageName } from "../shared/languages";
 import { t, actionLabel } from "../shared/i18n";
 import { stopSpeaking, useSpeechStatus } from "./speech";
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import {
   Pin,
   PinOff,
@@ -83,6 +84,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const [expanded, setExpanded] = useState(false);
   const [sourceOverflows, setSourceOverflows] = useState(false);
   const sourceText = useRef<HTMLParagraphElement>(null);
+  const sourceEditor = useRef<HTMLTextAreaElement>(null);
   const [savedNote, setSavedNote] = useState("");
   const narration = useSpeechStatus();
   const [confirmBook, setConfirmBook] = useState(false),
@@ -517,6 +519,13 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       snapshot.platform.startsWith("darwin") ? "⌘" : "Ctrl",
     )
     .replace(/\+/g, " + ");
+  function editSource() {
+    flushSync(() => setEditing(true));
+    const editor = sourceEditor.current;
+    if (!editor || editor.readOnly) return;
+    editor.focus();
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  }
   function editRecognizedText() {
     stop();
     setActiveAction(null);
@@ -524,7 +533,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     setError("");
     setKind("ocr");
     setPhase(text.trim() ? "done" : "idle");
-    setEditing(true);
+    editSource();
   }
   const displayTitle = working
     ? activeAction.id === "translate"
@@ -611,7 +620,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
               <h3>{t("未读到选中文字")}</h3>
               <p>
                 {t(
-                  "可以先选择文字。图片、扫描 PDF、视频或无法选择的界面，用框选取词。",
+                  session.javaBridgeUnavailable
+                    ? "当前 Java 应用尚未连接 Java Access Bridge。在 IntelliJ IDEA 中，请到「设置 → 外观与行为 → 外观」启用「支持屏幕阅读器」，然后重启 IDE。"
+                    : "可以先选择文字。图片、扫描 PDF、视频或无法选择的界面，用框选取词。",
                 )}
               </p>
               <button
@@ -641,10 +652,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   <ImagePlus size={14} />
                   {t("导入图片")}
                 </button>
-                <button
-                  className="text-button"
-                  onClick={() => setEditing(true)}
-                >
+                <button className="text-button" onClick={editSource}>
                   {t("输入文字")}
                 </button>
               </div>
@@ -669,7 +677,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                       className="icon-button"
                       aria-label={editing ? t("完成编辑") : t("编辑原文")}
                       title={editing ? t("完成编辑") : t("编辑原文")}
-                      onClick={() => setEditing(!editing)}
+                      onClick={editing ? () => setEditing(false) : editSource}
                     >
                       {editing ? <Check size={13} /> : <Pencil size={13} />}
                     </button>
@@ -757,6 +765,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
               )}
               {editing || !text ? (
                 <textarea
+                  ref={sourceEditor}
                   className="source-editor"
                   aria-label={t("原文")}
                   placeholder={
@@ -817,7 +826,8 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   <button
                     className="icon-button"
                     aria-label={t("编辑原文")}
-                    onClick={() => setEditing(true)}
+                    disabled={ocrBusy}
+                    onClick={editSource}
                   >
                     <Pencil size={15} />
                   </button>
@@ -1194,6 +1204,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             config={cfg}
             value={providerId}
             label={t("文字提供商")}
+            showModel={false}
             purpose={"action:" + (activeAction?.id ?? "")}
             onChange={(id) => {
               const p = cfg.providers.find((p) => p.id === id);

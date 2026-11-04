@@ -14,7 +14,7 @@ ReadFinch est une application de bureau open source dédiée à la lecture et à
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@ Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregi
 
 | Plateforme | Acquisition du texte |
 | --- | --- |
-| Windows | Lit les sélections exposées par l’application au premier plan via UI Automation. |
+| Windows | Lit le texte sélectionné dans l’application au premier plan via UI Automation et Java Access Bridge. |
 | macOS | L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran. |
 | Linux | Utilise la sélection PRIMARY sous X11 (`xclip`, `xdotool`, `xprop`). Sous Wayland, utilise le presse-papiers ou le portail de capture du bureau ; les raccourcis dépendent de l’environnement. |
 
@@ -153,7 +153,7 @@ Les rapports de bugs reproductibles, suggestions d’ergonomie, corrections de t
 
 ### Compiler depuis les sources
 
-Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, le compilateur C# de .NET Framework 4.8 est nécessaire ; sous macOS, installez les outils de ligne de commande Xcode.
+Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, installez le compilateur C# de .NET Framework 4.8 et faites pointer `JAVA_HOME` vers un OpenJDK x64 tel que Temurin 21. Sous macOS, installez les outils de ligne de commande Xcode.
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

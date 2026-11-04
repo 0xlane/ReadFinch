@@ -1,8 +1,31 @@
-import { mkdirSync, existsSync } from "node:fs";
+import { copyFileSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 mkdirSync("native/bin", { recursive: true });
 if (process.platform === "win32") {
+  const jdk = process.env.JAVA_HOME;
+  const bridge = "WindowsAccessBridge-64.dll";
+  if (!jdk || !existsSync(path.join(jdk, "bin", bridge)))
+    throw Error(
+      "Set JAVA_HOME to an x64 OpenJDK with Java Access Bridge (Temurin 21 recommended).",
+    );
+  for (const file of [bridge, "vcruntime140.dll"])
+    copyFileSync(path.join(jdk, "bin", file), path.join("native/bin", file));
+  const notices = "native/bin/openjdk";
+  for (const module of ["java.base", "jdk.accessibility"]) {
+    const dest = path.join(notices, "legal", module);
+    mkdirSync(dest, { recursive: true });
+    for (const name of [
+      "LICENSE",
+      "ASSEMBLY_EXCEPTION",
+      "ADDITIONAL_LICENSE_INFO",
+    ])
+      copyFileSync(
+        path.join(jdk, "legal", module, name),
+        path.join(dest, name),
+      );
+  }
+  copyFileSync(path.join(jdk, "release"), path.join(notices, "release"));
   const framework = path.join(
     process.env.WINDIR ?? "C:/Windows",
     "Microsoft.NET/Framework64/v4.0.30319",
@@ -20,10 +43,12 @@ if (process.platform === "win32") {
       "/platform:anycpu",
       `/out:${path.resolve("native/bin/readfinch-selection.exe")}`,
       "/r:System.Web.Extensions.dll",
+      "/r:System.Windows.Forms.dll",
       `/r:${path.join(framework, "WPF/UIAutomationClient.dll")}`,
       `/r:${path.join(framework, "WPF/UIAutomationTypes.dll")}`,
       `/r:${path.join(framework, "WPF/WindowsBase.dll")}`,
       path.resolve("native/windows/SelectionBridge.cs"),
+      path.resolve("native/windows/JavaSelection.cs"),
     ],
     { stdio: "inherit" },
   );

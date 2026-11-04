@@ -36,6 +36,20 @@ test("a popup opens next to the cursor and flips above it near the bottom", () =
   );
 });
 
+test("the toolbar clears the pointer at the inner edge of a left-hand monitor", () => {
+  const area = { x: -1440, y: -200, width: 1440, height: 900 };
+  const size = { width: 215, height: 48 };
+  assert.deepEqual(besideCursor({ x: -3, y: 686 }, size, area), {
+    x: -228,
+    y: 628,
+    ...size,
+  });
+  assert.equal(
+    besideCursor({ x: -10, y: 0 }, size, { ...area, x: -160, width: 160 }).x,
+    -152,
+  );
+});
+
 test("a result chooses the roomier side once and keeps its origin when late suggestions arrive", () => {
   const area = { x: 0, y: 0, width: 1280, height: 800 };
   for (const [y, side] of [

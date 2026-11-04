@@ -6,7 +6,30 @@ import {
   toolbarItems,
   editToolbar,
 } from "../src/shared/toolbar";
-import { toolbarPlacement } from "../src/core/toolbar-placement";
+import {
+  toolbarAnchor,
+  toolbarPlacement,
+  toolbarWindowLayout,
+} from "../src/core/toolbar-placement";
+test("the toolbar follows a keyboard selection on another monitor and ignores off-screen text bounds", () => {
+  const display = { x: -1536, y: -220, width: 1536, height: 864 };
+  const mouse = { x: 370, y: 400 },
+    word = { x: -1520, y: -207 };
+  assert.deepEqual(toolbarAnchor(mouse, word, display), word);
+  assert.deepEqual(toolbarAnchor(mouse, { x: -2000, y: -300 }, display), mouse);
+  const nearby = { x: -1420, y: -170 };
+  assert.deepEqual(toolbarAnchor(nearby, word, display), nearby);
+  for (const anchor of [word, { x: -1, y: 643 }]) {
+    const closed = toolbarWindowLayout(anchor, display, 5, 5, "none", false);
+    assert.equal(closed.shape, undefined);
+    assert.equal(closed.bounds.height, closed.bar.height + 16);
+    for (const mode of ["more", "disable"] as const) {
+      const open = toolbarWindowLayout(anchor, display, 5, 5, mode, false);
+      assert.equal(open.bounds.y + open.bar.y, closed.bounds.y + closed.bar.y);
+      assert.equal(open.bounds.x + open.bar.x, closed.bounds.x + closed.bar.x);
+    }
+  }
+});
 test("menu expansion stays on the monitor and keeps the toolbar anchored", () => {
   for (const x of [-1920, 0, 1920]) {
     const area = { x, y: -200, width: 1024, height: 768 };

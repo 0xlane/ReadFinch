@@ -18,6 +18,40 @@ import {
   JobGate,
 } from "../src/core/providers";
 import { readFile } from "node:fs/promises";
+import {
+  chatRequestOptions,
+  parseProviderOptions,
+} from "../src/shared/provider-options";
+
+test("provider options preserve valid JSON and protect request-owned fields", () => {
+  assert.equal(parseProviderOptions("  "), undefined);
+  assert.deepEqual(parseProviderOptions("{}"), {});
+  for (const invalid of [
+    "[]",
+    "null",
+    "{",
+    JSON.stringify({ value: "x".repeat(16000) }),
+  ])
+    assert.throws(() => parseProviderOptions(invalid));
+  const options = parseProviderOptions(
+    JSON.stringify({
+      reasoningEffort: "low",
+      maxCompletionTokens: 512,
+      textVerbosity: "high",
+      thinking: { enabled: true },
+      messages: [],
+      model: "another",
+      stream: false,
+      response_format: { type: "text" },
+    }),
+  );
+  assert.deepEqual(chatRequestOptions(options), {
+    reasoning_effort: "low",
+    max_completion_tokens: 512,
+    verbosity: "high",
+    thinking: { enabled: true },
+  });
+});
 async function fixture(
   handler: (req: IncomingMessage, res: ServerResponse, body: any) => void,
 ) {
@@ -168,7 +202,7 @@ test("invalid JSON responses never leak their response text", async () => {
 });
 test("provider failures are useful and never echo authorization or raw response", async () => {
   for (const [status, pattern] of [
-    [401, /凭据/],
+    [401, /HTTP 401.*API Key/],
     [429, /额度/],
     [404, /模型/],
     [400, /支持/],
@@ -534,7 +568,7 @@ test("streaming rejection falls back once without changing the provider; authent
         new AbortController().signal,
         () => {},
       ),
-      /凭据/,
+      /HTTP 401.*API Key/,
     );
     assert.equal(calls.length, 3);
   } finally {

@@ -1,10 +1,13 @@
 import { _electron as electron } from "playwright";
+import { execFileSync } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 
 const dir = path.resolve(".local/toolbar-" + Date.now()),
-  output = "docs/screenshots/current";
+  output = process.argv.includes("--verify-only")
+    ? dir
+    : "docs/screenshots/current";
 await mkdir(dir, { recursive: true });
 await mkdir(output, { recursive: true });
 const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
@@ -17,7 +20,14 @@ const check = (s) => {
 };
 async function launch() {
   app = await electron.launch({
-    args: [".", "--settings", "--data-dir=" + dir],
+    args: [
+      ".",
+      "--settings",
+      "--data-dir=" + dir,
+      ...process.argv
+        .slice(2)
+        .filter((arg) => arg.startsWith("--force-device-scale-factor=")),
+    ],
     env,
   });
   main = await app.firstWindow();
@@ -97,6 +107,44 @@ try {
     );
   const beforeHover = await frame(),
     barBefore = await pill.locator(".selection-toolbar").boundingBox();
+  async function checkWindowsPixels() {
+    if (process.platform !== "win32") return;
+    const handle = await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()
+        .find((w) => w.webContents.getURL().includes("mode=pill"))
+        .getNativeWindowHandle()
+        .readBigUInt64LE()
+        .toString(),
+    );
+    const rect = await pill.getByRole("toolbar").evaluate((el) => {
+      const b = el.getBoundingClientRect();
+      return [
+        b.x / innerWidth,
+        b.y / innerHeight,
+        b.width / innerWidth,
+        b.height / innerHeight,
+      ].map(String);
+    });
+    execFileSync(path.join(dir, "ToolbarHitTest.exe"), [handle, ...rect], {
+      windowsHide: true,
+    });
+  }
+  if (process.platform === "win32") {
+    execFileSync(
+      path.join(
+        process.env.WINDIR,
+        "Microsoft.NET/Framework64/v4.0.30319/csc.exe",
+      ),
+      [
+        "/nologo",
+        "/r:System.Drawing.dll",
+        "/out:" + path.join(dir, "ToolbarHitTest.exe"),
+        path.resolve("tests/fixtures/ToolbarHitTest.cs"),
+      ],
+      { windowsHide: true, stdio: "inherit" },
+    );
+    await checkWindowsPixels();
+  }
   await pill.evaluate(() => {
     window.menuShows = 0;
     new MutationObserver((changes) => {
@@ -111,7 +159,25 @@ try {
   await pill.locator(".toolbar-row").first().hover();
   await pill.waitForTimeout(350);
   assert.equal(await pill.evaluate(() => window.menuShows), 1);
-  if (process.platform !== "darwin") {
+  const afterHover = await frame();
+  const barAfter = await pill.locator(".selection-toolbar").boundingBox();
+  await checkWindowsPixels();
+  for (const axis of ["x", "y"]) {
+    assert.ok(
+      Math.abs(
+        beforeHover[axis] + barBefore[axis] - afterHover[axis] - barAfter[axis],
+      ) <= 1,
+      "Menu displaced the icon strip on screen",
+    );
+  }
+  if (process.platform === "win32") {
+    assert.ok(
+      beforeHover.height <= barBefore.height + 17,
+      "Closed toolbar has a hidden menu-sized window",
+    );
+    assert.ok(afterHover.height > beforeHover.height);
+  }
+  if (process.platform === "linux") {
     assert.deepEqual(await frame(), beforeHover);
     assert.deepEqual(
       await pill.locator(".selection-toolbar").boundingBox(),
@@ -119,7 +185,7 @@ try {
     );
   }
   check(
-    "Hover opens the menu once and crossing into the rows keeps the native frame and toolbar stationary",
+    "Hover opens the menu once and crossing into the rows keeps the icon strip stationary on screen",
   );
   await pill.locator(".toolbar-menu").waitFor();
   const rows = pill.locator(".toolbar-row");
@@ -274,7 +340,9 @@ try {
     "New action editor, per-app and global disable, and a one-hour pause that survives restart and can be resumed from Settings",
   );
   await writeFile(
-    "docs/toolbar-verification.json",
+    process.argv.includes("--verify-only")
+      ? path.join(dir, "report.json")
+      : "docs/toolbar-verification.json",
     JSON.stringify(
       {
         checks,

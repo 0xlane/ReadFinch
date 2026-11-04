@@ -211,8 +211,7 @@
   margin-inline-start: 6px;
 }
 
-.model-dropdown p,
-.model-fetch-error {
+.model-dropdown p {
   padding: 8px;
   font-size: 12px;
   color: var(--api-muted);

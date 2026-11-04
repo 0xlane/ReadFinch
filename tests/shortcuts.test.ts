@@ -221,13 +221,18 @@ test(
       selection: fresh,
     });
     assert.deepEqual(await pending, fresh);
-    const empty = native.readCurrent();
+    let javaHint = false;
+    const empty = native.readCurrent(() => {
+      javaHint = true;
+    });
     (native as any).receive({
       type: "selectionSnapshot",
       id: requests[1].id,
       selection: null,
+      javaBridgeUnavailable: true,
     });
     assert.equal(await empty, undefined);
+    assert.equal(javaHint, true);
     assert.equal(native.current, undefined);
     native.current = cache;
     const stopped = native.readCurrent();

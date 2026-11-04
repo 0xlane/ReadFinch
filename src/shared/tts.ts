@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { speechProtocol, type ModelCapabilities } from "./model-capabilities";
+import {
+  isLegacyOpenAiSpeech,
+  speechModelName,
+  speechProtocol,
+  type ModelCapabilities,
+} from "./model-capabilities";
 
 export const OnlineVoiceIdSchema = z
   .string()
@@ -70,7 +75,7 @@ export function onlineVoices(
   const protocol = provider ? speechProtocol(provider) : "openai";
   const names =
     protocol === "mimo"
-      ? /mimo-v2-tts(?:$|[-/])/.test(provider?.model ?? "")
+      ? provider && speechModelName(provider) === "mimo-v2-tts"
         ? ["mimo_default", "default_zh", "default_en"]
         : [
             "mimo_default",
@@ -83,7 +88,7 @@ export function onlineVoices(
             "Milo",
             "Dean",
           ]
-      : /(?:^|\/)tts-1(?:-hd)?$/.test(provider?.model ?? "")
+      : provider && isLegacyOpenAiSpeech(provider)
         ? [
             "alloy",
             "ash",

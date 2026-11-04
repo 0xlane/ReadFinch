@@ -4,6 +4,7 @@ export const UPDATE_PROXY = "https://gh-proxy.com/";
 export const UPDATE_MANIFEST = "readfinch-update.json";
 export const projectLinks = {
   repository: PROJECT_URL,
+  providerDocs: "https://ai-sdk.dev/providers/ai-sdk-providers",
   issues: PROJECT_URL + "/issues/new/choose",
   releases: RELEASES_URL,
   license: PROJECT_URL + "/blob/main/LICENSE",

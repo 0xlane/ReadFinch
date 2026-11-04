@@ -28,6 +28,7 @@ export class SelectionService extends EventEmitter {
     string,
     {
       resolve: (selection: Selection | undefined) => void;
+      onJavaBridgeUnavailable?: () => void;
       timer: ReturnType<typeof setTimeout>;
     }
   >();
@@ -166,6 +167,8 @@ export class SelectionService extends EventEmitter {
         pending.resolve(value);
       } else {
         this.invalidate();
+        if (event.javaBridgeUnavailable === true)
+          pending.onJavaBridgeUnavailable?.();
         pending.resolve(undefined);
       }
     }
@@ -246,7 +249,9 @@ export class SelectionService extends EventEmitter {
       this.invalidate();
     }
   }
-  async readCurrent(): Promise<Selection | undefined> {
+  async readCurrent(
+    onJavaBridgeUnavailable?: () => void,
+  ): Promise<Selection | undefined> {
     if (process.platform === "linux") {
       if (
         process.env.XDG_SESSION_TYPE === "wayland" ||
@@ -271,7 +276,7 @@ export class SelectionService extends EventEmitter {
         this.invalidate();
         resolve(undefined);
       }, 1800);
-      this.reads.set(id, { resolve, timer });
+      this.reads.set(id, { resolve, onJavaBridgeUnavailable, timer });
       this.child!.stdin.write(
         JSON.stringify({ op: "refresh", id }) + "\n",
         (error) => {

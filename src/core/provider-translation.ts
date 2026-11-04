@@ -88,7 +88,7 @@ export async function translateText(
       break;
     }
     case "deeplx":
-      if (url.includes("{{apiKey}}") && !key)
+      if (url.includes("{{apiKey}}") && !key && !profile.allowAnonymous)
         throw new ProviderError(
           "credential",
           t("此服务尚未配置 API Key，请在设置中添加"),

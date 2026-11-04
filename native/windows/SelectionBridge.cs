@@ -15,6 +15,7 @@ class SelectionBridge {
   [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd,out uint pid);
   [DllImport("user32.dll")] static extern short GetAsyncKeyState(int key);
   [DllImport("user32.dll")] static extern bool GetCursorPos(out Point point);
+  [DllImport("user32.dll")] static extern IntPtr WindowFromPoint(Point point);
   [DllImport("user32.dll")] static extern bool ClientToScreen(IntPtr hwnd,ref Point point);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr h,StringBuilder s,int n);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessage(IntPtr h,int msg,IntPtr w,StringBuilder s);
@@ -26,6 +27,14 @@ class SelectionBridge {
   [DllImport("user32.dll")] static extern bool IsChild(IntPtr parent,IntPtr child);
   [DllImport("user32.dll")] static extern bool GetGUIThreadInfo(uint thread,ref GuiInfo info);
   [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
+  [DllImport("user32.dll")] static extern bool SetProcessDpiAwarenessContext(IntPtr context);
+  [DllImport("shcore.dll")] static extern int SetProcessDpiAwareness(int awareness);
+  // UIA hit testing and bounding rectangles use physical screen coordinates.
+  static void UsePhysicalCoordinates(){
+    try{if(SetProcessDpiAwarenessContext(new IntPtr(-4)))return;}catch(EntryPointNotFoundException){}
+    try{if(SetProcessDpiAwareness(2)==0)return;}catch(EntryPointNotFoundException){}catch(DllNotFoundException){}
+    SetProcessDPIAware();
+  }
   [StructLayout(LayoutKind.Sequential)] struct Point {public int X,Y;}
   [StructLayout(LayoutKind.Sequential)] struct Rect {public int L,T,R,B;}
   [StructLayout(LayoutKind.Sequential)] struct GuiInfo {public int cbSize,flags;public IntPtr active,focus,capture,menuOwner,moveSize,caret;public Rect caretRect;}
@@ -66,11 +75,14 @@ class SelectionBridge {
         if(String.IsNullOrEmpty(part))continue;
         length+=part.Length+(parts.Count>0?1:0);if(length>100000)return false;
         parts.Add(part);
-        var rectangles=range.GetBoundingRectangles();
+        System.Windows.Rect[] rectangles;
+        try{rectangles=range.GetBoundingRectangles();}
+        catch(InvalidOperationException){continue;}
+        catch(NotSupportedException){continue;}
         if(rectangles.Length>0){
           var first=rectangles[0];var last=rectangles[rectangles.Length-1];
-          if(!Double.IsNaN(last.Right)&&!Double.IsInfinity(last.Right)&&!Double.IsNaN(last.Bottom)&&!Double.IsInfinity(last.Bottom)){
-            anchor.X=(int)last.Right;anchor.Y=(int)last.Bottom;
+          if(last.Width>0&&last.Height>0&&!Double.IsNaN(last.Right)&&!Double.IsInfinity(last.Right)&&!Double.IsNaN(last.Bottom)&&!Double.IsInfinity(last.Bottom)){
+            anchor.X=(int)Math.Ceiling(last.Right)-1;anchor.Y=(int)Math.Ceiling(last.Bottom)-1;
             positions.Append((int)first.Left).Append(',').Append((int)first.Top).Append(',').Append(anchor.X).Append(',').Append(anchor.Y).Append(';');
           }
         }
@@ -123,6 +135,15 @@ class SelectionBridge {
       int style=GetWindowLong(target,-16);if((style&0x20)!=0){Invalidate();return;}
       SendMessage(target,0xB0,out start,out end);if(end>start){full=WindowText(target);if(end<=full.Length){text=full.Substring(start,end-start);replace=(style&0x800)==0;key=target+":"+start+":"+end+":"+full;if(info.caret!=IntPtr.Zero){anchor.X=info.caretRect.R;anchor.Y=info.caretRect.B;ClientToScreen(info.caret,ref anchor);}}}
     }
+    if(text.Length==0 && JavaSelection.IsAwtWindow(foreground)){
+      var pointed=WindowFromPoint(anchor);uint pointedPid;GetWindowThreadProcessId(pointed,out pointedPid);
+      var java=JavaSelection.Read(foreground,anchor.X,anchor.Y,GetAncestor(pointed,2)==foreground,pointedPid==host);
+      if(java!=null){
+        if(String.IsNullOrEmpty(java.Text)){Invalidate();return;}
+        text=java.Text;key=java.Key;
+        if(java.HasAnchor){anchor.X=java.X;anchor.Y=java.Y;}
+      }
+    }
     if(text.Length==0){
       if(!ReadUiaSelection(foreground,ref anchor,out text,out key)){Invalidate();return;}
     }
@@ -139,7 +160,7 @@ class SelectionBridge {
       if(op=="quit"){running=false;return;}if(op=="invalidate"){Invalidate();return;}
       if(op=="refresh"){
         try{Poll(true);}catch{Invalidate();}
-        Emit(new{type="selectionSnapshot",id=id,selection=saved==null?null:saved.Selection});return;
+        Emit(new{type="selectionSnapshot",id=id,selection=saved==null?null:saved.Selection,javaBridgeUnavailable=saved==null&&JavaSelection.NeedsSetup(GetForegroundWindow())});return;
       }
       if(op!="replace")return;
       if(saved==null||saved.Token!=(string)c["token"]||saved.Handle==IntPtr.Zero||!IsWindow(saved.Handle))throw new Exception("原选区已失效，请复制结果");
@@ -157,9 +178,9 @@ class SelectionBridge {
       catch(CultureNotFoundException) { Console.WriteLine(CultureInfo.CurrentUICulture.Name); }
       return;
     }
-    Console.OutputEncoding=new UTF8Encoding(false);Console.InputEncoding=new UTF8Encoding(false);SetProcessDPIAware();if(args.Length>0)UInt32.TryParse(args[0],out host);
+    Console.OutputEncoding=new UTF8Encoding(false);Console.InputEncoding=new UTF8Encoding(false);UsePhysicalCoordinates();if(args.Length>0)UInt32.TryParse(args[0],out host);
     var input=new Thread(()=>{string line;while((line=Console.ReadLine())!=null)commands.Enqueue(line);running=false;});input.IsBackground=true;input.Start();
     Emit(new{type="ready",message="Windows UI Automation 已连接"});int ticks=0;
-    while(running){string command;while(commands.TryDequeue(out command))Command(command);try{Poll();}catch{Invalidate();}if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(150);}
+    while(running){JavaSelection.PumpMessages();string command;while(commands.TryDequeue(out command))Command(command);try{Poll();}catch{Invalidate();}if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(150);}
   }
 }

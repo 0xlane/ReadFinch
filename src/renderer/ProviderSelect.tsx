@@ -13,6 +13,7 @@ export function ProviderSelect({
   onChange,
   vision = false,
   purpose = "default",
+  showModel = true,
 }: {
   config: Config;
   value: string | null;
@@ -20,6 +21,7 @@ export function ProviderSelect({
   emptyLabel?: string;
   vision?: boolean;
   purpose?: string;
+  showModel?: boolean;
   onChange: (id: string | null) => void;
 }) {
   const choices = config.providers.filter(
@@ -29,6 +31,8 @@ export function ProviderSelect({
       (p.model || isTranslationOnly(p) || p.id === value),
   );
   const selected = choices.find((p) => p.id === value);
+  const optionLabel = (p: (typeof choices)[number]) =>
+    showModel && p.model ? p.name + " · " + p.model : p.name;
   return (
     <div className="assignment-select">
       {selected ? (
@@ -39,7 +43,7 @@ export function ProviderSelect({
       <select
         aria-label={label}
         value={selected?.id ?? ""}
-        title={selected ? selected.name + " · " + selected.model : emptyLabel}
+        title={selected ? optionLabel(selected) : emptyLabel}
         onChange={(e) => onChange(e.target.value || null)}
       >
         {(emptyLabel || !selected) && (
@@ -49,8 +53,7 @@ export function ProviderSelect({
         )}
         {choices.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.name}
-            {p.model && " · " + p.model}
+            {optionLabel(p)}
           </option>
         ))}
       </select>

@@ -898,18 +898,7 @@ export function Settings({
             })
           }
           credential={keyField}
-          credentialState={Object.fromEntries(
-            draft.providers.map((p) => [
-              p.id,
-              {
-                available:
-                  !!keys["text:" + p.id] ||
-                  snapshot.credentialIds.includes("text:" + p.id) ||
-                  snapshot.credentialIds.includes("headers:" + p.id),
-                version: keyVersions["text:" + p.id] ?? 0,
-              },
-            ]),
-          )}
+          credentialVersions={keyVersions}
           busy={busy}
           {...modelCatalog}
           test={async (id) => {

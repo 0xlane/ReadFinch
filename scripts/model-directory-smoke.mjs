@@ -11,10 +11,29 @@ const dir = path.resolve(".local/model-info-" + Date.now());
 await mkdir(dir, { recursive: true });
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
-const ids = ["deepseek-v4.1-flash-1017", "my-private-vision-tts"];
+const ids = [
+  "relay/deepseek-ai/DeepSeek-V4.1-Flash-1017:free",
+  "my-private-vision-tts",
+];
 let responseIds = ids;
 let modelRequests = 0;
-const server = createServer((req, res) => {
+let probeStatus = 401;
+const probes = [];
+const server = createServer(async (req, res) => {
+  assert.equal(req.headers.authorization, undefined);
+  if (req.url === "/v1/chat/completions") {
+    let raw = "";
+    for await (const chunk of req) raw += chunk;
+    probes.push({ body: JSON.parse(raw), headers: req.headers });
+    res.writeHead(probeStatus, { "Content-Type": "application/json" });
+    return res.end(
+      JSON.stringify(
+        probeStatus === 200
+          ? { choices: [{ message: { content: "Hi" } }] }
+          : { error: { message: "private-provider-detail" } },
+      ),
+    );
+  }
   if (req.url !== "/v1/models") {
     res.writeHead(404).end();
     return;
@@ -54,29 +73,34 @@ async function restartProviders() {
 const modelList = (page) => page.getByRole("listbox", { name: "模型候选" });
 try {
   let page = await launch();
-  await page.evaluate(async (endpoint) => {
-    const state = await window.readfinch.call("snapshot");
-    state.config.appearance.language = "zh-CN";
-    state.config.selection.automatic = false;
-    state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
-    state.config.actions.forEach((a) => (a.shortcut = ""));
-    Object.assign(state.config.providers[0], {
-      name: "Other account",
-      endpoint,
-      requiresKey: false,
-      proxy: { mode: "direct", address: "" },
-    });
-    state.config.providers.push({
-      ...state.config.providers[0],
-      id: "fetched-account",
-      name: "Fetched catalog",
-    });
-    await window.readfinch.call("saveConfig", {
-      config: state.config,
-      revision: state.revision,
-    });
-    await window.readfinch.call("settingsOpen", { tab: "text" });
-  }, `http://127.0.0.1:${server.address().port}/v1`);
+  await page.evaluate(
+    async ({ endpoint, model }) => {
+      const state = await window.readfinch.call("snapshot");
+      state.config.appearance.language = "zh-CN";
+      state.config.selection.automatic = false;
+      state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+      state.config.actions.forEach((a) => (a.shortcut = ""));
+      Object.assign(state.config.providers[0], {
+        name: "Other account",
+        endpoint,
+        model,
+        requiresKey: true,
+        proxy: { mode: "direct", address: "" },
+      });
+      state.config.providers.push({
+        ...state.config.providers[0],
+        id: "fetched-account",
+        name: "Fetched catalog",
+        model: "gpt-4.1-mini",
+      });
+      await window.readfinch.call("saveConfig", {
+        config: state.config,
+        revision: state.revision,
+      });
+      await window.readfinch.call("settingsOpen", { tab: "text" });
+    },
+    { endpoint: `http://127.0.0.1:${server.address().port}/v1`, model: ids[0] },
+  );
   await page
     .getByRole("button", { name: "Fetched catalog", exact: true })
     .click();
@@ -150,6 +174,104 @@ try {
     .locator(".model-input-field")
     .screenshot({ path: path.join(dir, "model-field.png") });
   await page.screenshot({ path: path.join(dir, "model-info.png") });
+  await page.locator(".provider-advanced summary").click();
+  const providerOptions = page.getByRole("textbox", {
+    name: "提供商选项",
+    exact: true,
+  });
+  const headers = page.getByRole("textbox", {
+    name: "自定义请求头",
+    exact: true,
+  });
+  await page
+    .getByRole("spinbutton", { name: "温度", exact: true })
+    .fill("0.35");
+  await providerOptions.fill('{"reasoningEffort":"low","seed":42}');
+  await providerOptions.blur();
+  await headers.fill('{"X-Fixture":"desktop"}');
+  await headers.blur();
+  await providerOptions.fill('{"seed":');
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "请输入有效的 JSON 对象" })
+    .waitFor();
+  const probeButton = (name) => page.getByRole("button", { name, exact: true });
+  await probeButton("测试连接").click();
+  const failure = page.getByRole("alert", { name: "连接失败" });
+  await failure.waitFor();
+  await page.mouse.move(0, 0);
+  assert.match(await failure.innerText(), /HTTP 401.*API Key/);
+  assert.doesNotMatch(await failure.innerText(), /private-provider-detail/);
+  assert.equal(probes.length, 1);
+  assert.equal(probes[0].headers["x-fixture"], "desktop");
+  assert.equal(probes[0].body.temperature, 0.35);
+  assert.equal(probes[0].body.seed, 42);
+  assert.equal(probes[0].body.reasoning_effort, "low");
+  assert.equal(probes[0].body.model, ids[0]);
+  assert.equal(await failure.getByRole("button").count(), 1);
+  const keyPosition = await page.locator("#provider-key").boundingBox();
+  await failure.hover();
+  await page.screenshot({ path: path.join(dir, "connection-notice.png") });
+  await new Promise((resolve) => setTimeout(resolve, 5100));
+  assert.ok(await failure.isVisible());
+  await failure.getByRole("button", { name: "关闭通知" }).click();
+  await failure.waitFor({ state: "detached" });
+  assert.deepEqual(
+    await page.locator("#provider-key").boundingBox(),
+    keyPosition,
+  );
+  assert.equal(await probeButton("测试连接").getAttribute("title"), null);
+  assert.equal(probes.length, 1);
+  await probeButton("测试连接").click();
+  await failure.waitFor();
+  await page.mouse.move(0, 0);
+  await failure.waitFor({ state: "detached", timeout: 7000 });
+  assert.equal(probes.length, 2);
+  probeStatus = 200;
+  await probeButton("测试连接").click();
+  await probeButton("成功").waitFor();
+  assert.equal(await failure.count(), 0);
+  await page.locator(".provider-advanced summary").click();
+  await page.locator(".provider-advanced summary").click();
+  assert.deepEqual(JSON.parse(await providerOptions.innerText()), {
+    reasoningEffort: "low",
+    seed: 42,
+  });
+  await page
+    .locator(".provider-temperature")
+    .evaluate((e) => e.scrollIntoView({ block: "start" }));
+  await page.screenshot({ path: path.join(dir, "advanced-light.png") });
+  await page.evaluate(() =>
+    window.readfinch.call("setTheme", { theme: "dark" }),
+  );
+  await page.locator('html[data-theme="dark"]').waitFor();
+  await page.screenshot({ path: path.join(dir, "advanced-dark.png") });
+  await page.evaluate(() =>
+    window.readfinch.call("setTheme", { theme: "light" }),
+  );
+  await page.locator(".provider-advanced summary").click();
+  const openedPanel =
+    app.windows().find((win) => win.url().includes("mode=panel")) ??
+    app.waitForEvent("window");
+  await page.evaluate(() =>
+    window.readfinch.call("panelOpen", {
+      source: "action-test",
+      actionId: "translate",
+    }),
+  );
+  const panel = await openedPanel;
+  const selector = panel.getByRole("combobox", {
+    name: "文字提供商",
+    exact: true,
+  });
+  await selector.waitFor();
+  assert.deepEqual(await selector.locator("option").allTextContents(), [
+    "Other account",
+    "Fetched catalog",
+  ]);
+  assert.equal(await selector.getAttribute("title"), "Other account");
+  await panel.screenshot({ path: path.join(dir, "panel-providers.png") });
+  await panel.getByRole("button", { name: "收起浮窗", exact: true }).click();
   await custom.check();
   await input.fill("my-private-vision-tts");
   assert.equal(await info.innerText(), "文本");
@@ -181,8 +303,15 @@ try {
     }
   }
   await page.getByRole("button", { name: "获取模型列表", exact: true }).click();
-  await page.locator(".model-fetch-error").waitFor();
+  await page.getByRole("alert", { name: "获取模型列表失败" }).waitFor();
   page = await restartProviders();
+  const savedOptions = await page.evaluate(
+    async () =>
+      (await window.readfinch.call("snapshot")).config.providers.find(
+        (p) => p.id === "fetched-account",
+      ).providerOptions,
+  );
+  assert.deepEqual(savedOptions, { reasoningEffort: "low", seed: 42 });
   await modelList(page)
     .getByRole("option")
     .filter({ hasText: ids[1] })

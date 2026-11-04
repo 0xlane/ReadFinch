@@ -169,11 +169,12 @@ export async function completeReplicate(
             ...(match[3] ? { version: match[3] } : {}),
             stream: profile.stream,
             input: {
-              prompt,
-              ...(system ? { system_prompt: system } : {}),
               ...(profile.temperature != null
                 ? { temperature: profile.temperature }
                 : {}),
+              ...profile.providerOptions,
+              prompt,
+              system_prompt: system || undefined,
             },
           }),
         },

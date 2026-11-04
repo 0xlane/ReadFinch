@@ -75,7 +75,7 @@ const customField = () =>
 const customToggle = () =>
   page.getByRole("checkbox", { name: "输入自定义模型 ID", exact: true });
 const fetchButton = () =>
-  page.getByRole("button", { name: /^(获取模型列表|重试获取模型)$/ });
+  page.getByRole("button", { name: "获取模型列表", exact: true });
 async function selectFirst() {
   await page.locator(".provider-select").first().click();
 }
@@ -308,7 +308,7 @@ try {
 
   mode = "error";
   await fetchButton().click();
-  await page.locator(".model-fetch-error").waitFor();
+  await page.getByRole("alert", { name: "获取模型列表失败" }).waitFor();
   assert.equal((await state()).config.providers[0].model, "vendor/model-119");
   mode = "empty";
   await fetchButton().click();

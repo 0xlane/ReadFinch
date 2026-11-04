@@ -1,6 +1,6 @@
+import { chatRequestOptions } from "../shared/provider-options";
 import {
   request,
-  auth,
   providerAuth,
   responseJson,
   ProviderError,
@@ -20,9 +20,12 @@ import {
   isTranslationOnly,
   providerProtocol,
   supportsSpeech,
-  requiresApiKey,
 } from "../shared/provider-presets";
-import { modelKind, speechProtocol } from "../shared/model-capabilities";
+import {
+  isLegacyOpenAiSpeech,
+  modelKind,
+  speechProtocol,
+} from "../shared/model-capabilities";
 import { completeNative, synthesizeAzureSpeech } from "./provider-native";
 import { translateText } from "./provider-translation";
 import { completeReplicate } from "./provider-replicate";
@@ -80,7 +83,7 @@ export async function synthesizeSpeech(
     ),
     {
       method: "POST",
-      headers: auth(key, requiresApiKey(profile), profile.headers),
+      headers: providerAuth(profile, key),
       body: JSON.stringify(
         protocol === "mimo"
           ? {
@@ -103,7 +106,7 @@ export async function synthesizeSpeech(
               voice,
               response_format: "mp3",
               speed,
-              ...(instructions && !/(?:^|\/)tts-1(?:-hd)?$/.test(profile.model)
+              ...(instructions && !isLegacyOpenAiSpeech(profile)
                 ? { instructions }
                 : {}),
             },
@@ -253,7 +256,7 @@ export async function complete(
         endpointUrl(profile.endpoint, "chat/completions"),
         {
           method: "POST",
-          headers: auth(key, requiresApiKey(profile), profile.headers),
+          headers: providerAuth(profile, key),
           body: JSON.stringify({
             model: profile.model,
             ...(profile.reasoningEffort && {
@@ -262,6 +265,7 @@ export async function complete(
             ...(profile.temperature != null
               ? { temperature: profile.temperature }
               : {}),
+            ...chatRequestOptions(profile.providerOptions),
             messages,
             ...(structured
               ? {

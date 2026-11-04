@@ -52,6 +52,8 @@ export class Secrets {
     );
   }
   async get(id: string, scope: string) {
+    // A connection probe may start immediately after the editor loses focus.
+    await this.queue;
     const record = this.values[id];
     return record?.scope === scope ? record.value : undefined;
   }

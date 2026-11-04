@@ -66,9 +66,12 @@ test("the service default and explicit reasoning efforts make distinct requests 
     model: "reasoner",
     requiresKey: false,
   };
-  const run = (reasoningEffort?: "high" | "xhigh") =>
+  const run = (
+    reasoningEffort?: "high" | "xhigh",
+    providerOptions?: { seed: number },
+  ) =>
     cache.run(
-      { ...profile, reasoningEffort },
+      { ...profile, reasoningEffort, providerOptions },
       [],
       undefined,
       new AbortController().signal,
@@ -83,6 +86,9 @@ test("the service default and explicit reasoning efforts make distinct requests 
     sent.slice(1).map((body) => body.reasoning_effort),
     ["xhigh", "high"],
   );
+  assert.equal(await run("high", { seed: 42 }), "4");
+  assert.equal(await run("high", { seed: 42 }), "4");
+  assert.equal(sent[3].seed, 42);
 });
 test("clearing in flight, cancellation and incomplete streams cannot populate cache", async (t) => {
   let answer!: (value: Response) => void,
