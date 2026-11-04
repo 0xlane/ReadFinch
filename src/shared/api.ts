@@ -30,6 +30,7 @@ export type JobEvent = {
   confidence?: number;
 };
 export type Snapshot = {
+  permissions: MacPermissions | null;
   interfaceLocale: "zh-CN" | "en";
   toolbarPausedUntil: number;
   version: string;
@@ -37,7 +38,6 @@ export type Snapshot = {
   config: Config;
   revision: string;
   credentialIds: string[];
-  secureStorage: boolean;
   ocrReady: boolean;
   platform: string;
   nativeStatus: string;
@@ -53,6 +53,10 @@ export type Snapshot = {
     hasPassword: boolean;
   };
   recovery?: string;
+};
+export type MacPermissions = {
+  accessibility: boolean;
+  screen: "not-determined" | "granted" | "denied" | "restricted" | "unknown";
 };
 export type Capture = { dataUrl: string; width: number; height: number };
 export type SettingsTab =
@@ -157,6 +161,10 @@ export type CallMap = {
     arg: { id: string; value: string; expectedScope?: string };
     result: Snapshot;
   };
+  getCredential: {
+    arg: { id: string; expectedScope: string };
+    result: string;
+  };
   runAction: {
     arg: {
       id: string;
@@ -252,8 +260,13 @@ export type CallMap = {
     result: void;
   };
   openData: { arg: void; result: void };
+  openPermissionSettings: {
+    arg: { permission: "accessibility" | "screen" };
+    result: void;
+  };
 };
 export type EventMap = {
+  permissions: MacPermissions | null;
   update: UpdateState;
   noteSuggestions: SuggestionCardData;
   notesChanged: void;

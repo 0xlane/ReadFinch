@@ -12,6 +12,7 @@ import {
 } from "../shared/model-capabilities";
 import { ProviderSelect } from "./ProviderSelect";
 import { Providers } from "./Providers";
+import { ProviderKeyField } from "./ProviderKeyField";
 import { SpeechSettings } from "./SpeechSettings";
 import { OcrSettings } from "./OcrSettings";
 import { ShortcutRecorder } from "./ShortcutRecorder";
@@ -105,7 +106,6 @@ export function Settings({
   const [error, setError] = useState("");
   const [keys, setKeys] = useState<Record<string, string>>({});
   const [keyVersions, setKeyVersions] = useState<Record<string, number>>({});
-  const [visibleDraftKey, setVisibleDraftKey] = useState("");
   const keyScopes = useRef<Record<string, string>>({});
   const [imported, setImported] = useState<ImportPreview | null>(null);
   const [sync, setSync] = useState({ ...snapshot.sync, password: "" });
@@ -268,71 +268,48 @@ export function Settings({
       if (value) await credential(id);
   }
   function keyField(id: string, testButton: ReactNode) {
-    const saved = snapshot.credentialIds.includes(id);
+    const scope =
+      draft.providers
+        .find((p) => "text:" + p.id === id)
+        ?.endpoint.replace(/\/+$/, "") ?? "missing";
     return (
-      <div className="provider-key-field">
-        <div className="provider-field-heading">
-          <label htmlFor="provider-key">API Key</label>
-          {testButton}
-        </div>
-        <div className="provider-key-input">
-          <input
-            id="provider-key"
-            type={visibleDraftKey === id ? "text" : "password"}
-            autoComplete="off"
-            spellCheck={false}
-            aria-label={id + " API Key"}
-            placeholder={saved ? "••••••••••••••••••••••••" : t("输入 API Key")}
-            value={keys[id] ?? ""}
-            onChange={(e) => {
-              setKeyVersions((versions) => ({
-                ...versions,
-                [id]: (versions[id] ?? 0) + 1,
-              }));
-              keyScopes.current[id] =
-                draft.providers
-                  .find((p) => "text:" + p.id === id)
-                  ?.endpoint.replace(/\/+$/, "") ?? "missing";
-              setKeys({ ...keys, [id]: e.target.value });
-            }}
-          />
-          {saved && (
-            <button
-              className="icon-button"
-              aria-label={t("移除凭据")}
-              title={t("移除本机保存的密钥")}
-              onClick={() =>
-                void perform(async () => {
-                  setKeyVersions((versions) => ({
-                    ...versions,
-                    [id]: (versions[id] ?? 0) + 1,
-                  }));
-                  onSnapshot(
-                    await window.readfinch.call("saveCredential", {
-                      id,
-                      value: "",
-                    }),
-                  );
-                  setKeys((current) => ({ ...current, [id]: "" }));
-                })
-              }
-            >
-              <Trash2 size={14} />
-            </button>
-          )}
-        </div>
-        <div className="provider-key-meta">
-          <label title={t("仅显示本次输入的内容")}>
-            <input
-              type="checkbox"
-              checked={visibleDraftKey === id}
-              onChange={(e) => setVisibleDraftKey(e.target.checked ? id : "")}
-            />
-            {t("显示输入的密钥")}
-          </label>
-          {saved && <small>{t("已加密保存")}</small>}
-        </div>
-      </div>
+      <ProviderKeyField
+        key={id + ":" + scope}
+        id={id}
+        scope={scope}
+        saved={
+          snapshot.credentialIds.includes(id) &&
+          snapshot.config.providers
+            .find((p) => "text:" + p.id === id)
+            ?.endpoint.replace(/\/+$/, "") === scope
+        }
+        value={keyScopes.current[id] === scope ? (keys[id] ?? "") : ""}
+        testButton={testButton}
+        onChange={(value) => {
+          setKeyVersions((versions) => ({
+            ...versions,
+            [id]: (versions[id] ?? 0) + 1,
+          }));
+          keyScopes.current[id] = scope;
+          setKeys((current) => ({ ...current, [id]: value }));
+        }}
+        onRemove={() =>
+          void perform(async () => {
+            setKeyVersions((versions) => ({
+              ...versions,
+              [id]: (versions[id] ?? 0) + 1,
+            }));
+            onSnapshot(
+              await window.readfinch.call("saveCredential", {
+                id,
+                value: "",
+                expectedScope: scope,
+              }),
+            );
+            setKeys((current) => ({ ...current, [id]: "" }));
+          })
+        }
+      />
     );
   }
   async function saveDav() {
@@ -1247,9 +1224,7 @@ export function Settings({
       {tab !== "actions" && (
         <footer className="settings-footnote">
           <KeyRound size={14} />
-          {snapshot.secureStorage
-            ? t("凭据由操作系统加密保存在本机")
-            : t("系统安全存储不可用：新凭据仅在当前会话保留，退出后需重新输入")}
+          {t("凭据以明文保存在本机，不参与配置导出或同步")}
         </footer>
       )}
     </div>

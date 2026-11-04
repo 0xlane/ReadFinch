@@ -1,24 +1,30 @@
 # 平台能力与验证矩阵
 
-状态说明：**已测**＝本环境实际执行通过；**实现/待测**＝存在真实平台代码，但没有成功的目标机交互证据；**受限**＝平台能力限制，提供明确回退；**未提供**＝当前没有实现。
+状态说明：**已测**＝在对应记录环境实际执行通过；**实现/待测**＝存在真实平台代码，但没有成功的目标机交互证据；**受限**＝平台能力限制，提供明确回退；**未提供**＝当前没有实现。
 
-| 能力            | Windows x64（当前环境）                         | macOS                                    | Linux X11                                   | KDE Plasma / Wayland                                             |
+| 能力            | Windows x64（历史验证）                         | macOS                                    | Linux X11                                   | KDE Plasma / Wayland                                             |
 | --------------- | ----------------------------------------------- | ---------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
-| 应用构建、主 UI | 已测                                            | 实现/待测                                | 实现/待测                                   | 实现/待测                                                        |
-| 自动选区        | UIA、标准 Edit、嵌入网页选区已测                | AXSelectedText 实现/待测，需辅助功能权限 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
-| 不抢焦点浮标    | showInactive + focusable:false，前台样例已测    | 实现/待测                                | 实现/待测                                   | 不提供自动浮标                                                   |
-| 全局快捷键      | 注册、录入/自动保存、冲突及动作回调已测；真实前台按键取词待测 | 实现/待测                         | 实现/待测                                   | GlobalShortcuts portal，需桌面确认/支持；可用托盘入口             |
-| 区域截图        | 截图、取消/恢复、125% 缩放裁剪与前台中英文样例已测 | 同路径，需系统录屏权限，待测             | 同路径，待测                                | Screenshot portal 的交互区域选择；需 python3-gi 与门户后端，待测 |
-| 图片导入/预览   | 解码、OCR、可编辑文本已测                       | 实现/待测                                | 实现/待测                                   | 实现/待测                                                        |
-| 离线中英文 OCR  | WASM、语言包、禁网主线程/Worker 已测            | 同引擎，目标机待测                       | 同引擎，目标机待测                          | 同引擎，目标机待测                                               |
+| 应用构建、主 UI | 已测                                            | x64 本机构建、设置与主要流程已测                                | 实现/待测                                   | 实现/待测                                                        |
+| 自动选区        | UIA、标准 Edit、嵌入网页选区已测                | NSTextView AXSelectedText、清除选区和密码框已测，需辅助功能权限 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
+| 不抢焦点浮标    | showInactive + focusable:false，前台样例已测    | 本机前台样例已测                                | 实现/待测                                   | 不提供自动浮标                                                   |
+| 全局快捷键      | 注册、录入/自动保存、冲突及动作回调已测；真实前台按键取词待测 | 注册、录入、冲突及真实 Option+T 已测                         | 实现/待测                                   | GlobalShortcuts portal，需桌面确认/支持；可用托盘入口             |
+| 区域截图        | 截图、取消/恢复、125% 缩放裁剪与前台中英文样例已测 | 本机 2× Retina 截图、裁剪像素与取消恢复已测，需录屏权限             | 同路径，待测                                | Screenshot portal 的交互区域选择；需 python3-gi 与门户后端，待测 |
+| 图片导入/预览   | 解码、OCR、可编辑文本已测                       | 图片输入、预览、OCR 和可编辑文本已测                                | 实现/待测                                   | 实现/待测                                                        |
+| 离线中英文 OCR  | WASM、语言包、禁网主线程/Worker 已测            | 禁网引擎及真实桌面识别已测                       | 同引擎，目标机待测                          | 同引擎，目标机待测                                               |
 | 原位替换        | 标准 Edit 替换与过期选区拒绝已测               | 未提供，使用复制                         | 未提供，使用复制                            | 不提供模拟输入，使用复制                                         |
-| 安全凭据        | Electron 异步 OS 加密路径已测                   | Keychain 实现/待测                       | libsecret/KWallet 实现/待测                 | KWallet6/libsecret 实现/待测；缺失时仅内存                       |
-| 配置/WebDAV     | 本机真实 HTTP 双配置测试已测                    | 平台无关逻辑已测，目标机待测             | 同左                                        | 同左                                                             |
-| 打包            | 见 VERIFICATION.md 的实际产物                   | 配置已写，签名/公证/目标机待测           | AppImage/deb 配置，目标机待测               | 同左，并校验 desktop ID                                          |
+| 本机凭据 | 平台无关核心逻辑已测 | 明文持久化、显示/隐藏、重启、删除及旧凭据迁移已测 | 明文实现，目标机待测 | 明文实现，不依赖系统密钥环，目标机待测 |
+| 配置/WebDAV     | 本机真实 HTTP 双配置测试已测                    | 本机核心测试、设置持久化及凭据迁移已测             | 同左                                        | 同左                                                             |
+| 打包            | 见 VERIFICATION.md 的实际产物                   | x64 .app 构建和启动已测；ad-hoc 签名，未公证           | AppImage/deb 配置，目标机待测               | 同左，并校验 desktop ID                                          |
 
-当前桌面为 Windows，设备像素比为 1.25。主 UI、原生选区与图像 OCR 已在这个缩放比例下检查。多显示器、负坐标屏幕、不同 DPI 混合布局仍需人工检查，不能用单显示器测试推断这些场景。
+历史 Windows 验证的设备像素比为 1.25。2026-11-04 在 macOS 15.8.1 / Intel x64 / 2× Retina 桌面完成了本机验证，见 [Mac 验证记录](macos-verification.json)。多显示器、负坐标屏幕、不同 DPI 混合布局仍需人工检查，不能用单显示器测试推断这些场景。
+
+`test:macos` 使用独立 Cocoa 样例窗口验证真实 AX 选区、浮标焦点、密码框排除和 Option+T；`test:credentials` 验证明文保存、显示已存密钥及真实重启，追加 `-- --packaged` 可测试 Mac 打包产物。
 
 `test:input` 验证真实 `desktopCapturer`、框选操作及裁剪像素比对。`test:native` 使用独立标准编辑器验证真实选区、焦点、替换、过期保护与屏幕 OCR；`test:selection` 使用独立 Electron 应用验证焦点和正文分离、跨站嵌入文档、清除选区、密码框及工具栏恢复。记录见 [原生测试](native-smoke.json) 和 [打包版选区测试](selection-compatibility-packaged.json)。这些样例不代表所有第三方应用均已测试；未公开 UIA 文本选区的界面仍需 OCR 或剪贴板。
+
+## macOS 权限检查
+
+启动时检查辅助功能和录屏权限。未授权时，设置页面提供原因说明与系统设置入口；划词和截图入口分别在使用前检查对应权限。辅助功能授权后自动连接，撤销后清除选区。更新后旧授权可能因 ad-hoc 签名变化而失效，需要在系统设置重新添加当前应用。自动化宿主派生进程的授权状态不能代替 Finder 正常启动验证，见 [权限补验](VERIFICATION.md#macos-正常启动与权限补验)。
 
 ## 更新方式
 
@@ -35,7 +41,7 @@ Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重
 6. 关闭/排除应用，确认浮标行为符合配置。
 7. 在系统中切换深浅模式，检查设置、工具条和结果卡片同步；修改设置后关闭再打开，确认自动保存生效。
 
-## macOS / Linux 验收准备
+## macOS / Linux 复验准备
 
 - macOS：在目标机编译 Swift helper；通过系统界面授权辅助功能和录屏；验证菜单栏/焦点、AXSelectedText、全局快捷键。签名和 notarization 应在分发前完成。
 - X11：安装 `xclip xdotool xprop`，验证 PRIMARY 所有者与前台应用切换。它不是读取所有应用内部编辑模型的通用 API，无法保证原位替换。
@@ -43,4 +49,4 @@ Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重
 - Wayland：安装 `xdg-desktop-portal`、对应桌面后端（KDE 为 `xdg-desktop-portal-kde`）和 `python3-gi`。安装包的 `.desktop` 名称、Electron desktopName 与 StartupWMClass 使用 `app.readfinch.ReadFinch`。快捷键需门户授权；开发未安装应用时可能只能使用主界面按钮。
 - Wayland 不尝试通过 X11 工具绕过合成器限制，也不合成粘贴事件。用户先复制，然后显式调用剪贴板入口。
 
-平台依据：[Electron 截屏 API](https://www.electronjs.org/docs/latest/api/desktop-capturer)、[GlobalShortcut 的 Linux 行为](https://www.electronjs.org/docs/latest/api/global-shortcut)、[SafeStorage](https://www.electronjs.org/docs/latest/api/safe-storage)、[Screenshot portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Screenshot.html)、[Windows TextPattern](https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-textpattern-overview)。
+平台依据：[Electron 截屏 API](https://www.electronjs.org/docs/latest/api/desktop-capturer)、[GlobalShortcut 的 Linux 行为](https://www.electronjs.org/docs/latest/api/global-shortcut)、[Screenshot portal](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Screenshot.html)、[Windows TextPattern](https://learn.microsoft.com/en-us/dotnet/framework/ui-automation/ui-automation-textpattern-overview)。

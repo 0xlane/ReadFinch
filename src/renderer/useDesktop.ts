@@ -7,6 +7,9 @@ export function useDesktop() {
   useEffect(() => {
     const off = [
       window.readfinch.on("config", setSnapshot),
+      window.readfinch.on("permissions", (permissions) =>
+        setSnapshot((value) => (value ? { ...value, permissions } : value)),
+      ),
       window.readfinch.on("update", (updates) =>
         setSnapshot((value) => (value ? { ...value, updates } : value)),
       ),

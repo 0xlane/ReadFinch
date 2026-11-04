@@ -49,7 +49,7 @@ export function RequestHeaders({
     <div>
       <Field
         label={t("自定义请求头")}
-        hint={t("填写 JSON 对象。请求头加密保存在本机。")}
+        hint={t("填写 JSON 对象。请求头以明文保存在本机。")}
       >
         <textarea
           rows={3}

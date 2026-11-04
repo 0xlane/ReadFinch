@@ -1,0 +1,159 @@
+{
+  "date": "2026-11-04",
+  "environment": {
+    "os": "macOS 15.8.1",
+    "arch": "x64",
+    "electron": "45.2.1",
+    "node": "26.5.0",
+    "displayScale": 2
+  },
+  "coreTests": {
+    "passed": 175,
+    "failed": 0
+  },
+  "credentials": {
+    "date": "2026-11-04T06:46:50.888Z",
+    "platform": {
+      "os": "darwin",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "accessibility": true,
+      "screenRecording": "granted",
+      "version": "1.2.1"
+    },
+    "nativeState": "ready",
+    "nativeStatus": "macOS Accessibility 已连接；当前提供复制结果",
+    "checks": [
+      "密钥自动保存、显示/隐藏、编辑及带凭据的真实本机 HTTP 连接通过（OS 加密 API 已禁用）",
+      "真实重启后密钥、请求头和 WebDAV 密码保留，查看开关默认关闭，普通配置及快照不包含密钥",
+      "复制提供商保留凭据；切换服务地址不显示或发送原密钥；删除立即生效",
+      "结果浮窗不能读取已保存密钥，仅设置窗口可读取",
+      "删除后重启不会恢复旧密钥"
+    ],
+    "errors": []
+  },
+  "native": {
+    "date": "2026-11-04T06:55:29.410Z",
+    "platform": "darwin",
+    "arch": "x64",
+    "checks": [
+      "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
+      "点击原生浮标后翻译浮窗使用真实选区、完成本机流式请求；Mac 提供复制结果",
+      "清空选区和进入安全密码框后不保留可用选区",
+      "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）"
+    ],
+    "errors": []
+  },
+  "desktopSuites": [
+    {
+      "script": "settings-smoke",
+      "code": 0,
+      "log": ".local/mac-settings-smoke.log"
+    },
+    {
+      "script": "smoke",
+      "code": 0,
+      "log": ".local/mac-smoke.log"
+    },
+    {
+      "script": "shortcut-smoke",
+      "code": 0,
+      "log": ".local/mac-shortcut-smoke.log"
+    },
+    {
+      "script": "speech-smoke",
+      "code": 0,
+      "log": ".local/mac-speech-smoke.log"
+    },
+    {
+      "script": "upgrade-smoke",
+      "code": 0,
+      "log": ".local/mac-upgrade-smoke.log"
+    },
+    {
+      "script": "update-ui-smoke",
+      "code": 0,
+      "log": ".local/mac-update-ui-smoke.log"
+    }
+  ],
+  "capture": {
+    "scaleFactor": 2,
+    "cropPixelsMatch": true,
+    "previewPixelsMatch": true,
+    "previewPixels": {
+      "source": {
+        "width": 3584,
+        "height": 2240
+      },
+      "displayed": {
+        "width": 3584,
+        "height": 2240
+      },
+      "differingChannels": 0,
+      "comparedChannels": 3052160
+    },
+    "viewport": {
+      "width": 1792,
+      "height": 1120,
+      "dpr": 2
+    },
+    "ocrCompleted": true,
+    "controlledSampleRecognized": true
+  },
+  "limitations": [
+    "Native selection tested with a dedicated Cocoa NSTextView and secure text field, not every third-party app.",
+    "AI, online OCR and online speech use loopback HTTP fixtures; external provider availability and output quality are not assessed.",
+    "Intel x64 and a single Retina display were tested; Apple silicon and multiple displays were not.",
+    "macOS uses copy instead of in-place replacement.",
+    "Package uses ad-hoc signing; no Apple notarization was performed."
+  ],
+  "packagedCredentials": {
+    "date": "2026-11-04T07:00:32.127Z",
+    "platform": {
+      "os": "darwin",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "accessibility": true,
+      "screenRecording": "granted",
+      "version": "1.2.1",
+      "packaged": true
+    },
+    "nativeState": "ready",
+    "nativeStatus": "macOS Accessibility 已连接；当前提供复制结果",
+    "checks": [
+      "密钥自动保存、显示/隐藏、编辑及带凭据的真实本机 HTTP 连接通过（OS 加密 API 已禁用）",
+      "真实重启后密钥、请求头和 WebDAV 密码保留，查看开关默认关闭，普通配置及快照不包含密钥",
+      "复制提供商保留凭据；切换服务地址不显示或发送原密钥；删除立即生效",
+      "结果浮窗不能读取已保存密钥，仅设置窗口可读取",
+      "删除后重启不会恢复旧密钥"
+    ],
+    "errors": []
+  },
+  "package": {
+    "path": "release/mac/ReadFinch.app",
+    "signing": "ad-hoc",
+    "notarized": false,
+    "launch": "passed",
+    "commandA": "passed"
+  },
+  "permissionsFollowup": {
+    "cause": "Normal LaunchServices launch used ReadFinch as TCC responsible process; code requirement no longer matched the old grant. Automated subprocess tests inherited the test host authorization.",
+    "normalLaunch": "Verified via Finder",
+    "guidance": [
+      "Startup banner identifies missing Accessibility and Screen Recording permissions",
+      "Accessibility settings button opens the matching macOS System Settings pane",
+      "ReadFinch Accessibility toggle observed off"
+    ],
+    "regressions": [
+      "Helper exit keeps its original error after 30 seconds",
+      "Permission wait remains limited, transitions to ready on grant, and invalidates selection on revoke"
+    ],
+    "authorization": "User explicitly approved both permissions and separately approved resetting the stale authorization entry; user completed macOS identity verification. Current build was added through System Settings.",
+    "normalLaunchResult": {
+      "accessibility": "granted; native status automatically changed to ready without restarting after the grant",
+      "screen": "granted after current build was added and restarted",
+      "startupGuidance": "shown when permissions are missing",
+      "toolbarVisibility": "not separately confirmed through the normal-launch UI; TextEdit automation timed out"
+    }
+  }
+}

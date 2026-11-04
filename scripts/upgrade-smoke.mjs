@@ -1,6 +1,6 @@
 import { _electron as electron } from "playwright";
 import { createServer } from "node:http";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 
@@ -60,6 +60,7 @@ try {
   });
   await app.close();
   app = undefined;
+  await rm(path.join(dataDir, "credentials.json"));
   const { providers, languageDetection, cache, ...rest } = current;
   const {
     description,
@@ -141,7 +142,7 @@ try {
     legacy,
   );
   checks.push(
-    "Schema v2 upgrades text/vision providers with colliding IDs, retains selected vision service, retires native Ollama, preserves source config and migrates OS-encrypted credentials without requests",
+    "Schema v2 upgrades providers and migrates legacy OS-encrypted credentials to local plain text without requests",
   );
   await call("testText", { profileId: textProvider.id });
   await page.evaluate(async (profileId) => {
@@ -196,6 +197,17 @@ try {
     await readFile(path.join(dataDir, "credentials.enc.json"), "utf8"),
     /legacy-text-fixture|legacy-vision-fixture/,
   );
+  const credentials = JSON.parse(
+    await readFile(path.join(dataDir, "credentials.json"), "utf8"),
+  );
+  assert.equal(
+    credentials["text:" + textProvider.id].value,
+    "legacy-text-fixture",
+  );
+  assert.equal(
+    credentials["text:" + visionProvider.id].value,
+    "legacy-vision-fixture",
+  );
   await app.close();
   app = undefined;
   await launch();
@@ -208,7 +220,7 @@ try {
   );
   assert.equal(requests.length, 2);
   checks.push(
-    "First save backs up the complete original v2 config; schema v15 and encrypted keys survive restart without duplicate providers or plaintext secrets",
+    "First save backs up the original v2 config; schema v15 and local keys survive restart; portable config excludes credentials",
   );
   await app.close();
   app = undefined;
@@ -257,7 +269,7 @@ try {
     assert.equal(requests.at(-1).auth, "Bearer legacy-text-fixture");
   }
   checks.push(
-    "Schema v4 splits a multi-model account, retaining per-action and OCR bindings and endpoint-scoped OS-encrypted credentials on all three providers",
+    "Schema v4 splits a multi-model account, retaining per-action and OCR bindings and endpoint-scoped local credentials on all three providers",
   );
   await writeFile(
     "docs/upgrade-verification.json",

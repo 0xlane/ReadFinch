@@ -23,6 +23,7 @@ import { CaptureOverlay } from "./Capture";
 import { InteractionPanel } from "./InteractionPanel";
 import { BrandMark } from "./ui";
 import { useDesktop } from "./useDesktop";
+import { PermissionNotice } from "./PermissionNotice";
 
 const navigation = [
   ["general", "通用", SlidersHorizontal],
@@ -161,7 +162,11 @@ function SettingsApp({
                 ? t("自动划词已暂停")
                 : snapshot.nativeState === "ready"
                   ? t("划词服务运行中")
-                  : t("划词服务需检查")}
+                  : snapshot.permissions?.accessibility === false ||
+                      (snapshot.platform.startsWith("darwin") &&
+                        snapshot.nativeState === "limited")
+                    ? t("需要辅助功能权限")
+                    : t("划词服务需检查")}
             </span>
           </div>
           <span className="app-version">
@@ -170,6 +175,7 @@ function SettingsApp({
         </div>
       </aside>
       <main className="settings-content" ref={content}>
+        <PermissionNotice snapshot={snapshot} tab={tab} />
         <Settings
           snapshot={snapshot}
           onSnapshot={onSnapshot}

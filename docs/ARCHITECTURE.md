@@ -2,7 +2,7 @@
 
 ## 选型
 
-Electron 45 + TypeScript + React。Electron 提供跨平台窗口、非激活浮标、全局快捷键、屏幕源、剪贴板、系统加密和桌面分发。Windows 使用独立 .NET Framework 辅助进程读取 UI Automation，避免被某个应用阻塞时冻结主进程。macOS 使用 Swift/AX；Linux 分开处理 X11 与 Wayland。
+Electron 45 + TypeScript + React。Electron 提供跨平台窗口、非激活浮标、全局快捷键、屏幕源、剪贴板和桌面分发。Windows 使用独立 .NET Framework 辅助进程读取 UI Automation，避免被某个应用阻塞时冻结主进程。macOS 使用 Swift/AX；Linux 分开处理 X11 与 Wayland。
 
 Windows 选区读取保留标准 Edit 控件的原位替换校验。其余界面从焦点控件、鼠标命中控件及其上层文档寻找 TextPattern；嵌入网页可能由其他进程提供，因此通过原生窗口的父子关系限定前台窗口，不要求提供者与窗口进程 ID 相同。鼠标移向工具栏时可以重新查询上次成功的文档，但不复用旧文字。取消选区、密码框、窗口切换和过长结果都不会留下可用选区。仅插入光标不视为选中文本。`npm run test:selection` 使用独立 Electron 桌面样例验证实际 UIA 读取和工具栏，`-- --packaged` 验证安装包产物；未提供 UIA 文本选区的应用仍需剪贴板或 OCR。
 
@@ -18,7 +18,7 @@ flowchart LR
   Main --> Actions[动作提示词与文字适配器]
   Main --> Store[配置校验 / 原子保存 / 备份]
   Store <--> DAV[条件请求 WebDAV]
-  Main --> Secrets[OS 加密凭据]
+  Main --> Secrets[本机明文凭据]
 ```
 
 | 目录                | 责任                                                         |
@@ -32,11 +32,11 @@ flowchart LR
 
 渲染进程无 Node，开启 context isolation 和 sandbox，CSP 禁止网络访问、脚本注入与表单提交。所有模型和同步网络请求仅在主进程。Markdown 不渲染 HTML、外部图片或可执行链接。自定义动作是保存的 AI 指令，不是 shell 命令。
 
-文字与视觉共用服务商，凭据按服务商 ID 和服务端点绑定。导入同 ID 但不同端点的配置时，旧凭据不会发送到新端点；WebDAV 凭据也按 URL 和用户名绑定。Linux 缺少安全密钥环时，新凭据仅在内存保留。
+文字与视觉共用服务商，凭据按服务商 ID 和服务端点绑定。导入同 ID 但不同端点的配置时，旧凭据不会发送到新端点；WebDAV 凭据也按 URL 和用户名绑定。凭据直接写入本机 `credentials.json`，不依赖系统密钥环；只有迁移旧文件时尝试读取系统加密凭据。
 
 每个运行任务使用独立 ID + AbortController，结果仅发送到创建任务的窗口。用户编辑原文、取消或开始新任务后，旧结果不再更新当前 UI。选区 token 与 AI 任务独立；替换按钮点击时仍需原生助手重新核验目标。
 
-schema v4 使用统一的 `providers` 列表与每账户的 `models` 库，OCR 默认使用固定的离线引擎，也可直接选择服务商和图片模型。预设提供地址和经过官方目录核查的模型候选；不将未知模型标为已具备图片能力。`ModelPicker` 共用于模型库、动作、OCR 和浮窗；用途分配写入独立动作绑定，临时浮窗选择保持为会话状态。`/models`、文字与 `image_url` 图片请求共用 OpenAI 兼容适配器；原生 Ollama 路径已移除。旧 schema 迁移保留 ID 映射，主进程按原端点复制加密凭据。离线资源在构建时校验 SHA-256，运行时没有语言包下载/导入 IPC。
+schema v4 使用统一的 `providers` 列表与每账户的 `models` 库，OCR 默认使用固定的离线引擎，也可直接选择服务商和图片模型。预设提供地址和经过官方目录核查的模型候选；不将未知模型标为已具备图片能力。`ModelPicker` 共用于模型库、动作、OCR 和浮窗；用途分配写入独立动作绑定，临时浮窗选择保持为会话状态。`/models`、文字与 `image_url` 图片请求共用 OpenAI 兼容适配器；原生 Ollama 路径已移除。旧 schema 迁移保留 ID 映射，主进程按原端点复制本机凭据。离线资源在构建时校验 SHA-256，运行时没有语言包下载/导入 IPC。
 
 ## 窗口与配置状态
 
@@ -44,7 +44,7 @@ schema v4 使用统一的 `providers` 列表与每账户的 `models` 库，OCR �
 
 浮窗位置使用 Electron 鼠标和工作区 DIP，内容自适应高度不反复换算窗口宽度。会话 ID 与初始状态查询解决新窗口监听器尚未准备时的事件丢失。退出前停止原生监听，并销毁非激活工具条，避免销毁过程中焦点回调阻止退出。
 
-设置以短时防抖、串行保存和 revision 校验写入。`rebaseDraft` 将保存回执和外部配置变更合并进未修改字段，保留用户仍在编辑的值。主题由主进程保存并广播，系统模式订阅 nativeTheme。凭据保持独立加密存储。
+设置以短时防抖、串行保存和 revision 校验写入。`rebaseDraft` 将保存回执和外部配置变更合并进未修改字段，保留用户仍在编辑的值。主题由主进程保存并广播，系统模式订阅 nativeTheme。凭据保持独立明文存储。
 
 开发环境只有显式设置 `READFINCH_TEST_HOOKS=1` 才能向主进程注入测试选区；打包应用禁止此入口，不暴露为 renderer IPC。
 
@@ -60,7 +60,7 @@ schema v4 使用统一的 `providers` 列表与每账户的 `models` 库，OCR �
 
 保留/适配：选区工具栏、原文对照、流式结果、词典、写作、动作提示词、模型配置、主题、配置可迁移性。
 
-新增桌面能力：原生选区、系统剪贴板、区域截图、离线与模型 OCR、OS 凭据存储、WebDAV 冲突保护、桌面快捷键。
+新增桌面能力：原生选区、系统剪贴板、区域截图、离线与模型 OCR、本机凭据存储、WebDAV 冲突保护、桌面快捷键。
 
 不包含：字幕翻译、浏览器 DOM 注入、全网页翻译、站点规则、浏览器扩展打包、Google 账号/Drive 同步。
 

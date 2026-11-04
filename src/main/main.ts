@@ -19,6 +19,7 @@ import {
   session,
   Menu,
   Tray,
+  systemPreferences,
 } from "electron";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -286,6 +287,7 @@ async function snapshot(): Promise<Snapshot> {
     if (await secrets.get(id, credentialScope(id))) credentialIds.push(id);
   }
   return {
+    permissions: readPermissions(),
     version: app.getVersion(),
     updates: updates.state,
     toolbarPausedUntil,
@@ -293,7 +295,6 @@ async function snapshot(): Promise<Snapshot> {
     config: runtimeConfig(),
     revision: store.revision,
     credentialIds,
-    secureStorage: secrets.available,
     ocrReady: await assetsReady(await assetDir()),
     platform:
       process.platform +
@@ -309,6 +310,36 @@ async function snapshot(): Promise<Snapshot> {
     },
     recovery: store.recovery,
   };
+}
+let permissionsTimer: ReturnType<typeof setInterval> | undefined;
+let previousPermissions = "";
+function readPermissions(): Snapshot["permissions"] {
+  if (process.platform !== "darwin") return null;
+  return {
+    accessibility: systemPreferences.isTrustedAccessibilityClient(false),
+    screen: systemPreferences.getMediaAccessStatus("screen"),
+  };
+}
+function refreshPermissions() {
+  const value = readPermissions();
+  const key = JSON.stringify(value);
+  if (key !== previousPermissions) {
+    previousPermissions = key;
+    broadcast("permissions", value);
+  }
+  return value;
+}
+function requirePermission(permission: "accessibility" | "screen") {
+  const value = refreshPermissions();
+  if (
+    !value ||
+    (permission === "accessibility"
+      ? value.accessibility
+      : value.screen === "granted")
+  )
+    return true;
+  openSettings(permission === "accessibility" ? "general" : "ocr");
+  return false;
 }
 async function configChanged() {
   if (
@@ -670,6 +701,7 @@ function showPill(
 }
 function openSelection(actionId?: string, current?: Selection | null) {
   if (captureBusy) return;
+  if (!requirePermission("accessibility")) return;
   if (
     actionId &&
     !store.config.actions.some(
@@ -843,6 +875,7 @@ function restoreAfterCapture() {
 }
 async function capture() {
   if (captureBusy) throw Error(t("截图正在进行"));
+  if (!requirePermission("screen")) return;
   shortcutGeneration++;
   captureBusy = true;
   captureReturn = panel?.isVisible()
@@ -1521,6 +1554,36 @@ async function handle(
       }
       return { id, snapshot: await configChanged() };
     }
+    case "openPermissionSettings": {
+      if (win !== main || process.platform !== "darwin")
+        throw Error(t("不支持的操作"));
+      const permission = z
+        .enum(["accessibility", "screen"])
+        .parse(arg.permission);
+      if (permission === "accessibility")
+        systemPreferences.isTrustedAccessibilityClient(true);
+      else if (
+        systemPreferences.getMediaAccessStatus("screen") === "not-determined"
+      ) {
+        // Register this app with macOS and show its permission request only after
+        // the user explicitly chooses the permission settings action.
+        await desktopCapturer
+          .getSources({
+            types: ["screen"],
+            thumbnailSize: { width: 1, height: 1 },
+          })
+          .catch(() => {});
+      }
+      await shell.openExternal(
+        "x-apple.systempreferences:com.apple.preference.security?" +
+          (permission === "accessibility"
+            ? "Privacy_Accessibility"
+            : "Privacy_ScreenCapture"),
+      );
+      refreshPermissions();
+      return;
+    }
+    case "getCredential":
     case "saveCredential":
       if (
         win !== main ||
@@ -1529,10 +1592,12 @@ async function handle(
       )
         throw Error(t("凭据字段无效"));
       if (
-        arg.expectedScope !== undefined &&
+        (method === "getCredential" || arg.expectedScope !== undefined) &&
         arg.expectedScope !== credentialScope(arg.id)
       )
         throw Error(t("服务地址已改变，请重新输入 API Key"));
+      if (method === "getCredential")
+        return (await secrets.get(arg.id, credentialScope(arg.id))) ?? "";
       await secrets.set(
         z.string().parse(arg.id),
         z.string().parse(arg.value),
@@ -2139,9 +2204,16 @@ async function boot() {
     main.once("closed", () => clearTimeout(refreshTimer));
   }
   main.once("ready-to-show", () => {
+    const permissions = readPermissions();
+    const needsPermissions =
+      permissions &&
+      (!permissions.accessibility || permissions.screen !== "granted");
     if (
       !atLogin &&
-      (firstLaunch || process.argv.includes("--settings") || !tray)
+      (firstLaunch ||
+        process.argv.includes("--settings") ||
+        !tray ||
+        needsPermissions)
     )
       main.show();
   });
@@ -2152,6 +2224,7 @@ async function boot() {
     }
   });
   main.on("blur", endShortcutRecording);
+  main.on("focus", refreshPermissions);
   main.on("hide", endShortcutRecording);
   main.webContents.on("render-process-gone", endShortcutRecording);
   native.on("selection", showPill);
@@ -2166,6 +2239,10 @@ async function boot() {
     broadcast("selectionInvalid", undefined);
   });
   native.start();
+  if (process.platform === "darwin") {
+    refreshPermissions();
+    permissionsTimer = setInterval(refreshPermissions, 2000);
+  }
   // Integration fixtures drive this coordinator only in development; never
   // expose synthetic selections or test IPC in a packaged application.
   if (!app.isPackaged && process.env.READFINCH_TEST_HOOKS === "1") {
@@ -2239,6 +2316,7 @@ if (!app.requestSingleInstanceLock()) {
 app.on("activate", () => main && openMain());
 app.on("before-quit", () => {
   quitting = true;
+  if (permissionsTimer) clearInterval(permissionsTimer);
   // Non-activating Windows toolbar windows must be destroyed explicitly;
   // waiting for their native close sequence can keep the process alive.
   if (pill && !pill.isDestroyed()) pill.destroy();

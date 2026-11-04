@@ -302,6 +302,27 @@ kbd {
   margin-top: 8px;
   accent-color: var(--accent);
 }
+.permission-notice {
+  margin: 24px 28px 0;
+}
+.permission-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 0;
+}
+.permission-row > div {
+  flex: 1;
+  min-width: 240px;
+}
+.permission-row p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 .boot-message {
   padding: 24px;
   color: var(--muted);

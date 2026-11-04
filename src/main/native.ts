@@ -46,6 +46,7 @@ export class SelectionService extends EventEmitter {
     super();
   }
   start() {
+    this.heartbeat = Date.now();
     if (process.platform === "linux") {
       if (
         process.env.XDG_SESSION_TYPE === "wayland" ||
@@ -87,6 +88,7 @@ export class SelectionService extends EventEmitter {
       }
     });
     this.child.on("error", () => {
+      this.stopWatchdog();
       this.setStatus(
         "选区助手未启动；可框选取词或读取剪贴板，重启后重试",
         "error",
@@ -95,6 +97,7 @@ export class SelectionService extends EventEmitter {
       this.finishReads();
     });
     this.child.on("exit", () => {
+      this.stopWatchdog();
       if (this.state !== "error")
         this.setStatus(
           "选区助手已停止；可框选取词或读取剪贴板，重启后重试",
@@ -104,6 +107,7 @@ export class SelectionService extends EventEmitter {
       this.finishReads();
     });
     this.watchdog = setInterval(() => {
+      if (this.state === "limited") return;
       if (Date.now() - this.heartbeat > 10000) {
         this.stalled = true;
         this.setStatus(
@@ -116,7 +120,10 @@ export class SelectionService extends EventEmitter {
   }
   private receive(event: any) {
     this.heartbeat = Date.now();
-    if (this.stalled && event.type !== "error") {
+    if (
+      this.stalled &&
+      ["heartbeat", "ready", "selection"].includes(event.type)
+    ) {
       this.stalled = false;
       this.setStatus(this.connectedMessage, "ready");
     }
@@ -125,6 +132,11 @@ export class SelectionService extends EventEmitter {
       this.setStatus(event.message, "ready");
     }
     if (event.type === "error") this.setStatus(event.message, "error");
+    if (event.type === "permission") {
+      this.stalled = false;
+      this.invalidate();
+      this.setStatus(event.message, "limited");
+    }
     if (event.type === "selection") {
       this.current = {
         token: event.token,
@@ -297,7 +309,7 @@ export class SelectionService extends EventEmitter {
   }
   stop() {
     if (this.timer) clearInterval(this.timer);
-    if (this.watchdog) clearInterval(this.watchdog);
+    this.stopWatchdog();
     this.child?.kill();
     for (const pending of this.requests.values()) {
       clearTimeout(pending.timer);
@@ -305,5 +317,10 @@ export class SelectionService extends EventEmitter {
     }
     this.requests.clear();
     this.finishReads();
+  }
+  private stopWatchdog() {
+    if (this.watchdog) clearInterval(this.watchdog);
+    this.watchdog = undefined;
+    this.stalled = false;
   }
 }

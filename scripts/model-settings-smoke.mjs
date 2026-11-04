@@ -347,6 +347,8 @@ try {
     "Real text, detection and image HTTP requests use each provider's model, scoped key, headers and temperature",
   );
   await nav("API 提供商");
+  // Provider navigation remembers the previously selected (custom-model) copy.
+  await page.locator(".provider-select").first().click();
   const search = page.getByRole("combobox", { name: "模型", exact: true });
   await search.click();
   await search.fill("gpt-4");
