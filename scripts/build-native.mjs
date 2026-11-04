@@ -57,6 +57,7 @@ if (process.platform === "win32") {
     "swiftc",
     [
       "native/macos/SelectionBridge.swift",
+      "native/macos/SelectionReading.swift",
       "-o",
       "native/bin/readfinch-selection",
     ],

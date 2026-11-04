@@ -26,6 +26,12 @@ Windows 单物理屏已验证 125% 下的选区与 OCR，并在 100% 和 150% �
 
 在 IDEA 的代码编辑器中选中一个标识符即可使用工具栏。若选区没有反应，在 **Settings → Appearance & Behavior → Appearance** 启用 **Support screen readers**，然后重启 IDEA。如果 IDE 使用的 Java 运行时尚未启用 Java Access Bridge，在 **Help → Edit Custom VM Options** 单独添加一行 `-Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge` 后重启。该选项仅作用于配置它的 IDE。伴读雀的 Windows 包已包含读取选区所需的客户端。[JetBrains 无障碍设置](https://www.jetbrains.com/help/idea/accessibility.html) · [Java Access Bridge](https://docs.oracle.com/en/java/javase/21/access/enabling-and-testing-java-access-bridge.html)
 
+### 在 macOS 中划词
+
+在「系统设置 → 隐私与安全性 → 辅助功能」中允许伴读雀读取选区。授权后选区助手会自动重新连接。伴读雀优先读取当前控件的选中文字，再尝试按选区范围或网页文本标记读取。键盘选词时，如果鼠标远离选区，工具栏按系统提供的文字边界定位。未提供边界的应用会使用当前鼠标位置。
+
+网页文本标记的处理参考了 Easydict 所用的 SelectedTextKit。辅助功能与应用兼容性的背景可参阅 [SelectedTextKit 的取词实现](https://github.com/tisfeng/SelectedTextKit/blob/93dc960a5ef8d52de98af41d4abd7a89576d091c/Sources/SelectedTextKit/Accessibility/AXManager.swift#L56-L115)、[Bob 的取词权限说明](https://bobtranslate.com/faq/selection-error.html) 和 [Electron 的辅助功能接口](https://www.electronjs.org/docs/latest/tutorial/accessibility)。
+
 ## 更新方式
 
 Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重启更新。Windows 便携版、macOS 与 Linux DEB 提供校验后的下载包，由用户手动安装。macOS 首次发布使用 ad-hoc 签名，尚无 Apple 开发者证书与公证，因此不启用 Squirrel.Mac 自动替换。所有平台共享默认开启的自动检查、GitHub 优先与 gh-proxy 回退。详见 [更新机制](UPDATES.md)。

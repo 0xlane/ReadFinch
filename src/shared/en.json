@@ -471,6 +471,7 @@
   "伴读雀启动失败": "ReadFinch could not start",
   "正在连接系统选区": "Connecting to system selection",
   "系统选区已连接": "System selection connected",
+  "请在系统设置 → 隐私与安全性 → 辅助功能中允许伴读雀读取选区。": "Allow ReadFinch to read selected text in System Settings → Privacy & Security → Accessibility.",
   "Wayland：使用框选取词或剪贴板；截图由桌面门户确认": "Wayland: use screen capture or clipboard. Your desktop confirms screen captures.",
   "X11：正在检查 PRIMARY 选区支持": "X11: checking PRIMARY selection support",
   "选区助手未启动；可框选取词或读取剪贴板，重启后重试": "Selection helper unavailable. Use capture or clipboard, or restart to retry.",

@@ -500,6 +500,9 @@ function createWindow(
       process.platform === "win32" ? "icon.ico" : "icon.png",
     ),
     autoHideMenuBar: true,
+    ...(process.platform === "darwin" && (mode === "pill" || mode === "panel")
+      ? { type: "panel" }
+      : {}),
     ...options,
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
@@ -509,6 +512,12 @@ function createWindow(
       webSecurity: true,
     },
   });
+  if (mode === "pill" && process.platform === "darwin") {
+    win.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true,
+    });
+  }
   const ownerId = win.webContents.id;
   windows.add(win);
   function releaseSpeech() {
@@ -565,6 +574,12 @@ function hideToolbar() {
 }
 function selectionAnchor(selection: Selection) {
   const cursor = screen.getCursorScreenPoint();
+  if (process.platform === "darwin") {
+    // The AX helper chooses the pointer for mouse selections and the text
+    // bounds for distant or keyboard selections, in the same units as Electron.
+    const point = { x: Math.round(selection.x), y: Math.round(selection.y) };
+    return toolbarAnchor(cursor, point, screen.getDisplayNearestPoint(point).bounds, true);
+  }
   if (process.platform !== "win32") return cursor;
   const point = screen.screenToDipPoint({ x: selection.x, y: selection.y });
   return toolbarAnchor(cursor, point, screen.getDisplayNearestPoint(point).bounds);
