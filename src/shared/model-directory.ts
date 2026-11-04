@@ -84,20 +84,79 @@ export function parseDirectory(
   );
 }
 
-const namespaces: Record<string, string> = {
-  gemini: "google",
-  mimo: "xiaomi",
-  qwen: "qwen",
-  mistral: "mistralai",
-  xai: "x-ai",
-  moonshotai: "moonshotai",
-};
-// A bare vendor ID can match the complete model part of a canonical lab/model ID.
-// Never remove namespaces from the requested ID or guess from partial names.
+const namespaces = new Map(
+  Object.entries({
+    gemini: "google",
+    mimo: "xiaomi",
+    qwen: "alibaba",
+    qwenlm: "alibaba",
+    "alibaba-cloud": "alibaba",
+    "deepseek-ai": "deepseek",
+    "meta-llama": "meta",
+    mistralai: "mistral",
+    "x-ai": "xai",
+    "x.ai": "xai",
+    "z-ai": "zhipuai",
+    "zai-org": "zhipuai",
+    thudm: "zhipuai",
+    moonshot: "moonshotai",
+    "xiaomi-mimo": "xiaomi",
+  }),
+);
+function namespace(name: string) {
+  return namespaces.get(name) ?? name;
+}
+const hostedCatalogs = new Set([
+  "openrouter",
+  "fireworks",
+  "azure",
+  "bedrock",
+  "huggingface",
+  "siliconflow",
+  "togetherai",
+]);
+const knownCreators = new Set([
+  "openai",
+  "anthropic",
+  "amazon",
+  ...namespaces.values(),
+]);
+
+// These spellings identify catalog records only. Keep the account's original
+// model ID for API calls, selection, and caching.
+function identity(id: string) {
+  const parts = id.trim().toLowerCase().split("/");
+  let model = parts.pop()!;
+  let owner = parts.pop() ?? "";
+  if (owner === "models") {
+    // Vertex publishers/google/models/… and Gemini models/… are resource paths.
+    // Fireworks' accounts/<account>/models/… names a host, not the model creator.
+    owner = parts.at(-2) === "publishers" ? parts.at(-1)! : "";
+  }
+  const bedrock =
+    /^(?:(?:us|eu|apac|au|jp|global)\.)?(anthropic|amazon|meta|mistral|cohere|deepseek|openai|qwen)\.(.+)$/.exec(
+      model,
+    );
+  if (bedrock) {
+    owner = bedrock[1];
+    model = bedrock[2].replace(/-v\d+:\d+$/, "");
+  }
+  model = model
+    .replace(/(?:\s*\(free\)|:(?:free|cloud|nitro|floor))$/, "")
+    .replace(/@(20\d{6})$/, "-$1")
+    .replace(/(\d)[.p](?=\d)/g, "$1-")
+    .replace(/[\s_-]+/g, "-");
+  return { owner: namespace(owner), model };
+}
+
+type DirectoryIndex = Map<string, DirectoryEntry | null>;
+
 export class ModelDirectory {
   private readonly exact = new Map<string, DirectoryEntry>();
   private readonly router = new Map<string, DirectoryEntry>();
-  private readonly bare = new Map<string, DirectoryEntry | null>();
+  private readonly scoped: DirectoryIndex = new Map();
+  private readonly bare: DirectoryIndex = new Map();
+  private readonly owners = new Set<string>();
   private readonly fallbackEntries = new WeakSet<DirectoryEntry>();
   constructor(data: DirectoryData) {
     for (const source of data.bundledSources ?? [])
@@ -112,10 +171,32 @@ export class ModelDirectory {
         this.exact.set(entry.id, entry);
     }
     for (const entry of this.exact.values()) {
-      const parts = entry.id.split("/");
-      if (parts.length !== 2) continue;
-      const id = parts[1];
-      this.bare.set(id, this.bare.has(id) ? null : entry);
+      const { owner, model } = identity(entry.id);
+      if (owner) {
+        this.owners.add(owner);
+        this.index(this.scoped, owner + "/" + model, entry, owner);
+      }
+      this.index(this.bare, model, entry, owner);
+    }
+  }
+  private index(
+    index: DirectoryIndex,
+    key: string,
+    entry: DirectoryEntry,
+    owner: string,
+  ) {
+    const existing = index.get(key);
+    if (existing === null) return;
+    if (
+      existing &&
+      (identity(existing.id).owner !== owner || existing.kind !== entry.kind)
+    ) {
+      index.set(key, null);
+    } else if (
+      !existing ||
+      (this.isBundled(existing) && !this.isBundled(entry))
+    ) {
+      index.set(key, entry);
     }
   }
   // null means the live directory positively reports a collision. Never revive
@@ -129,13 +210,31 @@ export class ModelDirectory {
       (!this.isBundled(routerEntry) || this.isBundled(this.exact.get(id)!))
     )
       return routerEntry;
-    return (
-      this.exact.get(id) ??
-      (id.includes("/")
-        ? undefined
-        : (this.exact.get((namespaces[preset] ?? preset) + "/" + id) ??
-          this.bare.get(id)))
+    const exact = this.exact.get(id);
+    if (exact) return exact;
+    const { owner, model } = identity(id);
+    const scope = owner || namespace(preset);
+    const resolve = (key: string) => {
+      const scoped = this.scoped.get(scope + "/" + key);
+      if (scoped !== undefined) return scoped;
+      // An explicit creator must not silently resolve to a different one.
+      if (
+        owner &&
+        !hostedCatalogs.has(owner) &&
+        (this.owners.has(owner) || knownCreators.has(owner))
+      )
+        return undefined;
+      return this.bare.get(key);
+    };
+    const candidate = resolve(model);
+    if (candidate !== undefined) return candidate;
+    // Fall back only to an actual undated catalog entry. Preserve named
+    // variants, four-digit releases and OpenAI's dashed snapshot dates.
+    const base = model.replace(
+      /-(?:20\d{2}|2[3-9])(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])$/,
+      "",
     );
+    if (base !== model) return resolve(base);
   }
   lookup(preset: string, id: string) {
     return this.match(preset, id) ?? undefined;

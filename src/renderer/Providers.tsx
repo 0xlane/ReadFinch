@@ -1,7 +1,7 @@
 import { t } from "../shared/i18n";
 import { RequestHeaders } from "./RequestHeaders";
 import { ProviderProxySettings } from "./ProviderProxySettings";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Plus, ChevronRight } from "lucide-react";
 import {
   createProvider,
@@ -24,7 +24,12 @@ import { modelKind } from "../shared/model-capabilities";
 import { ModelOverride } from "./ModelCapability";
 import { ProviderSpecificSettings } from "./ProviderSpecificSettings";
 import { ConnectionTestButton } from "./ConnectionTestButton";
+import { ProviderNotifications } from "./ProviderNotifications";
 import { Field } from "./ui";
+import {
+  AdvancedFieldHeading,
+  ProviderOptionsField,
+} from "./ProviderAdvancedField";
 import { ProviderIcon, ProviderSwitch } from "./provider-ui";
 import { ProviderModels } from "./ProviderModels";
 import { ProviderCatalog } from "./ProviderCatalog";
@@ -38,7 +43,7 @@ type ProviderProps = ModelCatalogAccess & {
   duplicate: (id: string) => Promise<string | undefined>;
   credential: (id: string, action: ReactNode) => ReactNode;
   test: (id: string) => Promise<{ durationMs: number }>;
-  credentialState: Record<string, { available: boolean; version: number }>;
+  credentialVersions: Record<string, number>;
   busy: boolean;
 };
 
@@ -135,7 +140,7 @@ export function Providers(props: ProviderProps) {
     select(fallback.id);
   }
   return (
-    <>
+    <ProviderNotifications>
       <section aria-labelledby="provider-config-title" id="provider-config">
         <div className="provider-section-intro">
           <h2 id="provider-config-title">{t("提供商配置")}</h2>
@@ -247,7 +252,7 @@ export function Providers(props: ProviderProps) {
         onChange={onChange}
       />
       {adding && <ProviderCatalog onSelect={add} onClose={closeCatalog} />}
-    </>
+    </ProviderNotifications>
   );
 }
 
@@ -263,7 +268,7 @@ function ProviderEditor({
   remove,
   canRemove,
   savedEndpoints,
-  credentialState,
+  credentialVersions,
   ...catalog
 }: ProviderProps & {
   provider: TextProfile;
@@ -276,6 +281,7 @@ function ProviderEditor({
   const [showHelp, setShowHelp] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [headerVersion, setHeaderVersion] = useState(0);
+  const temperatureId = useId();
   const model = provider.model;
   const preset = providerPreset(provider.preset);
   const translationOnly = isTranslationOnly(provider);
@@ -291,7 +297,7 @@ function ProviderEditor({
     <ConnectionTestButton
       identity={JSON.stringify([
         provider,
-        credentialState[provider.id]?.version,
+        credentialVersions["text:" + provider.id] ?? 0,
         headerVersion,
       ])}
       disabled={busy || (!model && !translationOnly) || !provider.enabled}
@@ -369,53 +375,76 @@ function ProviderEditor({
           <ChevronRight size={15} />
           {t("高级选项")}
         </summary>
-        {!translationOnly && provider.model && (
-          <ModelOverride
-            provider={provider}
-            directory={catalog.directory}
-            onChange={(p) => onChange(updateProviderModel(config, p))}
-          />
-        )}
-        {!translationOnly && modelKind(provider) !== "speech" && (
-          <Field label={t("温度")} hint={t("留空使用提供商默认值。")}>
-            <input
-              type="number"
-              step="0.01"
-              min={0}
-              max={2}
-              placeholder={t("默认")}
-              value={provider.temperature ?? ""}
-              onChange={(e) =>
-                change({
-                  temperature:
-                    e.target.value === "" ? null : Number(e.target.value),
-                })
-              }
+        {advanced && (
+          <div className="provider-advanced-fields">
+            {!translationOnly &&
+              modelKind(provider, catalog.directory) !== "speech" && (
+                <>
+                  <div className="provider-temperature">
+                    <AdvancedFieldHeading
+                      id={temperatureId}
+                      label={t("温度")}
+                      help={t(
+                        "较低的温度使回答更稳定，较高的温度使回答更多样。留空使用提供商默认值。",
+                      )}
+                    />
+                    <input
+                      id={temperatureId}
+                      aria-describedby={temperatureId + "-help"}
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      max={2}
+                      placeholder={t("默认")}
+                      value={provider.temperature ?? ""}
+                      onChange={(e) =>
+                        change({
+                          temperature:
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <ProviderOptionsField
+                    options={provider.providerOptions}
+                    preset={provider.preset}
+                    onChange={(providerOptions) => change({ providerOptions })}
+                  />
+                </>
+              )}
+            {savedEndpoints[provider.id] === provider.endpoint && (
+              <RequestHeaders
+                onChange={() => setHeaderVersion((v) => v + 1)}
+                key={provider.id + "|" + provider.endpoint}
+                provider={provider}
+              />
+            )}
+            {!translationOnly && provider.model && (
+              <ModelOverride
+                provider={provider}
+                directory={catalog.directory}
+                onChange={(p) => onChange(updateProviderModel(config, p))}
+              />
+            )}
+            <ProviderProxySettings
+              value={provider.proxy}
+              onChange={(proxy) => change({ proxy })}
             />
-          </Field>
+            <Field label={t("请求超时（秒）")}>
+              <input
+                type="number"
+                min={1}
+                max={600}
+                value={provider.timeoutMs / 1000}
+                onChange={(e) =>
+                  change({ timeoutMs: Number(e.target.value) * 1000 })
+                }
+              />
+            </Field>
+          </div>
         )}
-        <ProviderProxySettings
-          value={provider.proxy}
-          onChange={(proxy) => change({ proxy })}
-        />
-        {advanced && savedEndpoints[provider.id] === provider.endpoint && (
-          <RequestHeaders
-            onChange={() => setHeaderVersion((v) => v + 1)}
-            key={provider.id + "|" + provider.endpoint}
-            provider={provider}
-          />
-        )}
-        <Field label={t("请求超时（秒）")}>
-          <input
-            type="number"
-            min={1}
-            max={600}
-            value={provider.timeoutMs / 1000}
-            onChange={(e) =>
-              change({ timeoutMs: Number(e.target.value) * 1000 })
-            }
-          />
-        </Field>
       </details>
       <footer>
         <button

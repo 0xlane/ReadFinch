@@ -5,7 +5,7 @@
 | 能力            | Windows x64（当前环境）                         | macOS                                    | Linux X11                                   | KDE Plasma / Wayland                                             |
 | --------------- | ----------------------------------------------- | ---------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
 | 应用构建、主 UI | 已测                                            | 实现/待测                                | 实现/待测                                   | 实现/待测                                                        |
-| 自动选区        | UIA、标准 Edit、嵌入网页选区已测                | AXSelectedText 实现/待测，需辅助功能权限 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
+| 自动选区        | 标准 Edit、UIA 嵌入网页和 Java Swing 选区已测    | AXSelectedText 实现/待测，需辅助功能权限 | PRIMARY 实现/待测，需 xclip、xdotool、xprop | 受限：无通用全局选区协议，使用显式剪贴板入口                     |
 | 不抢焦点浮标    | showInactive + focusable:false，前台样例已测    | 实现/待测                                | 实现/待测                                   | 不提供自动浮标                                                   |
 | 全局快捷键      | 注册、录入/自动保存、冲突及动作回调已测；真实前台按键取词待测 | 实现/待测                         | 实现/待测                                   | GlobalShortcuts portal，需桌面确认/支持；可用托盘入口             |
 | 区域截图        | 截图、取消/恢复、125% 缩放裁剪与前台中英文样例已测 | 同路径，需系统录屏权限，待测             | 同路径，待测                                | Screenshot portal 的交互区域选择；需 python3-gi 与门户后端，待测 |
@@ -16,9 +16,15 @@
 | 配置/WebDAV     | 本机真实 HTTP 双配置测试已测                    | 平台无关逻辑已测，目标机待测             | 同左                                        | 同左                                                             |
 | 打包            | 见 VERIFICATION.md 的实际产物                   | 配置已写，签名/公证/目标机待测           | AppImage/deb 配置，目标机待测               | 同左，并校验 desktop ID                                          |
 
-当前桌面为 Windows，设备像素比为 1.25。主 UI、原生选区与图像 OCR 已在这个缩放比例下检查。多显示器、负坐标屏幕、不同 DPI 混合布局仍需人工检查，不能用单显示器测试推断这些场景。
+Windows 单物理屏已验证 125% 下的选区与 OCR，并在 100% 和 150% 两次独立运行中检查了工具栏的桌面像素、原生命中区域和菜单位置。双屏相对位置和负坐标有布局测试。Windows 10 双物理屏、不同 DPI 混合布局仍需在对应设备上复测。
 
-`test:input` 验证真实 `desktopCapturer`、框选操作及裁剪像素比对。`test:native` 使用独立标准编辑器验证真实选区、焦点、替换、过期保护与屏幕 OCR；`test:selection` 使用独立 Electron 应用验证焦点和正文分离、跨站嵌入文档、清除选区、密码框及工具栏恢复。记录见 [原生测试](native-smoke.json) 和 [打包版选区测试](selection-compatibility-packaged.json)。这些样例不代表所有第三方应用均已测试；未公开 UIA 文本选区的界面仍需 OCR 或剪贴板。
+工具栏按选区所在显示器的工作区定位。指针右侧或下方放不下时，会分别向左或向上展开。重复上报同一选区时沿用已显示的窗口。选中另一处相同单词时会重新定位。可参阅 [STranslate 的跨屏定位实现](https://github.com/STranslate/STranslate/blob/8925ba829d1749fc90da1b8ec0cc8efbde77a5f9/src/STranslate/Views/MouseSelectionIconWindow.xaml.cs#L55-L102) 和 [GoldenDict 的取词窗口实现](https://github.com/goldendict/goldendict/blob/b4f3fcdc4861975ec49ae2bb894f907c072fc8f6/scanpopup.cc)。
+
+`test:input` 验证真实 `desktopCapturer`、框选操作及裁剪像素比对。`test:native` 使用独立标准编辑器验证真实选区、焦点、替换、过期保护与屏幕 OCR。`test:selection` 使用独立 Electron 应用验证焦点和正文分离、跨站嵌入文档、清除选区、密码框及工具栏恢复。`test:selection:java` 使用独立 Swing 编辑器验证 Java 选区及工具栏。记录见 [原生测试](native-smoke.json) 和 [打包版网页选区测试](selection-compatibility-packaged.json)。
+
+### 在 IntelliJ IDEA 编辑器中划词
+
+在 IDEA 的代码编辑器中选中一个标识符即可使用工具栏。若选区没有反应，在 **Settings → Appearance & Behavior → Appearance** 启用 **Support screen readers**，然后重启 IDEA。如果 IDE 使用的 Java 运行时尚未启用 Java Access Bridge，在 **Help → Edit Custom VM Options** 单独添加一行 `-Djavax.accessibility.assistive_technologies=com.sun.java.accessibility.AccessBridge` 后重启。该选项仅作用于配置它的 IDE。伴读雀的 Windows 包已包含读取选区所需的客户端。[JetBrains 无障碍设置](https://www.jetbrains.com/help/idea/accessibility.html) · [Java Access Bridge](https://docs.oracle.com/en/java/javase/21/access/enabling-and-testing-java-access-bridge.html)
 
 ## 更新方式
 
@@ -29,6 +35,7 @@ Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重
 1. 打开普通记事本/标准 Edit 及浏览器，实际拖动选中一段非敏感样例文字。
    另用 Shift + 方向键选择另一段文字，按当前配置的翻译、词典、润色快捷键；确认直接打开对应卡片且原文为新选区。暂停自动浮标后重试；取消选区后再按，应显示无选区提示。输入框中设置新的组合键后确认旧键释放、重启仍有效；录入和编辑提示词时不得误运行动作。
 2. 确认浮标出现时原应用仍有焦点，且没有模型请求。
+   在双屏机器上分别在两个屏幕选词，尤其是资源管理器的文件重命名输入框。确认工具栏完整显示，再悬停「更多指令」并移入菜单。将鼠标留在主屏、用键盘在副屏选择代码，确认工具栏出现在副屏。
 3. 点击图标工具条的翻译、词典和润色，使用已配置的真实文字服务；验证原文折叠、复制、取消、服务切换、重试、Esc、失焦收起及固定后保留位置。
 4. 标准 Edit 中生成结果后检查替换；随后改变原选区或目标内容，再用旧结果替换，必须被拒绝。
 5. 触发区域截图，分别在不同显示器和缩放比例裁剪样例文字；检查像素映射、取消和 OCR。

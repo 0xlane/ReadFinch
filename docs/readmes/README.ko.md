@@ -14,7 +14,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 | 플랫폼 | 텍스트를 가져오는 방법 |
 | --- | --- |
-| Windows | UI Automation으로 전경 앱이 제공하는 선택 텍스트를 읽습니다. |
+| Windows | UI Automation과 Java Access Bridge를 통해 활성 앱에서 선택한 텍스트를 읽습니다. |
 | macOS | 선택 텍스트에는 손쉬운 사용 권한이, 화면 캡처에는 화면 기록 권한이 필요합니다. |
 | Linux | X11에서는 PRIMARY 선택 영역을 사용합니다(`xclip`, `xdotool`, `xprop` 필요). Wayland에서는 클립보드 또는 데스크톱 스크린샷 포털을 사용하며 단축키 지원은 데스크톱 환경에 따라 달라집니다. |
 
@@ -153,7 +153,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 ### 소스에서 빌드
 
-로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러가, macOS에서는 Xcode Command Line Tools가 추가로 필요합니다.
+로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러를 설치하고 `JAVA_HOME`을 x64 OpenJDK(예: Temurin 21) 경로로 설정하세요. macOS에서는 Xcode Command Line Tools가 필요합니다.
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

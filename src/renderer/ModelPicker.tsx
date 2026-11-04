@@ -9,6 +9,7 @@ import {
   toggleCustomModel,
 } from "../shared/provider-model";
 import { ModelBadge, ModelSummary, modelKindLabel } from "./ModelCapability";
+import { ProviderErrorNotice } from "./ProviderNotifications";
 import { bundledDirectory } from "../shared/model-capabilities";
 import type { ModelDirectory } from "../shared/model-directory";
 
@@ -41,6 +42,7 @@ export function ModelPicker({
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const fetchButton = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [above, setAbove] = useState(false);
   const [query, setQuery] = useState("");
@@ -193,12 +195,13 @@ export function ModelPicker({
             <button
               type="button"
               className="model-fetch-button"
+              ref={fetchButton}
               disabled={busy}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => void refresh()}
             >
               <RefreshCw size={13} className={busy ? "spin" : ""} />
-              {t(busy ? "获取中…" : error ? "重试获取模型" : "获取模型列表")}
+              {t(busy ? "获取中…" : "获取模型列表")}
             </button>
           )}
         </div>
@@ -374,9 +377,12 @@ export function ModelPicker({
         </p>
       )}
       {error && (
-        <p className="model-fetch-error" role="alert">
-          {error}
-        </p>
+        <ProviderErrorNotice
+          title={t("获取模型列表失败")}
+          message={error}
+          onClose={() => setError("")}
+          trigger={fetchButton}
+        />
       )}
     </div>
   );

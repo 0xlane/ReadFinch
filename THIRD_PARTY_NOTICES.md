@@ -29,6 +29,8 @@ The bundled provider marks come from [LobeHub Icons](https://github.com/lobehub/
 
 ## Runtime dependencies and assets
 
+Windows packages include the OpenJDK Java Access Bridge client and its Microsoft Visual C++ runtime dependency (`vcruntime140.dll`) from the build JDK. The Windows release workflow uses Eclipse Temurin 21. The JDK version and its license notices are included in `resources/native/bin/openjdk/`. The OpenJDK client is distributed under GPL-2.0 with the Classpath Exception. [OpenJDK 21 update sources](https://github.com/openjdk/jdk21u) · [Temurin source archives by release](https://github.com/adoptium/temurin21-binaries/releases).
+
 The model capability snapshot contains model identifiers, names, modalities and context limits from [Models.dev](https://models.dev/) (Copyright © 2025 models.dev, [MIT license](src/renderer/public/licenses/models-dev.txt)) and the [OpenRouter public model directory](https://openrouter.ai/docs/api/api-reference/models/list-all-models-and-their-properties). The snapshot contains no model weights.
 
 - franc 6.2.0 and its language-model dependencies retain their MIT notices.

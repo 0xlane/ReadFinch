@@ -72,7 +72,7 @@ import {
   type ToolbarMenu,
   type ToolbarView,
 } from "../shared/toolbar";
-import { toolbarWindowLayout } from "../core/toolbar-placement";
+import { toolbarAnchor, toolbarWindowLayout } from "../core/toolbar-placement";
 import { basicLanguage, detectLanguage } from "../core/language";
 import { parseOutput, jsonContract } from "../shared/action-output";
 import { promptVariables } from "../shared/config";
@@ -159,6 +159,8 @@ let speechOwner:
 let settingsLocation: SettingsLocation = { tab: "general", request: 0 };
 let toolbarFrame = "";
 let toolbarRegion = "";
+let toolbarReady = false;
+let toolbarRequested = false;
 let toolbarMenu: ToolbarMenu = "none";
 let toolbarPausedUntil = 0;
 let resumeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -326,7 +328,7 @@ async function configChanged() {
     !selection ||
     !toolbarEnabled(store.config, selection.app, toolbarPausedUntil)
   )
-    pill?.hide();
+    hideToolbar();
   else if (pill?.isVisible()) updateToolbar();
   registerShortcuts();
   updateTray();
@@ -552,23 +554,38 @@ function openSettings(
     actionId,
     request: settingsLocation.request + 1,
   };
-  pill?.hide();
+  hideToolbar();
   dismissPanel();
   openMain();
   send(main, "settings", settingsLocation);
 }
-function updateToolbar(): ToolbarView | null {
-  const selection = native.current;
-  if (!selection || !pill || pill.isDestroyed()) return null;
+function hideToolbar() {
+  toolbarRequested = false;
+  if (pill?.isVisible()) pill.hide();
+}
+function selectionAnchor(selection: Selection) {
+  const cursor = screen.getCursorScreenPoint();
+  if (process.platform !== "win32") return cursor;
+  const point = screen.screenToDipPoint({ x: selection.x, y: selection.y });
+  return toolbarAnchor(cursor, point, screen.getDisplayNearestPoint(point).bounds);
+}
+function currentToolbarLayout() {
   const items = toolbarItems(store.config);
-  const layout = toolbarWindowLayout(
+  return toolbarWindowLayout(
     triggerAnchor,
     screen.getDisplayNearestPoint(triggerAnchor).workArea,
     items.filter((i) => i.pinned).length,
     items.length,
     toolbarMenu,
-    process.platform !== "darwin",
+    // A cached HWND region can clip the entire strip after a mixed-DPI move.
+    // On Windows size the window to the visible controls, without a region.
+    process.platform === "linux",
   );
+}
+function updateToolbar(): ToolbarView | null {
+  const selection = native.current;
+  if (!toolbarRequested || !selection || !pill || pill.isDestroyed()) return null;
+  const layout = currentToolbarLayout();
   const frame = JSON.stringify(layout.bounds);
   if (frame !== toolbarFrame) {
     pill.setBounds(layout.bounds);
@@ -609,25 +626,23 @@ async function saveToolbarPause(until: number) {
   armToolbarResume();
   return configChanged();
 }
-function showPill(
-  selection: Selection,
-  anchor = screen.getCursorScreenPoint(),
-) {
+function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
   if (quitting || captureBusy || selectionReadCount) return;
   const cfg = store.config;
   if (!toolbarEnabled(cfg, selection.app, toolbarPausedUntil)) {
-    pill?.hide();
+    hideToolbar();
     return;
   }
-  // Cursor coordinates are already DIPs, unlike Windows UIA rectangles.
+  toolbarRequested = true;
   triggerAnchor = anchor;
   toolbarMenu = "none";
   if (!pill || pill.isDestroyed()) {
-    toolbarFrame = "";
+    const { bounds } = currentToolbarLayout();
+    toolbarFrame = JSON.stringify(bounds);
     toolbarRegion = "";
+    toolbarReady = false;
     pill = createWindow("pill", {
-      width: 190,
-      height: 40,
+      ...bounds,
       minWidth: 1,
       minHeight: 1,
       resizable: false,
@@ -637,7 +652,27 @@ function showPill(
       skipTaskbar: true,
       alwaysOnTop: true,
       hasShadow: false,
+      thickFrame: false,
+      maximizable: false,
+      fullscreenable: false,
     });
+    if (process.platform === "win32") {
+      const win = pill;
+      win.hookWindowMessage(0x02e0, () => {
+        // Let Windows apply WM_DPICHANGED before checking its suggested size.
+        setImmediate(() => {
+          if (quitting || !toolbarRequested || win.isDestroyed()) return;
+          const desired = currentToolbarLayout().bounds;
+          const actual = win.getBounds();
+          if ((["x", "y", "width", "height"] as const).some(
+            key => Math.abs(desired[key] - actual[key]) > 1,
+          )) {
+            toolbarFrame = "";
+            updateToolbar();
+          }
+        });
+      });
+    }
     pill.on("hide", () => {
       toolbarMenu = "none";
       send(pill, "toolbarState", null);
@@ -649,7 +684,9 @@ function showPill(
       }
     });
     pill.once("ready-to-show", () => {
+      toolbarReady = true;
       if (
+        toolbarRequested &&
         !quitting &&
         !captureBusy &&
         !selectionReadCount &&
@@ -659,16 +696,16 @@ function showPill(
         toolbarEnabled(store.config, native.current.app, toolbarPausedUntil)
       ) {
         updateToolbar();
-        pill!.showInactive();
+        if (!pill.isVisible()) pill.showInactive();
       }
     });
-  } else {
-    pill.setFocusable(false);
+  } else if (toolbarReady) {
+    if (process.platform !== "win32" || pill.isFocusable()) pill.setFocusable(false);
     updateToolbar();
-    pill.showInactive();
+    if (!pill.isVisible()) pill.showInactive();
   }
 }
-function openSelection(actionId?: string, current?: Selection | null) {
+function openSelection(actionId?: string, current?: Selection | null, javaBridgeUnavailable = false) {
   if (captureBusy) return;
   if (
     actionId &&
@@ -688,6 +725,7 @@ function openSelection(actionId?: string, current?: Selection | null) {
       id: randomUUID(),
       source: "selection-unavailable",
       text: "",
+      javaBridgeUnavailable,
     });
     return;
   }
@@ -699,7 +737,9 @@ function openSelection(actionId?: string, current?: Selection | null) {
       selection: s,
       actionId,
     },
-    pill?.isVisible() ? triggerAnchor : screen.getCursorScreenPoint(),
+    pill?.isVisible() && s.token === native.current?.token
+      ? triggerAnchor
+      : selectionAnchor(s),
   );
 }
 async function openClipboard() {
@@ -724,7 +764,7 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
     panelPlacedByUser = false;
     panelPinned = false;
   }
-  pill?.hide();
+  hideToolbar();
   const deliver = () => {
     if (!reusePinned) {
       const bounds = panelBounds(panelPlacement!, 220);
@@ -806,16 +846,17 @@ async function dispatchShortcut(id: string) {
   selectionReadCount++;
   try {
     let selection: Selection | undefined;
+    let javaBridgeUnavailable = false;
     if (nextSelectionForTest) {
       const fixture = nextSelectionForTest;
       nextSelectionForTest = undefined;
       await new Promise((resolve) => setTimeout(resolve, fixture.delay));
       selection = fixture.value;
-    } else selection = await native.readCurrent();
+    } else selection = await native.readCurrent(() => { javaBridgeUnavailable = true; });
     if (generation !== shortcutGeneration || captureBusy || quitting) return;
     if (!shortcutTestTarget && BrowserWindow.getFocusedWindow() === main)
       return;
-    openSelection(binding.actionId, selection ?? null);
+    openSelection(binding.actionId, selection ?? null, javaBridgeUnavailable);
   } catch {
     if (generation === shortcutGeneration && !quitting && !captureBusy)
       openSelection(undefined, null);
@@ -852,7 +893,7 @@ async function capture() {
       : undefined;
   captureReturnPinned = panelPinned;
   native.invalidate();
-  pill?.hide();
+  hideToolbar();
   dismissPanel();
   main.hide();
   try {
@@ -1205,7 +1246,14 @@ async function handle(
     case "openProjectLink": {
       if (win !== main) throw Error(t("仅可从设置窗口打开项目链接"));
       const link = z
-        .enum(["repository", "issues", "releases", "license", "credits"])
+        .enum([
+          "repository",
+          "issues",
+          "releases",
+          "license",
+          "credits",
+          "providerDocs",
+        ])
         .parse(arg?.link);
       await shell.openExternal(projectLinks[link]);
       return;
@@ -1745,11 +1793,13 @@ async function handle(
       return;
     }
     case "testText": {
+      if (win !== main) throw Error(t("提供商不可用"));
       const startedAt = performance.now();
       const p = store.config.providers.find((p) => p.id === arg.profileId);
       if (!p) throw Error(t("服务不存在"));
       if (!p.enabled) throw Error(t("此 API 提供商已停用"));
       const { key, headers } = await credentials(p);
+      const probe = { ...p, headers, allowAnonymous: true };
       if (modelKind(p) === "speech") {
         const settings = store.config.tts;
         const choices = onlineVoices(
@@ -1766,7 +1816,7 @@ async function handle(
           choices[0]?.id.slice(4) ||
           "alloy";
         await synthesizeSpeech(
-          { ...p, headers },
+          probe,
           key,
           APP_NAME,
           voice,
@@ -1780,8 +1830,7 @@ async function handle(
       );
       const result = await complete(
         {
-          ...p,
-          headers,
+          ...probe,
           ...(isTranslationOnly(p)
             ? {
                 translation: {
@@ -2155,6 +2204,15 @@ async function boot() {
   main.on("hide", endShortcutRecording);
   main.webContents.on("render-process-gone", endShortcutRecording);
   native.on("selection", showPill);
+  const repositionToolbar = () => {
+    if (!quitting && toolbarRequested && pill?.isVisible() && native.current) {
+      triggerAnchor = selectionAnchor(native.current);
+      toolbarFrame = "";
+      updateToolbar();
+    }
+  };
+  screen.on("display-metrics-changed", repositionToolbar);
+  screen.on("display-removed", repositionToolbar);
   native.on("status", (state) => {
     if (quitting) return;
     broadcast("nativeStatus", state);
@@ -2162,7 +2220,7 @@ async function boot() {
   });
   native.on("invalid", () => {
     if (quitting) return;
-    pill?.hide();
+    hideToolbar();
     broadcast("selectionInvalid", undefined);
   });
   native.start();

@@ -151,9 +151,10 @@ try {
   );
 
   await panel.getByRole("button", { name: "输入文字", exact: true }).click();
-  await panel
-    .getByLabel("原文", { exact: true })
-    .fill("Keep this draft when capture is cancelled.");
+  const original = panel.getByRole("textbox", { name: "原文", exact: true });
+  const draft = "Keep this draft when capture is cancelled.";
+  await panel.keyboard.type(draft);
+  assert.equal(await original.inputValue(), draft);
   await panel.getByRole("button", { name: "保持浮窗", exact: true }).click();
   await panel.evaluate(() => {
     window.__inputJobs = [];
@@ -243,11 +244,13 @@ try {
   await panel
     .locator(".interaction-shell")
     .screenshot({ path: output + "/ocr-to-writing-dark.png" });
+  await panel.getByRole("button", { name: "展开原文", exact: true }).click();
+  await panel.getByRole("button", { name: "编辑原文", exact: true }).click();
+  await panel.keyboard.type("!");
+  assert.equal(await original.inputValue(), corrected + "!");
   await panel.getByRole("button", { name: "校对文字", exact: true }).click();
-  assert.equal(
-    await panel.getByLabel("原文", { exact: true }).inputValue(),
-    corrected,
-  );
+  await panel.keyboard.press("Backspace");
+  assert.equal(await original.inputValue(), corrected);
   checks.push(
     "local OCR starts once without a text model; corrected text reuses action cards, preserves its image, and never offers replacement",
   );

@@ -2,6 +2,7 @@ import { Image, Text, Volume2 } from "lucide-react";
 import type { TextProfile } from "../shared/config";
 import {
   inferredModelKind,
+  isLegacyOpenAiSpeech,
   bundledDirectory,
   modelKind,
   speechProtocol,
@@ -148,9 +149,7 @@ export function SpeechModelSettings({
           <option value="mimo">Xiaomi MiMo · Chat Completions</option>
         </select>
       </Field>
-      {!(
-        protocol === "openai" && /(?:^|\/)tts-1(?:-hd)?$/.test(provider.model)
-      ) &&
+      {!(protocol === "openai" && isLegacyOpenAiSpeech(provider)) &&
         protocol !== "azure" && (
           <Field
             label={t("朗读风格")}

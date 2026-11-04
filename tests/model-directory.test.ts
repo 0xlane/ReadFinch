@@ -12,6 +12,7 @@ import {
 import {
   bundledDirectory,
   modelKind,
+  speechProtocol,
   withCatalogMatch,
 } from "../src/shared/model-capabilities";
 import { chooseProviderModel } from "../src/shared/provider-model";
@@ -69,7 +70,6 @@ test("exact model IDs and unambiguous bare IDs resolve; ambiguous and lookalike 
   for (const id of [
     "lens",
     "lab/draw",
-    "LAB/lens",
     "next/lens",
     "lab/lens-v2",
     "gpt-6-private-vision",
@@ -136,6 +136,96 @@ test("exact model IDs and unambiguous bare IDs resolve; ambiguous and lookalike 
   assert.equal(modelKind(p), "text");
   assert.equal(providerCanServe(p, "ocr"), false);
   assert.equal(providerCanServe(p, "tts"), false);
+});
+
+test("model metadata recognizes provider paths and vendor spellings without changing the wire ID", () => {
+  const entries = [
+    {
+      id: "alibaba/qwen2-5-vl-72b-instruct",
+      name: "Qwen VL",
+      kind: "vision" as const,
+    },
+    {
+      id: "google/gemini-2.5-flash",
+      name: "Gemini Flash",
+      kind: "vision" as const,
+    },
+    {
+      id: "anthropic/claude-sonnet-4.5",
+      name: "Sonnet",
+      kind: "vision" as const,
+    },
+    {
+      id: "deepseek/deepseek-v4.1-flash-1017",
+      name: "DeepSeek",
+      kind: "vision" as const,
+    },
+  ];
+  const directory = new ModelDirectory({ modelsDev: entries, openRouter: [] });
+  for (const [i, inputs] of [
+    [
+      "Qwen/Qwen2.5-VL-72B-Instruct",
+      "openrouter/QWEN/Qwen2.5-VL-72B-Instruct:free",
+      "QWEN2.5 VL 72B Instruct",
+    ],
+    [
+      "models/gemini-2.5-flash",
+      "projects/sample/locations/us/publishers/google/models/gemini-2.5-flash",
+      "GOOGLE/GEMINI-2.5-FLASH (free)",
+    ],
+    [
+      "anthropic/claude-sonnet-4-5@20250929",
+      "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    ],
+    [
+      "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+      "deepseek-ai/DeepSeek_V4.1_Flash_1017",
+    ],
+  ].entries()) {
+    for (const input of inputs) {
+      const profile = chooseProviderModel(
+        createProvider("custom", "relay"),
+        input,
+        false,
+        directory,
+      );
+      assert.equal(profile.model, input);
+      assert.equal(directory.lookup("custom", input)?.id, entries[i].id, input);
+      assert.equal(modelKind(profile, directory), "vision");
+    }
+  }
+  for (const id of [
+    "gemini-2.5-flash-private",
+    "google/gemini-2.5-flash:batch",
+    "deepseek/deepseek-v4.1-flash",
+    "anthropic/claude-sonnet-4.5-2025-09-29",
+    "google/claude-sonnet-4.5",
+  ])
+    assert.equal(directory.lookup("custom", id), undefined, id);
+  const colliding = new ModelDirectory({
+    modelsDev: [
+      { id: "one/model-2.5", name: "Vision", kind: "vision" },
+      { id: "two/model-2-5", name: "Speech", kind: "speech" },
+    ],
+    openRouter: [],
+  });
+  assert.equal(colliding.match("custom", "gateway/Model_2-5:free"), null);
+  assert.equal(
+    colliding.lookup("custom", "gateway/TWO/Model_2-5")?.kind,
+    "speech",
+  );
+  const voice = {
+    preset: "custom",
+    model: "gateway/XIAOMI/MiMo-V2.5-TTS:cloud",
+  };
+  assert.equal(modelKind(voice), "speech");
+  assert.equal(speechProtocol(voice), "mimo");
+  assert.equal(modelKind({ ...voice, model: "openai/TTS-1-HD" }), "speech");
+  assert.equal(modelKind({ ...voice, model: "google/TTS-1-HD" }), "text");
+  assert.equal(
+    bundledDirectory.lookup("custom", "openrouter/gpt-4o")?.kind,
+    "vision",
+  );
 });
 
 test("public catalog refresh shares requests, persists exact metadata, and retains stale data when only one source fails", async () => {

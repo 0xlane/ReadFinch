@@ -14,7 +14,7 @@ ReadFinch es una aplicación de escritorio de código abierto para leer y escrib
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@ Puedes cambiar los atajos en su página de ajustes. La configuración se guarda 
 
 | Plataforma | Cómo se obtiene el texto |
 | --- | --- |
-| Windows | Lee las selecciones que expone la aplicación en primer plano mediante UI Automation. |
+| Windows | Lee el texto seleccionado en la aplicación activa mediante UI Automation y Java Access Bridge. |
 | macOS | Requiere permiso de Accesibilidad para leer selecciones y de Grabación de pantalla para las capturas. |
 | Linux | Utiliza la selección PRIMARY en X11 (`xclip`, `xdotool`, `xprop`). En Wayland utiliza el portapapeles o el portal de capturas del escritorio; los atajos dependen del entorno. |
 
@@ -153,7 +153,7 @@ Son bienvenidos los informes de errores reproducibles, las propuestas de usabili
 
 ### Compilar desde el código fuente
 
-Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows se requiere el compilador de C# de .NET Framework 4.8; en macOS, las herramientas de línea de comandos de Xcode.
+Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows, instala el compilador de C# de .NET Framework 4.8 y configura `JAVA_HOME` con la ruta de un OpenJDK x64 como Temurin 21. En macOS, instala las herramientas de línea de comandos de Xcode.
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

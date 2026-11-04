@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@
 
 | 平台 | 如何取得文字 |
 | --- | --- |
-| Windows | 通过 UI Automation 读取前台应用提供的文本选区。 |
+| Windows | 通过 UI Automation 和 Java Access Bridge 读取前台应用的选区。 |
 | macOS | 读取选区需要辅助功能授权；截图需要屏幕录制权限。 |
 | Linux | X11 使用 PRIMARY 选区，依赖 `xclip`、`xdotool`、`xprop`。Wayland 使用剪贴板或桌面截图门户，快捷键能力取决于桌面环境。 |
 
@@ -153,7 +153,7 @@
 
 ### 从源码构建
 
-本地构建需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 编译器；macOS 需要 Xcode 命令行工具。
+本地构建需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 编译器，并将 `JAVA_HOME` 指向 x64 OpenJDK（如 Temurin 21）。macOS 需要 Xcode 命令行工具。
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@
 
 | 平台 | 如何取得文字 |
 | --- | --- |
-| Windows | 透過 UI Automation 讀取前景應用程式提供的文字選取範圍。 |
+| Windows | 透過 UI Automation 和 Java Access Bridge 讀取前景應用程式的文字選取範圍。 |
 | macOS | 讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。 |
 | Linux | X11 使用 PRIMARY 選取範圍，依賴 `xclip`、`xdotool`、`xprop`。Wayland 使用剪貼簿或桌面截圖入口，快捷鍵能力取決於桌面環境。 |
 
@@ -153,7 +153,7 @@
 
 ### 從原始碼建置
 
-本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器；macOS 需要 Xcode 命令列工具。
+本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器，並將 `JAVA_HOME` 指向 x64 OpenJDK（例如 Temurin 21）。macOS 需要 Xcode 命令列工具。
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

@@ -1,5 +1,6 @@
 import { defaultSpeech, SpeechConfigSchema } from "./tts";
 import { defaultProxy, ProxySchema } from "./proxy";
+import { ProviderOptionsSchema } from "./provider-options";
 import { iconPosition, legacyIcons } from "./icons";
 import { z } from "zod";
 import { initialTargetLanguage } from "./languages";
@@ -133,6 +134,7 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
   speechInstructions: z.string().max(2000).optional(),
   builtinModel: z.string().max(200).optional(),
   temperature: z.number().min(0).max(2).nullable().default(null),
+  providerOptions: ProviderOptionsSchema.optional(),
   reasoningEffort: z.enum(reasoningEfforts).optional(),
   proxy: ProxySchema.default(defaultProxy),
   providerSettings: z

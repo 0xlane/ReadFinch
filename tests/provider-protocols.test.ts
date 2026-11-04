@@ -570,9 +570,68 @@ test("native requests obey the per-provider transport and cannot read ambient cr
       /API Key/,
     );
     assert.equal(seen.length, 1);
+    await complete(
+      { ...profile, requiresKey: true, allowAnonymous: true },
+      messages,
+      undefined,
+      new AbortController().signal,
+      () => {},
+    );
+    assert.equal(seen.length, 2);
+    assert.equal(seen[1].headers.get("x-goog-api-key"), null);
   } finally {
     delete process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     setProviderTransport((url, init) => fetch(url, init));
+  }
+});
+test("flat provider options reach native APIs in their own protocol", async () => {
+  const cases = [
+    [
+      "gemini",
+      { thinkingConfig: { thinkingBudget: 256 } },
+      (body: any) => body.generationConfig.thinkingConfig.thinkingBudget,
+      256,
+    ],
+    [
+      "open-responses",
+      { reasoningEffort: "low" },
+      (body: any) => body.reasoning.effort,
+      "low",
+    ],
+    [
+      "bedrock",
+      { additionalModelRequestFields: { top_k: 6 } },
+      (body: any) => body.additionalModelRequestFields.top_k,
+      6,
+    ],
+    ["ollama", { num_ctx: 512 }, (body: any) => body.options.num_ctx, 512],
+  ] as const;
+  for (const [preset, providerOptions, read, expected] of cases) {
+    let received;
+    const profile = {
+      ...createProvider(preset, preset),
+      model: "fixture",
+      stream: false,
+      providerOptions,
+    };
+    const f = await fixture((_req, res, body) => {
+      received = read(body);
+      const reply = nativeResponse(providerProtocol(profile), false);
+      res.setHeader("content-type", reply.type);
+      res.end(reply.body);
+    });
+    try {
+      await complete(
+        { ...profile, endpoint: f.url },
+        messages,
+        "fixture",
+        new AbortController().signal,
+        () => {},
+      );
+      assert.equal(received, expected, preset);
+    } finally {
+      await f.close();
+    }
   }
 });
 test("translation providers only bind to translation; schemas reject invalid feature assignments", () => {

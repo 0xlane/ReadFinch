@@ -14,7 +14,7 @@ ReadFinch is an open-source desktop reading and writing companion. Translate sel
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@ Rebind shortcuts on the dedicated settings page. Settings save automatically; ap
 
 | Platform | How text is acquired |
 | --- | --- |
-| Windows | Reads selections exposed by the foreground app through UI Automation. |
+| Windows | Reads foreground selections through UI Automation and Java Access Bridge. |
 | macOS | Uses Accessibility for selected text and Screen Recording permission for captures. |
 | Linux | Uses PRIMARY selection on X11 (`xclip`, `xdotool`, `xprop`). Wayland uses clipboard input or the desktop screenshot portal; shortcuts depend on the desktop environment. |
 
@@ -153,7 +153,7 @@ Bring a reproducible bug report, an interaction improvement, a translation corre
 
 ### Build from source
 
-Build locally with **Node.js 24**, npm and Git. Windows builds require the .NET Framework 4.8 C# compiler; macOS builds require Xcode Command Line Tools.
+Build locally with **Node.js 24**, npm and Git. On Windows, install the .NET Framework 4.8 C# compiler and point `JAVA_HOME` at an x64 OpenJDK such as Temurin 21. On macOS, install Xcode Command Line Tools.
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

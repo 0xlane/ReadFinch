@@ -84,6 +84,7 @@ export type Interaction = {
     | "empty";
   text: string;
   selection?: Selection;
+  javaBridgeUnavailable?: boolean;
   capture?: Capture;
   actionId?: string;
   error?: string;

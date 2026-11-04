@@ -1,6 +1,19 @@
 import { besideCursor, type Point, type Bounds } from "./placement";
 import type { ToolbarMenu, ToolbarRect } from "../shared/toolbar";
 
+export function toolbarAnchor(
+  cursor: Point,
+  selection: Point,
+  display: Bounds,
+) {
+  const contains = (p: Point) =>
+    p.x >= display.x &&
+    p.x < display.x + display.width &&
+    p.y >= display.y &&
+    p.y < display.y + display.height;
+  return contains(selection) && !contains(cursor) ? selection : cursor;
+}
+
 // Keep the icon strip anchored while opening a menu. Only the enclosing native
 // window grows, including room for its close button and the two surfaces' shadows.
 export function toolbarPlacement(

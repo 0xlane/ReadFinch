@@ -21,21 +21,39 @@ export type ModelCapabilities = {
 };
 
 // Exact official IDs not covered by the general-purpose directories.
-const localKinds = new Map<string, ModelKind>([
-  ["gpt-4o-mini-tts", "speech"],
-  ["gpt-4o-mini-tts-2025-03-20", "speech"],
-  ["gpt-4o-mini-tts-2025-12-15", "speech"],
-  ["tts-1", "speech"],
-  ["tts-1-hd", "speech"],
-  ["tts-1-1106", "speech"],
-  ["tts-1-hd-1106", "speech"],
-  ["mimo-v2-tts", "speech"],
-  ["mimo-v2.5-tts", "speech"],
-  ["mimo-v2.5-tts-voicedesign", "speech"],
-  ["mimo-v2.5-tts-voiceclone", "speech"],
-  ["deepseek-flash", "vision"],
-  ["Qwen/Qwen2.5-VL-72B-Instruct", "vision"],
-]);
+const supplemental = new ModelDirectory({
+  modelsDev: [
+    ...[
+      "gpt-4o-mini-tts",
+      "gpt-4o-mini-tts-2025-03-20",
+      "gpt-4o-mini-tts-2025-12-15",
+      "tts-1",
+      "tts-1-hd",
+      "tts-1-1106",
+      "tts-1-hd-1106",
+    ].map((name) => ({ id: "openai/" + name, name, kind: "speech" as const })),
+    ...[
+      "mimo-v2-tts",
+      "mimo-v2.5-tts",
+      "mimo-v2.5-tts-voicedesign",
+      "mimo-v2.5-tts-voiceclone",
+    ].map((name) => ({ id: "xiaomi/" + name, name, kind: "speech" as const })),
+    { id: "deepseek/deepseek-flash", name: "DeepSeek Flash", kind: "vision" },
+    {
+      id: "Qwen/Qwen2.5-VL-72B-Instruct",
+      name: "Qwen2.5 VL 72B Instruct",
+      kind: "vision",
+    },
+  ],
+  openRouter: [],
+});
+
+export function speechModelName(p: ModelCapabilities) {
+  return supplemental.lookup(p.preset, p.model)?.name ?? p.model;
+}
+export function isLegacyOpenAiSpeech(p: ModelCapabilities) {
+  return /^tts-1(?:-hd)?(?:-1106)?$/.test(speechModelName(p));
+}
 
 export function inferredModelKind(
   p: ModelCapabilities,
@@ -48,7 +66,7 @@ export function inferredModelKind(
     (p.catalogMatch?.id === p.model ? p.catalogMatch.kind : undefined) ??
     match?.kind ??
     bundledDirectory.lookup(p.preset, p.model)?.kind ??
-    localKinds.get(p.model) ??
+    supplemental.lookup(p.preset, p.model)?.kind ??
     "text"
   );
 }
@@ -79,12 +97,7 @@ export function speechProtocol(p: ModelCapabilities): SpeechProtocol {
   if (p.preset === "azure") return "azure";
   if (
     p.preset === "mimo" ||
-    [
-      "mimo-v2-tts",
-      "mimo-v2.5-tts",
-      "mimo-v2.5-tts-voicedesign",
-      "mimo-v2.5-tts-voiceclone",
-    ].includes(p.model.replace(/^xiaomi\//, ""))
+    supplemental.lookup(p.preset, p.model)?.id.startsWith("xiaomi/")
   )
     return "mimo";
   try {

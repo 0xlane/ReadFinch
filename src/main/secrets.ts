@@ -29,6 +29,8 @@ export class Secrets {
     });
   }
   async get(id: string, scope: string) {
+    // A probe can start immediately after the credentials editor loses focus.
+    await this.queue;
     const memory = this.memory.get(id);
     if (memory) return memory.scope === scope ? memory.value : undefined;
     const record = this.values[id];

@@ -14,7 +14,7 @@ ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze m
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.1-4d443e?style=flat-square" alt="1.2.1">
+<img src="https://img.shields.io/badge/Version-1.2.2-4d443e?style=flat-square" alt="1.2.2">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -119,7 +119,7 @@ Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellu
 
 | Plattform | Texterfassung |
 | --- | --- |
-| Windows | Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation. |
+| Windows | Liest die Textauswahl der aktiven App über UI Automation und Java Access Bridge. |
 | macOS | Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots. |
 | Linux | Verwendet unter X11 die PRIMARY-Auswahl (`xclip`, `xdotool`, `xprop`). Unter Wayland werden Zwischenablage oder Screenshot-Portal genutzt; Tastenkürzel hängen von der Desktop-Umgebung ab. |
 
@@ -153,7 +153,7 @@ Reproduzierbare Fehlerberichte, Verbesserungsvorschläge, Übersetzungskorrektur
 
 ### Aus dem Quellcode erstellen
 
-Für einen lokalen Build benötigst du **Node.js 24**, npm und Git. Unter Windows wird der C#-Compiler von .NET Framework 4.8 benötigt, unter macOS die Xcode Command Line Tools.
+Für einen lokalen Build benötigst du **Node.js 24**, npm und Git. Installiere unter Windows den C#-Compiler von .NET Framework 4.8 und setze `JAVA_HOME` auf ein x64-OpenJDK wie Temurin 21. Unter macOS benötigst du die Xcode Command Line Tools.
 
 ```sh
 git clone https://github.com/0xlane/ReadFinch.git

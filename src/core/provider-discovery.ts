@@ -24,7 +24,7 @@ export async function listModels(
       t("此提供商请使用内置列表或输入部署与模型 ID"),
     );
   const protocol = providerProtocol(profile),
-    headers = providerAuth(profile, key);
+    headers = providerAuth({ ...profile, allowAnonymous: true }, key);
   const deadline = AbortSignal.any([
     signal,
     AbortSignal.timeout(Math.min(profile.timeoutMs, 30000)),

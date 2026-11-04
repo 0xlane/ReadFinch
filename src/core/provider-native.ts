@@ -124,6 +124,7 @@ function modelFor(
       }).languageModel(profile.model);
     case "ollama":
       return createOllama(options).languageModel(profile.model, {
+        options: profile.providerOptions,
         think:
           profile.reasoningEffort && profile.reasoningEffort !== "none"
             ? true
@@ -169,6 +170,27 @@ function checkedFinish(reason: string) {
       t("模型未返回完整结果，可重新生成。"),
     );
 }
+function nativeOptions(
+  profile: TextProfile,
+  provider: string,
+): LanguageModelV4CallOptions["providerOptions"] {
+  const protocol = providerProtocol(profile);
+  const options = profile.providerOptions;
+  if (options !== undefined) {
+    if (protocol === "bedrock") return { amazonBedrock: options };
+    if (protocol === "azure") return { openai: options, azure: options };
+    return { [provider.split(".")[0]]: options };
+  }
+  if (profile.reasoningEffort === "none") return;
+  if (
+    protocol === "gemini" &&
+    (profile.reasoningEffort ||
+      /^gemini-(?:2\.5|[3-9](?:[.-]|$))/.test(profile.model))
+  )
+    return { google: { thinkingConfig: { includeThoughts: true } } };
+  if (protocol === "responses" && profile.reasoningEffort)
+    return { readfinch: { reasoningSummary: "auto" } };
+}
 function safeError(error: unknown, signal: AbortSignal): never {
   if (signal.aborted)
     throw new ProviderError(
@@ -203,26 +225,12 @@ export async function completeNative(
   };
   try {
     const model = modelFor(profile, key, deadline);
-    const protocol = providerProtocol(profile);
     const options: LanguageModelV4CallOptions = {
       prompt: promptFor(messages),
       abortSignal: deadline,
       temperature: profile.temperature ?? undefined,
       reasoning: profile.reasoningEffort,
-      ...(protocol === "gemini" &&
-      profile.reasoningEffort !== "none" &&
-      (profile.reasoningEffort ||
-        /^gemini-(?:2\.5|[3-9](?:[.-]|$))/.test(profile.model))
-        ? {
-            providerOptions: {
-              google: { thinkingConfig: { includeThoughts: true } },
-            },
-          }
-        : protocol === "responses" &&
-            profile.reasoningEffort &&
-            profile.reasoningEffort !== "none"
-          ? { providerOptions: { readfinch: { reasoningSummary: "auto" } } }
-          : {}),
+      providerOptions: nativeOptions(profile, model.provider),
       ...(profile.preset === "anthropic" ? { maxOutputTokens: 8192 } : {}),
       ...(profile.outputContract
         ? {

@@ -46,6 +46,7 @@ export function suggestionBinding(config: Config) {
     provider.endpoint,
     provider.model,
     provider.temperature,
+    provider.providerOptions ?? null,
     provider.reasoningEffort ?? null,
     provider.requiresKey,
   ]);

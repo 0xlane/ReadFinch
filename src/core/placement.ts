@@ -62,10 +62,11 @@ export function besideCursor(
   const margin = 8;
   const width = Math.min(size.width, Math.max(1, area.width - margin * 2));
   const height = Math.min(size.height, Math.max(1, area.height - margin * 2));
-  const x = Math.max(
-    area.x + margin,
-    Math.min(anchor.x + 10, area.x + area.width - width - margin),
-  );
+  const left = area.x + margin;
+  const right = area.x + area.width - margin;
+  const beside =
+    anchor.x + 10 + width <= right ? anchor.x + 10 : anchor.x - 10 - width;
+  const x = Math.max(left, Math.min(beside, right - width));
   let y = anchor.y + 16;
   if (y + height > area.y + area.height - margin) y = anchor.y - height - 10;
   y = Math.max(

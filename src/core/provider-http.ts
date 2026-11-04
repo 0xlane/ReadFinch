@@ -8,6 +8,7 @@ export type TranslationInput = {
 };
 export type Connection<T> = T & {
   headers?: Record<string, string>;
+  allowAnonymous?: boolean;
   outputContract?: object;
   translation?: TranslationInput;
 };
@@ -37,7 +38,7 @@ export class ProviderError extends Error {
 }
 export function httpError(status: number): ProviderError {
   const errors: Record<number, [string, string]> = {
-    401: ["auth", t("凭据无效或已过期，请检查 API Key")],
+    401: ["auth", t("身份验证未通过，请检查 API Key 或认证请求头。")],
     403: ["auth", t("服务拒绝访问，请检查权限或额度")],
     404: ["model", t("模型或接口不存在，请检查模型 ID 和服务地址")],
     429: ["rate", t("请求过于频繁或额度不足，请稍后重试")],
@@ -47,11 +48,10 @@ export function httpError(status: number): ProviderError {
     ],
     413: ["image", t("图片过大，请缩小选区")],
   };
-  const [code, message] = errors[status] ?? [
-    "service",
-    t("服务返回 HTTP {0}，请稍后重试", status),
-  ];
-  return new ProviderError(code, message);
+  const known = errors[status];
+  return known
+    ? new ProviderError(known[0], `HTTP ${status} · ${known[1]}`)
+    : new ProviderError("service", t("服务返回 HTTP {0}，请稍后重试", status));
 }
 export function endpointUrl(base: string, suffix: string) {
   return base.replace(/\/+$/, "") + "/" + suffix;
@@ -89,23 +89,6 @@ export async function request(
     );
   }
 }
-export function auth(
-  key: string | undefined,
-  required: boolean,
-  custom?: Record<string, string>,
-) {
-  const headers = new Headers({ "Content-Type": "application/json" });
-  if (key) headers.set("Authorization", "Bearer " + key);
-  for (const [name, value] of Object.entries(custom ?? {}))
-    headers.set(name, value);
-  if (required && !key && !headers.has("Authorization"))
-    throw new ProviderError(
-      "credential",
-      t("此服务尚未配置 API Key，请在设置中添加"),
-    );
-  return headers;
-}
-
 export function providerAuth(
   profile: Connection<TextProfile>,
   key: string | undefined,
@@ -131,6 +114,7 @@ export function providerAuth(
   for (const [name, value] of Object.entries(profile.headers ?? {}))
     headers.set(name, value);
   if (
+    !profile.allowAnonymous &&
     requiresApiKey(profile) &&
     !key &&
     !["Authorization", "x-api-key", "api-key", "x-goog-api-key"].some((name) =>

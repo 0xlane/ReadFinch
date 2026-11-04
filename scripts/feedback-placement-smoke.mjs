@@ -141,25 +141,21 @@ try {
   await btn(main, "缓慢（建议调节思考模式）").waitFor();
   mode = "error";
   await btn(main, "缓慢（建议调节思考模式）").click();
-  await btn(main, "失败").waitFor();
-  assert.match(await btn(main, "失败").getAttribute("title"), /凭据无效/);
-  assert.doesNotMatch(
-    await btn(main, "失败").getAttribute("title"),
-    /private-provider/,
-  );
+  const errorDetail = main.getByRole("alert", { name: "连接失败" });
+  await errorDetail.waitFor();
+  await main.mouse.move(0, 0);
+  assert.match(await errorDetail.innerText(), /HTTP 401.*API Key/);
+  assert.doesNotMatch(await errorDetail.innerText(), /private-provider/);
   mode = "empty";
-  await btn(main, "失败").click();
+  await btn(main, "测试连接").click();
   await btn(main, "测试中...").waitFor();
-  await btn(main, "失败").waitFor();
-  assert.match(
-    await btn(main, "失败").getAttribute("title"),
-    /未返回(?:有效内容|文字结果)/,
-  );
+  await errorDetail.waitFor();
+  assert.match(await errorDetail.innerText(), /未返回(?:有效内容|文字结果)/);
   checks.push(
-    "Connection feedback stays inside the button: Testing, Success, Failed and Slow after 3 seconds; feedback resets after 5 seconds and raw replies never appear.",
+    "The probe button shows pending, success and slow states. A dismissible notification explains a failure without moving the form.",
   );
   mode = "held";
-  await btn(main, "失败").click();
+  await btn(main, "测试连接").click();
   await until(() => probeCount >= 5);
   const name = main.locator(".provider-editor").getByRole("textbox").first();
   await name.fill("Renamed while testing");

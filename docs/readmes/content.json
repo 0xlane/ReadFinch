@@ -54,7 +54,7 @@
     "languages": "Choose from eight preset languages for translations and explanations:",
     "languageNote": "The **interface supports English and Simplified Chinese** and follows the system language by default. Interface language and output language are configured separately. Translation quality and language coverage depend on the selected provider and model.",
     "startTitle": "Get started",
-    "buildIntro": "Build locally with **Node.js 24**, npm and Git. Windows builds require the .NET Framework 4.8 C# compiler; macOS builds require Xcode Command Line Tools.",
+    "buildIntro": "Build locally with **Node.js 24**, npm and Git. On Windows, install the .NET Framework 4.8 C# compiler and point `JAVA_HOME` at an x64 OpenJDK such as Temurin 21. On macOS, install Xcode Command Line Tools.",
     "buildNote": "`assets:ocr` downloads the recognition data **during development**. The data is bundled in the app, so installed copies do not need a language-pack download. Run `npm run dist` on the target operating system to create packages in `release/`.",
     "firstRunTitle": "First steps",
     "steps": [
@@ -81,7 +81,7 @@
       "How text is acquired"
     ],
     "platforms": [
-      "Reads selections exposed by the foreground app through UI Automation.",
+      "Reads foreground selections through UI Automation and Java Access Bridge.",
       "Uses Accessibility for selected text and Screen Recording permission for captures.",
       "Uses PRIMARY selection on X11 (`xclip`, `xdotool`, `xprop`). Wayland uses clipboard input or the desktop screenshot portal; shortcuts depend on the desktop environment."
     ],
@@ -182,7 +182,7 @@
     "languages": "翻译和解释可选择以下 8 种预置目标语言：",
     "languageNote": "**应用界面支持简体中文和英文**，默认跟随系统。界面语言与输出语言独立设置；翻译质量和语言覆盖范围取决于所选提供商及模型。",
     "startTitle": "开始使用",
-    "buildIntro": "本地构建需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 编译器；macOS 需要 Xcode 命令行工具。",
+    "buildIntro": "本地构建需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 编译器，并将 `JAVA_HOME` 指向 x64 OpenJDK（如 Temurin 21）。macOS 需要 Xcode 命令行工具。",
     "buildNote": "`assets:ocr` 仅在**开发构建阶段**准备识别数据。数据随应用打包，安装后无需下载语言包。在目标操作系统上运行 `npm run dist`，安装包会生成到 `release/`。",
     "firstRunTitle": "第一次使用",
     "steps": [
@@ -209,7 +209,7 @@
       "如何取得文字"
     ],
     "platforms": [
-      "通过 UI Automation 读取前台应用提供的文本选区。",
+      "通过 UI Automation 和 Java Access Bridge 读取前台应用的选区。",
       "读取选区需要辅助功能授权；截图需要屏幕录制权限。",
       "X11 使用 PRIMARY 选区，依赖 `xclip`、`xdotool`、`xprop`。Wayland 使用剪贴板或桌面截图门户，快捷键能力取决于桌面环境。"
     ],
@@ -310,7 +310,7 @@
     "languages": "翻譯與解釋可選擇以下 8 種預設目標語言：",
     "languageNote": "**應用程式介面支援簡體中文與英文**，預設跟隨系統。介面語言與輸出語言分開設定；翻譯品質及支援的語言範圍取決於所選供應商與模型。",
     "startTitle": "開始使用",
-    "buildIntro": "本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器；macOS 需要 Xcode 命令列工具。",
+    "buildIntro": "本機建置需要 **Node.js 24**、npm 和 Git。Windows 需要 .NET Framework 4.8 的 C# 編譯器，並將 `JAVA_HOME` 指向 x64 OpenJDK（例如 Temurin 21）。macOS 需要 Xcode 命令列工具。",
     "buildNote": "`assets:ocr` 僅在**開發建置階段**準備辨識資料。資料隨應用程式打包，安裝後無須下載語言套件。在目標作業系統上執行 `npm run dist`，安裝套件會產生於 `release/`。",
     "firstRunTitle": "第一次使用",
     "steps": [
@@ -337,7 +337,7 @@
       "如何取得文字"
     ],
     "platforms": [
-      "透過 UI Automation 讀取前景應用程式提供的文字選取範圍。",
+      "透過 UI Automation 和 Java Access Bridge 讀取前景應用程式的文字選取範圍。",
       "讀取選取文字需要輔助使用授權；截圖需要螢幕錄製權限。",
       "X11 使用 PRIMARY 選取範圍，依賴 `xclip`、`xdotool`、`xprop`。Wayland 使用剪貼簿或桌面截圖入口，快捷鍵能力取決於桌面環境。"
     ],
@@ -438,7 +438,7 @@
     "languages": "翻訳と解説の出力先として、次の 8 言語を選択できます。",
     "languageNote": "**アプリの画面表示は英語と簡体字中国語に対応**し、初期設定ではシステム言語に従います。表示言語と出力言語は個別に設定できます。翻訳品質と言語への対応は、選んだプロバイダーとモデルによって異なります。",
     "startTitle": "使い始める",
-    "buildIntro": "ローカルでのビルドには **Node.js 24**、npm、Git が必要です。Windows は .NET Framework 4.8 の C# コンパイラー、macOS は Xcode Command Line Tools も必要です。",
+    "buildIntro": "ローカルでのビルドには **Node.js 24**、npm、Git が必要です。Windows では .NET Framework 4.8 の C# コンパイラーを用意し、`JAVA_HOME` に x64 版 OpenJDK（Temurin 21 など）のパスを設定してください。macOS では Xcode Command Line Tools が必要です。",
     "buildNote": "`assets:ocr` は**開発時のビルド準備**として認識データをダウンロードします。データはアプリに同梱されるため、インストール後の言語パック取得は不要です。対象 OS 上で `npm run dist` を実行すると、`release/` にパッケージを生成します。",
     "firstRunTitle": "初めて使うとき",
     "steps": [
@@ -465,7 +465,7 @@
       "文字の取得方法"
     ],
     "platforms": [
-      "UI Automation を通じて、前面のアプリが公開する選択テキストを読み取ります。",
+      "UI Automation および Java Access Bridge を通じて、前面のアプリの選択テキストを読み取ります。",
       "選択テキストにはアクセシビリティ、画面キャプチャには画面収録の許可が必要です。",
       "X11 は PRIMARY 選択を利用します（`xclip`、`xdotool`、`xprop` が必要）。Wayland はクリップボードまたはデスクトップのスクリーンショットポータルを使用し、ショートカットは環境に依存します。"
     ],
@@ -566,7 +566,7 @@
     "languages": "번역과 설명에 사용할 언어를 다음 8개 프리셋에서 선택할 수 있습니다.",
     "languageNote": "**앱 인터페이스는 영어와 중국어 간체를 지원**하며 기본적으로 시스템 언어를 따릅니다. 인터페이스 언어와 출력 언어는 별도로 설정합니다. 번역 품질과 지원 언어는 선택한 제공업체 및 모델에 따라 달라집니다.",
     "startTitle": "시작하기",
-    "buildIntro": "로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러가, macOS에서는 Xcode Command Line Tools가 추가로 필요합니다.",
+    "buildIntro": "로컬 빌드에는 **Node.js 24**, npm, Git이 필요합니다. Windows에서는 .NET Framework 4.8 C# 컴파일러를 설치하고 `JAVA_HOME`을 x64 OpenJDK(예: Temurin 21) 경로로 설정하세요. macOS에서는 Xcode Command Line Tools가 필요합니다.",
     "buildNote": "`assets:ocr`는 **개발 빌드 준비 과정에서** 인식 데이터를 다운로드합니다. 데이터가 앱에 포함되므로 설치 후 언어 팩을 내려받을 필요가 없습니다. 대상 운영체제에서 `npm run dist`를 실행하면 `release/`에 패키지가 생성됩니다.",
     "firstRunTitle": "처음 사용하기",
     "steps": [
@@ -593,7 +593,7 @@
       "텍스트를 가져오는 방법"
     ],
     "platforms": [
-      "UI Automation으로 전경 앱이 제공하는 선택 텍스트를 읽습니다.",
+      "UI Automation과 Java Access Bridge를 통해 활성 앱에서 선택한 텍스트를 읽습니다.",
       "선택 텍스트에는 손쉬운 사용 권한이, 화면 캡처에는 화면 기록 권한이 필요합니다.",
       "X11에서는 PRIMARY 선택 영역을 사용합니다(`xclip`, `xdotool`, `xprop` 필요). Wayland에서는 클립보드 또는 데스크톱 스크린샷 포털을 사용하며 단축키 지원은 데스크톱 환경에 따라 달라집니다."
     ],
@@ -694,7 +694,7 @@
     "languages": "Huit langues prédéfinies sont proposées pour les traductions et les explications :",
     "languageNote": "L’**interface est disponible en anglais et en chinois simplifié** et suit par défaut la langue du système. La langue de l’interface et celle des résultats se règlent séparément. La qualité des traductions et les langues couvertes dépendent du fournisseur et du modèle choisis.",
     "startTitle": "Bien démarrer",
-    "buildIntro": "Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, le compilateur C# de .NET Framework 4.8 est nécessaire ; sous macOS, installez les outils de ligne de commande Xcode.",
+    "buildIntro": "Pour compiler localement, installez **Node.js 24**, npm et Git. Sous Windows, installez le compilateur C# de .NET Framework 4.8 et faites pointer `JAVA_HOME` vers un OpenJDK x64 tel que Temurin 21. Sous macOS, installez les outils de ligne de commande Xcode.",
     "buildNote": "`assets:ocr` télécharge les données de reconnaissance **pendant la préparation du développement**. Elles sont incluses dans l’application : aucune langue n’est à télécharger après l’installation. Exécutez `npm run dist` sur le système cible pour créer les paquets dans `release/`.",
     "firstRunTitle": "Premiers pas",
     "steps": [
@@ -721,7 +721,7 @@
       "Acquisition du texte"
     ],
     "platforms": [
-      "Lit les sélections exposées par l’application au premier plan via UI Automation.",
+      "Lit le texte sélectionné dans l’application au premier plan via UI Automation et Java Access Bridge.",
       "L’accès au texte sélectionné nécessite l’autorisation Accessibilité ; les captures nécessitent l’autorisation Enregistrement de l’écran.",
       "Utilise la sélection PRIMARY sous X11 (`xclip`, `xdotool`, `xprop`). Sous Wayland, utilise le presse-papiers ou le portail de capture du bureau ; les raccourcis dépendent de l’environnement."
     ],
@@ -822,7 +822,7 @@
     "languages": "Für Übersetzungen und Erklärungen stehen acht voreingestellte Zielsprachen zur Auswahl:",
     "languageNote": "Die **Oberfläche unterstützt Englisch und vereinfachtes Chinesisch** und folgt standardmäßig der Systemsprache. Oberflächen- und Ausgabesprache lassen sich getrennt einstellen. Übersetzungsqualität und Sprachabdeckung hängen vom gewählten Anbieter und Modell ab.",
     "startTitle": "Erste Schritte",
-    "buildIntro": "Für einen lokalen Build benötigst du **Node.js 24**, npm und Git. Unter Windows wird der C#-Compiler von .NET Framework 4.8 benötigt, unter macOS die Xcode Command Line Tools.",
+    "buildIntro": "Für einen lokalen Build benötigst du **Node.js 24**, npm und Git. Installiere unter Windows den C#-Compiler von .NET Framework 4.8 und setze `JAVA_HOME` auf ein x64-OpenJDK wie Temurin 21. Unter macOS benötigst du die Xcode Command Line Tools.",
     "buildNote": "`assets:ocr` lädt die Erkennungsdaten **bei der Vorbereitung des Entwicklungs-Builds** herunter. Die Daten werden mit der App ausgeliefert; nach der Installation ist kein Sprachpaket-Download nötig. Mit `npm run dist` auf dem Zielbetriebssystem entstehen Pakete im Verzeichnis `release/`.",
     "firstRunTitle": "Erste Schritte",
     "steps": [
@@ -849,7 +849,7 @@
       "Texterfassung"
     ],
     "platforms": [
-      "Liest die von der Vordergrund-App bereitgestellte Textauswahl über UI Automation.",
+      "Liest die Textauswahl der aktiven App über UI Automation und Java Access Bridge.",
       "Benötigt die Bedienungshilfen-Freigabe für markierten Text und die Bildschirmaufnahme-Berechtigung für Screenshots.",
       "Verwendet unter X11 die PRIMARY-Auswahl (`xclip`, `xdotool`, `xprop`). Unter Wayland werden Zwischenablage oder Screenshot-Portal genutzt; Tastenkürzel hängen von der Desktop-Umgebung ab."
     ],
@@ -950,7 +950,7 @@
     "languages": "Elige entre ocho idiomas predefinidos para las traducciones y las explicaciones:",
     "languageNote": "La **interfaz está disponible en inglés y chino simplificado** y sigue el idioma del sistema por defecto. El idioma de la interfaz y el de los resultados se configuran por separado. La calidad de la traducción y los idiomas admitidos dependen del proveedor y del modelo elegidos.",
     "startTitle": "Primeros pasos",
-    "buildIntro": "Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows se requiere el compilador de C# de .NET Framework 4.8; en macOS, las herramientas de línea de comandos de Xcode.",
+    "buildIntro": "Para compilar en tu equipo necesitas **Node.js 24**, npm y Git. En Windows, instala el compilador de C# de .NET Framework 4.8 y configura `JAVA_HOME` con la ruta de un OpenJDK x64 como Temurin 21. En macOS, instala las herramientas de línea de comandos de Xcode.",
     "buildNote": "`assets:ocr` descarga los datos de reconocimiento **al preparar la compilación de desarrollo**. Los datos se incluyen en la aplicación, por lo que no hay que descargar paquetes de idiomas después de instalarla. Ejecuta `npm run dist` en el sistema de destino para generar los paquetes en `release/`.",
     "firstRunTitle": "Primeros pasos",
     "steps": [
@@ -977,7 +977,7 @@
       "Cómo se obtiene el texto"
     ],
     "platforms": [
-      "Lee las selecciones que expone la aplicación en primer plano mediante UI Automation.",
+      "Lee el texto seleccionado en la aplicación activa mediante UI Automation y Java Access Bridge.",
       "Requiere permiso de Accesibilidad para leer selecciones y de Grabación de pantalla para las capturas.",
       "Utiliza la selección PRIMARY en X11 (`xclip`, `xdotool`, `xprop`). En Wayland utiliza el portapapeles o el portal de capturas del escritorio; los atajos dependen del entorno."
     ],
