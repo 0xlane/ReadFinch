@@ -1,7 +1,7 @@
 {
   "name": "readfinch",
   "productName": "ReadFinch",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A desktop reading and writing companion: select, translate, understand and save. 伴读雀：随选随用的桌面阅读与写作助手。",
   "author": "ReadFinch contributors",
   "license": "GPL-3.0-only",
@@ -14,7 +14,7 @@
     "build": "node scripts/build.mjs",
     "start": "node scripts/start.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
     "test:desktop": "node scripts/smoke.mjs",
     "test:commands": "node scripts/action-schema-smoke.mjs",
     "test:suggestions": "node scripts/suggestion-smoke.mjs",
@@ -36,6 +36,7 @@
     "test:packaged": "node scripts/packaged-smoke.mjs",
     "assets:ocr": "node scripts/download-ocr.mjs",
     "native:build": "node scripts/build-native.mjs",
+    "signing:check": "node scripts/macos-signing.mjs check",
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
     "format": "prettier --write src scripts tests vite.config.ts package.json tsconfig.json",
@@ -153,6 +154,8 @@
     "mac": {
       "artifactName": "ReadFinch-${version}-macos-${arch}.${ext}",
       "identity": "-",
+      "sign": "scripts/sign-macos.mjs",
+      "notarize": false,
       "hardenedRuntime": false,
       "target": [
         "dmg",

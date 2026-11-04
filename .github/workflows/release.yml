@@ -66,7 +66,16 @@ jobs:
       - run: npm run build
       - run: npm run test:ocr
       - name: Build platform packages
+        env:
+          READFINCH_MACOS_SIGNING_P12: ${{ runner.os == 'macOS' && secrets.READFINCH_MACOS_SIGNING_P12 || '' }}
+          READFINCH_MACOS_SIGNING_PASSWORD: ${{ runner.os == 'macOS' && secrets.READFINCH_MACOS_SIGNING_PASSWORD || '' }}
         run: npx electron-builder ${{ matrix.command }} --publish never
+      - name: Verify fixed macOS signing identity and native signatures
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then app="release/mac-arm64/ReadFinch.app"; else app="release/mac/ReadFinch.app"; fi
+          node scripts/verify-macos-signing.mjs "$app" --ci
       - name: Run the Windows packaged application and bundled OCR
         if: matrix.platform == 'windows'
         run: node scripts/packaged-smoke.mjs release/win-unpacked/ReadFinch.exe --isolated-shortcuts

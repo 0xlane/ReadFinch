@@ -6,3 +6,7 @@ release/
 assets/ocr/*.traineddata
 native/bin/
 *.log
+*.p12
+*.key
+*.keychain-db
+*.password
