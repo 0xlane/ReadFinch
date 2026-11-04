@@ -190,7 +190,12 @@ export type CallMap = {
     arg: { text: string; localOnly?: boolean };
     result: string;
   };
-  listModels: { arg: { profileId: string }; result: string[] };
+  // null means this connection has no saved list. An empty array is a saved result.
+  cachedModels: { arg: { scope: string }; result: string[] | null };
+  listModels: {
+    arg: { profileId: string; expectedScope?: string };
+    result: string[];
+  };
   modelDirectory: { arg: { refresh: boolean }; result: DirectoryData };
   testText: { arg: { profileId: string }; result: { durationMs: number } };
   recognize: {

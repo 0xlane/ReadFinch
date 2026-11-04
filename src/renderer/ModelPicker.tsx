@@ -14,8 +14,12 @@ import type { ModelDirectory } from "../shared/model-directory";
 
 export type ModelCatalogAccess = {
   directory?: ModelDirectory;
-  catalogs?: Record<string, string[]>;
-  fetchModels?: (providerId: string) => Promise<string[]>;
+  catalogs: Partial<Record<string, string[] | null>>;
+  restoreModels: (scope: string) => Promise<void>;
+  fetchModels?: (
+    providerId: string,
+    expectedScope: string,
+  ) => Promise<string[]>;
 };
 export function ModelPicker({
   config,
@@ -23,7 +27,8 @@ export function ModelPicker({
   onChange,
   label,
   placeholder,
-  catalogs = {},
+  catalogs,
+  restoreModels,
   fetchModels,
   directory = bundledDirectory,
 }: ModelCatalogAccess & {
@@ -40,7 +45,7 @@ export function ModelPicker({
   const [above, setAbove] = useState(false);
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState(false);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [empty, setEmpty] = useState(false);
@@ -48,7 +53,11 @@ export function ModelPicker({
   const currentKey = useRef(key);
   currentKey.current = key;
   const custom = provider.customModel;
-  const options = modelOptions(config, provider.id, catalogs[key], directory);
+  const ids = catalogs[key];
+  const ready = ids !== undefined;
+  const options = ready
+    ? modelOptions(config, provider.id, ids ?? undefined, directory)
+    : [];
   const ordered = [
     ...options.filter((m) => m.kind === "vision"),
     ...options.filter((m) => m.kind === "text"),
@@ -60,12 +69,20 @@ export function ModelPicker({
   );
   const manual = query.trim();
   const canAdd =
+    ready &&
     !custom &&
     !!manual &&
     !/\s/.test(manual) &&
     !choices.some((m) => m.id === manual);
   const count = choices.length + Number(canAdd);
-  const active = Math.min(index, count - 1);
+  const active = Math.min(
+    index ??
+      Math.max(
+        0,
+        choices.findIndex((m) => m.id === provider.model),
+      ),
+    count - 1,
+  );
   function place() {
     const rect = input.current!.getBoundingClientRect();
     const top =
@@ -82,16 +99,12 @@ export function ModelPicker({
   }
   function show() {
     if (open) return;
+    if (!ready) void restoreModels(key);
     place();
     setOpen(true);
     setQuery("");
     setEditing(false);
-    setIndex(
-      Math.max(
-        0,
-        ordered.findIndex((m) => m.id === provider.model),
-      ),
-    );
+    setIndex(null);
   }
   function choose(model: string, manualChoice = false) {
     onChange(chooseProviderModel(provider, model, manualChoice, directory));
@@ -148,7 +161,7 @@ export function ModelPicker({
     setError("");
     setEmpty(false);
     try {
-      const models = await fetchModels(provider.id);
+      const models = await fetchModels(provider.id, scope);
       if (currentKey.current !== scope) return;
       setEmpty(models.length === 0);
       if (models.length) {
@@ -326,7 +339,13 @@ export function ModelPicker({
                   <span>{t("使用自定义 ID「{0}」", manual)}</span>
                 </button>
               )}
-              {!count && <p>{t("没有匹配的模型，可直接输入自定义 ID。")}</p>}
+              {!count && (
+                <p>
+                  {t(
+                    ready ? "没有匹配的模型，可直接输入自定义 ID。" : "获取中…",
+                  )}
+                </p>
+              )}
             </div>
           </div>
         )}

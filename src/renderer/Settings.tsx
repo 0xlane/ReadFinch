@@ -1,7 +1,6 @@
 import { t, actionLabel } from "../shared/i18n";
 import { useEffect, useState, useRef, type ReactNode } from "react";
 import {
-  catalogKey,
   suggestionAction,
   assignProvider,
   updateProviderModel,
@@ -99,7 +98,9 @@ export function Settings({
     };
   }, [tab]);
   const [busy, setBusy] = useState(false);
-  const [catalogs, setCatalogs] = useState<Record<string, string[]>>({});
+  const [catalogs, setCatalogs] = useState<
+    Partial<Record<string, string[] | null>>
+  >({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [keys, setKeys] = useState<Record<string, string>>({});
@@ -372,17 +373,23 @@ export function Settings({
   }, [sync, syncDirty]);
   const modelCatalog = {
     catalogs,
-    fetchModels: async (id: string) => {
-      const profile = latest.current.draft.providers.find((p) => p.id === id);
-      if (!profile) throw Error(t("服务商不存在"));
-      const key = catalogKey(profile);
+    restoreModels: async (scope: string) => {
+      const ids = await window.readfinch
+        .call("cachedModels", { scope })
+        .catch(() => null);
+      setCatalogs((current) =>
+        current[scope] === undefined ? { ...current, [scope]: ids } : current,
+      );
+    },
+    fetchModels: async (profileId: string, expectedScope: string) => {
       await save();
       await flushCredentials();
-      const result = await window.readfinch.call("listModels", {
-        profileId: id,
+      const ids = await window.readfinch.call("listModels", {
+        profileId,
+        expectedScope,
       });
-      setCatalogs((current) => ({ ...current, [key]: result }));
-      return result;
+      setCatalogs((current) => ({ ...current, [expectedScope]: ids }));
+      return ids;
     },
   };
   const titles: Record<Tab, [string, string]> = {

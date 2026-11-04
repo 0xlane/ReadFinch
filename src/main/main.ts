@@ -1,5 +1,6 @@
 import { isTranslationOnly, requiresApiKey } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
+import { catalogKey } from "../shared/models";
 import { PublicModelDirectory } from "../core/public-model-directory";
 import { APP_NAME, APP_ID } from "../shared/brand";
 import { OnlineVoiceIdSchema, onlineVoices } from "../shared/tts";
@@ -37,7 +38,7 @@ import {
 import { sameDraft } from "../shared/draft";
 import { CompletionCache } from "../core/completion-cache";
 import { providerFetch } from "./provider-network";
-import { ConfigStore, readJson, atomicWrite } from "../core/store";
+import { ConfigStore, readJson, atomicWrite, digest } from "../core/store";
 import { DavSync, davUrl, type DavSettings } from "../core/sync";
 import {
   complete,
@@ -125,6 +126,9 @@ const root = app.getAppPath();
 const resource = app.isPackaged ? process.resourcesPath : root;
 const nativeRoot = path.join(resource, "native");
 const dataDir = app.getPath("userData");
+function providerModelListFile(scope: string) {
+  return path.join(dataDir, "provider-model-lists", digest(scope) + ".json");
+}
 const publicModelDirectory = new PublicModelDirectory(dataDir, (url, init) =>
   session.defaultSession.fetch(url.toString(), init),
 );
@@ -1802,12 +1806,29 @@ async function handle(
         throw Error(t("服务未返回有效内容，请检查模型 ID 和接口兼容性"));
       return { durationMs: Math.round(performance.now() - startedAt) };
     }
+    case "cachedModels": {
+      if (win !== main) throw Error(t("提供商不可用"));
+      const file = providerModelListFile(z.string().parse(arg.scope));
+      const data = await readJson<unknown>(file, null).catch(() => null);
+      const ids = z.array(z.string().min(1).max(200)).max(2000).safeParse(data);
+      return ids.success ? ids.data : null;
+    }
     case "listModels": {
+      if (win !== main) throw Error(t("提供商不可用"));
       const p = store.config.providers.find((p) => p.id === arg.profileId);
       if (!p) throw Error(t("服务商不存在"));
       if (!p.enabled) throw Error(t("此 API 提供商已停用"));
+      const scope = catalogKey(p);
+      if (arg.expectedScope !== undefined && arg.expectedScope !== scope)
+        throw Error(t("配置已更改，请重试"));
       const { key, headers } = await credentials(p);
-      return listModels({ ...p, headers }, key, new AbortController().signal);
+      const ids = await listModels(
+        { ...p, headers },
+        key,
+        new AbortController().signal,
+      );
+      await atomicWrite(providerModelListFile(scope), JSON.stringify(ids));
+      return ids;
     }
     case "recognize":
       return recognize(

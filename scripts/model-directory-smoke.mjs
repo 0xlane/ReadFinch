@@ -12,26 +12,48 @@ await mkdir(dir, { recursive: true });
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 const ids = ["deepseek-v4.1-flash-1017", "my-private-vision-tts"];
+let responseIds = ids;
+let modelRequests = 0;
 const server = createServer((req, res) => {
   if (req.url !== "/v1/models") {
     res.writeHead(404).end();
     return;
   }
+  modelRequests++;
+  if (!responseIds) return res.writeHead(503).end();
   res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ data: ids.map((id) => ({ id })) }));
+  res.end(JSON.stringify({ data: responseIds.map((id) => ({ id })) }));
 });
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 let app;
-try {
+const errors = [];
+async function launch() {
   app = await electron.launch({
     ...(packaged ? { executablePath: path.resolve(executable) } : {}),
     args: [...(packaged ? [] : ["."]), "--settings", "--data-dir=" + dir],
     env,
   });
-  const page = await app.firstWindow(),
-    errors = [];
+  const page = await app.firstWindow();
   page.on("pageerror", (e) => errors.push(e.message));
   await page.locator("main h1").waitFor();
+  return page;
+}
+async function restartProviders() {
+  await app.close();
+  const page = await launch();
+  await page.evaluate(() =>
+    window.readfinch.call("settingsOpen", { tab: "text" }),
+  );
+  await page
+    .locator('.provider-select[aria-current="true"]')
+    .filter({ hasText: "Fetched catalog" })
+    .waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "展开模型列表", exact: true }).click();
+  return page;
+}
+const modelList = (page) => page.getByRole("listbox", { name: "模型候选" });
+try {
+  let page = await launch();
   await page.evaluate(async (endpoint) => {
     const state = await window.readfinch.call("snapshot");
     state.config.appearance.language = "zh-CN";
@@ -39,9 +61,15 @@ try {
     state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
     state.config.actions.forEach((a) => (a.shortcut = ""));
     Object.assign(state.config.providers[0], {
+      name: "Other account",
       endpoint,
       requiresKey: false,
       proxy: { mode: "direct", address: "" },
+    });
+    state.config.providers.push({
+      ...state.config.providers[0],
+      id: "fetched-account",
+      name: "Fetched catalog",
     });
     await window.readfinch.call("saveConfig", {
       config: state.config,
@@ -49,6 +77,57 @@ try {
     });
     await window.readfinch.call("settingsOpen", { tab: "text" });
   }, `http://127.0.0.1:${server.address().port}/v1`);
+  await page
+    .getByRole("button", { name: "Fetched catalog", exact: true })
+    .click();
+  await page.getByRole("button", { name: "获取模型列表", exact: true }).click();
+  const options = modelList(page).getByRole("option");
+  await options.filter({ hasText: ids[0] }).waitFor();
+  assert.equal(await options.count(), ids.length);
+  await options.filter({ hasText: ids[0] }).click();
+  const saveDeadline = Date.now() + 5000;
+  for (;;) {
+    const config = JSON.parse(
+      await readFile(path.join(dir, "config.json"), "utf8"),
+    );
+    if (
+      config.providers.find((p) => p.id === "fetched-account").model === ids[0]
+    )
+      break;
+    assert.ok(Date.now() < saveDeadline, "Selected model did not autosave");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  responseIds = null;
+  page = await restartProviders();
+  const restored = modelList(page).getByRole("option");
+  await restored.filter({ hasText: ids[1] }).waitFor({ timeout: 5000 });
+  assert.deepEqual(
+    await restored.locator(":scope > span:first-child").allTextContents(),
+    ids,
+  );
+  assert.equal(modelRequests, 1);
+  await page
+    .getByRole("button", { name: "Other account", exact: true })
+    .click();
+  await page.getByRole("button", { name: "展开模型列表", exact: true }).click();
+  await modelList(page)
+    .getByRole("option")
+    .filter({ hasText: "gpt-" })
+    .first()
+    .waitFor();
+  assert.equal(
+    await modelList(page)
+      .getByRole("option")
+      .filter({ hasText: ids[1] })
+      .count(),
+    0,
+  );
+  await page
+    .getByRole("button", { name: "Fetched catalog", exact: true })
+    .click();
+  const model = page.getByRole("combobox", { name: "模型", exact: true });
+  assert.equal(await model.inputValue(), ids[0]);
+  await model.press("Escape");
   const custom = page.getByRole("checkbox", { name: "输入自定义模型 ID" });
   const input = page.getByRole("combobox", {
     name: "自定义模型 ID",
@@ -56,13 +135,6 @@ try {
   });
   const info = page.locator(".model-capability-line");
   const caps = page.getByRole("combobox", { name: "模型能力", exact: true });
-  await page.getByRole("button", { name: "获取模型列表", exact: true }).click();
-  const options = page
-    .getByRole("listbox", { name: "模型候选" })
-    .getByRole("option");
-  await options.filter({ hasText: ids[0] }).waitFor();
-  assert.equal(await options.count(), ids.length);
-  await options.filter({ hasText: ids[0] }).click();
   assert.equal(await custom.isChecked(), false);
   await info.getByText("DeepSeek V4.1 Flash 1017", { exact: true }).waitFor();
   assert.match(await info.innerText(), /文本与图片/);
@@ -108,9 +180,27 @@ try {
       console.log(key + ": " + file.entries.length + " live records");
     }
   }
+  await page.getByRole("button", { name: "获取模型列表", exact: true }).click();
+  await page.locator(".model-fetch-error").waitFor();
+  page = await restartProviders();
+  await modelList(page)
+    .getByRole("option")
+    .filter({ hasText: ids[1] })
+    .waitFor();
+  assert.equal(await modelList(page).getByRole("option").count(), ids.length);
+  responseIds = [];
+  await page.getByRole("button", { name: "获取模型列表", exact: true }).click();
+  await page.locator(".model-fetch-note[role=status]").waitFor();
+  const requestsBeforeRestart = modelRequests;
+  page = await restartProviders();
+  await modelList(page)
+    .getByText("没有匹配的模型，可直接输入自定义 ID。")
+    .waitFor();
+  assert.equal(await modelList(page).getByRole("option").count(), 0);
+  assert.equal(modelRequests, requestsBeforeRestart);
   assert.deepEqual(errors, []);
   console.log(
-    "Exact ID, context, text fallback, advanced override and speech controls passed: " +
+    "Model metadata, provider isolation, offline restart, failed refresh and persisted empty list passed: " +
       dir,
   );
 } finally {

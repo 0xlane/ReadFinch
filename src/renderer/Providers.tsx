@@ -1,7 +1,7 @@
 import { t } from "../shared/i18n";
 import { RequestHeaders } from "./RequestHeaders";
 import { ProviderProxySettings } from "./ProviderProxySettings";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Plus, ChevronRight } from "lucide-react";
 import {
   createProvider,
@@ -42,14 +42,33 @@ type ProviderProps = ModelCatalogAccess & {
   busy: boolean;
 };
 
+const lastProviderKey = "readfinch.settings.lastProvider";
+
 export function Providers(props: ProviderProps) {
   const { config, onChange } = props;
-  const [selected, setSelected] = useState(config.defaults.textProfileId);
+  const [selected, setSelected] = useState(() => {
+    try {
+      return (
+        localStorage.getItem(lastProviderKey) ?? config.defaults.textProfileId
+      );
+    } catch {
+      return config.defaults.textProfileId;
+    }
+  });
   const [adding, setAdding] = useState(false);
   const [notice, setNotice] = useState("");
   const addButton = useRef<HTMLButtonElement>(null);
   const provider =
-    config.providers.find((p) => p.id === selected) ?? config.providers[0];
+    config.providers.find((p) => p.id === selected) ??
+    config.providers.find((p) => p.id === config.defaults.textProfileId) ??
+    config.providers[0];
+  useEffect(() => {
+    try {
+      localStorage.setItem(lastProviderKey, provider.id);
+    } catch {
+      /* Navigation still works when local storage is unavailable. */
+    }
+  }, [provider.id]);
   const purposes = modelPurposes(config);
   function select(id: string) {
     setSelected(id);

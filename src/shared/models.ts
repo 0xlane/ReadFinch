@@ -26,7 +26,10 @@ export const catalogKey = (
     provider.id,
     provider.endpoint,
     provider.preset,
-    provider.providerSettings,
+    provider.providerSettings?.region,
+    provider.providerSettings?.resourceName,
+    provider.providerSettings?.apiVersion,
+    provider.providerSettings?.apiMode,
     provider.proxy.mode,
     provider.proxy.mode === "custom" ? provider.proxy.address.trim() : "",
   ]);
