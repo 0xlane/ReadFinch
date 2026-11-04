@@ -514,13 +514,21 @@ function createWindow(
   mode: "main" | "panel" | "pill" | "capture",
   options: Electron.BrowserWindowConstructorOptions = {},
 ) {
+  const nativeMacControls =
+    process.platform === "darwin" && (mode === "main" || mode === "panel");
   const win = new BrowserWindow({
     width: 940,
     height: 740,
     minWidth: 760,
     minHeight: 560,
     show: false,
-    frame: false,
+    frame: nativeMacControls,
+    ...(nativeMacControls
+      ? {
+          titleBarStyle: "hidden" as const,
+          trafficLightPosition: { x: 16, y: 15 },
+        }
+      : {}),
     backgroundColor: nativeTheme.shouldUseDarkColors ? "#202020" : "#ffffff",
     title: t("伴读雀"),
     icon: path.join(
@@ -777,8 +785,9 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
       alwaysOnTop: true,
       maximizable: false,
       fullscreenable: false,
-      transparent: true,
-      backgroundColor: "#00000000",
+      ...(process.platform === "darwin"
+        ? { minimizable: false }
+        : { transparent: true, backgroundColor: "#00000000" }),
     });
     panel.once("ready-to-show", deliver);
     panel.on("blur", () => {

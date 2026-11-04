@@ -47,6 +47,7 @@ function SettingsApp({
     request: 0,
   });
   const tab = location.tab;
+  const nativeMacControls = snapshot.platform.startsWith("darwin");
   const content = useRef<HTMLElement>(null);
   useEffect(() => {
     content.current?.scrollTo({ top: 0 });
@@ -73,25 +74,29 @@ function SettingsApp({
           {t("伴读雀")} <span className="muted">{t("设置")}</span>
         </span>
         <div className="grow" />
-        <button
-          className="window-control"
-          aria-label={t("最小化")}
-          onClick={() =>
-            void window.readfinch.call("window", { command: "minimize" })
-          }
-        >
-          <Minus size={16} />
-        </button>
-        <button
-          className="window-control close-control"
-          aria-label={t("关闭设置")}
-          title={t("关闭后继续在托盘运行")}
-          onClick={() =>
-            void window.readfinch.call("window", { command: "close" })
-          }
-        >
-          <X size={17} />
-        </button>
+        {!nativeMacControls && (
+          <>
+            <button
+              className="window-control"
+              aria-label={t("最小化")}
+              onClick={() =>
+                void window.readfinch.call("window", { command: "minimize" })
+              }
+            >
+              <Minus size={16} />
+            </button>
+            <button
+              className="window-control close-control"
+              aria-label={t("关闭设置")}
+              title={t("关闭后继续在托盘运行")}
+              onClick={() =>
+                void window.readfinch.call("window", { command: "close" })
+              }
+            >
+              <X size={17} />
+            </button>
+          </>
+        )}
       </header>
       <aside className="settings-sidebar">
         <div className="sidebar-scroll">
@@ -197,6 +202,8 @@ export function App() {
   if (snapshot) {
     setLocale(snapshot.interfaceLocale);
     document.documentElement.lang = snapshot.interfaceLocale;
+    document.documentElement.dataset.platform =
+      snapshot.platform.split(" / ")[0];
   }
   useEffect(() => {
     document.title = t("伴读雀");

@@ -448,6 +448,10 @@ details {
   user-select: none;
   font-size: 12px;
 }
+:root[data-platform="darwin"] .window-titlebar,
+:root[data-platform="darwin"] .panel-titlebar {
+  padding-left: 96px;
+}
 .window-titlebar .brand-mark {
   width: 22px;
   height: 22px;
