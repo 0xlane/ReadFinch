@@ -27,7 +27,7 @@ async function language(page, value) {
     const state = await window.readfinch.call("snapshot");
     state.config.appearance.language = value;
     state.config.selection.automatic = false;
-    state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+    state.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
     state.config.actions.forEach((action) => (action.shortcut = ""));
     await window.readfinch.call("saveConfig", {
       config: state.config,

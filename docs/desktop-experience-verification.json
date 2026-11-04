@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-05",
+  "platform": "macOS 15.8.1 Intel x64",
+  "version": "1.2.3 (unreleased candidate)",
+  "unitTests": {
+    "passed": 187,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "panelChecks": [
+    "Input shortcut focuses editor; Enter translates; Shift+Enter and IME composition do not submit",
+    "A new shortcut opens a second window without cancelling or replacing the pinned window's running request",
+    "Dock remains available and pinned results survive closing/reopening settings",
+    "Unpinned window is reused; settings do not dismiss pinned windows",
+    "Short input window stays on the cursor's display with its nearest edge within 24 DIP",
+    "Image import from a pinned result opens another window and preserves the original session"
+  ],
+  "panelRendererErrors": [],
+  "shortcuts": {
+    "checks": 11,
+    "registration": "Actual Electron OS registration with isolated keys",
+    "invocation": "Development callbacks and synthetic selection fixtures; not physical key presses"
+  },
+  "suggestions": "Six integration checks passed using local HTTP fixtures, including save, cancellation, cache and failure paths",
+  "pending": [
+    "Physical mouse selection in the Feishu composer and keyboard-only negative check on the updated candidate",
+    "Screen capture cancellation and crop verification on an unlocked desktop"
+  ],
+  "captureAttempt": "No capture overlay became available in the locked session; not counted as passed.",
+  "releaseCreated": false
+}

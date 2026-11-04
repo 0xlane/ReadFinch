@@ -19,6 +19,7 @@
     "test:commands": "node scripts/action-schema-smoke.mjs",
     "test:suggestions": "node scripts/suggestion-smoke.mjs",
     "test:reasoning": "node scripts/reasoning-smoke.mjs",
+    "test:panels": "node scripts/panel-smoke.mjs",
     "test:input": "node scripts/input-flow.mjs",
     "test:shortcuts": "node scripts/shortcut-smoke.mjs",
     "test:toolbar": "node scripts/toolbar-smoke.mjs",

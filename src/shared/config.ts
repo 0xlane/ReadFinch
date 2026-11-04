@@ -39,6 +39,7 @@ export const OCR_INSTRUCTION =
 export const OFFLINE_OCR_ID = "ocr-offline";
 import {
   DEFAULT_ACTION_SHORTCUTS,
+  currentShortcutPlatform,
   normalizeShortcut,
   shortcutBindings,
   shortcutConflict,
@@ -198,7 +199,7 @@ export const ActionSchema = z
   .strict();
 export const ConfigSchema = z
   .object({
-    schemaVersion: z.literal(15),
+    schemaVersion: z.literal(16),
     tts: SpeechConfigSchema,
     localNotebases: z.array(LocalNotebaseSchema).max(1000),
     noteSuggestion: z.strictObject({
@@ -247,6 +248,7 @@ export const ConfigSchema = z
       .strict(),
     shortcuts: z
       .object({
+        input: shortcut,
         selection: shortcut,
         capture: shortcut,
         clipboard: shortcut,
@@ -490,7 +492,7 @@ const retiredDefaults = [
 ];
 function baseConfig(preferred: readonly string[] = []): Config {
   return {
-    schemaVersion: 15,
+    schemaVersion: 16,
     tts: defaultSpeech(),
     localNotebases: [],
     noteSuggestion: { enabled: true, actionId: null, providerId: null },
@@ -539,8 +541,12 @@ function baseConfig(preferred: readonly string[] = []): Config {
       excludedApps: ["1password", "keepass", "bitwarden"],
     },
     shortcuts: {
+      input: "Alt+A",
       selection: "CommandOrControl+Shift+Space",
-      capture: "CommandOrControl+Shift+2",
+      capture:
+        currentShortcutPlatform() === "darwin"
+          ? "Alt+Shift+S"
+          : "CommandOrControl+Shift+2",
       clipboard: "CommandOrControl+Shift+V",
     },
   };
@@ -1100,7 +1106,7 @@ export function parseConfig(
     candidate &&
     typeof candidate === "object" &&
     "schemaVersion" in candidate &&
-    [12, 13, 14, 15].includes(Number(candidate.schemaVersion)) &&
+    [12, 13, 14, 15, 16].includes(Number(candidate.schemaVersion)) &&
     "actions" in candidate &&
     Array.isArray(candidate.actions)
   ) {
@@ -1208,6 +1214,54 @@ export function parseConfig(
         })
       : old.providers;
     candidate = { ...candidate, schemaVersion: 15, defaults, providers };
+  }
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 15
+  ) {
+    const old = candidate as Record<string, any>;
+    const shortcuts = { ...old.shortcuts };
+    const actions = Array.isArray(old.actions)
+      ? old.actions.map((a: any) => ({ ...a }))
+      : old.actions;
+    // Change only known old defaults, and reserve even disabled custom action
+    // keys so re-enabling an action will not introduce a new collision.
+    const identity = (key: unknown) => {
+      try {
+        return typeof key === "string" ? shortcutIdentity(key) : "";
+      } catch {
+        return String(key);
+      } // The schema still reports invalid bindings.
+    };
+    const occupied = () =>
+      new Set(
+        [
+          ...Object.values(shortcuts),
+          ...(Array.isArray(actions)
+            ? actions.map((a: any) => a.shortcut)
+            : []),
+        ].map(identity),
+      );
+    const translate = Array.isArray(actions)
+      ? actions.find((a: any) => a.id === "translate")
+      : undefined;
+    if (
+      currentShortcutPlatform() === "darwin" &&
+      translate &&
+      identity(translate.shortcut) === identity("Alt+T") &&
+      !occupied().has(identity("Alt+D"))
+    )
+      translate.shortcut = "Alt+D";
+    if (
+      currentShortcutPlatform() === "darwin" &&
+      identity(shortcuts.capture) === identity("CommandOrControl+Shift+2") &&
+      !occupied().has(identity("Alt+Shift+S"))
+    )
+      shortcuts.capture = "Alt+Shift+S";
+    shortcuts.input = occupied().has(identity("Alt+A")) ? "" : "Alt+A";
+    candidate = { ...old, schemaVersion: 16, shortcuts, actions };
   }
   const result = ConfigSchema.safeParse(candidate);
   if (!result.success)

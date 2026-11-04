@@ -106,12 +106,13 @@
 
 | 指令 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 翻譯選取文字 | `Alt + T` | `Option + T` |
+| 翻譯選取文字 | `Alt + T` | `Option + D` |
 | 開啟字典 | `Alt + Shift + D` | `Option + Shift + D` |
 | 改善寫作 | `Alt + Shift + W` | `Option + Shift + W` |
 | 選擇指令 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 框選螢幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| 框選螢幕文字 | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | 讀取剪貼簿 | `Ctrl + Shift + V` | `Command + Shift + V` |
+| 輸入翻譯 | `Alt + A` | `Option + A` |
 
 快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。
 

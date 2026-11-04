@@ -100,7 +100,7 @@ try {
   s.config.appearance.theme = "light";
   s.config.selection.automatic = true;
   s.config.noteSuggestion.enabled = false;
-  s.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+  s.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
   s.config.actions.forEach((a) => (a.shortcut = ""));
   s.config.providers.push(
     {

@@ -106,12 +106,13 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 
 | 操作 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 選択範囲を翻訳 | `Alt + T` | `Option + T` |
+| 選択範囲を翻訳 | `Alt + T` | `Option + D` |
 | 辞書を開く | `Alt + Shift + D` | `Option + Shift + D` |
 | 文章を改善 | `Alt + Shift + W` | `Option + Shift + W` |
 | 指示を選ぶ | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 画面の文字を OCR で取得 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| 画面の文字を OCR で取得 | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | クリップボードの文字を読む | `Ctrl + Shift + V` | `Command + Shift + V` |
+| 入力翻訳 | `Alt + A` | `Option + A` |
 
 ショートカットは専用設定ページで変更できます。設定は自動保存され、外観はシステム連動またはライト・ダークから選べます。ログイン時の自動起動は初期状態ではオフで、トレイメニューから変更できます。
 

@@ -78,7 +78,7 @@ try {
       const state = await window.readfinch.call("snapshot");
       state.config.appearance.language = "zh-CN";
       state.config.selection.automatic = false;
-      state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+      state.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
       state.config.actions.forEach((a) => (a.shortcut = ""));
       Object.assign(state.config.providers[0], {
         name: "Other account",

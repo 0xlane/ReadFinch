@@ -57,8 +57,17 @@ for (const code of order) {
         "Ctrl + Shift + Space",
         "Ctrl + Shift + 2",
         "Ctrl + Shift + V",
+        "Alt + A",
       ][i];
-      const mac = win.replace("Alt", "Option").replace("Ctrl", "Command");
+      const mac = [
+        "Option + D",
+        "Option + Shift + D",
+        "Option + Shift + W",
+        "Command + Shift + Space",
+        "Option + Shift + S",
+        "Command + Shift + V",
+        "Option + A",
+      ][i];
       return "| " + name + " | `" + win + "` | `" + mac + "` |";
     })
     .join("\n");

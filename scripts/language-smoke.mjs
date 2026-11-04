@@ -154,7 +154,7 @@ try {
     c.appearance.theme = "light";
     c.selection.automatic = false;
     c.noteSuggestion.enabled = false;
-    c.shortcuts = { selection: "", capture: "", clipboard: "" };
+    c.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
     c.actions.forEach((a) => (a.shortcut = ""));
     Object.assign(c.providers[0], {
       model: "language-fixture",

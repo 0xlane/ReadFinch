@@ -166,23 +166,28 @@ let toolbarMenu: ToolbarMenu = "none";
 let toolbarPausedUntil = 0;
 let resumeTimer: ReturnType<typeof setTimeout> | undefined;
 const pauseFile = path.join(dataDir, "device-toolbar.json");
-let interaction: Interaction | null = null;
+type PanelState = {
+  interaction: Interaction;
+  pinned: boolean;
+  placedByUser: boolean;
+  placement: PanelPlacement;
+  frame: string;
+  height: number;
+  dialog: boolean;
+};
+const panels = new Map<BrowserWindow, PanelState>();
 type PendingSuggestion = {
+  win: BrowserWindow;
   id: string;
   bindingKey: string;
   controller: AbortController;
   translated: boolean;
   notes: SuggestedNote[];
 };
-let pendingSuggestion: PendingSuggestion | undefined;
+const pendingSuggestions = new Map<BrowserWindow, PendingSuggestion>();
 let triggerAnchor: Point = { x: 0, y: 0 };
-let panelPinned = false;
-let panelPlacedByUser = false;
-let panelPlacement: PanelPlacement | undefined;
-let panelFrame = "";
-let panelDialog = false;
 let captureReturn: BrowserWindow | undefined;
-let captureReturnPinned = false;
+let captureHidden: BrowserWindow[] = [];
 let settings: DavSettings = {
   enabled: false,
   url: "",
@@ -344,11 +349,9 @@ function requirePermission(permission: "accessibility" | "screen") {
   return false;
 }
 async function configChanged() {
-  if (
-    pendingSuggestion &&
-    suggestionBinding(runtimeConfig())?.key !== pendingSuggestion.bindingKey
-  )
-    cancelSuggestion();
+  for (const [win, run] of pendingSuggestions)
+    if (suggestionBinding(runtimeConfig())?.key !== run.bindingKey)
+      cancelSuggestion(win);
   resultCache.configure(store.config.cache);
   setLocale(interfaceLocale());
   for (const win of BrowserWindow.getAllWindows()) win.setTitle(t("伴读雀"));
@@ -370,26 +373,36 @@ async function configChanged() {
 function applyTheme() {
   const effective = nativeTheme.shouldUseDarkColors ? "dark" : "light";
   for (const win of windows)
-    if (win !== pill && win !== panel && win !== overlay && !win.isDestroyed())
+    if (
+      win !== pill &&
+      !panels.has(win) &&
+      win !== overlay &&
+      !win.isDestroyed()
+    )
       win.setBackgroundColor(effective === "dark" ? "#202020" : "#ffffff");
   broadcast("theme", { preference: store.config.appearance.theme, effective });
 }
 function cancelWindowJobs(win: BrowserWindow | undefined) {
   if (!win || win.isDestroyed()) return;
-  if (win === panel) cancelSuggestion();
+  cancelSuggestion(win);
   for (const [id, owner] of owners)
     if (owner === win.webContents.id) {
       jobs.cancel(id);
       owners.delete(id);
     }
 }
-function dismissPanel() {
+function dismissPanel(win = panel) {
   shortcutGeneration++;
-  if (!panel || panel.isDestroyed() || panel.webContents.isDestroyed()) return;
-  cancelWindowJobs(panel);
-  send(panel, "hidden", undefined);
-  panel?.hide();
-  panelPinned = false;
+  if (!win || win.isDestroyed() || win.webContents.isDestroyed()) return;
+  cancelWindowJobs(win);
+  send(win, "hidden", undefined);
+  const state = panels.get(win);
+  if (state) {
+    state.pinned = false;
+    state.interaction.pinned = false;
+  }
+  if (win === panel) win.hide();
+  else win.destroy();
 }
 function contextError(error: Error) {
   openPanel({
@@ -452,6 +465,11 @@ function updateTray() {
             dialog.showErrorBox(t("无法更改划词状态"), error.message),
           );
       },
+    },
+    {
+      label: t("输入翻译"),
+      accelerator: store.config.shortcuts.input || undefined,
+      click: openInput,
     },
     {
       label: t("框选屏幕文字（OCR）"),
@@ -569,7 +587,7 @@ function createWindow(
   win.on("closed", () => {
     releaseSpeech();
     windows.delete(win);
-    if (win === panel) cancelSuggestion();
+    cancelSuggestion(win);
     for (const [id, owner] of owners)
       if (owner === ownerId) {
         jobs.cancel(id);
@@ -603,7 +621,7 @@ function openSettings(
     request: settingsLocation.request + 1,
   };
   hideToolbar();
-  dismissPanel();
+  if (panel && !panels.get(panel)?.pinned) dismissPanel();
   openMain();
   send(main, "settings", settingsLocation);
 }
@@ -617,11 +635,20 @@ function selectionAnchor(selection: Selection) {
     // The AX helper chooses the pointer for mouse selections and the text
     // bounds for distant or keyboard selections, in the same units as Electron.
     const point = { x: Math.round(selection.x), y: Math.round(selection.y) };
-    return toolbarAnchor(cursor, point, screen.getDisplayNearestPoint(point).bounds, true);
+    return toolbarAnchor(
+      cursor,
+      point,
+      screen.getDisplayNearestPoint(point).bounds,
+      true,
+    );
   }
   if (process.platform !== "win32") return cursor;
   const point = screen.screenToDipPoint({ x: selection.x, y: selection.y });
-  return toolbarAnchor(cursor, point, screen.getDisplayNearestPoint(point).bounds);
+  return toolbarAnchor(
+    cursor,
+    point,
+    screen.getDisplayNearestPoint(point).bounds,
+  );
 }
 function currentToolbarLayout() {
   const items = toolbarItems(store.config);
@@ -638,7 +665,8 @@ function currentToolbarLayout() {
 }
 function updateToolbar(): ToolbarView | null {
   const selection = native.current;
-  if (!toolbarRequested || !selection || !pill || pill.isDestroyed()) return null;
+  if (!toolbarRequested || !selection || !pill || pill.isDestroyed())
+    return null;
   const layout = currentToolbarLayout();
   const frame = JSON.stringify(layout.bounds);
   if (frame !== toolbarFrame) {
@@ -680,86 +708,97 @@ async function saveToolbarPause(until: number) {
   armToolbarResume();
   return configChanged();
 }
+function ensureToolbarWindow() {
+  if (pill && !pill.isDestroyed()) return;
+  const { bounds } = currentToolbarLayout();
+  toolbarFrame = JSON.stringify(bounds);
+  toolbarRegion = "";
+  toolbarReady = false;
+  pill = createWindow("pill", {
+    ...bounds,
+    minWidth: 1,
+    minHeight: 1,
+    resizable: false,
+    transparent: true,
+    backgroundColor: "#00000000",
+    focusable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    thickFrame: false,
+    maximizable: false,
+    fullscreenable: false,
+  });
+  if (process.platform === "win32") {
+    const win = pill;
+    win.hookWindowMessage(0x02e0, () => {
+      // Let Windows apply WM_DPICHANGED before checking its suggested size.
+      setImmediate(() => {
+        if (quitting || !toolbarRequested || win.isDestroyed()) return;
+        const desired = currentToolbarLayout().bounds;
+        const actual = win.getBounds();
+        if (
+          (["x", "y", "width", "height"] as const).some(
+            (key) => Math.abs(desired[key] - actual[key]) > 1,
+          )
+        ) {
+          toolbarFrame = "";
+          updateToolbar();
+        }
+      });
+    });
+  }
+  pill.on("hide", () => {
+    toolbarMenu = "none";
+    send(pill, "toolbarState", null);
+  });
+  pill.on("blur", () => {
+    if (toolbarMenu !== "none" && pill?.isVisible()) {
+      toolbarMenu = "none";
+      updateToolbar();
+    }
+  });
+  pill.once("ready-to-show", () => {
+    toolbarReady = true;
+    showLoadedToolbar();
+  });
+}
+function showLoadedToolbar(): ToolbarView | null {
+  if (
+    !toolbarReady ||
+    !toolbarRequested ||
+    quitting ||
+    captureBusy ||
+    selectionReadCount ||
+    !pill ||
+    pill.isDestroyed() ||
+    !native.current ||
+    !toolbarEnabled(store.config, native.current.app, toolbarPausedUntil)
+  )
+    return null;
+  if (process.platform !== "win32" || pill.isFocusable())
+    pill.setFocusable(false);
+  const state = updateToolbar();
+  if (state && !pill.isVisible()) pill.showInactive();
+  return state;
+}
 function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
   if (quitting || captureBusy || selectionReadCount) return;
-  const cfg = store.config;
-  if (!toolbarEnabled(cfg, selection.app, toolbarPausedUntil)) {
+  if (!toolbarEnabled(store.config, selection.app, toolbarPausedUntil)) {
     hideToolbar();
     return;
   }
   toolbarRequested = true;
   triggerAnchor = anchor;
   toolbarMenu = "none";
-  if (!pill || pill.isDestroyed()) {
-    const { bounds } = currentToolbarLayout();
-    toolbarFrame = JSON.stringify(bounds);
-    toolbarRegion = "";
-    toolbarReady = false;
-    pill = createWindow("pill", {
-      ...bounds,
-      minWidth: 1,
-      minHeight: 1,
-      resizable: false,
-      transparent: true,
-      backgroundColor: "#00000000",
-      focusable: false,
-      skipTaskbar: true,
-      alwaysOnTop: true,
-      hasShadow: false,
-      thickFrame: false,
-      maximizable: false,
-      fullscreenable: false,
-    });
-    if (process.platform === "win32") {
-      const win = pill;
-      win.hookWindowMessage(0x02e0, () => {
-        // Let Windows apply WM_DPICHANGED before checking its suggested size.
-        setImmediate(() => {
-          if (quitting || !toolbarRequested || win.isDestroyed()) return;
-          const desired = currentToolbarLayout().bounds;
-          const actual = win.getBounds();
-          if ((["x", "y", "width", "height"] as const).some(
-            key => Math.abs(desired[key] - actual[key]) > 1,
-          )) {
-            toolbarFrame = "";
-            updateToolbar();
-          }
-        });
-      });
-    }
-    pill.on("hide", () => {
-      toolbarMenu = "none";
-      send(pill, "toolbarState", null);
-    });
-    pill.on("blur", () => {
-      if (toolbarMenu !== "none" && pill?.isVisible()) {
-        toolbarMenu = "none";
-        updateToolbar();
-      }
-    });
-    pill.once("ready-to-show", () => {
-      toolbarReady = true;
-      if (
-        toolbarRequested &&
-        !quitting &&
-        !captureBusy &&
-        !selectionReadCount &&
-        pill &&
-        !pill.isDestroyed() &&
-        native.current &&
-        toolbarEnabled(store.config, native.current.app, toolbarPausedUntil)
-      ) {
-        updateToolbar();
-        if (!pill.isVisible()) pill.showInactive();
-      }
-    });
-  } else if (toolbarReady) {
-    if (process.platform !== "win32" || pill.isFocusable()) pill.setFocusable(false);
-    updateToolbar();
-    if (!pill.isVisible()) pill.showInactive();
-  }
+  ensureToolbarWindow();
+  showLoadedToolbar();
 }
-function openSelection(actionId?: string, current?: Selection | null, javaBridgeUnavailable = false) {
+function openSelection(
+  actionId?: string,
+  current?: Selection | null,
+  javaBridgeUnavailable = false,
+) {
   if (captureBusy) return;
   if (!requirePermission("accessibility")) return;
   if (
@@ -792,46 +831,33 @@ function openSelection(actionId?: string, current?: Selection | null, javaBridge
       selection: s,
       actionId,
     },
-    pill?.isVisible() && s.token === native.current?.token
-      ? triggerAnchor
-      : selectionAnchor(s),
+    screen.getCursorScreenPoint(),
   );
 }
 async function openClipboard() {
   const text = (await clipboard.readText()).slice(0, 100000);
   openPanel({ id: randomUUID(), source: "clipboard", text });
 }
+function openInput() {
+  openPanel({
+    id: randomUUID(),
+    source: "empty",
+    text: "",
+    actionId: "translate",
+  });
+}
 function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
   shortcutGeneration++;
+  // A pinned result owns its session, jobs and suggestions until explicitly closed.
+  if (panel && panels.get(panel)?.pinned) panel = undefined;
   cancelWindowJobs(panel);
-  const reusePinned = panelPinned && panel?.isVisible();
-  interaction = { ...value, pinned: !!reusePinned };
-  if (!reusePinned) {
-    const expectsSuggestions =
-      store.config.noteSuggestion.enabled &&
-      (!value.actionId || value.actionId === "translate");
-    panelPlacement = planPanel(
-      anchor,
-      screen.getDisplayNearestPoint(anchor).workArea,
-      expectsSuggestions || value.capture ? 520 : 420,
-    );
-    panelFrame = "";
-    panelPlacedByUser = false;
-    panelPinned = false;
-  }
+  const placement = planPanel(
+    anchor,
+    screen.getDisplayNearestPoint(anchor).workArea,
+  );
   hideToolbar();
-  const deliver = () => {
-    if (!reusePinned) {
-      const bounds = panelBounds(panelPlacement!, 220);
-      panelFrame = JSON.stringify(bounds);
-      panel!.setBounds(bounds);
-    }
-    panel!.show();
-    panel!.focus();
-    send(panel, "interaction", interaction!);
-  };
   if (!panel || panel.isDestroyed()) {
-    panel = createWindow("panel", {
+    const win = createWindow("panel", {
       width: 500,
       height: 320,
       minWidth: 320,
@@ -844,24 +870,50 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
         ? { minimizable: false }
         : { transparent: true, backgroundColor: "#00000000" }),
     });
-    panel.once("ready-to-show", deliver);
-    panel.on("blur", () => {
-      if (!quitting && !panelPinned && !panelDialog && !captureBusy)
-        dismissPanel();
+    panel = win;
+    win.once("ready-to-show", () => deliverPanel(win));
+    win.on("blur", () => {
+      const state = panels.get(win);
+      if (!quitting && state && !state.pinned && !state.dialog && !captureBusy)
+        dismissPanel(win);
     });
-    panel.on("will-move", () => {
-      panelPlacedByUser = true;
-    });
-    panel.on("will-resize", () => {
-      panelPlacedByUser = true;
-    });
-    panel.on("close", (event) => {
+    const placedByUser = () => {
+      const state = panels.get(win);
+      if (state) state.placedByUser = true;
+    };
+    win.on("will-move", placedByUser);
+    win.on("will-resize", placedByUser);
+    win.on("close", (event) => {
       if (!quitting) {
         event.preventDefault();
-        dismissPanel();
+        dismissPanel(win);
       }
     });
-  } else if (!panel.webContents.isLoadingMainFrame()) deliver();
+    win.on("closed", () => {
+      panels.delete(win);
+      if (panel === win) panel = undefined;
+    });
+  }
+  panels.set(panel, {
+    interaction: { ...value, pinned: false },
+    pinned: false,
+    placement,
+    placedByUser: false,
+    frame: "",
+    height: 220,
+    dialog: false,
+  });
+  if (!panel.webContents.isLoadingMainFrame()) deliverPanel(panel);
+}
+function deliverPanel(win: BrowserWindow) {
+  const state = panels.get(win);
+  if (!state || win.isDestroyed()) return;
+  const bounds = panelBounds(state.placement, state.height);
+  state.frame = JSON.stringify(bounds);
+  win.setBounds(bounds);
+  win.show();
+  win.focus();
+  send(win, "interaction", state.interaction);
 }
 function registerShortcuts() {
   shortcutErrors = shortcutRegistry.update(shortcutBindings(store.config));
@@ -876,6 +928,10 @@ async function dispatchShortcut(id: string) {
     return;
   const binding = shortcutBindings(store.config).find((item) => item.id === id);
   if (!binding) return;
+  if (id === "input") {
+    openInput();
+    return;
+  }
   if (id === "capture") {
     await capture();
     return;
@@ -893,9 +949,13 @@ async function dispatchShortcut(id: string) {
   if (
     binding.actionId &&
     (shortcutTestTarget === "panel" ||
-      (!shortcutTestTarget && focused === panel))
+      (!shortcutTestTarget && focused && panels.has(focused)))
   ) {
-    send(panel, "actionShortcut", { actionId: binding.actionId });
+    send(
+      shortcutTestTarget === "panel" ? panel : (focused ?? undefined),
+      "actionShortcut",
+      { actionId: binding.actionId },
+    );
     return;
   }
   const generation = ++shortcutGeneration;
@@ -908,7 +968,10 @@ async function dispatchShortcut(id: string) {
       nextSelectionForTest = undefined;
       await new Promise((resolve) => setTimeout(resolve, fixture.delay));
       selection = fixture.value;
-    } else selection = await native.readCurrent(() => { javaBridgeUnavailable = true; });
+    } else
+      selection = await native.readCurrent(() => {
+        javaBridgeUnavailable = true;
+      });
     if (generation !== shortcutGeneration || captureBusy || quitting) return;
     if (!shortcutTestTarget && BrowserWindow.getFocusedWindow() === main)
       return;
@@ -929,14 +992,15 @@ function imageCapture(image: Electron.NativeImage): Capture {
 function openImage(image: Capture, source: "capture" | "image") {
   openPanel({ id: randomUUID(), source, text: "", capture: image });
 }
-function restoreAfterCapture() {
-  if (captureReturn && !captureReturn.isDestroyed()) {
-    if (captureReturn === panel) panelPinned = captureReturnPinned;
+function restoreAfterCapture(cancelled = true) {
+  for (const win of captureHidden)
+    if (!win.isDestroyed() && panels.get(win)?.pinned) win.showInactive();
+  if (cancelled && captureReturn && !captureReturn.isDestroyed()) {
     captureReturn.show();
     captureReturn.focus();
   }
   captureReturn = undefined;
-  captureReturnPinned = false;
+  captureHidden = [];
 }
 async function capture() {
   if (captureBusy) throw Error(t("截图正在进行"));
@@ -948,10 +1012,16 @@ async function capture() {
     : main.isVisible()
       ? main
       : undefined;
-  captureReturnPinned = panelPinned;
+  captureHidden = [...panels.keys()].filter((win) => win.isVisible());
   native.invalidate();
   hideToolbar();
-  dismissPanel();
+  for (const win of captureHidden) {
+    if (!panels.get(win)?.pinned) {
+      cancelWindowJobs(win);
+      send(win, "hidden", undefined);
+    }
+    win.hide();
+  }
   main.hide();
   try {
     await new Promise((r) => setTimeout(r, 200));
@@ -976,9 +1046,9 @@ async function capture() {
       activeCapture = imageCapture(
         nativeImage.createFromPath(fileURLToPath(result.uri)),
       );
+      restoreAfterCapture(false);
       openImage(activeCapture, "capture");
       activeCapture = null;
-      captureReturn = undefined;
       return;
     }
     const display = screen.getDisplayNearestPoint(
@@ -1024,25 +1094,30 @@ async function capture() {
       restoreAfterCapture();
     });
   } catch (e) {
-    captureReturn = undefined;
+    restoreAfterCapture(false);
     contextError(e as Error);
   } finally {
     if (!overlay) captureBusy = false;
   }
 }
-function cancelSuggestion(id?: string) {
-  const current = pendingSuggestion;
+function cancelSuggestion(win: BrowserWindow, id?: string) {
+  const current = pendingSuggestions.get(win);
   if (!current || (id !== undefined && current.id !== id)) return;
-  pendingSuggestion = undefined;
+  pendingSuggestions.delete(win);
   current.controller.abort();
-  send(panel, "noteSuggestions", { id: current.id, notebook: "", items: [] });
+  send(win, "noteSuggestions", { id: current.id, notebook: "", items: [] });
 }
 function publishSuggestions(run: PendingSuggestion) {
-  if (pendingSuggestion !== run || !run.translated || !run.notes.length) return;
+  if (
+    pendingSuggestions.get(run.win) !== run ||
+    !run.translated ||
+    !run.notes.length
+  )
+    return;
   const cfg = store.config,
     action = cfg.actions.find((a) => a.id === run.notes[0].note.actionId);
   if (!action) return;
-  send(panel, "noteSuggestions", {
+  send(run.win, "noteSuggestions", {
     id: run.id,
     notebook: connectedBook(cfg, action)?.name ?? action.name,
     needsConnection: !action.noteConnection,
@@ -1053,6 +1128,7 @@ function publishSuggestions(run: PendingSuggestion) {
   });
 }
 function startSuggestions(
+  win: BrowserWindow,
   cfg: Config,
   input: Parameters<typeof suggestionMessages>[1] & {
     id: string;
@@ -1062,15 +1138,16 @@ function startSuggestions(
   const binding = suggestionBinding(cfg);
   if (!binding) return;
   const { action, provider } = binding;
-  const sourceApp = noteSourceApp(interaction);
+  const sourceApp = noteSourceApp(panels.get(win)?.interaction ?? null);
   const run: PendingSuggestion = {
+    win,
     id: input.id,
     bindingKey: binding.key,
     controller: new AbortController(),
     translated: false,
     notes: [],
   };
-  pendingSuggestion = run;
+  pendingSuggestions.set(win, run);
   const signal = run.controller.signal;
   void (async () => {
     const { key, headers } = await credentials(provider);
@@ -1098,7 +1175,7 @@ function startSuggestions(
     publishSuggestions(run);
   })().catch(() => {
     // An optional recommendation must never replace a translation with an error.
-    if (pendingSuggestion === run) cancelSuggestion(run.id);
+    if (pendingSuggestions.get(win) === run) cancelSuggestion(win, run.id);
   });
 }
 async function beginJob(
@@ -1112,7 +1189,7 @@ async function beginJob(
 ) {
   jobId.parse(id);
   const controller = jobs.begin(id);
-  if (win === panel) cancelSuggestion();
+  cancelSuggestion(win);
   owners.set(id, win.webContents.id);
   const emit = (event: Partial<JobEvent>) => {
     if (jobs.active(id, controller))
@@ -1147,7 +1224,7 @@ async function beginJob(
       emit({ status: "done" });
     })
     .catch((e) => {
-      if (win === panel) cancelSuggestion(id);
+      if (panels.has(win)) cancelSuggestion(win, id);
       flush();
       emit({
         status: controller.signal.aborted ? "cancelled" : "error",
@@ -1264,7 +1341,11 @@ async function saveActionNotes(
   if (creating) {
     await store.save(config, revision);
     const key = suggestionBinding(config)?.key;
-    if (suggestion && key && pendingSuggestion === suggestion)
+    if (
+      suggestion &&
+      key &&
+      pendingSuggestions.get(suggestion.win) === suggestion
+    )
       suggestion.bindingKey = key;
   }
   try {
@@ -1323,7 +1404,7 @@ async function handle(
       return configChanged();
     }
     case "setTranslationPreference": {
-      if (win !== panel) throw Error(t("仅可从结果窗口更改此设置"));
+      if (!panels.has(win)) throw Error(t("仅可从结果窗口更改此设置"));
       const preference = z
         .union([
           z.strictObject({ targetLanguage: TargetLanguageSchema }),
@@ -1379,14 +1460,14 @@ async function handle(
           : undefined,
       );
     case "saveNote": {
-      if (win !== panel) throw Error(t("仅可从结果窗口保存笔记"));
+      if (!panels.has(win)) throw Error(t("仅可从结果窗口保存笔记"));
       const { note, create } = z
         .strictObject({ note: NoteInputSchema, create: z.boolean().optional() })
         .parse(arg);
       return (await saveActionNotes([note], create))[0];
     }
     case "saveSuggestions": {
-      if (win !== panel) throw Error(t("仅可从结果窗口保存笔记"));
+      if (!panels.has(win)) throw Error(t("仅可从结果窗口保存笔记"));
       const { id, indexes, create } = z
         .strictObject({
           id: jobId,
@@ -1403,7 +1484,7 @@ async function handle(
           create: z.boolean().optional(),
         })
         .parse(arg);
-      const run = pendingSuggestion;
+      const run = pendingSuggestions.get(win);
       if (
         !run?.translated ||
         run.id !== id ||
@@ -1419,7 +1500,7 @@ async function handle(
       return ids;
     }
     case "disableNoteSuggestions": {
-      if (win !== panel) throw Error(t("仅可从结果窗口更改此设置"));
+      if (!panels.has(win)) throw Error(t("仅可从结果窗口更改此设置"));
       const cfg = store.config;
       cfg.noteSuggestion.enabled = false;
       await store.save(cfg, store.revision);
@@ -1463,7 +1544,9 @@ async function handle(
     case "settingsLocation":
       return settingsLocation;
     case "toolbarState":
-      return win === pill ? updateToolbar() : null;
+      if (win !== pill) return null;
+      toolbarReady = true;
+      return showLoadedToolbar();
     case "resumeToolbar":
       if (win !== main) throw Error(t("仅设置窗口可恢复工具栏"));
       return saveToolbarPause(0);
@@ -1540,7 +1623,7 @@ async function handle(
       }
     }
     case "interactionGet":
-      return win === panel ? interaction : null;
+      return panels.get(win)?.interaction ?? null;
     case "panelOpen": {
       const source = z
         .enum(["clipboard", "empty", "action-test"])
@@ -1554,13 +1637,15 @@ async function handle(
       });
     }
     case "panelResize": {
-      if (win !== panel || panelPlacedByUser || !panelPlacement) return;
+      const state = panels.get(win);
+      if (!state || state.placedByUser) return;
       const height = z.number().min(160).max(3000).parse(arg.height);
-      const bounds = panelBounds(panelPlacement, height);
+      state.height = height;
+      const bounds = panelBounds(state.placement, height);
       // Ignore duplicate ResizeObserver notifications and Windows DIP rounding.
       const frame = JSON.stringify(bounds);
-      if (frame !== panelFrame) {
-        panelFrame = frame;
+      if (frame !== state.frame) {
+        state.frame = frame;
         win.setBounds(bounds);
       }
       return;
@@ -1735,14 +1820,14 @@ async function handle(
         const { key, headers } = await credentials(provider);
         signal.throwIfAborted();
         if (
-          win === panel &&
+          panels.has(win) &&
           action.id === "translate" &&
           (provider.model.trim() || isTranslationOnly(provider)) &&
           (!requiresApiKey(provider) ||
             key ||
             new Headers(headers).has("Authorization"))
         )
-          startSuggestions(cfg, {
+          startSuggestions(win, cfg, {
             ...input,
             sourceLanguage,
             targetLanguage,
@@ -1750,7 +1835,9 @@ async function handle(
         const variables = {
           text: input.text,
           context: input.context,
-          sourceApp: win === panel ? noteSourceApp(interaction) : "",
+          sourceApp: panels.has(win)
+            ? noteSourceApp(panels.get(win)?.interaction ?? null)
+            : "",
           targetLanguage,
           sourceLanguage,
         };
@@ -1785,13 +1872,10 @@ async function handle(
               }
             : undefined,
         );
-        if (
-          win === panel &&
-          pendingSuggestion?.id === input.id &&
-          answer.trim()
-        ) {
-          pendingSuggestion.translated = true;
-          publishSuggestions(pendingSuggestion);
+        const suggestion = pendingSuggestions.get(win);
+        if (suggestion?.id === input.id && answer.trim()) {
+          suggestion.translated = true;
+          publishSuggestions(suggestion);
         }
       });
     }
@@ -1873,7 +1957,7 @@ async function handle(
     }
     case "cancel": {
       const id = jobId.parse(arg.id);
-      if (win === panel) cancelSuggestion(id);
+      if (panels.has(win)) cancelSuggestion(win, id);
       if (owners.get(id) === win.webContents.id) {
         jobs.cancel(id);
         owners.delete(id);
@@ -2031,13 +2115,15 @@ async function handle(
         nativeImage.createFromDataURL(activeCapture.dataUrl).crop(rect),
       );
       activeCapture = null;
-      captureReturn = undefined;
+      restoreAfterCapture(false);
       overlay.close();
       openImage(cropped, "capture");
       return;
     }
     case "imageImport": {
-      panelDialog = win === panel;
+      const state = panels.get(win);
+      if (state) state.dialog = true;
+      let opened = false;
       try {
         const result = await dialog.showOpenDialog(win, {
           properties: ["openFile"],
@@ -2045,15 +2131,22 @@ async function handle(
             { name: t("图片"), extensions: ["png", "jpg", "jpeg", "webp"] },
           ],
         });
-        if (!result.canceled)
+        if (!result.canceled) {
           openImage(
             imageCapture(nativeImage.createFromPath(result.filePaths[0])),
             "image",
           );
+          opened = true;
+        }
         return;
       } finally {
-        panelDialog = false;
-        if (win === panel) {
+        if (state) state.dialog = false;
+        if (
+          !opened &&
+          state &&
+          !win.isDestroyed() &&
+          (state.pinned || win === panel)
+        ) {
           win.show();
           win.focus();
         }
@@ -2163,19 +2256,23 @@ async function handle(
           win.minimize();
           break;
         case "pin":
-          if (win === panel) panelPinned = !!arg.value;
+          if (panels.has(win)) {
+            const state = panels.get(win)!;
+            state.pinned = !!arg.value;
+            state.interaction.pinned = state.pinned;
+          }
           break;
         case "dismiss":
           if (win === overlay) {
             activeCapture = null;
             win.close();
-          } else if (win === panel) dismissPanel();
+          } else if (panels.has(win)) dismissPanel(win);
           else win.hide();
           break;
         case "close":
           if (win === main) {
             win.close();
-          } else if (win === panel) dismissPanel();
+          } else if (panels.has(win)) dismissPanel(win);
           else win.hide();
           break;
       }
@@ -2277,6 +2374,8 @@ async function boot() {
     main.once("closed", () => clearTimeout(refreshTimer));
   }
   main.once("ready-to-show", () => {
+    if (process.platform === "darwin" && store.config.selection.automatic)
+      ensureToolbarWindow();
     const permissions = readPermissions();
     const needsPermissions =
       permissions &&
@@ -2288,7 +2387,7 @@ async function boot() {
         !tray ||
         needsPermissions)
     )
-      main.show();
+      openMain();
   });
   main.on("close", (event) => {
     if (tray && !quitting) {
@@ -2402,7 +2501,7 @@ app.on("before-quit", () => {
   // Non-activating Windows toolbar windows must be destroyed explicitly;
   // waiting for their native close sequence can keep the process alive.
   if (pill && !pill.isDestroyed()) pill.destroy();
-  cancelSuggestion();
+  for (const win of pendingSuggestions.keys()) cancelSuggestion(win);
   jobs.cancelAll();
   updates.stop();
   native.stop();

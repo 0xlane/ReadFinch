@@ -2,7 +2,7 @@ import { t } from "./i18n";
 import type { Config } from "./config";
 
 export const DEFAULT_ACTION_SHORTCUTS: Record<string, string> = {
-  translate: "Alt+T",
+  translate: currentShortcutPlatform() === "darwin" ? "Alt+D" : "Alt+T",
   dictionary: "Alt+Shift+D",
   polish: "Alt+Shift+W",
 };
@@ -191,6 +191,7 @@ export function shortcutBindings(
   includeDisabled = false,
 ): ShortcutBinding[] {
   return [
+    { id: "input", label: t("输入翻译"), key: config.shortcuts.input },
     {
       id: "selection",
       label: t("选区指令菜单"),

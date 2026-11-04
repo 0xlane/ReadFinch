@@ -106,12 +106,13 @@
 
 | 指令 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 翻译选区 | `Alt + T` | `Option + T` |
+| 翻译选区 | `Alt + T` | `Option + D` |
 | 打开词典 | `Alt + Shift + D` | `Option + Shift + D` |
 | 写作改进 | `Alt + Shift + W` | `Option + Shift + W` |
 | 选择指令 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 框选屏幕文字 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| 框选屏幕文字 | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | 读取剪贴板 | `Ctrl + Shift + V` | `Command + Shift + V` |
+| 输入翻译 | `Alt + A` | `Option + A` |
 
 快捷键可在独立设置页面重新绑定。设置自动保存，外观可跟随系统或手动切换深浅色。开机自启默认关闭，可在托盘菜单中切换。
 

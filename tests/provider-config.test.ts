@@ -112,7 +112,7 @@ test("local upgrade preserves original config until saving and supplies only end
   await writeFile(file, JSON.stringify(old));
   const store = new ConfigStore(dir);
   await store.init();
-  assert.equal(store.config.schemaVersion, 15);
+  assert.equal(store.config.schemaVersion, 16);
   assert.equal(JSON.parse(await readFile(file, "utf8")).schemaVersion, 2);
   assert.ok(
     store.credentialMoves.some(

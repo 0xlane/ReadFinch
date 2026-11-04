@@ -299,6 +299,8 @@ try {
   log(
     "Saving only the checked term opens its structured local note with the exact passage, source app and recommendation model.",
   );
+  // Subsequent requests in this suite exercise one reusable result window.
+  await api(panel, "window", { command: "pin", value: false });
   await translate(passage);
   await card.getByRole("button", { name: "保存", exact: true }).waitFor();
   assert.equal(requests.length, 2, "both answers should be cached");

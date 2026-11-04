@@ -88,7 +88,7 @@ try {
     theme: "light",
   };
   s.config.selection.automatic = false;
-  s.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+  s.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
   s.config.actions.forEach((a) => (a.shortcut = ""));
   await api("saveConfig", { config: s.config, revision: s.revision });
   await api("settingsOpen", { tab: "text" });

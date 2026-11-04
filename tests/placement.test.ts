@@ -50,18 +50,22 @@ test("the toolbar clears the pointer at the inner edge of a left-hand monitor", 
   );
 });
 
-test("a result chooses the roomier side once and keeps its origin when late suggestions arrive", () => {
+test("a result chooses the roomier side once and keeps its pointer-facing edge when late suggestions arrive", () => {
   const area = { x: 0, y: 0, width: 1280, height: 800 };
   for (const [y, side] of [
     [100, "below"],
     [750, "above"],
   ] as const) {
-    const plan = planPanel({ x: 260, y }, area, 520);
+    const plan = planPanel({ x: 260, y }, area);
     assert.equal(plan.side, side);
     const first = panelBounds(plan, 220);
     for (const height of [250, 380, 540, 720, 3000, 220]) {
       const next = panelBounds(plan, height);
-      assert.deepEqual({ x: next.x, y: next.y }, { x: first.x, y: first.y });
+      assert.equal(next.x, first.x);
+      assert.equal(
+        side === "below" ? next.y : next.y + next.height,
+        side === "below" ? y + 12 : y - 12,
+      );
       assert.ok(next.y + next.height <= 792);
     }
   }
@@ -80,7 +84,6 @@ test("stable result plans clamp to small, offset and fractional-DIP work areas",
           y: area.y + area.height * portion + 0.3,
         },
         area,
-        520,
       );
       const bounds = panelBounds(plan, 3000);
       assert.ok(bounds.x >= area.x + 8 && bounds.y >= area.y + 8);

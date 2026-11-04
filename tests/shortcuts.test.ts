@@ -94,7 +94,7 @@ test("v1 upgrade preserves the old direct translation key, other preferences, an
   old.textProfiles[0].model = "personal-model";
   old.appearance.theme = "dark";
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 15);
+  assert.equal(next.schemaVersion, 16);
   assert.equal(
     next.actions.find((a) => a.id === "translate")!.shortcut,
     "Ctrl+Alt+F9",
@@ -240,3 +240,45 @@ test(
     assert.equal(await stopped, undefined);
   },
 );
+
+test("v15 adopts familiar input/selection/OCR defaults once and preserves custom or disabled keys", () => {
+  const old: any = defaultConfig();
+  old.schemaVersion = 15;
+  delete old.shortcuts.input;
+  old.shortcuts.capture = "CmdOrCtrl+Shift+2";
+  old.actions.find((a: any) => a.id === "translate").shortcut = "Option+T";
+  const next = parseConfig(old);
+  assert.equal(next.shortcuts.input, "Alt+A");
+  assert.equal(
+    next.shortcuts.capture,
+    process.platform === "darwin" ? "Alt+Shift+S" : "CmdOrCtrl+Shift+2",
+  );
+  assert.equal(
+    next.actions.find((a) => a.id === "translate")!.shortcut,
+    process.platform === "darwin" ? "Alt+D" : "Option+T",
+  );
+  next.shortcuts.input = "";
+  assert.deepEqual(parseConfig(next), next);
+  old.shortcuts.capture = "Ctrl+Alt+F7";
+  old.actions[0].shortcut = "";
+  const custom = parseConfig(old);
+  assert.equal(custom.shortcuts.capture, "Ctrl+Alt+F7");
+  assert.equal(custom.actions[0].shortcut, "");
+});
+
+test("shortcut migration never takes a custom action's key, including dormant actions", () => {
+  const old: any = defaultConfig();
+  old.schemaVersion = 15;
+  delete old.shortcuts.input;
+  old.shortcuts.selection = "Option+A";
+  old.shortcuts.capture = "CommandOrControl+Shift+2";
+  old.actions[0].shortcut = "Alt+T";
+  old.actions[1].shortcut = "Option+D";
+  old.actions[1].enabled = false;
+  old.actions[2].shortcut = "Shift+Alt+S";
+  const next = parseConfig(old);
+  assert.equal(next.shortcuts.input, "");
+  assert.equal(next.shortcuts.selection, "Option+A");
+  assert.equal(next.shortcuts.capture, "CommandOrControl+Shift+2");
+  assert.equal(next.actions[0].shortcut, "Alt+T");
+});

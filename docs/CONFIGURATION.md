@@ -72,7 +72,7 @@ v2 的文字和 OpenAI 视觉服务迁移到同一个 `providers` 列表，保�
 
 v3 → v4 自动将服务商的原文字模型、视觉模型与各指令覆盖模型收集进模型库，保留原引用与本机凭据。内置目录仅作为搜索候选，不限制自定义 ID。
 
-新配置使用 `Alt+T` 翻译、`Alt+Shift+D` 词典、`Alt+Shift+W` 润色、`CommandOrControl+Shift+Space` 选区指令菜单。截图与剪贴板入口保持 `CommandOrControl+Shift+2` / `CommandOrControl+Shift+V`。快捷键随配置导出和同步；停用指令释放系统注册，复制指令不复制其快捷键。
+macOS 默认使用 `Option+A` 输入翻译、`Option+D` 划词翻译、`Option+Shift+S` 截图 OCR。输入浮窗中 Enter 翻译，Shift+Enter 换行；置顶窗口不会被新请求覆盖。升级会保留自定义快捷键，遇到冲突则保留原有绑定。Windows / Linux 新配置使用 `Alt+A` 输入翻译、`Alt+T` 翻译、`Alt+Shift+D` 词典、`Alt+Shift+W` 润色、`CommandOrControl+Shift+Space` 选区指令菜单。截图与剪贴板入口保持 `CommandOrControl+Shift+2` / `CommandOrControl+Shift+V`。快捷键随配置导出和同步；停用指令释放系统注册，复制指令不复制其快捷键。
 
 在设置输入框按组合键录入，Esc 取消本次录入，Backspace/Delete 清空。录入期间暂停应用快捷键，结束或窗口失焦后恢复。冲突按当前系统解释修饰键与别名，保留上次有效设置；其他应用占用组合键时在快捷键区域显示注册失败，不声称该组合键已可用。
 

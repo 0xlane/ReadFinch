@@ -111,22 +111,21 @@ export class ConfigStore {
     }
     const original = JSON.parse(raw);
     if (
-      original.schemaVersion === 14 ||
+      [14, 15].includes(original.schemaVersion) ||
       original.defaults.targetLanguage === "system" ||
       original.defaults.targetLanguage === "auto"
     ) {
       // Older schemas may still need credential moves on startup. Freeze only
       // their language until the existing credential migration has finished.
-      const upgraded =
-        original.schemaVersion === 14
-          ? this.value
-          : {
-              ...original,
-              defaults: {
-                ...original.defaults,
-                targetLanguage: this.value.defaults.targetLanguage,
-              },
-            };
+      const upgraded = [14, 15].includes(original.schemaVersion)
+        ? this.value
+        : {
+            ...original,
+            defaults: {
+              ...original.defaults,
+              targetLanguage: this.value.defaults.targetLanguage,
+            },
+          };
       await atomicWrite(this.file + ".bak", raw);
       await atomicWrite(this.file, JSON.stringify(upgraded, null, 2) + "\n");
     }

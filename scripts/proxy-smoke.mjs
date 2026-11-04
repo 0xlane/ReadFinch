@@ -141,7 +141,7 @@ try {
     c.appearance.language = "zh-CN";
     c.appearance.theme = "light";
     c.selection.automatic = false;
-    c.shortcuts = { selection: "", capture: "", clipboard: "" };
+    c.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
     c.actions.forEach((a) => {
       a.shortcut = "";
     });

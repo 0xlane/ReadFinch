@@ -4,7 +4,7 @@
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 15
+      "const": 16
     },
     "tts": {
       "type": "object",
@@ -862,6 +862,10 @@
     "shortcuts": {
       "type": "object",
       "properties": {
+        "input": {
+          "type": "string",
+          "maxLength": 100
+        },
         "selection": {
           "type": "string",
           "maxLength": 100
@@ -876,6 +880,7 @@
         }
       },
       "required": [
+        "input",
         "selection",
         "capture",
         "clipboard"
@@ -931,6 +936,6 @@
       ]
     }
   },
-  "$id": "https://readfinch.local/schema/config-v15.json",
+  "$id": "https://readfinch.local/schema/config-v16.json",
   "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
 }

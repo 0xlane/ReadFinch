@@ -56,7 +56,7 @@ try {
   await main.evaluate(async () => {
     const state = await window.readfinch.call("snapshot");
     state.config.selection.automatic = true;
-    state.config.shortcuts = { selection: "", clipboard: "", capture: "" };
+    state.config.shortcuts = { input: "", selection: "", clipboard: "", capture: "" };
     state.config.actions.forEach((action) => (action.shortcut = ""));
     await window.readfinch.call("saveConfig", {
       config: state.config,

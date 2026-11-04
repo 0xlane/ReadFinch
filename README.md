@@ -106,12 +106,13 @@ Automatic update checks are enabled by default and can be configured in **About*
 
 | Command | Windows / Linux | macOS |
 | --- | --- | --- |
-| Translate selection | `Alt + T` | `Option + T` |
+| Translate selection | `Alt + T` | `Option + D` |
 | Open dictionary | `Alt + Shift + D` | `Option + Shift + D` |
 | Improve writing | `Alt + Shift + W` | `Option + Shift + W` |
 | Choose a command | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capture text with OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Capture text with OCR | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | Read clipboard text | `Ctrl + Shift + V` | `Command + Shift + V` |
+| Input translation | `Alt + A` | `Option + A` |
 
 Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.
 

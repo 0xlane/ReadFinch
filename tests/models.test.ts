@@ -102,7 +102,7 @@ test("v4/v5 multi-model providers split deterministically and preserve actions, 
     const moves: import("../src/shared/config").CredentialMove[] = [];
     const c = parseConfig(old, moves);
     assert.deepEqual(c, parseConfig(old));
-    assert.equal(c.schemaVersion, 15);
+    assert.equal(c.schemaVersion, 16);
     assert.equal(actionModel(c, c.actions[1]).model, "lookup");
     assert.equal(
       c.providers.find((p) => p.id === c.defaults.ocrProfileId)?.model,

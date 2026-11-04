@@ -106,12 +106,13 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 | 명령 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 선택 영역 번역 | `Alt + T` | `Option + T` |
+| 선택 영역 번역 | `Alt + T` | `Option + D` |
 | 사전 열기 | `Alt + Shift + D` | `Option + Shift + D` |
 | 글쓰기 개선 | `Alt + Shift + W` | `Option + Shift + W` |
 | 명령 선택 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| OCR로 화면 글 가져오기 | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| OCR로 화면 글 가져오기 | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | 클립보드 글 읽기 | `Ctrl + Shift + V` | `Command + Shift + V` |
+| 입력 번역 | `Alt + A` | `Option + A` |
 
 단축키는 전용 설정 페이지에서 바꿀 수 있습니다. 설정은 자동 저장되며, 테마는 시스템 설정을 따르거나 밝게·어둡게 지정할 수 있습니다. 로그인 시 자동 시작은 기본적으로 꺼져 있으며 트레이 메뉴에서 변경합니다.
 

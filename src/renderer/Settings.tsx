@@ -806,7 +806,7 @@ export function Settings({
             )}
             <p className="helper">
               {t(
-                "选中文字后按快捷键，直接在浮窗中处理。暂停自动划词时仍可使用。",
+                "输入翻译可直接打开空白浮窗；选中文字后也可按指令快捷键处理。暂停自动划词时仍可使用。",
               )}
             </p>
             <div className="shortcut-section-label">{t("取词与入口")}</div>
@@ -814,6 +814,7 @@ export function Settings({
               <div className="setting-row shortcut-row" key={key}>
                 <strong>
                   {{
+                    input: t("输入翻译"),
                     selection: t("选区指令菜单"),
                     capture: t("框选屏幕文字（OCR）"),
                     clipboard: t("读取剪贴板"),
@@ -822,6 +823,7 @@ export function Settings({
                 <ShortcutRecorder
                   label={
                     ({
+                      input: t("输入翻译"),
                       selection: t("选区指令菜单"),
                       capture: t("框选屏幕文字（OCR）"),
                       clipboard: t("读取剪贴板"),

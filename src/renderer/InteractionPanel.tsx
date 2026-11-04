@@ -236,6 +236,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     };
   }, []);
   useEffect(() => {
+    if (session?.source === "empty" && editing) sourceEditor.current?.focus();
+  }, [session?.id, editing]);
+  useEffect(() => {
     if (
       !session?.actionId ||
       session.source !== "selection" ||
@@ -298,7 +301,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
       observer.disconnect();
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [session?.id]);
   useEffect(() => {
     if (ocrProfiles(cfg).every((item) => item.id !== ocrProfile))
       setOcrProfile(cfg.defaults.ocrProfileId);
@@ -545,7 +548,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
         : t("屏幕取词")
       : missingSelection
         ? t("选取文字")
-        : t("选择指令");
+        : session?.source === "empty" && session.actionId === "translate"
+          ? t("输入翻译")
+          : t("选择指令");
   return (
     <div
       className={
@@ -771,7 +776,9 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                   placeholder={
                     image
                       ? t("识别后的文字可在这里编辑…")
-                      : t("粘贴或输入要处理的文字…")
+                      : session?.source === "empty"
+                        ? t("输入文字，Enter 翻译，Shift+Enter 换行…")
+                        : t("粘贴或输入要处理的文字…")
                   }
                   rows={ocrInput ? 5 : 3}
                   readOnly={ocrBusy}
@@ -781,6 +788,24 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                     stop();
                     setText(event.target.value);
                     setCopied(false);
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      session?.source !== "empty" ||
+                      event.key !== "Enter" ||
+                      event.shiftKey ||
+                      event.altKey ||
+                      event.ctrlKey ||
+                      event.metaKey ||
+                      event.nativeEvent.isComposing ||
+                      event.keyCode === 229
+                    )
+                      return;
+                    event.preventDefault();
+                    const action = enabled.find(
+                      (a) => a.id === (session.actionId ?? "translate"),
+                    );
+                    if (action && text.trim() && !running) void run(action);
                   }}
                   onBlur={() => {
                     if (text && working) setEditing(false);

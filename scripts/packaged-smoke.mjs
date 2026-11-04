@@ -38,12 +38,13 @@ try {
   const original = await page.evaluate(() => window.readfinch.call("snapshot"));
   assert.equal(
     original.config.actions.find((a) => a.id === "translate").shortcut,
-    "Alt+T",
+    process.platform === "darwin" ? "Alt+D" : "Alt+T",
   );
   if (isolated)
     await page.evaluate(async () => {
       const state = await window.readfinch.call("snapshot");
       state.config.shortcuts = {
+        input: "Control+Alt+Shift+F4",
         selection: "Control+Alt+Shift+F8",
         capture: "Control+Alt+Shift+F11",
         clipboard: "Control+Alt+Shift+F12",
@@ -63,12 +64,12 @@ try {
       });
     });
   const state = await page.evaluate(() => window.readfinch.call("snapshot"));
-  assert.equal(state.config.schemaVersion, 15);
+  assert.equal(state.config.schemaVersion, 16);
   assert.equal(state.config.noteSuggestion.enabled, true);
   assert.deepEqual(state.shortcutErrors, []);
   assert.equal(
     state.config.actions.find((action) => action.id === "translate").shortcut,
-    isolated ? "Control+Alt+Shift+F5" : "Alt+T",
+    isolated ? "Control+Alt+Shift+F5" : "Alt+D",
   );
   await page
     .getByRole("navigation")

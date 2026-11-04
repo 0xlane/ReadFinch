@@ -47,7 +47,7 @@ test("v0 migration adds font size, unknown fields remain rejected", () => {
   old.schemaVersion = 0;
   delete old.appearance.fontSize;
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 15);
+  assert.equal(next.schemaVersion, 16);
   assert.equal(next.appearance.fontSize, 15);
 });
 test("substitution is single-pass and preserves source tokens literally", () => {
@@ -97,4 +97,28 @@ test("store persists actions, protects last valid state and detects concurrent w
   assert.equal(recovery.config.actions[0].name, "A changed action");
   assert.ok(recovery.recovery);
   assert.ok((await readdir(dir)).some((f) => f.startsWith("config-invalid")));
+});
+
+test("v15 shortcut migration is persisted once with a recoverable original", async () => {
+  const dir = await mkdtemp(
+    path.join(os.tmpdir(), "readfinch-shortcut-upgrade-"),
+  );
+  const old: any = defaultConfig();
+  old.schemaVersion = 15;
+  delete old.shortcuts.input;
+  const original = JSON.stringify(old);
+  const store = new ConfigStore(dir);
+  await writeFile(store.file, original);
+  await store.init();
+  assert.equal(
+    JSON.parse(await readFile(store.file, "utf8")).schemaVersion,
+    16,
+  );
+  assert.equal(await readFile(store.file + ".bak", "utf8"), original);
+  const config = store.config;
+  config.shortcuts.input = "";
+  await store.save(config);
+  const reopened = new ConfigStore(dir);
+  await reopened.init();
+  assert.equal(reopened.config.shortcuts.input, "");
 });

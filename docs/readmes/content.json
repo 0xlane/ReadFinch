@@ -72,7 +72,8 @@
       "Improve writing",
       "Choose a command",
       "Capture text with OCR",
-      "Read clipboard text"
+      "Read clipboard text",
+      "Input translation"
     ],
     "shortcutsNote": "Rebind shortcuts on the dedicated settings page. Settings save automatically; appearance follows the system or your light/dark preference. Launch at login is off by default and can be changed from the tray menu.",
     "platformTitle": "Platform support",
@@ -200,7 +201,8 @@
       "写作改进",
       "选择指令",
       "框选屏幕文字",
-      "读取剪贴板"
+      "读取剪贴板",
+      "输入翻译"
     ],
     "shortcutsNote": "快捷键可在独立设置页面重新绑定。设置自动保存，外观可跟随系统或手动切换深浅色。开机自启默认关闭，可在托盘菜单中切换。",
     "platformTitle": "平台支持",
@@ -328,7 +330,8 @@
       "改善寫作",
       "選擇指令",
       "框選螢幕文字",
-      "讀取剪貼簿"
+      "讀取剪貼簿",
+      "輸入翻譯"
     ],
     "shortcutsNote": "快捷鍵可在獨立設定頁面重新指定。設定自動儲存，外觀可跟隨系統或手動切換明暗模式。開機自動啟動預設關閉，可在系統匣選單中切換。",
     "platformTitle": "平台支援",
@@ -456,7 +459,8 @@
       "文章を改善",
       "指示を選ぶ",
       "画面の文字を OCR で取得",
-      "クリップボードの文字を読む"
+      "クリップボードの文字を読む",
+      "入力翻訳"
     ],
     "shortcutsNote": "ショートカットは専用設定ページで変更できます。設定は自動保存され、外観はシステム連動またはライト・ダークから選べます。ログイン時の自動起動は初期状態ではオフで、トレイメニューから変更できます。",
     "platformTitle": "プラットフォーム対応",
@@ -584,7 +588,8 @@
       "글쓰기 개선",
       "명령 선택",
       "OCR로 화면 글 가져오기",
-      "클립보드 글 읽기"
+      "클립보드 글 읽기",
+      "입력 번역"
     ],
     "shortcutsNote": "단축키는 전용 설정 페이지에서 바꿀 수 있습니다. 설정은 자동 저장되며, 테마는 시스템 설정을 따르거나 밝게·어둡게 지정할 수 있습니다. 로그인 시 자동 시작은 기본적으로 꺼져 있으며 트레이 메뉴에서 변경합니다.",
     "platformTitle": "플랫폼 지원",
@@ -712,7 +717,8 @@
       "Améliorer la rédaction",
       "Choisir une commande",
       "Capturer du texte par OCR",
-      "Lire le presse-papiers"
+      "Lire le presse-papiers",
+      "Traduire du texte saisi"
     ],
     "shortcutsNote": "Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.",
     "platformTitle": "Plateformes prises en charge",
@@ -840,7 +846,8 @@
       "Text verbessern",
       "Befehl auswählen",
       "Bildschirmtext per OCR erfassen",
-      "Text aus der Zwischenablage lesen"
+      "Text aus der Zwischenablage lesen",
+      "Eingegebenen Text übersetzen"
     ],
     "shortcutsNote": "Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.",
     "platformTitle": "Plattformunterstützung",
@@ -968,7 +975,8 @@
       "Mejorar escritura",
       "Elegir instrucción",
       "Capturar texto con OCR",
-      "Leer texto del portapapeles"
+      "Leer texto del portapapeles",
+      "Traducir texto escrito"
     ],
     "shortcutsNote": "Puedes cambiar los atajos en su página de ajustes. La configuración se guarda automáticamente y la apariencia sigue al sistema o a tu elección clara u oscura. El inicio al entrar en el sistema está desactivado por defecto y se cambia desde el menú de la bandeja.",
     "platformTitle": "Compatibilidad con plataformas",

@@ -108,7 +108,7 @@ try {
         requiresKey: false,
       });
       state.config.selection.automatic = false;
-      state.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+      state.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
       state.config.actions.forEach((a) => (a.shortcut = ""));
       state.config.defaults.targetLanguage = english ? "English" : "简体中文";
       if (english) {

@@ -114,7 +114,7 @@ try {
   const s = await api("snapshot");
   s.config.appearance.language = "zh-CN";
   s.config.appearance.theme = "light";
-  s.config.shortcuts = { selection: "", capture: "", clipboard: "" };
+  s.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
   s.config.actions.forEach((a) => (a.shortcut = ""));
   s.config.selection.automatic = true;
   s.config.noteSuggestion.enabled = true;
@@ -173,9 +173,13 @@ try {
     "Changing connection settings invalidates an in-flight probe; dark mode keeps readable state icons and failed responses expose only safe diagnostics.",
   );
   await api("setTheme", { theme: "light" });
-  const area = await app.evaluate(
-    ({ screen }) => screen.getPrimaryDisplay().workArea,
-  );
+  const { area, cursor } = await app.evaluate(({ screen }) => ({
+    cursor: screen.getCursorScreenPoint(),
+    area: screen.getDisplayNearestPoint(screen.getCursorScreenPoint()).workArea,
+  }));
+  const below =
+    area.y + area.height - 8 - cursor.y - 12 >= cursor.y - 12 - area.y - 8;
+  const edge = (bounds) => (below ? bounds.y : bounds.y + bounds.height);
   if (!packaged) {
     await app.evaluate(({ screen }) => {
       const a = screen.getPrimaryDisplay().workArea,
@@ -236,7 +240,7 @@ try {
   const frames = await app.evaluate(() => globalThis.recordedBounds);
   for (const b of frames) {
     assert.equal(b.x, before.x);
-    assert.equal(b.y, before.y);
+    assert.equal(edge(b), edge(before));
   }
   assert.ok(after.y + after.height <= area.y + area.height - 6);
   await panel.screenshot({
@@ -262,11 +266,11 @@ try {
       .getBounds(),
   );
   assert.equal(capped.x, before.x);
-  assert.equal(capped.y, before.y);
+  assert.equal(edge(capped), edge(before));
   assert.ok(capped.y + capped.height <= area.y + area.height - 6);
   checks.push(
-    (packaged ? "Packaged result" : "Result opened near the screen bottom") +
-      " keeps the same x/y when delayed suggestions arrive; oversized results scroll inside a bounded window.",
+    (packaged ? "Packaged result" : "Result opened at the pointer") +
+      " keeps its pointer-facing edge when delayed suggestions arrive; oversized results scroll inside a bounded window.",
   );
   assert.deepEqual(errors, []);
   await writeFile(
@@ -282,7 +286,7 @@ try {
         rendererErrors: errors,
         bounds: { before, after, capped },
         scope:
-          "Isolated desktop profile and local HTTP fixtures. Bottom-of-screen anchoring is driven through development-only selection hooks; packaged mode uses the normal command trial.",
+          "Isolated desktop profile and local HTTP fixtures. Synthetic selection coordinates deliberately differ from the actual pointer; packaged mode uses the normal command trial.",
       },
       null,
       2,

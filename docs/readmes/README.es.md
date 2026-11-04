@@ -106,12 +106,13 @@ La búsqueda automática de actualizaciones está activada por defecto. En About
 
 | Instrucción | Windows / Linux | macOS |
 | --- | --- | --- |
-| Traducir selección | `Alt + T` | `Option + T` |
+| Traducir selección | `Alt + T` | `Option + D` |
 | Abrir diccionario | `Alt + Shift + D` | `Option + Shift + D` |
 | Mejorar escritura | `Alt + Shift + W` | `Option + Shift + W` |
 | Elegir instrucción | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capturar texto con OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Capturar texto con OCR | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | Leer texto del portapapeles | `Ctrl + Shift + V` | `Command + Shift + V` |
+| Traducir texto escrito | `Alt + A` | `Option + A` |
 
 Puedes cambiar los atajos en su página de ajustes. La configuración se guarda automáticamente y la apariencia sigue al sistema o a tu elección clara u oscura. El inicio al entrar en el sistema está desactivado por defecto y se cambia desde el menú de la bandeja.
 

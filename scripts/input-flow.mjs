@@ -208,6 +208,8 @@ try {
     "Esc and right-click cancel the real capture overlay, restore draft and pin, and never start OCR",
   );
 
+  // End the pinned draft scenario before testing acquisition in the reusable window.
+  await call(panel, "window", { command: "pin", value: false });
   await useOcr("ocr-offline");
   await acquiredImage(dataUrl, "image");
   await panel.waitForFunction(() =>

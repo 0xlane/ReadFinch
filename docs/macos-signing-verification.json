@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-04",
+  "platform": "macOS 15.8.1 Intel x64",
+  "baseline": "Locally re-signed 1.2.1 fixture using the new fixed certificate; not the previously published ad-hoc build",
+  "candidate": "1.2.3",
+  "certificateSHA1": "890B58F9582B8591AC754C9E9DAB4CC2B8D54613",
+  "identityCount": 15,
+  "identitiesUnchanged": true,
+  "mainCodeChanged": true,
+  "helperCodeChanged": true,
+  "normalLaunch": "Finder, same app path, no test host inheritance",
+  "permissionsAfterUpgrade": {
+    "accessibility": true,
+    "screenRecording": true,
+    "nativeService": "ready",
+    "regrantedAfterReplacement": false
+  },
+  "systemCertificateTrustChanged": false,
+  "scope": "A one-time migration grant was performed before the baseline launch. This checks preservation between fixed-identity builds, not preservation from the old ad-hoc release."
+}

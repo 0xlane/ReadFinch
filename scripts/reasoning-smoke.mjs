@@ -99,7 +99,7 @@ try {
   await configure((c) => {
     c.appearance.language = "zh-CN";
     c.appearance.theme = "light";
-    c.shortcuts = { selection: "", capture: "", clipboard: "" };
+    c.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
     c.actions.forEach((a) => (a.shortcut = ""));
     c.selection.automatic = false;
     c.noteSuggestion.enabled = false;

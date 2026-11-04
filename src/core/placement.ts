@@ -6,18 +6,14 @@ export type PanelPlacement = Point & {
   side: "above" | "below";
 };
 
-// Reserve room once, before the first paint. Later streamed content and optional
-// recommendations can grow down from this origin without flipping the window.
-export function planPanel(
-  anchor: Point,
-  area: Bounds,
-  reserveHeight = 460,
-): PanelPlacement {
+// Keep the edge nearest the pointer fixed as content grows. Reserving a tall
+// invisible box above the pointer leaves short results hundreds of pixels away.
+export function planPanel(anchor: Point, area: Bounds): PanelPlacement {
   const margin = 8,
     gap = 12;
-  const top = area.y + margin,
-    bottom = area.y + area.height - margin;
-  const width = Math.min(500, Math.max(1, area.width - margin * 2));
+  const top = Math.ceil(area.y + margin),
+    bottom = Math.floor(area.y + area.height - margin);
+  const width = Math.min(500, Math.max(1, Math.floor(area.width - margin * 2)));
   const x = Math.round(
     Math.max(
       area.x + margin,
@@ -27,30 +23,36 @@ export function planPanel(
   const below = bottom - anchor.y - gap,
     above = anchor.y - gap - top;
   const side = below >= above ? "below" : "above";
-  const reserve = Math.min(
-    Math.max(220, reserveHeight),
-    680,
-    Math.max(1, bottom - top),
-  );
-  const idealY = side === "below" ? anchor.y + gap : anchor.y - gap - reserve;
   const y = Math.round(
-    Math.max(top, Math.min(idealY, bottom - Math.min(220, bottom - top))),
+    Math.max(
+      top,
+      Math.min(bottom, side === "below" ? anchor.y + gap : anchor.y - gap),
+    ),
   );
   return {
     x,
     y,
     width,
     side,
-    maxHeight: Math.max(1, Math.min(680, Math.floor(bottom - y))),
+    maxHeight: Math.max(
+      1,
+      Math.min(680, side === "below" ? bottom - y : y - top),
+    ),
   };
 }
 
-export function panelBounds(plan: PanelPlacement, height: number): Bounds {
+export function panelBounds(
+  plan: PanelPlacement,
+  requestedHeight: number,
+): Bounds {
+  const height = Math.round(
+    Math.max(1, Math.min(requestedHeight, plan.maxHeight)),
+  );
   return {
     x: plan.x,
-    y: plan.y,
+    y: plan.side === "above" ? plan.y - height : plan.y,
     width: plan.width,
-    height: Math.round(Math.max(1, Math.min(height, plan.maxHeight))),
+    height,
   };
 }
 // Coordinates are Electron screen DIPs throughout; do not convert them twice.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 15,
+  "schemaVersion": 16,
   "tts": {
     "onlineProviderId": null,
     "customVoices": [],
@@ -53,7 +53,7 @@
       "providerId": null,
       "enabled": true,
       "pinned": true,
-      "shortcut": "Alt+T",
+      "shortcut": "Alt+D",
       "format": "markdown"
     },
     {
@@ -277,8 +277,9 @@
     ]
   },
   "shortcuts": {
+    "input": "Alt+A",
     "selection": "CommandOrControl+Shift+Space",
-    "capture": "CommandOrControl+Shift+2",
+    "capture": "Alt+Shift+S",
     "clipboard": "CommandOrControl+Shift+V"
   }
 }

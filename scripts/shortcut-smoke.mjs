@@ -146,6 +146,7 @@ try {
   if (isolated)
     await editConfig((config) => {
       config.shortcuts = {
+        input: "Control+Alt+Shift+F4",
         selection: "Control+Alt+Shift+F8",
         capture: "Control+Alt+Shift+F11",
         clipboard: "Control+Alt+Shift+F12",
@@ -186,8 +187,8 @@ try {
   );
   check(
     isolated
-      ? "All six isolated bindings are registered with the actual Electron OS API; installed app keeps its default keys"
-      : "All six default shortcuts are registered with the actual Electron OS API",
+      ? "All seven isolated bindings are registered with the actual Electron OS API; installed app keeps its default keys"
+      : "All seven default shortcuts are registered with the actual Electron OS API",
   );
   await editConfig((config) => {
     config.selection.automatic = false;
@@ -431,7 +432,7 @@ try {
   assert.equal((await call(main, "snapshot")).nativeState, "ready");
   assert.notEqual(nativeRead?.text, "NATIVE PROTOCOL CACHE MUST NOT RETURN");
   check(
-    "The running Windows helper answers refresh IPC without returning an injected old cache; external foreground text remains unverified",
+    "The running native helper answers refresh IPC without returning an injected old cache; external foreground text remains unverified",
   );
   assert.deepEqual(errors, []);
   await writeFile(

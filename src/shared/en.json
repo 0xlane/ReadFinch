@@ -469,6 +469,7 @@
   "伴读雀启动失败": "ReadFinch could not start",
   "正在连接系统选区": "Connecting to system selection",
   "系统选区已连接": "System selection connected",
+  "无法监听鼠标选区，请重启伴读雀后重试。": "Mouse selection monitoring is unavailable. Restart ReadFinch and try again.",
   "需要辅助功能权限": "Accessibility permission required",
   "系统权限": "System permissions",
   "截图需要录屏权限": "Screen recording permission required",
@@ -1140,5 +1141,8 @@
   "语音服务没有返回有效的音频": "The speech service did not return valid audio",
   "此模型需要参考音频，请选择使用预置音色的 TTS 模型。": "This model requires reference audio. Select a TTS model with built-in voices.",
   "此模型需要音色描述，请先填写朗读风格。": "This model requires a voice description. Enter a speaking style first.",
-  "语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。": "Speech models are used for online reading. Select another provider for text features."
+  "语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。": "Speech models are used for online reading. Select another provider for text features.",
+  "输入翻译": "Input translation",
+  "输入文字，Enter 翻译，Shift+Enter 换行…": "Type text, Enter to translate, Shift+Enter for a new line…",
+  "输入翻译可直接打开空白浮窗；选中文字后也可按指令快捷键处理。暂停自动划词时仍可使用。": "Open a blank input window, or use an action shortcut on selected text. Shortcuts still work while automatic selection is paused."
 }

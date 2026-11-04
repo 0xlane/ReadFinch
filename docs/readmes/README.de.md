@@ -106,12 +106,13 @@ Die automatische Suche nach Updates ist standardmäßig aktiviert. Unter About k
 
 | Befehl | Windows / Linux | macOS |
 | --- | --- | --- |
-| Auswahl übersetzen | `Alt + T` | `Option + T` |
+| Auswahl übersetzen | `Alt + T` | `Option + D` |
 | Wörterbuch öffnen | `Alt + Shift + D` | `Option + Shift + D` |
 | Text verbessern | `Alt + Shift + W` | `Option + Shift + W` |
 | Befehl auswählen | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Bildschirmtext per OCR erfassen | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Bildschirmtext per OCR erfassen | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | Text aus der Zwischenablage lesen | `Ctrl + Shift + V` | `Command + Shift + V` |
+| Eingegebenen Text übersetzen | `Alt + A` | `Option + A` |
 
 Tastenkürzel lassen sich auf einer eigenen Einstellungsseite ändern. Einstellungen werden automatisch gespeichert. Das Design folgt dem System oder deiner Wahl zwischen Hell und Dunkel. Der Start bei der Anmeldung ist standardmäßig aus und lässt sich im Tray-Menü ändern.
 

@@ -106,12 +106,13 @@ La recherche automatique de mises à jour est activée par défaut. Vous pouvez 
 
 | Commande | Windows / Linux | macOS |
 | --- | --- | --- |
-| Traduire la sélection | `Alt + T` | `Option + T` |
+| Traduire la sélection | `Alt + T` | `Option + D` |
 | Ouvrir le dictionnaire | `Alt + Shift + D` | `Option + Shift + D` |
 | Améliorer la rédaction | `Alt + Shift + W` | `Option + Shift + W` |
 | Choisir une commande | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capturer du texte par OCR | `Ctrl + Shift + 2` | `Command + Shift + 2` |
+| Capturer du texte par OCR | `Ctrl + Shift + 2` | `Option + Shift + S` |
 | Lire le presse-papiers | `Ctrl + Shift + V` | `Command + Shift + V` |
+| Traduire du texte saisi | `Alt + A` | `Option + A` |
 
 Les raccourcis sont modifiables sur une page dédiée. Les réglages sont enregistrés automatiquement ; l’apparence suit le système ou votre choix clair/sombre. Le démarrage à la connexion est désactivé par défaut et se règle depuis le menu de la zone de notification.
 
