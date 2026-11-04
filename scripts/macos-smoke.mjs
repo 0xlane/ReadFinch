@@ -95,6 +95,14 @@ try {
   };
   await until(() => replies.has("ready"), "fixture launch");
   await command("select");
+  await pause(600);
+  assert.equal(
+    await call("selectionGet"),
+    null,
+    "programmatic/keyboard selection must not create an automatic toolbar",
+  );
+  check("非鼠标选区不创建自动工具栏");
+  await command("mouse-select");
   await until(
     async () =>
       (await call("selectionGet"))?.text ===
@@ -148,11 +156,11 @@ try {
   assert.equal(await call("selectionGet"), null);
   check("清空选区和进入安全密码框后不保留可用选区");
   await command("changed");
-  await until(
-    async () =>
-      (await call("selectionGet"))?.text ===
-      "A fresh selection for the shortcut.",
-    "fresh selection",
+  await pause(400);
+  assert.equal(
+    await call("selectionGet"),
+    null,
+    "keyboard selection stays manual",
   );
   const before = requests.length;
   await command("shortcut");

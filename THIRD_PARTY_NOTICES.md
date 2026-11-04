@@ -47,3 +47,29 @@ The model capability snapshot contains model identifiers, names, modalities and 
 - electron-updater: MIT. It provides the Windows NSIS and Linux AppImage update installation engine; its license and runtime dependencies are included in the distribution.
 
 Exact installed runtime dependency versions are recorded in package-lock.json; static reference icon package versions are recorded above and in their bundled notice. Other UI icons are Lucide and the original ReadFinch mark. No remotely hosted fonts or stock illustrations are loaded.
+
+## macOS selection references
+
+The focused-element/direct-child/ancestor lookup and numeric AXSelectedText support in `native/macos/SelectionReading.swift`, and the Chromium accessibility activation in `SelectionBridge.swift`, are adapted from [selection-hook](https://github.com/0xfullex/selection-hook/tree/d8ac605db1b0a87f816f6fdfd880e054033737e5), `src/mac/core/engine.mm`, under MIT. ReadFinch retains its own bounded Swift reader, secure-field checks, mouse-only automatic trigger and text-marker support; selection-hook's clipboard simulation and keyboard hooks are not included.
+
+MIT License
+
+Copyright (c) 2025 0xfullex
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

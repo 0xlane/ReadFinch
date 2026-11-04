@@ -122,6 +122,24 @@ export class SelectionService extends EventEmitter {
   private receive(event: any) {
     this.heartbeat = Date.now();
     if (
+      event.type === "diagnostic" &&
+      process.env.READFINCH_SELECTION_DIAGNOSTICS === "1"
+    ) {
+      // Diagnostic mode never logs the selected text, window title, or clipboard.
+      console.info(
+        "[ReadFinch selection]",
+        JSON.stringify({
+          stage: event.stage,
+          role: event.role,
+          length: event.length,
+          clicks: event.clicks,
+          age: event.age,
+          accepted: event.accepted,
+        }),
+      );
+      return;
+    }
+    if (
       this.stalled &&
       ["heartbeat", "ready", "selection"].includes(event.type)
     ) {

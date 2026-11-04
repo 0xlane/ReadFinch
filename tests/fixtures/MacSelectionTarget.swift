@@ -33,6 +33,23 @@ window.contentView?.addSubview(password)
       textView.string = op == "changed" ? "A fresh selection for the shortcut." : "Small steps make a big difference."
       window.makeFirstResponder(textView)
       textView.setSelectedRange(NSRange(location: 0, length: (textView.string as NSString).length))
+    case "mouse-select":
+      textView.string = "Small steps make a big difference."
+      window.makeFirstResponder(textView)
+      textView.setSelectedRange(NSRange(location: 0, length: 0))
+      textView.layoutManager?.ensureLayout(for: textView.textContainer!)
+      let start = textView.firstRect(forCharacterRange: NSRange(location: 0, length: 0), actualRange: nil)
+      let end = textView.firstRect(forCharacterRange: NSRange(location: (textView.string as NSString).length, length: 0), actualRange: nil)
+      let screenTop = NSScreen.screens.first?.frame.maxY ?? 0
+      let first = CGPoint(x: start.minX + 0.5, y: screenTop - start.midY)
+      let last = CGPoint(x: end.maxX + 2, y: screenTop - end.midY)
+      CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: first, mouseButton: .left)?.post(tap: .cghidEventTap)
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+        CGEvent(mouseEventSource: nil, mouseType: .leftMouseDragged, mouseCursorPosition: last, mouseButton: .left)?.post(tap: .cghidEventTap)
+      }
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+        CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: last, mouseButton: .left)?.post(tap: .cghidEventTap)
+      }
     case "clear": textView.setSelectedRange(NSRange(location: 0, length: 0))
     case "secure": window.makeFirstResponder(password); password.selectText(nil)
     case "shortcut":
