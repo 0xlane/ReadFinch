@@ -1,7 +1,7 @@
 import { t } from "../shared/i18n";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import { parseConfig, type Config } from "../shared/config";
+import type { Config } from "../shared/config";
 import { atomicWrite, readJson, digest, ConfigStore } from "./store";
 import type { SyncResult } from "../shared/api";
 export type DavSettings = {
@@ -140,7 +140,7 @@ export class DavSync {
       chunks.push(chunk);
     }
     const text = Buffer.concat(chunks).toString("utf8");
-    const config = parseConfig(text);
+    const config = this.store.parse(text);
     return { config, etag: res.headers.get("etag") ?? "" };
   }
   async test() {

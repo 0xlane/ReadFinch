@@ -5,14 +5,9 @@ import {
 } from "./provider-presets";
 import type { TextProfile } from "./config";
 import catalog from "./provider-catalog.json";
-import {
-  modelKind,
-  inferredModelKind,
-  imageCapabilities as capabilities,
-} from "./model-capabilities";
+import { modelKind, inferredModelKind } from "./model-capabilities";
 
-// The list and ordering mirror the pinned Read Frog catalog. Capability metadata is
-// independent: unknown means "test this endpoint", never a promise of vision support.
+// The selectable IDs are independent of the directory used to describe them.
 export type BuiltinModel = {
   id: string;
   vision?: boolean;
@@ -30,11 +25,7 @@ export const BUILTIN_MODELS = Object.fromEntries(
       preset,
       (p?.models ?? []).map((id) => ({
         id,
-        vision:
-          capabilities[preset + ":" + id] ??
-          (inferredModelKind({ preset, model: id }) === "vision"
-            ? true
-            : undefined),
+        vision: inferredModelKind({ preset, model: id }) === "vision",
         kind: inferredModelKind({ preset, model: id }),
       })),
     ];
@@ -60,14 +51,8 @@ export function supportsImages(p: TextProfile) {
   if (
     isTranslationOnly(p) ||
     p.preset === "replicate" ||
-    p.preset === "perplexity" ||
-    modelKind(p) === "speech" ||
-    p.modelKind === "text"
+    p.preset === "perplexity"
   )
     return false;
-  if (p.modelKind === "vision") return Boolean(p.model.trim());
-  const known =
-    BUILTIN_MODELS[p.preset].find((m) => m.id === p.model)?.vision ??
-    capabilities[p.preset + ":" + p.model];
-  return Boolean(p.model.trim()) && known !== false;
+  return Boolean(p.model.trim()) && modelKind(p) === "vision";
 }

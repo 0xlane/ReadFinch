@@ -12,6 +12,7 @@ import {
 import {
   modelPurposes,
   providerCanServe,
+  updateProviderModel,
   type ModelPurpose,
 } from "../shared/models";
 import {
@@ -20,7 +21,7 @@ import {
   requiresApiKey,
 } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
-import { ModelBadge } from "./ModelCapability";
+import { ModelOverride } from "./ModelCapability";
 import { ProviderSpecificSettings } from "./ProviderSpecificSettings";
 import { ConnectionTestButton } from "./ConnectionTestButton";
 import { Field } from "./ui";
@@ -160,9 +161,6 @@ export function Providers(props: ProviderProps) {
                     <ProviderIcon preset={item.preset} />
                     <span className="provider-list-name">
                       <span>{item.name || t("未命名提供商")}</span>
-                      {!isTranslationOnly(item) && (
-                        <ModelBadge kind={modelKind(item)} compact />
-                      )}
                     </span>
                   </button>
                   {assigned.length > 0 && (
@@ -352,6 +350,13 @@ function ProviderEditor({
           <ChevronRight size={15} />
           {t("高级选项")}
         </summary>
+        {!translationOnly && provider.model && (
+          <ModelOverride
+            provider={provider}
+            directory={catalog.directory}
+            onChange={(p) => onChange(updateProviderModel(config, p))}
+          />
+        )}
         {!translationOnly && modelKind(provider) !== "speech" && (
           <Field label={t("温度")} hint={t("留空使用提供商默认值。")}>
             <input

@@ -46,11 +46,7 @@ function resetSample(action: Action): OutputSample {
         fields.some((f) => f.id === definition(k).outputSchema[0].id),
     ) ?? "blank";
   const sample = action.sample
-    ? localizedSample(
-        kind,
-        action.sample.targetLanguage,
-        action.sample.explanationLanguage,
-      )
+    ? localizedSample(kind, action.sample.targetLanguage)
     : definition(kind).sample;
   return {
     ...sample,

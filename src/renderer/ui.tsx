@@ -191,13 +191,11 @@ export function LanguageSelect({
   value,
   onChange,
   auto = false,
-  followLabel,
   label,
 }: {
   value: string;
   onChange: (v: string) => void;
   auto?: boolean;
-  followLabel?: string;
   label: string;
 }) {
   return (
@@ -206,14 +204,7 @@ export function LanguageSelect({
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >
-      {auto && <option value="auto">{t("自动检测语言")}</option>}
-      {!auto && (
-        <option value="system">
-          {followLabel
-            ? t("跟随应用语言（{0}）", followLabel)
-            : t("跟随应用语言")}
-        </option>
-      )}
+      {auto && <option value="auto">{t("自动检测")}</option>}
       {!languages.includes(value) && value !== "auto" && value !== "system" && (
         <option>{value}</option>
       )}

@@ -29,6 +29,8 @@ The bundled provider marks come from [LobeHub Icons](https://github.com/lobehub/
 
 ## Runtime dependencies and assets
 
+The model capability snapshot contains model identifiers, names, modalities and context limits from [Models.dev](https://models.dev/) (Copyright © 2025 models.dev, [MIT license](src/renderer/public/licenses/models-dev.txt)) and the [OpenRouter public model directory](https://openrouter.ai/docs/api/api-reference/models/list-all-models-and-their-properties). The snapshot contains no model weights.
+
 - franc 6.2.0 and its language-model dependencies retain their MIT notices.
 - Electron: MIT (Chromium and bundled components retain their own notices in the Electron distribution).
 - React and React DOM: MIT.

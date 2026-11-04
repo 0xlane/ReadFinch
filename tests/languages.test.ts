@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { defaultConfig, parseConfig } from "../src/shared/config";
@@ -10,8 +10,8 @@ import {
   matchingBuiltinOutput,
 } from "../src/shared/action-language";
 import {
-  preferredResultLanguage,
-  resolveResultLanguage,
+  initialTargetLanguage,
+  resultLanguageName,
 } from "../src/shared/languages";
 import { setLocale } from "../src/shared/i18n";
 import languages from "../src/shared/target-languages.json";
@@ -25,29 +25,21 @@ import {
 import { ConfigStore } from "../src/core/store";
 import { buildActionHelperPrompt } from "../src/shared/action-ai-helper";
 
-test("follow-language defaults recognize every offered output language, OS regions and fallback preferences", () => {
+test("first use selects a concrete target from supported OS language preferences", () => {
   for (const language of languages) {
-    assert.equal(
-      preferredResultLanguage("system", [language.code]),
-      language.name,
-    );
-    assert.equal(
-      resolveResultLanguage(language.name, "en", ["ja"]),
-      language.name,
-    );
+    assert.equal(initialTargetLanguage([language.code]), language.name);
+    assert.equal(resultLanguageName(language.code), language.name);
   }
   for (const region of ["zh-TW", "zh-Hant", "zh_HK", "zh-MO"])
-    assert.equal(preferredResultLanguage("system", [region]), "繁體中文");
-  assert.equal(preferredResultLanguage("system", ["ja-JP", "en-US"]), "日本語");
+    assert.equal(initialTargetLanguage([region]), "繁體中文");
+  assert.equal(initialTargetLanguage(["ja-JP", "en-US"]), "日本語");
   assert.equal(
-    preferredResultLanguage("system", ["pt-BR", "fr-FR"]),
+    initialTargetLanguage(["not_a_valid_tag!", "pt-BR", "fr-FR"]),
     "Français",
   );
-  assert.equal(preferredResultLanguage("system", ["xx-XX"]), "English");
-  assert.equal(preferredResultLanguage("en", ["zh-CN"]), "English");
-  assert.equal(preferredResultLanguage("zh-CN", ["en-US"]), "简体中文");
-  assert.equal(resolveResultLanguage("system", "system", ["ko-KR"]), "한국어");
-  assert.equal(resolveResultLanguage("Italiano", "en", []), "Italiano");
+  assert.equal(initialTargetLanguage(["xx-XX"]), "English");
+  assert.equal(initialTargetLanguage(["zh-Hans-HK"]), "简体中文");
+  assert.equal(resultLanguageName("Italiano"), "Italiano");
 });
 
 test("fresh defaults do not depend on global UI initialization order", () => {
@@ -57,17 +49,99 @@ test("fresh defaults do not depend on global UI initialization order", () => {
     setLocale("en");
     const english = defaultConfig();
     assert.deepEqual(chinese, english);
-    assert.equal(english.defaults.targetLanguage, "system");
-    assert.equal(english.defaults.explanationLanguage, "system");
+    assert.equal(english.defaults.targetLanguage, "English");
+    assert.equal(english.defaults.sourceLanguage, "auto");
+    assert.ok(!("explanationLanguage" in english.defaults));
   } finally {
     setLocale("zh-CN");
+  }
+});
+
+test("first-run and v14 follow-mode initialization is written once; restarts, imports and UI switches preserve explicit choices", async () => {
+  for (const old of [
+    undefined,
+    ["system", "system", "日本語"],
+    ["en", "system", "English"],
+    ["system", "Français", "Français"],
+  ] as const) {
+    const dir = await mkdtemp(
+      path.join(os.tmpdir(), "readfinch-first-language-"),
+    );
+    const file = path.join(dir, "config.json");
+    const data = defaultConfig();
+    const legacy = old && {
+      ...data,
+      schemaVersion: 14,
+      appearance: { ...data.appearance, language: old[0] },
+      defaults: {
+        ...data.defaults,
+        sourceLanguage: "Deutsch",
+        targetLanguage: old[1],
+        explanationLanguage: "한국어",
+      },
+    };
+    if (legacy) await writeFile(file, JSON.stringify(legacy));
+    let reads = 0;
+    const store = new ConfigStore(dir, canonicalizeBuiltinConfig, () => {
+      reads++;
+      return ["ja-JP"];
+    });
+    await store.init();
+    const stored = JSON.parse(await readFile(file, "utf8"));
+    assert.equal(stored.defaults.targetLanguage, old ? old[2] : "日本語");
+    assert.equal(stored.defaults.sourceLanguage, old ? "Deutsch" : "auto");
+    assert.equal(stored.schemaVersion, 15);
+    assert.ok(!("explanationLanguage" in stored.defaults));
+    assert.equal(
+      reads,
+      !old || (old[0] === "system" && old[1] === "system") ? 1 : 0,
+    );
+    if (legacy)
+      assert.deepEqual(
+        JSON.parse(await readFile(file + ".bak", "utf8")),
+        legacy,
+      );
+    const noDetect = () => {
+      throw Error("Target language re-detected");
+    };
+    const restarted = new ConfigStore(dir, canonicalizeBuiltinConfig, noDetect);
+    await restarted.init();
+    assert.equal(
+      restarted.config.defaults.targetLanguage,
+      stored.defaults.targetLanguage,
+    );
+    const chosen = restarted.config;
+    chosen.appearance.language = "zh-CN";
+    chosen.defaults.targetLanguage = "Español";
+    chosen.defaults.sourceLanguage = "Français";
+    await restarted.save(chosen);
+    assert.deepEqual(
+      parseConfig(await readFile(file, "utf8"), [], noDetect).defaults,
+      chosen.defaults,
+    );
+    assert.equal(
+      restarted.parse({
+        ...chosen,
+        schemaVersion: 14,
+        appearance: { ...chosen.appearance, language: "system" },
+        defaults: { ...chosen.defaults, targetLanguage: "system" },
+      }).defaults.targetLanguage,
+      "Español",
+    );
+    for (const targetLanguage of ["auto", "system"])
+      assert.throws(() =>
+        parseConfig({
+          ...chosen,
+          defaults: { ...chosen.defaults, targetLanguage },
+        }),
+      );
   }
 });
 
 test("English built-ins contain no Chinese instructions, field descriptions, layouts or sample data", () => {
   const config = defaultConfig();
   config.appearance.language = "en";
-  const view = localizeBuiltinConfig(config, "en", ["zh-CN"]);
+  const view = localizeBuiltinConfig(config, "en");
   for (const action of view.actions) {
     assert.doesNotMatch(
       JSON.stringify({
@@ -90,21 +164,19 @@ test("English built-ins contain no Chinese instructions, field descriptions, lay
   }
 });
 
-test("all output languages expand explicitly and independently of UI language; dictionary explanations use their own preference", () => {
+test("translations, dictionary entries, writing feedback and examples share one target in both interface languages", () => {
   for (const locale of ["en", "zh-CN"] as const)
     for (const language of languages) {
       const config = defaultConfig();
       config.appearance.language = locale;
       config.defaults.targetLanguage = language.name;
-      config.defaults.explanationLanguage = "日本語";
-      const view = localizeBuiltinConfig(config, locale, ["de-DE"]);
+      const view = localizeBuiltinConfig(config, locale);
       const vars = {
         text: "blossom",
         context: "",
         sourceLanguage: "en",
         sourceApp: "Reader",
         targetLanguage: language.name,
-        explanationLanguage: "日本語",
       };
       for (const action of view.actions) {
         const messages = actionMessages(action, vars);
@@ -112,19 +184,16 @@ test("all output languages expand explicitly and independently of UI language; d
           JSON.stringify(messages),
           /\{\{\s*(?:targetLanguage|explanationLanguage)/,
         );
-        if (action.id === "translate" || action.id === "sentence")
-          assert.ok(messages[0].content.includes(language.name), action.id);
-        if (action.id !== "translate")
-          assert.ok(messages[0].content.includes("日本語"), action.id);
+        assert.ok(messages[0].content.includes(language.name), action.id);
         if (action.sample) {
           assert.equal(action.sample.targetLanguage, language.name);
-          assert.equal(action.sample.explanationLanguage, "日本語");
+          assert.ok(!("explanationLanguage" in action.sample));
         }
       }
       const sample = view.actions[1].sample!;
       assert.equal(
         sample.values["dictionary-definition"],
-        localizedSample("dictionary", "English", "日本語").values[
+        localizedSample("dictionary", language.name).values[
           "dictionary-definition"
         ],
       );
@@ -139,8 +208,12 @@ test("language switching is reversible and does not change stored defaults or sy
   const config = canonicalizeBuiltinConfig(defaultConfig());
   for (const locale of ["en", "zh-CN"] as const)
     for (const language of languages) {
-      const viewed = localizeBuiltinConfig(config, locale, [language.code]);
-      assert.deepEqual(canonicalizeBuiltinConfig(viewed), config);
+      const configured = {
+        ...config,
+        defaults: { ...config.defaults, targetLanguage: language.name },
+      };
+      const viewed = localizeBuiltinConfig(configured, locale);
+      assert.deepEqual(canonicalizeBuiltinConfig(viewed), configured);
       assert.deepEqual(parseConfig(viewed), viewed);
     }
 });
@@ -152,7 +225,7 @@ test("earlier untouched built-ins update while user prompts, layouts, samples an
     structuredClone(history["zh-CN"].dictionary),
   );
   config.appearance.language = "en";
-  const upgraded = localizeBuiltinConfig(config, "en", []);
+  const upgraded = localizeBuiltinConfig(config, "en");
   assert.match(upgraded.actions[1].system, /explain|dictionary/i);
   assert.doesNotMatch(upgraded.actions[1].system, /[\u3400-\u9fff]/);
   const custom = structuredClone(upgraded.actions[1]);
@@ -169,7 +242,7 @@ test("earlier untouched built-ins update while user prompts, layouts, samples an
     notebaseId: "library",
     mappings: { "dictionary-definition": "definition-column" },
   };
-  const view = localizeBuiltinConfig(config, "en", []);
+  const view = localizeBuiltinConfig(config, "en");
   assert.equal(view.actions[1].system, config.actions[1].system);
   assert.equal(view.actions[1].layout, config.actions[1].layout);
   assert.equal(view.actions[1].outputSchema![0].name, "My term");
@@ -184,8 +257,8 @@ test("earlier untouched built-ins update while user prompts, layouts, samples an
 
 test("a result produced before a language switch still matches its built-in command, but schema changes are rejected", () => {
   const config = defaultConfig();
-  const before = localizeBuiltinConfig(config, "en", ["en"]).actions[1];
-  const after = localizeBuiltinConfig(config, "zh-CN", ["zh-CN"]).actions[1];
+  const before = localizeBuiltinConfig(config, "en").actions[1];
+  const after = localizeBuiltinConfig(config, "zh-CN").actions[1];
   assert.deepEqual(
     matchingBuiltinOutput(after, before.outputSchema)?.outputSchema,
     before.outputSchema,
@@ -200,7 +273,7 @@ test("persisting a localized settings snapshot and restarting retains a canonica
   const store = new ConfigStore(dir, canonicalizeBuiltinConfig);
   await store.init();
   const revision = store.revision;
-  const view = localizeBuiltinConfig(store.config, "en", ["ja-JP"]);
+  const view = localizeBuiltinConfig(store.config, "en");
   await store.save(view, revision);
   assert.equal(store.revision, revision);
   const restarted = new ConfigStore(dir, canonicalizeBuiltinConfig);
@@ -213,32 +286,34 @@ test("persisting a localized settings snapshot and restarting retains a canonica
   );
 });
 
-test("note suggestions and the AI setup helper preserve separate translation and explanation languages", () => {
+test("note suggestions, old custom language tokens and the editor helper use the selected target", () => {
   const config = defaultConfig();
   config.appearance.language = "en";
-  const action = localizeBuiltinConfig(config, "en", []).actions[1];
+  const action = {
+    ...localizeBuiltinConfig(config, "en").actions[1],
+    system: "Explain in {{explanationLanguage}}.",
+  };
   const messages = suggestionMessages(action, {
     text: "blossom",
     context: "",
     sourceLanguage: "en",
     targetLanguage: "Français",
-    explanationLanguage: "日本語",
   });
   const body = JSON.parse(messages[1].content);
-  assert.equal(body.explanationLanguage, "日本語");
   assert.equal(body.targetLanguage, "Français");
-  assert.match(body.guidance.join("\n"), /日本語/);
+  assert.match(body.guidance.join("\n"), /Explain in Français/);
   const before = suggestionBinding(config)!.key;
-  config.defaults.explanationLanguage = "한국어";
+  config.defaults.targetLanguage = "한국어";
   assert.notEqual(suggestionBinding(config)!.key, before);
   const guide = buildActionHelperPrompt({
     action,
     otherActionNames: [],
     uiLocale: "en",
     targetLanguage: "Français",
-    explanationLanguage: "日本語",
   });
-  assert.match(guide, /translations is currently "Français"/);
-  assert.match(guide, /explanations use "日本語"/);
+  assert.match(
+    guide,
+    /"Français", for translations, definitions and explanations/,
+  );
   assert.match(guide, /- System prompt/);
 });

@@ -1,63 +1,92 @@
-import catalog from "./provider-catalog.json";
-
-export const imageCapabilities: Record<string, boolean> = {
-  "openai:gpt-5.4-mini": true,
-  "openai:gpt-4.1-mini": true,
-  "openai:gpt-4o-mini": true,
-  "deepseek:deepseek-flash": true,
-  "deepseek:deepseek-v4-pro": false,
-  "qwen:qwen3.7-plus": true,
-  "qwen:qwen3.8-max": true,
-  "siliconflow:Qwen/Qwen3.5-397B-A17B": true,
-  "siliconflow:Qwen/Qwen2.5-VL-72B-Instruct": true,
-  "gemini:gemini-3.5-flash-lite": true,
-  "gemini:gemini-3.8-flash": true,
-  "openrouter:openai/gpt-4.1-mini": true,
-  "openrouter:google/gemini-3.8-flash": true,
-  "openrouter:deepseek/deepseek-v4-pro": false,
-};
-
-export type ModelKind = "text" | "vision" | "speech";
+import bundled from "./model-directory.json";
+import {
+  ModelDirectory,
+  type DirectoryData,
+  type ModelKind,
+} from "./model-directory";
+export type { ModelKind } from "./model-directory";
+export const bundledDirectoryData = bundled as DirectoryData;
+export const bundledDirectory = new ModelDirectory({
+  ...bundledDirectoryData,
+  bundledSources: ["modelsDev", "openRouter"],
+});
 export type SpeechProtocol = "openai" | "mimo" | "azure";
 export type ModelCapabilities = {
   preset: string;
   model: string;
   endpoint?: string;
   modelKind?: ModelKind;
+  catalogMatch?: { id: string; kind: ModelKind };
   speechProtocol?: Exclude<SpeechProtocol, "azure">;
 };
 
-// Model lists often contain only IDs. Unknown capabilities stay unknown; a
-// user-defined deployment can be classified explicitly in the provider editor.
+// Exact official IDs not covered by the general-purpose directories.
+const localKinds = new Map<string, ModelKind>([
+  ["gpt-4o-mini-tts", "speech"],
+  ["gpt-4o-mini-tts-2025-03-20", "speech"],
+  ["gpt-4o-mini-tts-2025-12-15", "speech"],
+  ["tts-1", "speech"],
+  ["tts-1-hd", "speech"],
+  ["tts-1-1106", "speech"],
+  ["tts-1-hd-1106", "speech"],
+  ["mimo-v2-tts", "speech"],
+  ["mimo-v2.5-tts", "speech"],
+  ["mimo-v2.5-tts-voicedesign", "speech"],
+  ["mimo-v2.5-tts-voiceclone", "speech"],
+  ["deepseek-flash", "vision"],
+  ["Qwen/Qwen2.5-VL-72B-Instruct", "vision"],
+]);
+
 export function inferredModelKind(
-  p: Pick<ModelCapabilities, "preset" | "model">,
-): ModelKind | undefined {
-  const id = p.model.toLowerCase();
-  if (/(?:^|[/._-])tts(?:$|[/._-])|(?:^|\/)kokoro(?:$|[-/])|cosyvoice/.test(id))
-    return "speech";
-  const images = imageCapabilities[p.preset + ":" + p.model];
-  if (images !== undefined) return images ? "vision" : "text";
-  if (/(?:^|[-/_])(?:asr|embedding|transcribe|realtime)(?:[-/_]|$)/.test(id))
-    return undefined;
+  p: ModelCapabilities,
+  directory?: ModelDirectory,
+): ModelKind {
+  const match = directory?.match(p.preset, p.model);
+  if (match === null) return "text";
+  if (match && directory && !directory.isBundled(match)) return match.kind;
+  return (
+    (p.catalogMatch?.id === p.model ? p.catalogMatch.kind : undefined) ??
+    match?.kind ??
+    bundledDirectory.lookup(p.preset, p.model)?.kind ??
+    localKinds.get(p.model) ??
+    "text"
+  );
+}
+export function modelKind(
+  p: ModelCapabilities,
+  directory?: ModelDirectory,
+): ModelKind {
+  return p.modelKind ?? inferredModelKind(p, directory);
+}
+export function withCatalogMatch<T extends ModelCapabilities>(
+  p: T,
+  directory: ModelDirectory,
+): T {
+  const hit = directory.match(p.preset, p.model);
+  if (hit && directory.isBundled(hit)) return p;
+  const kind = hit === null ? "text" : hit?.kind;
+  // Retain a saved exact match when a source is unavailable. Never transfer it to another ID.
   if (
-    /(?:^|\/)gpt-(?:4o(?!.*(?:audio|transcribe))|4\.1|5|6)|(?:^|\/)o[134](?:-|$)|(?:^|\/)claude-(?:3|sonnet|opus|haiku)|(?:^|\/)gemini-(?!.*(?:tts|embedding))|(?:^|\/)mimo-v2\.(?:5|6)(?:-|$)|(?:^|[/_-])(?:vl|vision)(?:$|[-/])/.test(
-      id,
-    )
+    !kind ||
+    (p.catalogMatch?.id === p.model && p.catalogMatch.kind === kind) ||
+    (!p.catalogMatch && inferredModelKind(p) === kind)
   )
-    return "vision";
-  const entries = catalog.providers[p.preset as keyof typeof catalog.providers]
-    ?.models as readonly string[] | undefined;
-  return entries?.includes(p.model) ? "text" : undefined;
+    return p;
+  return { ...p, catalogMatch: { id: p.model, kind } };
 }
-
-export function modelKind(p: ModelCapabilities): ModelKind | undefined {
-  return p.modelKind ?? inferredModelKind(p);
-}
-
 export function speechProtocol(p: ModelCapabilities): SpeechProtocol {
   if (p.speechProtocol) return p.speechProtocol;
   if (p.preset === "azure") return "azure";
-  if (p.preset === "mimo" || /(?:^|\/)mimo-.*tts/i.test(p.model)) return "mimo";
+  if (
+    p.preset === "mimo" ||
+    [
+      "mimo-v2-tts",
+      "mimo-v2.5-tts",
+      "mimo-v2.5-tts-voicedesign",
+      "mimo-v2.5-tts-voiceclone",
+    ].includes(p.model.replace(/^xiaomi\//, ""))
+  )
+    return "mimo";
   try {
     if (new URL(p.endpoint ?? "").hostname.endsWith(".xiaomimimo.com"))
       return "mimo";

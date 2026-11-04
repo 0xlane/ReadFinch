@@ -1,5 +1,6 @@
 import { isTranslationOnly, requiresApiKey } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
+import { PublicModelDirectory } from "../core/public-model-directory";
 import { APP_NAME, APP_ID } from "../shared/brand";
 import { OnlineVoiceIdSchema, onlineVoices } from "../shared/tts";
 import {
@@ -56,13 +57,13 @@ import {
   mapNoteToBook,
   type NoteInput,
 } from "../shared/notes";
-import { resolveLocale, setLocale, t } from "../shared/i18n";
+import { getLocale, resolveLocale, setLocale, t } from "../shared/i18n";
 import {
   canonicalizeBuiltinConfig,
   localizeBuiltinConfig,
   matchingBuiltinOutput,
 } from "../shared/action-language";
-import { resolveResultLanguage } from "../shared/languages";
+import { resultLanguageName } from "../shared/languages";
 import {
   editToolbar,
   toolbarEnabled,
@@ -76,7 +77,8 @@ import { parseOutput, jsonContract } from "../shared/action-output";
 import { promptVariables } from "../shared/config";
 import { assetsReady, offlineRecognize } from "../core/ocr";
 import {
-  parseConfig,
+  SourceLanguageSchema,
+  TargetLanguageSchema,
   mergeConfig,
   shortcutPreview,
   ocrProfiles,
@@ -123,7 +125,12 @@ const root = app.getAppPath();
 const resource = app.isPackaged ? process.resourcesPath : root;
 const nativeRoot = path.join(resource, "native");
 const dataDir = app.getPath("userData");
-const store = new ConfigStore(dataDir, canonicalizeBuiltinConfig);
+const publicModelDirectory = new PublicModelDirectory(dataDir, (url, init) =>
+  session.defaultSession.fetch(url.toString(), init),
+);
+const store = new ConfigStore(dataDir, canonicalizeBuiltinConfig, () =>
+  app.getPreferredSystemLanguages(),
+);
 const localNotes = new LocalNotes(path.join(dataDir, "local-notes.sqlite"));
 const secrets = new Secrets(dataDir);
 const native = new SelectionService(nativeRoot);
@@ -188,8 +195,7 @@ const shortcutRegistry = new ShortcutRegistry(
   (id) => void dispatchShortcut(id),
   process.platform,
 );
-let pendingImport:
-  { token: string; config: ReturnType<typeof parseConfig> } | undefined;
+let pendingImport: { token: string; config: Config } | undefined;
 function davScope(value: DavSettings) {
   return value.url.replace(/\/+$/, "") + "|" + value.username;
 }
@@ -211,18 +217,37 @@ async function credentials(provider: { id: string; endpoint: string }) {
   ]);
   return { key, headers: parseHeaders(raw ?? "") };
 }
+// Windows lets users choose a display language independently of their preferred language list.
+let windowsDisplayLanguage: string | undefined;
+async function readWindowsDisplayLanguage() {
+  if (process.platform !== "win32") return;
+  try {
+    const { stdout } = await promisify(execFile)(
+      path.join(nativeRoot, "bin", "readfinch-selection.exe"),
+      ["--display-language"],
+      { windowsHide: true, timeout: 2000, maxBuffer: 1024, encoding: "utf8" },
+    );
+    const tag = stdout.trim();
+    if (tag) windowsDisplayLanguage = tag;
+  } catch {
+    // A missing helper leaves the last known language or Chromium's UI locale available.
+  }
+}
 function interfaceLocale() {
+  const language = store.config.appearance.language;
+  if (language !== "system") return language;
+  const displayLanguage =
+    process.platform === "win32"
+      ? (windowsDisplayLanguage ?? app.getLocale())
+      : undefined;
   return resolveLocale(
-    store.config.appearance.language,
+    language,
     app.getPreferredSystemLanguages(),
+    displayLanguage,
   );
 }
 function runtimeConfig() {
-  return localizeBuiltinConfig(
-    store.config,
-    interfaceLocale(),
-    app.getPreferredSystemLanguages(),
-  );
+  return localizeBuiltinConfig(store.config, interfaceLocale());
 }
 const dav = new DavSync(
   store,
@@ -261,7 +286,6 @@ async function snapshot(): Promise<Snapshot> {
     updates: updates.state,
     toolbarPausedUntil,
     interfaceLocale: interfaceLocale(),
-    systemLanguages: app.getPreferredSystemLanguages(),
     config: runtimeConfig(),
     revision: store.revision,
     credentialIds,
@@ -364,7 +388,7 @@ function updateTray() {
     ? t("自动划词已暂停")
     : native.state === "ready"
       ? t("自动划词已开启")
-      : native.status;
+      : t(native.status);
   tray.setImage(trayIcon());
   tray.setToolTip(`${t("伴读雀")} · ${description}`);
   const menu = Menu.buildFromTemplate([
@@ -501,7 +525,7 @@ function createWindow(
   win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
   win.webContents.on("will-navigate", (event) => event.preventDefault());
   void win.loadFile(path.join(__dirname, "../renderer/index.html"), {
-    query: { mode },
+    query: { mode, uiLanguage: interfaceLocale() },
   });
   return win;
 }
@@ -1158,6 +1182,11 @@ async function handle(
   switch (method) {
     case "snapshot":
       return snapshot();
+    case "modelDirectory":
+      if (win !== main) throw Error(t("提供商不可用"));
+      return arg?.refresh === true
+        ? publicModelDirectory.refresh()
+        : publicModelDirectory.read();
     case "updateCheck":
     case "updateDownload":
     case "updateInstall":
@@ -1188,13 +1217,16 @@ async function handle(
       if (win !== panel) throw Error(t("仅可从结果窗口更改此设置"));
       const preference = z
         .union([
-          z.strictObject({ targetLanguage: z.string().trim().min(1).max(80) }),
+          z.strictObject({ targetLanguage: TargetLanguageSchema }),
+          z.strictObject({ sourceLanguage: SourceLanguageSchema }),
           z.strictObject({ providerId: z.string().min(1).max(100) }),
         ])
         .parse(arg);
       const config = store.config;
       if ("targetLanguage" in preference)
         config.defaults.targetLanguage = preference.targetLanguage;
+      else if ("sourceLanguage" in preference)
+        config.defaults.sourceLanguage = preference.sourceLanguage;
       else {
         const action = config.actions.find((a) => a.id === "translate");
         if (
@@ -1510,8 +1542,8 @@ async function handle(
           actionId: z.string(),
           text: safeText.min(1),
           context: safeText,
-          sourceLanguage: z.string().max(80),
-          targetLanguage: z.string().max(80),
+          sourceLanguage: SourceLanguageSchema,
+          targetLanguage: TargetLanguageSchema,
           providerId: z.string().optional(),
           refresh: z.boolean().optional(),
         })
@@ -1536,26 +1568,18 @@ async function handle(
       if (!provider.enabled)
         throw Error(t("此 API 提供商已停用，请选择其他模型"));
       return beginJob(win, input.id, "text", async (signal, emit) => {
-        const targetLanguage = resolveResultLanguage(
-          input.targetLanguage,
-          cfg.appearance.language,
-          app.getPreferredSystemLanguages(),
-        );
-        const explanationLanguage = resolveResultLanguage(
-          cfg.defaults.explanationLanguage,
-          cfg.appearance.language,
-          app.getPreferredSystemLanguages(),
-        );
+        const targetLanguage = resultLanguageName(input.targetLanguage);
         let sourceLanguage = input.sourceLanguage;
         if (
           sourceLanguage === "auto" &&
-          /\{\{\s*sourceLanguage\s*\}\}/.test(
-            [
-              action.prompt,
-              action.system,
-              ...(action.outputSchema ?? []).map((f) => f.description),
-            ].join("\n"),
-          )
+          (action.id === "translate" ||
+            /\{\{\s*sourceLanguage\s*\}\}/.test(
+              [
+                action.prompt,
+                action.system,
+                ...(action.outputSchema ?? []).map((f) => f.description),
+              ].join("\n"),
+            ))
         ) {
           const code = await detectLanguage(
             cfg,
@@ -1581,7 +1605,6 @@ async function handle(
             ...input,
             sourceLanguage,
             targetLanguage,
-            explanationLanguage,
           });
         const variables = {
           text: input.text,
@@ -1589,7 +1612,6 @@ async function handle(
           sourceApp: win === panel ? noteSourceApp(interaction) : "",
           targetLanguage,
           sourceLanguage,
-          explanationLanguage,
         };
         const outputContract = action.outputSchema
           ? jsonContract(action.outputSchema, (s) =>
@@ -1749,10 +1771,8 @@ async function handle(
         );
         return { durationMs: Math.round(performance.now() - startedAt) };
       }
-      const targetLanguage = resolveResultLanguage(
+      const targetLanguage = resultLanguageName(
         store.config.defaults.targetLanguage,
-        store.config.appearance.language,
-        app.getPreferredSystemLanguages(),
       );
       const result = await complete(
         {
@@ -1921,7 +1941,7 @@ async function handle(
         filters: [{ name: "JSON", extensions: ["json"] }],
       });
       if (file.canceled) return null;
-      const config = parseConfig(await readFile(file.filePaths[0], "utf8"));
+      const config = store.parse(await readFile(file.filePaths[0], "utf8"));
       pendingImport = { token: randomUUID(), config };
       return {
         ...pendingImport,
@@ -2012,7 +2032,7 @@ async function handle(
 async function boot() {
   const atLogin = startsInTray(process.argv);
   const firstLaunch = !existsSync(store.file);
-  await store.init();
+  await Promise.all([store.init(), readWindowsDisplayLanguage()]);
   await updates.init();
   if (existsSync(path.join(dataDir, "local-notes.sqlite"))) {
     const cfg = store.config,
@@ -2084,6 +2104,19 @@ async function boot() {
     }
   });
   main = createWindow("main");
+  if (process.platform === "win32") {
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    // WM_SETTINGCHANGE also reaches the settings window while it is hidden in the tray.
+    main.hookWindowMessage(0x001a, () => {
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(async () => {
+        await readWindowsDisplayLanguage();
+        if (!quitting && interfaceLocale() !== getLocale())
+          await configChanged();
+      }, 200);
+    });
+    main.once("closed", () => clearTimeout(refreshTimer));
+  }
   main.once("ready-to-show", () => {
     if (
       !atLogin &&

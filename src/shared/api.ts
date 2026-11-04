@@ -9,6 +9,7 @@ import type {
   SuggestionCardData,
 } from "./notes";
 import type { Config } from "./config";
+import type { DirectoryData } from "./model-directory";
 import type { ToolbarCommand, ToolbarView } from "./toolbar";
 export type Selection = {
   token: string;
@@ -30,7 +31,6 @@ export type JobEvent = {
 };
 export type Snapshot = {
   interfaceLocale: "zh-CN" | "en";
-  systemLanguages: string[];
   toolbarPausedUntil: number;
   version: string;
   updates: UpdateState;
@@ -138,7 +138,10 @@ export type CallMap = {
   panelResize: { arg: { height: number }; result: void };
   shortcutRecording: { arg: { id: string; active: boolean }; result: void };
   setTranslationPreference: {
-    arg: { targetLanguage: string } | { providerId: string };
+    arg:
+      | { sourceLanguage: string }
+      | { targetLanguage: string }
+      | { providerId: string };
     result: void;
   };
   saveConfig: { arg: { config: Config; revision: string }; result: Snapshot };
@@ -188,6 +191,7 @@ export type CallMap = {
     result: string;
   };
   listModels: { arg: { profileId: string }; result: string[] };
+  modelDirectory: { arg: { refresh: boolean }; result: DirectoryData };
   testText: { arg: { profileId: string }; result: { durationMs: number } };
   recognize: {
     arg: { id: string; profileId: string; dataUrl: string; refresh?: boolean };

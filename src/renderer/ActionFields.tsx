@@ -62,7 +62,6 @@ const tokens = [
   ["targetLanguage", "目标语言"],
   ["sourceLanguage", "源语言"],
   ["sourceApp", "来源应用"],
-  ["explanationLanguage", "解释语言"],
 ] as const;
 export function TextTokens({
   label,

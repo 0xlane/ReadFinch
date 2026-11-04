@@ -1,30 +1,22 @@
 import languages from "./target-languages.json";
-import type { Locale } from "./i18n";
 
-// "system" follows an explicit app language, or the user's OS language preference.
-// Keep native output-language names separate from the UI's currently available locales.
-export function preferredResultLanguage(
-  appearance: "system" | Locale,
-  preferred: readonly string[],
-) {
-  const choices = appearance === "system" ? preferred : [appearance];
-  for (const value of choices) {
-    const code = value.replaceAll("_", "-").toLowerCase();
-    if (code.startsWith("zh"))
-      return /(?:hant|tw|hk|mo)/i.test(code) ? "繁體中文" : "简体中文";
-    const found = languages.find(
-      (l) => l.code.toLowerCase() === code || l.code === code.split("-")[0],
-    );
-    if (found) return found.name;
+// Used only when creating a profile or resolving an old "follow" preference.
+export function initialTargetLanguage(preferred: readonly string[]) {
+  for (const value of preferred) {
+    try {
+      const locale = new Intl.Locale(value.replaceAll("_", "-"));
+      if (locale.language === "zh")
+        return locale.maximize().script === "Hant" ? "繁體中文" : "简体中文";
+      const found = languages.find((l) => l.code === locale.language);
+      if (found) return found.name;
+    } catch {
+      // Ignore an invalid locale and try the next system preference.
+    }
   }
   return "English";
 }
-export function resolveResultLanguage(
-  value: string,
-  appearance: "system" | Locale,
-  preferred: readonly string[],
-) {
-  if (value === "system") return preferredResultLanguage(appearance, preferred);
+
+export function resultLanguageName(value: string) {
   return (
     languages.find((l) => l.code.toLowerCase() === value.toLowerCase())?.name ??
     value

@@ -1,5 +1,5 @@
 import { isTranslationOnly } from "../shared/provider-presets";
-import { resolveResultLanguage } from "../shared/languages";
+import { resultLanguageName } from "../shared/languages";
 import { t, actionLabel } from "../shared/i18n";
 import { stopSpeaking, useSpeechStatus } from "./speech";
 import { useEffect, useRef, useState } from "react";
@@ -57,6 +57,10 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   );
   const [sourceLanguage, setSourceLanguage] = useState(
     snapshot.config.defaults.sourceLanguage,
+  );
+  useEffect(
+    () => setSourceLanguage(snapshot.config.defaults.sourceLanguage),
+    [snapshot.config.defaults.sourceLanguage],
   );
   const [ocrProfile, setOcrProfile] = useState(
     snapshot.config.defaults.ocrProfileId,
@@ -325,11 +329,7 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     setEditing(false);
     setShowImage(false);
     setCopied(false);
-    const resultLanguage = resolveResultLanguage(
-      targetOverride ?? target,
-      cfg.appearance.language,
-      snapshot.systemLanguages,
-    );
+    const resultLanguage = resultLanguageName(targetOverride ?? target);
     const requested =
       typeof override === "string"
         ? { providerId: override }
@@ -461,7 +461,10 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
   const destination = noteAction && connectedBook(cfg, noteAction);
   const translationWrite = useRef(Promise.resolve());
   function rememberTranslation(
-    preference: { targetLanguage: string } | { providerId: string },
+    preference:
+      | { sourceLanguage: string }
+      | { targetLanguage: string }
+      | { providerId: string },
   ) {
     const write = translationWrite.current.then(() =>
       window.readfinch.call("setTranslationPreference", preference),
@@ -557,11 +560,6 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           <LanguageSelect
             label={t("目标语言")}
             value={target}
-            followLabel={resolveResultLanguage(
-              "system",
-              cfg.appearance.language,
-              snapshot.systemLanguages,
-            )}
             onChange={(value) => {
               setTarget(value);
               const intent = ++translationIntent.current;
@@ -838,10 +836,13 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
                     />
                   </label>
                   <LanguageSelect
-                    label={t("原文语言")}
+                    label={t("源语言")}
                     auto
                     value={sourceLanguage}
-                    onChange={setSourceLanguage}
+                    onChange={(value) => {
+                      setSourceLanguage(value);
+                      void rememberTranslation({ sourceLanguage: value });
+                    }}
                   />
                 </div>
               )}

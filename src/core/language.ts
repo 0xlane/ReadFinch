@@ -39,7 +39,8 @@ export async function detectLanguage(
 ): Promise<string> {
   const detection = config.languageDetection;
   const sample = text.trim().slice(0, 500);
-  if (sample && detection.mode === "llm") {
+  // Short selections rarely give a detector enough context; keep them local.
+  if (sample.length >= 10 && detection.mode === "llm") {
     const provider = config.providers.find(
       (p) => p.enabled && p.id === detection.providerId,
     );

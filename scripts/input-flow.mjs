@@ -98,6 +98,7 @@ async function useOcr(id, model = "ocr-fixture") {
           id: "ocr-fixture",
           name: "远程识别 · fixture",
           model,
+          modelKind: "vision",
           endpoint,
           requiresKey: false,
         });

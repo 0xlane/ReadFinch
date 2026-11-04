@@ -112,7 +112,7 @@ test("local upgrade preserves original config until saving and supplies only end
   await writeFile(file, JSON.stringify(old));
   const store = new ConfigStore(dir);
   await store.init();
-  assert.equal(store.config.schemaVersion, 14);
+  assert.equal(store.config.schemaVersion, 15);
   assert.equal(JSON.parse(await readFile(file, "utf8")).schemaVersion, 2);
   assert.ok(
     store.credentialMoves.some(
@@ -130,6 +130,12 @@ test("local upgrade preserves original config until saving and supplies only end
 });
 
 test("interface locale honors system preferences and keeps custom action names intact", () => {
+  assert.equal(resolveLocale("system", ["zh-Hans-CN", "en-US"], "en-US"), "en");
+  assert.equal(resolveLocale("system", ["en-US"], "zh-Hans-CN"), "zh-CN");
+  assert.equal(resolveLocale("system", ["zh_CN.UTF-8"], "de-DE"), "zh-CN");
+  assert.equal(resolveLocale("system", [], "ja-JP"), "en");
+  assert.equal(resolveLocale("zh-CN", ["en-US"], "en-US"), "zh-CN");
+  assert.equal(resolveLocale("en", ["zh-CN"], "zh-CN"), "en");
   assert.equal(resolveLocale("system", ["zh-Hant-TW", "en-US"]), "zh-CN");
   assert.equal(resolveLocale("system", ["de-DE", "en-GB"]), "en");
   assert.equal(resolveLocale("zh-CN", ["en-US"]), "zh-CN");

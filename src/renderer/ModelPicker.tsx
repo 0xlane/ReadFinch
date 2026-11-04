@@ -8,9 +8,12 @@ import {
   chooseProviderModel,
   toggleCustomModel,
 } from "../shared/provider-model";
-import { ModelBadge, modelKindLabel } from "./ModelCapability";
+import { ModelBadge, ModelSummary, modelKindLabel } from "./ModelCapability";
+import { bundledDirectory } from "../shared/model-capabilities";
+import type { ModelDirectory } from "../shared/model-directory";
 
 export type ModelCatalogAccess = {
+  directory?: ModelDirectory;
   catalogs?: Record<string, string[]>;
   fetchModels?: (providerId: string) => Promise<string[]>;
 };
@@ -22,6 +25,7 @@ export function ModelPicker({
   placeholder,
   catalogs = {},
   fetchModels,
+  directory = bundledDirectory,
 }: ModelCatalogAccess & {
   config: Config;
   provider: TextProfile;
@@ -44,7 +48,7 @@ export function ModelPicker({
   const currentKey = useRef(key);
   currentKey.current = key;
   const custom = provider.customModel;
-  const options = modelOptions(config, provider.id, catalogs[key]);
+  const options = modelOptions(config, provider.id, catalogs[key], directory);
   const ordered = [
     ...options.filter((m) => m.kind === "vision"),
     ...options.filter((m) => m.kind === "text"),
@@ -90,7 +94,7 @@ export function ModelPicker({
     );
   }
   function choose(model: string, manualChoice = false) {
-    onChange(chooseProviderModel(provider, model, manualChoice));
+    onChange(chooseProviderModel(provider, model, manualChoice, directory));
     close();
     setError("");
     setEmpty(false);
@@ -215,7 +219,9 @@ export function ModelPicker({
           }}
           onChange={(e) => {
             if (custom)
-              onChange(chooseProviderModel(provider, e.target.value, true));
+              onChange(
+                chooseProviderModel(provider, e.target.value, true, directory),
+              );
             else show();
             setQuery(e.target.value);
             setEditing(true);
@@ -224,7 +230,12 @@ export function ModelPicker({
           onBlur={(e) => {
             if (custom && e.target.value !== e.target.value.trim())
               onChange(
-                chooseProviderModel(provider, e.target.value.trim(), true),
+                chooseProviderModel(
+                  provider,
+                  e.target.value.trim(),
+                  true,
+                  directory,
+                ),
               );
           }}
           onKeyDown={(e) => {
@@ -320,7 +331,7 @@ export function ModelPicker({
           </div>
         )}
       </div>
-      {
+      <div className="model-input-meta">
         <label className="custom-model-check">
           <input
             type="checkbox"
@@ -329,12 +340,15 @@ export function ModelPicker({
               close();
               setError("");
               setEmpty(false);
-              onChange(toggleCustomModel(provider, e.target.checked));
+              onChange(
+                toggleCustomModel(provider, e.target.checked, directory),
+              );
             }}
           />
           {t("输入自定义模型 ID")}
         </label>
-      }
+        <ModelSummary provider={provider} directory={directory} />
+      </div>
       {empty && (
         <p className="model-fetch-note" role="status">
           {t("接口未返回模型，可直接输入自定义 ID。")}

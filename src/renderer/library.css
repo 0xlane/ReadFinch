@@ -122,32 +122,21 @@
 .model-capability-badge[data-kind="vision"] {
   color: var(--api-accent);
 }
-.provider-list-name .model-capability-badge {
-  margin-top: 3px;
-  font-size: 10px;
-}
-.provider-list-name .model-capability-badge svg {
-  width: 11px;
-  height: 11px;
-}
 .model-capability-line {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 8px;
-}
-.model-capability-edit {
+  gap: 5px 9px;
   color: var(--api-muted);
-  font-size: 11px;
-  padding: 3px 0 3px 7px;
-  gap: 3px;
+  font-size: 12px;
 }
-.model-capability-edit:hover {
-  color: var(--api-accent);
+.model-display-name {
+  overflow-wrap: anywhere;
 }
-.model-capability-settings > .field {
-  margin-top: 14px;
+.model-context {
+  padding-inline-start: 9px;
+  border-inline-start: 1px solid var(--api-line);
+  font-variant-numeric: tabular-nums;
 }
 .provider-speech-settings {
   margin-top: 16px;
@@ -228,12 +217,20 @@
   font-size: 12px;
   color: var(--api-muted);
 }
+.model-input-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+}
 .model-input-field .custom-model-check {
   display: flex;
   width: fit-content;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin: 0;
   font-size: 13px;
 }
 .custom-model-check input {

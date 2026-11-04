@@ -14,7 +14,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 - [화면 캡처 및 이미지 문자 인식(OCR)](../../docs/OCR.md)
 - [설정 관리와 WebDAV](../../docs/CONFIGURATION.md)
 - [플랫폼 지원과 권한](../../docs/PLATFORMS.md)
-- [인터페이스·번역·설명 언어](../../docs/LANGUAGES.md)
+- [인터페이스 및 번역 언어](../../docs/LANGUAGES.md)
 - [릴리스와 앱 업데이트](../../docs/UPDATES.md)
 
 기술 문서는 중국어 또는 영어로 제공됩니다.

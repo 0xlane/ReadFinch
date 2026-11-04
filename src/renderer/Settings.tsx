@@ -1,7 +1,16 @@
 import { t, actionLabel } from "../shared/i18n";
-import { resolveResultLanguage } from "../shared/languages";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { catalogKey, suggestionAction, assignProvider } from "../shared/models";
+import {
+  catalogKey,
+  suggestionAction,
+  assignProvider,
+  updateProviderModel,
+} from "../shared/models";
+import { ModelDirectory } from "../shared/model-directory";
+import {
+  bundledDirectory,
+  withCatalogMatch,
+} from "../shared/model-capabilities";
 import { ProviderSelect } from "./ProviderSelect";
 import { Providers } from "./Providers";
 import { SpeechSettings } from "./SpeechSettings";
@@ -63,6 +72,32 @@ export function Settings({
       );
   }, [navigation]);
   const [draft, setDraft] = useState(snapshot.config);
+  const [directory, setDirectory] = useState(bundledDirectory);
+  useEffect(() => {
+    if (tab !== "text") return;
+    let active = true;
+    void (async () => {
+      for (const refresh of [false, true]) {
+        const data = await window.readfinch.call("modelDirectory", { refresh });
+        if (!active) return;
+        const index = new ModelDirectory(data);
+        setDirectory(index);
+        setDraft((current) =>
+          current.providers.reduce((config, p) => {
+            const updated = withCatalogMatch(p, index);
+            return p === updated
+              ? config
+              : updateProviderModel(config, updated);
+          }, current),
+        );
+      }
+    })().catch(() => {
+      /* The bundled directory remains available. */
+    });
+    return () => {
+      active = false;
+    };
+  }, [tab]);
   const [busy, setBusy] = useState(false);
   const [catalogs, setCatalogs] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState("");
@@ -510,11 +545,9 @@ export function Settings({
                 }
               />
             </Field>
-          </section>
-          <section className="settings-card">
-            <h3>{t("语言偏好")}</h3>
             <Field label={t("界面语言")}>
               <select
+                aria-label={t("界面语言")}
                 value={draft.appearance.language}
                 onChange={(e) =>
                   setDraft({
@@ -532,47 +565,41 @@ export function Settings({
                 <option value="en">English</option>
               </select>
             </Field>
-            <div className="form-grid">
-              <Field label={t("默认目标语言")}>
+          </section>
+          <section className="settings-card translation-languages">
+            <h3>{t("翻译语言")}</h3>
+            {(
+              [
+                [
+                  "sourceLanguage",
+                  "源语言",
+                  "选择原文的语言，或自动检测所选文字。",
+                ],
+                [
+                  "targetLanguage",
+                  "目标语言",
+                  "译文、词典释义和写作建议使用此语言。",
+                ],
+              ] as const
+            ).map(([key, label, hint]) => (
+              <label className="setting-row" key={key}>
+                <span>
+                  <strong>{t(label)}</strong>
+                  <small>{t(hint)}</small>
+                </span>
                 <LanguageSelect
-                  label={t("默认目标语言")}
-                  followLabel={resolveResultLanguage(
-                    "system",
-                    draft.appearance.language,
-                    snapshot.systemLanguages,
-                  )}
-                  value={draft.defaults.targetLanguage}
-                  onChange={(v) =>
-                    setDraft({
-                      ...draft,
-                      defaults: { ...draft.defaults, targetLanguage: v },
-                    })
+                  label={t(label)}
+                  auto={key === "sourceLanguage"}
+                  value={draft.defaults[key]}
+                  onChange={(value) =>
+                    setDraft((current) => ({
+                      ...current,
+                      defaults: { ...current.defaults, [key]: value },
+                    }))
                   }
                 />
-              </Field>
-              <Field
-                label={t("修改说明与词义语言")}
-                hint={t(
-                  "词义、语法分析和修改说明使用的语言；写作改进保留原文语言。",
-                )}
-              >
-                <LanguageSelect
-                  label={t("解释语言")}
-                  followLabel={resolveResultLanguage(
-                    "system",
-                    draft.appearance.language,
-                    snapshot.systemLanguages,
-                  )}
-                  value={draft.defaults.explanationLanguage}
-                  onChange={(v) =>
-                    setDraft({
-                      ...draft,
-                      defaults: { ...draft.defaults, explanationLanguage: v },
-                    })
-                  }
-                />
-              </Field>
-            </div>
+              </label>
+            ))}
           </section>
           <section className="settings-card cache-settings">
             <div className="setting-row">
@@ -867,6 +894,7 @@ export function Settings({
       {tab === "text" && (
         <Providers
           config={draft}
+          directory={directory}
           onChange={setDraft}
           savedEndpoints={Object.fromEntries(
             snapshot.config.providers.map((p) => [p.id, p.endpoint]),

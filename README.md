@@ -14,7 +14,7 @@ ReadFinch is an open-source desktop reading and writing companion. Translate sel
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@ Automatic selection depends on the foreground app exposing its text. Use OCR or 
 - [Screenshot and image recognition (OCR)](docs/OCR.md)
 - [Configuration and WebDAV](docs/CONFIGURATION.md)
 - [Platform support and permissions](docs/PLATFORMS.md)
-- [Interface, translation and explanation languages](docs/LANGUAGES.md)
+- [Interface and translation languages](docs/LANGUAGES.md)
 - [Releases and application updates](docs/UPDATES.md)
 
 Technical documentation is available in Chinese or English.

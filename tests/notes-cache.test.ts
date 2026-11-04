@@ -6,6 +6,7 @@ import path from "node:path";
 import { CompletionCache } from "../src/core/completion-cache";
 import { LocalNotes } from "../src/core/local-notes";
 import { defaultConfig, parseConfig } from "../src/shared/config";
+import oldBuiltinPrompts from "../src/shared/action-default-history.json";
 import { toolbarWindowLayout } from "../src/core/toolbar-placement";
 import type { NoteInput } from "../src/shared/notes";
 
@@ -160,6 +161,7 @@ test("v6 migration retires only untouched sample commands and recognizes custom 
     ...old.actions[0],
     id: "shorten",
     name: "精简表达",
+    prompt: oldBuiltinPrompts.en.translate.prompt,
     icon: "align" as const,
     system:
       "Shorten the text without losing essential facts. Preserve names, numbers, technical content and the source language. Return only the revision.",

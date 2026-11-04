@@ -14,7 +14,7 @@ ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze m
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@ Die automatische Auswahl setzt voraus, dass die aktive App ihren markierten Text
 - [Texterkennung in Screenshots und Bildern (OCR)](../../docs/OCR.md)
 - [Konfiguration und WebDAV](../../docs/CONFIGURATION.md)
 - [Plattformen und Berechtigungen](../../docs/PLATFORMS.md)
-- [Sprachen für Oberfläche, Übersetzung und Erklärungen](../../docs/LANGUAGES.md)
+- [Oberflächen- und Übersetzungssprache](../../docs/LANGUAGES.md)
 - [Veröffentlichungen und App-Updates](../../docs/UPDATES.md)
 
 Die technische Dokumentation ist auf Chinesisch oder Englisch verfügbar.

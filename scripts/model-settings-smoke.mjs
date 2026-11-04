@@ -229,6 +229,9 @@ try {
   );
   await field("名称").fill("词典与识别");
   await choose("vendor/vision");
+  await page.locator(".provider-advanced summary").click();
+  await field("模型能力").selectOption("vision");
+  await page.locator(".provider-advanced summary").click();
   await page.getByRole("button", { name: /功能提供商/ }).click();
   await page
     .getByRole("switch", { name: "将 vendor/vision 用于 词典", exact: true })
@@ -290,6 +293,23 @@ try {
   assert.match(
     requests.at(-1).body.messages[1].content,
     /(?:Source language: |源语言：)fr/,
+  );
+  const beforeFixed = requests.length;
+  await job("runAction", {
+    actionId: "translate",
+    text: "Gift",
+    context: "",
+    sourceLanguage: "Deutsch",
+    targetLanguage: "English",
+  });
+  assert.equal(
+    requests.length,
+    beforeFixed + 1,
+    "a fixed source must bypass the LLM detector",
+  );
+  assert.match(
+    requests.at(-1).body.messages[1].content,
+    /(?:Source language: |源语言：)Deutsch/,
   );
   await job("runAction", {
     actionId: "dictionary",

@@ -134,10 +134,12 @@ const copy: Record<
 export function localizedSample(
   kind: TemplateId,
   targetLanguage: string,
-  explanationLanguage = targetLanguage,
+  previousExplanationLanguage?: string,
 ): OutputSample {
   const target = copy[resultLanguageCode(targetLanguage)] ?? copy.en,
-    explain = copy[resultLanguageCode(explanationLanguage)] ?? copy.en;
+    explain = previousExplanationLanguage
+      ? (copy[resultLanguageCode(previousExplanationLanguage)] ?? copy.en)
+      : target;
   const selection =
     kind === "dictionary"
       ? "blossom"
@@ -195,5 +197,12 @@ export function localizedSample(
               "improve-writing-summary": explain.summary,
             }
           : { result: target.observation };
-  return { selection, targetLanguage, explanationLanguage, values };
+  return {
+    selection,
+    targetLanguage,
+    ...(previousExplanationLanguage
+      ? { explanationLanguage: previousExplanationLanguage }
+      : {}),
+    values,
+  };
 }

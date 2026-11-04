@@ -14,7 +14,7 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 - [スクリーンショットと画像の文字認識（OCR）](../../docs/OCR.md)
 - [設定管理と WebDAV](../../docs/CONFIGURATION.md)
 - [プラットフォームと権限](../../docs/PLATFORMS.md)
-- [画面・翻訳・解説の言語](../../docs/LANGUAGES.md)
+- [表示言語と翻訳言語](../../docs/LANGUAGES.md)
 - [リリースとアプリの更新](../../docs/UPDATES.md)
 
 技術文書は中国語または英語で提供しています。

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -9,6 +10,7 @@ using System.Web.Script.Serialization;
 using System.Windows.Automation;
 
 class SelectionBridge {
+  [DllImport("kernel32.dll")] static extern ushort GetUserDefaultUILanguage();
   [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd,out uint pid);
   [DllImport("user32.dll")] static extern short GetAsyncKeyState(int key);
@@ -150,6 +152,11 @@ class SelectionBridge {
     }catch(Exception e){Emit(new{type="response",id=id,ok=false,error=e.Message});}
   }
   [STAThread] static void Main(string[] args){
+    if(args.Length==1 && args[0]=="--display-language"){
+      try { Console.WriteLine(CultureInfo.GetCultureInfo(GetUserDefaultUILanguage()).Name); }
+      catch(CultureNotFoundException) { Console.WriteLine(CultureInfo.CurrentUICulture.Name); }
+      return;
+    }
     Console.OutputEncoding=new UTF8Encoding(false);Console.InputEncoding=new UTF8Encoding(false);SetProcessDPIAware();if(args.Length>0)UInt32.TryParse(args[0],out host);
     var input=new Thread(()=>{string line;while((line=Console.ReadLine())!=null)commands.Enqueue(line);running=false;});input.IsBackground=true;input.Start();
     Emit(new{type="ready",message="Windows UI Automation 已连接"});int ticks=0;

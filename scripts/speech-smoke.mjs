@@ -188,6 +188,7 @@ try {
     ...p,
     id: "voice-fixture",
     model: "tts-fixture",
+    modelKind: "speech",
     name: "语音测试服务",
   });
   await api(main, "saveConfig", { config, revision: snapshot.revision });

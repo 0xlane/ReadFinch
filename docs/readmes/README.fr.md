@@ -14,7 +14,7 @@ ReadFinch est une application de bureau open source dédiée à la lecture et à
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@ La détection automatique dépend de l’accès au texte sélectionné fourni pa
 - [Reconnaissance de texte dans les captures et images (OCR)](../../docs/OCR.md)
 - [Configuration et WebDAV](../../docs/CONFIGURATION.md)
 - [Plateformes et autorisations](../../docs/PLATFORMS.md)
-- [Langues de l’interface, des traductions et des explications](../../docs/LANGUAGES.md)
+- [Langues de l’interface et de traduction](../../docs/LANGUAGES.md)
 - [Versions et mises à jour de l’application](../../docs/UPDATES.md)
 
 La documentation technique est disponible en chinois ou en anglais.

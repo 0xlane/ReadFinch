@@ -120,7 +120,7 @@ try {
   );
   await launch();
   let state = await call("snapshot");
-  assert.equal(state.config.schemaVersion, 14);
+  assert.equal(state.config.schemaVersion, 15);
   assert.equal(state.config.providers.length, 2);
   const textProvider = state.config.providers.find(
     (p) => p.model === "legacy-text-model",
@@ -187,7 +187,7 @@ try {
     legacy,
   );
   const saved = await readFile(path.join(dataDir, "config.json"), "utf8");
-  assert.equal(JSON.parse(saved).schemaVersion, 14);
+  assert.equal(JSON.parse(saved).schemaVersion, 15);
   assert.doesNotMatch(
     saved,
     /legacy-text-fixture|legacy-vision-fixture|ciphertext/,
@@ -208,7 +208,7 @@ try {
   );
   assert.equal(requests.length, 2);
   checks.push(
-    "First save backs up the complete original v2 config; schema v14 and encrypted keys survive restart without duplicate providers or plaintext secrets",
+    "First save backs up the complete original v2 config; schema v15 and encrypted keys survive restart without duplicate providers or plaintext secrets",
   );
   await app.close();
   app = undefined;

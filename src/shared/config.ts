@@ -2,6 +2,8 @@ import { defaultSpeech, SpeechConfigSchema } from "./tts";
 import { defaultProxy, ProxySchema } from "./proxy";
 import { iconPosition, legacyIcons } from "./icons";
 import { z } from "zod";
+import { initialTargetLanguage } from "./languages";
+import { inferredModelKind } from "./model-capabilities";
 import {
   LayoutSchema,
   OutputSchema,
@@ -13,6 +15,7 @@ import {
   definition,
   presetLayout,
   legacyDictionaryLayout,
+  translationDefinition,
 } from "./action-templates";
 import {
   LocalNotebaseSchema,
@@ -52,6 +55,20 @@ const shortcut = z
       return false;
     }
   }, "快捷键需包含 Ctrl、Alt、⌘ 或 Win 及一个普通按键；留空可停用");
+
+export const TargetLanguageSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .refine(
+    (v) => !["auto", "system"].includes(v.toLowerCase()),
+    "请选择具体语言",
+  );
+export const SourceLanguageSchema = z.union([
+  z.literal("auto"),
+  TargetLanguageSchema,
+]);
 
 const id = z
   .string()
@@ -106,6 +123,12 @@ export const TextProfileSchema = LegacyTextProfileSchema.omit({
 }).extend({
   customModel: z.boolean().default(false),
   modelKind: z.enum(["text", "vision", "speech"]).optional(),
+  catalogMatch: z
+    .strictObject({
+      id: z.string().min(1).max(200),
+      kind: z.enum(["text", "vision", "speech"]),
+    })
+    .optional(),
   speechProtocol: z.enum(["openai", "mimo"]).optional(),
   speechInstructions: z.string().max(2000).optional(),
   builtinModel: z.string().max(200).optional(),
@@ -173,7 +196,7 @@ export const ActionSchema = z
   .strict();
 export const ConfigSchema = z
   .object({
-    schemaVersion: z.literal(14),
+    schemaVersion: z.literal(15),
     tts: SpeechConfigSchema,
     localNotebases: z.array(LocalNotebaseSchema).max(1000),
     noteSuggestion: z.strictObject({
@@ -197,9 +220,8 @@ export const ConfigSchema = z
       .object({
         textProfileId: id,
         ocrProfileId: id,
-        sourceLanguage: z.string().min(1).max(80),
-        targetLanguage: z.string().min(1).max(80),
-        explanationLanguage: z.string().min(1).max(80),
+        sourceLanguage: SourceLanguageSchema,
+        targetLanguage: TargetLanguageSchema,
       })
       .strict(),
     appearance: z
@@ -464,9 +486,9 @@ const retiredDefaults = [
     "writing",
   ),
 ];
-function baseConfig(): Config {
+function baseConfig(preferred: readonly string[] = []): Config {
   return {
-    schemaVersion: 14,
+    schemaVersion: 15,
     tts: defaultSpeech(),
     localNotebases: [],
     noteSuggestion: { enabled: true, actionId: null, providerId: null },
@@ -504,8 +526,7 @@ function baseConfig(): Config {
       textProfileId: "text-default",
       ocrProfileId: "ocr-offline",
       sourceLanguage: "auto",
-      targetLanguage: "system",
-      explanationLanguage: "system",
+      targetLanguage: initialTargetLanguage(preferred),
     },
     appearance: { theme: "system", fontSize: 15, language: "system" },
     selection: {
@@ -522,12 +543,14 @@ function baseConfig(): Config {
     },
   };
 }
-export function defaultConfig(): Config {
-  const config = baseConfig();
+export function defaultConfig(preferred: readonly string[] = []): Config {
+  const config = baseConfig(preferred);
   config.actions = config.actions.map((a) =>
     builtinId(a.id)
       ? { ...a, ...definition(a.id, "zh-CN"), pinned: a.id !== "polish" }
-      : a,
+      : a.id === "translate"
+        ? { ...a, ...translationDefinition("zh-CN") }
+        : a,
   );
   return config;
 }
@@ -724,6 +747,7 @@ function migrateSingleModel(raw: Record<string, any>, moves: CredentialMove[]) {
 export function parseConfig(
   raw: unknown,
   moves: CredentialMove[] = [],
+  legacyTarget: () => string = () => "English",
 ): Config {
   let candidate = raw;
   if (typeof raw === "string") {
@@ -1074,7 +1098,7 @@ export function parseConfig(
     candidate &&
     typeof candidate === "object" &&
     "schemaVersion" in candidate &&
-    [12, 13, 14].includes(Number(candidate.schemaVersion)) &&
+    [12, 13, 14, 15].includes(Number(candidate.schemaVersion)) &&
     "actions" in candidate &&
     Array.isArray(candidate.actions)
   ) {
@@ -1136,6 +1160,53 @@ export function parseConfig(
     candidate.schemaVersion === 13
   )
     candidate = { ...candidate, schemaVersion: 14 };
+  if (
+    candidate &&
+    typeof candidate === "object" &&
+    "schemaVersion" in candidate &&
+    candidate.schemaVersion === 14 &&
+    "defaults" in candidate &&
+    candidate.defaults &&
+    typeof candidate.defaults === "object"
+  ) {
+    const { explanationLanguage: _removed, ...defaults } =
+      candidate.defaults as Record<string, unknown>;
+    if (
+      defaults.targetLanguage === "system" ||
+      defaults.targetLanguage === "auto"
+    ) {
+      const ui = (candidate as { appearance?: { language?: unknown } })
+        .appearance?.language;
+      defaults.targetLanguage =
+        ui === "en" || ui === "zh-CN"
+          ? initialTargetLanguage([ui])
+          : legacyTarget();
+    }
+    if (defaults.sourceLanguage === "system") defaults.sourceLanguage = "auto";
+    const old = candidate as Record<string, any>;
+    // A previously assigned private image/voice deployment is an explicit user choice.
+    const providers = Array.isArray(old.providers)
+      ? old.providers.map((p) => {
+          if (
+            !p ||
+            p.modelKind !== undefined ||
+            typeof p.model !== "string" ||
+            !p.model.trim()
+          )
+            return p;
+          const kind =
+            p.id === defaults.ocrProfileId
+              ? "vision"
+              : p.id === old.tts?.onlineProviderId
+                ? "speech"
+                : undefined;
+          return kind && inferredModelKind(p) !== kind
+            ? { ...p, modelKind: kind }
+            : p;
+        })
+      : old.providers;
+    candidate = { ...candidate, schemaVersion: 15, defaults, providers };
+  }
   const result = ConfigSchema.safeParse(candidate);
   if (!result.success)
     throw Error(
@@ -1168,7 +1239,13 @@ export function promptVariables(
     /\{\{\s*(text|selection|context|paragraphs|sourceApp|sourceLanguage|targetLanguage|explanationLanguage)\s*\}\}/g,
     (_, key) =>
       vars[
-        key === "selection" ? "text" : key === "paragraphs" ? "context" : key
+        key === "selection"
+          ? "text"
+          : key === "paragraphs"
+            ? "context"
+            : key === "explanationLanguage"
+              ? "targetLanguage"
+              : key
       ] ?? "",
   );
 }

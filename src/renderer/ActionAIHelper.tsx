@@ -2,8 +2,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Check, Copy, Sparkles } from "lucide-react";
 import type { Action, Config } from "../shared/config";
 import { buildActionHelperPrompt } from "../shared/action-ai-helper";
-import { resolveLocale, t } from "../shared/i18n";
-import { resolveResultLanguage } from "../shared/languages";
+import { getLocale, t } from "../shared/i18n";
+import { resultLanguageName } from "../shared/languages";
 
 export function ActionAIHelper({
   action,
@@ -49,26 +49,16 @@ export function ActionAIHelper({
     setError("");
     try {
       // Build on click, so unsaved edits are included. No credentials enter this input.
-      const state = await window.readfinch.call("snapshot");
       const text = buildActionHelperPrompt({
         action,
         otherActionNames: config.actions
           .filter((a) => a.id !== action.id)
           .map((a) => a.name),
-        uiLocale: resolveLocale(
-          config.appearance.language,
-          state.systemLanguages,
-        ),
-        targetLanguage: resolveResultLanguage(
-          config.defaults.targetLanguage,
-          config.appearance.language,
-          state.systemLanguages,
-        ),
-        explanationLanguage: resolveResultLanguage(
-          config.defaults.explanationLanguage,
-          config.appearance.language,
-          state.systemLanguages,
-        ),
+        uiLocale:
+          config.appearance.language === "system"
+            ? getLocale()
+            : config.appearance.language,
+        targetLanguage: resultLanguageName(config.defaults.targetLanguage),
       });
       await window.readfinch.call("clipboardWrite", { text });
       setCopied(true);

@@ -1,35 +1,17 @@
-# Language behavior
+# Language preferences
 
-ReadFinch separates the interface language, translation target and explanation language.
+In **General → Translation languages**, choose the source and target for your selections.
 
-- **Interface language:** English, Simplified Chinese, or the operating system preference. English is the fallback when an interface translation is unavailable.
-- **Translation target:** the language used by Translation and the translated sentence in Sentence analysis.
-- **Explanation language:** the language used for dictionary definitions, example translations, memory tips, grammar explanations, writing notes and note suggestions. Writing improvement preserves the original passage's language.
+- **Source language** starts on **Auto-detect**. Choose a language when the same word can mean different things in different languages, or when you already know what you are reading. A fixed source bypasses language detection for translation. Detection of a selection never changes your preferences.
+- **Target language** is the language for translations, dictionary definitions, grammar notes, writing feedback and suggested vocabulary notes. Writing revisions keep the original language. On first use, ReadFinch saves the first supported language in your operating system’s preference list, or English if none match. It stays selected until you change it, including from the translation window.
+- **Interface language**, under **Appearance**, defaults to **Follow system**. On Windows it follows the current user's Windows display language. If the interface is unavailable in that language, ReadFinch uses the first supported language in the preference list, then English. Menus, built-in prompt wording and field labels support English and Simplified Chinese.
 
-New profiles follow the application language for both result preferences. When the application follows the operating system, results use the first supported OS language preference. The built-in result choices are English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German and Spanish. An unsupported preference falls back to English. A manually selected language remains unchanged when the interface language changes.
+The eight preset translation languages are English, Simplified Chinese, Traditional Chinese, Japanese, Korean, French, German and Spanish. **Auto-detect** is available only for the source. Its detection method is configured under **API providers → Language detection**.
 
-## Built-in and custom commands
+![Translation settings with source set to Auto-detect and target set to Simplified Chinese.](screenshots/current/translation-languages.png)
 
-Untouched built-in prompts, output field names, descriptions and layouts follow the interface language. Their language variables are resolved for every request. A Chinese interface can therefore request a French translation and Japanese explanations; the instruction language does not determine the result language.
+## Custom commands and saved results
 
-Preview data follows the target and explanation preferences. OCR transcribes the original text without translating it. Language detection and the internal JSON contract use stable technical instructions.
+Use `{{sourceLanguage}}` for the input language and `{{targetLanguage}}` for the language of the answer. Existing custom commands using `{{explanationLanguage}}` still work: the token is an alias for the target language. Edited prompts, layouts, samples and saved notes are preserved. A result already streaming keeps its original schema and language; regenerating uses the current settings.
 
-Custom commands, edited prompts, custom layouts and edited preview data are preserved verbatim. They are not automatically translated. Authors can use these variables:
-
-| Variable | Purpose |
-| --- | --- |
-| {{sourceLanguage}} | The input language or automatic detection |
-| {{targetLanguage}} | The resolved translation target |
-| {{explanationLanguage}} | The resolved explanation language |
-
-Commands should name the relevant language variable in each generated field description. Revisions should explicitly preserve the input language unless translation is intended.
-
-## Running requests, notes and synchronization
-
-A running result retains its original field schema and resolved language if preferences change mid-request. Regenerating uses the latest preferences. Saved notes retain the rendered result and language from that run, with stable field IDs for notebase mappings.
-
-Builtin defaults are stored in a canonical form. Localized settings views do not rewrite custom text or cause synchronization changes solely because the operating system language differs.
-
-## Verification
-
-The language tests cover all eight result choices, both interface locales, independent explanation preferences, existing defaults, custom content preservation and configuration round trips. The Electron language smoke test exercises streamed output, changing the interface while a request runs, local note storage and regeneration with different language preferences. These tests verify application behavior; a provider's actual adherence to the requested language depends on its model.
+An upgrade from a version with **Follow app language** saves its last effective target as a concrete language. Explicit source and target choices are kept. Exports and WebDAV carry those selections to another device without detecting them again.

@@ -41,7 +41,7 @@ test("built-in catalogs are a fallback; a fetched catalog replaces all candidate
   assert.ok(options.every((m) => m.source === "remote"));
   assert.equal(options.find((m) => m.id === "gpt-4.1-mini")?.vision, true);
   assert.deepEqual(modelOptions(config, p.id, []), []);
-  assert.equal(options.find((m) => m.id === "remote/model")?.vision, undefined);
+  assert.equal(options.find((m) => m.id === "remote/model")?.vision, false);
   assert.equal(
     BUILTIN_MODELS.deepseek.find((m) => m.id === "deepseek-v4-pro")?.vision,
     false,
@@ -57,6 +57,7 @@ test("each provider routes exactly one model to every assigned feature", () => {
   let c = defaultConfig();
   const p = createProvider("custom", "second");
   p.model = "lookup";
+  p.modelKind = "vision"; // This private deployment was explicitly assigned for images.
   c.providers.push(p);
   c.providers[0].model = "default";
   c = assignProvider(c, "action:dictionary", p.id);
@@ -75,7 +76,12 @@ test("each provider routes exactly one model to every assigned feature", () => {
     parseConfig({ ...c, actions: [{ ...c.actions[0], model: "another" }] }),
   );
   assert.equal(
-    supportsImages({ ...p, preset: "deepseek", model: "deepseek-v4-pro" }),
+    supportsImages({
+      ...p,
+      preset: "deepseek",
+      model: "deepseek-v4-pro",
+      modelKind: undefined,
+    }),
     false,
   );
 });
@@ -96,7 +102,7 @@ test("v4/v5 multi-model providers split deterministically and preserve actions, 
     const moves: import("../src/shared/config").CredentialMove[] = [];
     const c = parseConfig(old, moves);
     assert.deepEqual(c, parseConfig(old));
-    assert.equal(c.schemaVersion, 14);
+    assert.equal(c.schemaVersion, 15);
     assert.equal(actionModel(c, c.actions[1]).model, "lookup");
     assert.equal(
       c.providers.find((p) => p.id === c.defaults.ocrProfileId)?.model,
@@ -203,7 +209,7 @@ test("model capabilities separate text, images and speech, including discovered 
   const entries = modelOptions(c, p.id, ids);
   assert.deepEqual(
     entries.map((m) => m.kind),
-    ["vision", "speech", "speech", undefined],
+    ["vision", "speech", "speech", "text"],
   );
   for (const id of ids.slice(1, 3)) {
     const speech = { ...p, model: id };

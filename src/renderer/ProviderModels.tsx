@@ -18,7 +18,7 @@ import { ProviderSwitch } from "./provider-ui";
 import { Field } from "./ui";
 import { isTranslationOnly } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
-import { ModelCapability } from "./ModelCapability";
+import { SpeechModelSettings } from "./ModelCapability";
 
 export function ProviderModels({
   config,
@@ -55,10 +55,12 @@ export function ProviderModels({
             }
             {...catalog}
           />
-          <ModelCapability
-            provider={provider}
-            onChange={(p) => onChange(updateProviderModel(config, p))}
-          />
+          {speech && (
+            <SpeechModelSettings
+              provider={provider}
+              onChange={(p) => onChange(updateProviderModel(config, p))}
+            />
+          )}
           {speech && config.defaults.textProfileId === provider.id && (
             <p className="model-fetch-note">
               {t("语音合成模型只能用于在线朗读，请为文本功能选择其他提供商。")}

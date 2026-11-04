@@ -4,11 +4,18 @@ let active: Locale = "zh-CN";
 export function resolveLocale(
   setting: "system" | Locale,
   languages: readonly string[],
+  displayLanguage?: string,
 ): Locale {
   if (setting !== "system") return setting;
-  for (const lang of languages) {
-    if (/^zh(?:-|$)/i.test(lang)) return "zh-CN";
-    if (/^en(?:-|$)/i.test(lang)) return "en";
+  for (const tag of displayLanguage
+    ? [displayLanguage, ...languages]
+    : languages) {
+    const language = tag
+      .trim()
+      .split(/[-_.@]/, 1)[0]
+      .toLowerCase();
+    if (language === "zh") return "zh-CN";
+    if (language === "en") return "en";
   }
   return "en";
 }

@@ -7,7 +7,7 @@ await writeFile(
   JSON.stringify(
     {
       ...schema,
-      $id: "https://readfinch.local/schema/config-v14.json",
+      $id: "https://readfinch.local/schema/config-v15.json",
       $comment:
         "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts.",
     },

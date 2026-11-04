@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.1.0-4d443e?style=flat-square" alt="1.1.0">
+<img src="https://img.shields.io/badge/Version-1.2.0-4d443e?style=flat-square" alt="1.2.0">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -142,7 +142,7 @@
 - [截图与图片识别（OCR）](../../docs/OCR.md)
 - [配置管理与 WebDAV](../../docs/CONFIGURATION.md)
 - [平台支持与权限](../../docs/PLATFORMS.md)
-- [界面、翻译与解释语言](../../docs/LANGUAGES.md)
+- [界面语言与翻译语言](../../docs/LANGUAGES.md)
 - [版本发布与应用更新](../../docs/UPDATES.md)
 
 技术文档使用中文或英文。

@@ -4,7 +4,7 @@
   "properties": {
     "schemaVersion": {
       "type": "number",
-      "const": 14
+      "const": 15
     },
     "tts": {
       "type": "object",
@@ -332,6 +332,29 @@
               "vision",
               "speech"
             ]
+          },
+          "catalogMatch": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "text",
+                  "vision",
+                  "speech"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind"
+            ],
+            "additionalProperties": false
           },
           "speechProtocol": {
             "type": "string",
@@ -723,16 +746,19 @@
           "pattern": "^[a-zA-Z0-9_-]+$"
         },
         "sourceLanguage": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "auto"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            }
+          ]
         },
         "targetLanguage": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "explanationLanguage": {
           "type": "string",
           "minLength": 1,
           "maxLength": 80
@@ -742,8 +768,7 @@
         "textProfileId",
         "ocrProfileId",
         "sourceLanguage",
-        "targetLanguage",
-        "explanationLanguage"
+        "targetLanguage"
       ],
       "additionalProperties": false
     },
@@ -864,6 +889,6 @@
     "shortcuts"
   ],
   "additionalProperties": false,
-  "$id": "https://readfinch.local/schema/config-v14.json",
+  "$id": "https://readfinch.local/schema/config-v15.json",
   "$comment": "Unique IDs, enabled provider references and shortcut conflicts are checked by src/shared/config.ts."
 }

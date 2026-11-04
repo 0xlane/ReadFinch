@@ -63,7 +63,7 @@ try {
       });
     });
   const state = await page.evaluate(() => window.readfinch.call("snapshot"));
-  assert.equal(state.config.schemaVersion, 14);
+  assert.equal(state.config.schemaVersion, 15);
   assert.equal(state.config.noteSuggestion.enabled, true);
   assert.deepEqual(state.shortcutErrors, []);
   assert.equal(

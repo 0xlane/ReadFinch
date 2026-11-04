@@ -8,6 +8,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
+import { initialTargetLanguage } from "../shared/languages";
 import {
   defaultConfig,
   parseConfig,
@@ -56,15 +57,22 @@ export class ConfigStore {
   private queue: Promise<unknown> = Promise.resolve();
   recovery?: string;
   credentialMoves: CredentialMove[] = [];
+  parse(input: unknown) {
+    // An imported old "follow" value has no target of its own. Do not re-detect on this device.
+    return parseConfig(input, [], () => this.value.defaults.targetLanguage);
+  }
   private readConfig(raw: string) {
     const moves: CredentialMove[] = [];
-    const config = parseConfig(raw, moves);
+    const config = parseConfig(raw, moves, () =>
+      initialTargetLanguage(this.preferredLanguages()),
+    );
     this.credentialMoves = moves;
     return this.normalize(config);
   }
   constructor(
     readonly dir: string,
     private readonly normalize: (config: Config) => Config = (config) => config,
+    private readonly preferredLanguages: () => readonly string[] = () => [],
   ) {}
   get file() {
     return path.join(this.dir, "config.json");
@@ -76,12 +84,14 @@ export class ConfigStore {
     return digest(this.value);
   }
   async init() {
-    this.value = this.normalize(this.value);
     await mkdir(this.dir, { recursive: true });
+    let raw: string;
     try {
-      this.value = this.readConfig(await readFile(this.file, "utf8"));
+      raw = await readFile(this.file, "utf8");
+      this.value = this.readConfig(raw);
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code === "ENOENT") {
+        this.value = this.normalize(defaultConfig(this.preferredLanguages()));
         await atomicWrite(this.file, JSON.stringify(this.value, null, 2));
         return;
       }
@@ -93,14 +103,36 @@ export class ConfigStore {
         );
         this.recovery = "配置损坏，已恢复上次有效备份；原文件已保留。";
       } catch {
-        this.value = this.normalize(defaultConfig());
+        this.value = this.normalize(defaultConfig(this.preferredLanguages()));
         this.recovery = "配置损坏，已启动默认设置；原文件已保留在数据目录。";
       }
       await atomicWrite(this.file, JSON.stringify(this.value, null, 2));
+      return;
+    }
+    const original = JSON.parse(raw);
+    if (
+      original.schemaVersion === 14 ||
+      original.defaults.targetLanguage === "system" ||
+      original.defaults.targetLanguage === "auto"
+    ) {
+      // Older schemas may still need credential moves on startup. Freeze only
+      // their language until the existing credential migration has finished.
+      const upgraded =
+        original.schemaVersion === 14
+          ? this.value
+          : {
+              ...original,
+              defaults: {
+                ...original.defaults,
+                targetLanguage: this.value.defaults.targetLanguage,
+              },
+            };
+      await atomicWrite(this.file + ".bak", raw);
+      await atomicWrite(this.file, JSON.stringify(upgraded, null, 2) + "\n");
     }
   }
   async save(input: unknown, expected = this.revision): Promise<Config> {
-    const next = parseConfig(this.normalize(parseConfig(input)));
+    const next = parseConfig(this.normalize(this.parse(input)));
     const serialized = JSON.stringify(next, null, 2) + "\n";
     if (Buffer.byteLength(serialized) > 2_000_000)
       throw Error("配置文件超过 2 MB");

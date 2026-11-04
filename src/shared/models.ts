@@ -5,7 +5,7 @@ import { BUILTIN_MODELS } from "./model-catalog";
 import { supportsImages } from "./model-catalog";
 import { isTranslationOnly, supportsSpeech } from "./provider-presets";
 import {
-  inferredModelKind,
+  bundledDirectory,
   modelKind,
   type ModelKind,
 } from "./model-capabilities";
@@ -34,33 +34,23 @@ export function modelOptions(
   config: Config,
   providerId: string,
   remote?: readonly string[],
+  directory = bundledDirectory,
 ): ModelInfo[] {
   const p = config.providers.find((p) => p.id === providerId);
   if (!p) return [];
-  if (remote !== undefined) {
-    const metadata = new Map(BUILTIN_MODELS[p.preset].map((m) => [m.id, m]));
-    return [...new Set(remote)].map((id) => ({
-      kind: inferredModelKind({ preset: p.preset, model: id }),
-      ...metadata.get(id),
-      ...(id === p.model && p.modelKind ? { kind: p.modelKind } : {}),
-      id,
-      source: "remote",
-    }));
-  }
-  const entries = new Map<string, ModelInfo>();
-  for (const m of BUILTIN_MODELS[p.preset])
-    entries.set(m.id, {
-      ...m,
-      ...(m.id === p.model && p.modelKind ? { kind: p.modelKind } : {}),
-      source: "builtin",
-    });
-  if (p.model && !entries.has(p.model))
-    entries.set(p.model, {
-      id: p.model,
-      kind: modelKind(p),
-      source: "saved",
-    });
-  return [...entries.values()];
+  const info = (id: string, source: ModelInfo["source"]): ModelInfo => {
+    const kind = modelKind(
+      id === p.model ? p : { preset: p.preset, model: id },
+      directory,
+    );
+    return { id, kind, vision: kind === "vision", source };
+  };
+  if (remote !== undefined)
+    return [...new Set(remote)].map((id) => info(id, "remote"));
+  const entries = BUILTIN_MODELS[p.preset].map((m) => info(m.id, "builtin"));
+  if (p.model && !entries.some((m) => m.id === p.model))
+    entries.push(info(p.model, "saved"));
+  return entries;
 }
 export function defaultModel(config: Config): ModelRef {
   const p = config.providers.find(
