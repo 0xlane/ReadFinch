@@ -33,6 +33,11 @@ Windows 单物理屏已验证 125% 下的选区与 OCR，并在 100% 和 150% �
 ## macOS 权限检查
 
 启动时检查辅助功能和录屏权限。未授权时，设置页面提供原因说明与系统设置入口；划词和截图入口分别在使用前检查对应权限。辅助功能授权后自动连接，撤销后清除选区。更新后旧授权可能因 ad-hoc 签名变化而失效，需要在系统设置重新添加当前应用。自动化宿主派生进程的授权状态不能代替 Finder 正常启动验证，见 [权限补验](VERIFICATION.md#macos-正常启动与权限补验)。
+### 在 macOS 中划词
+
+在「系统设置 → 隐私与安全性 → 辅助功能」中允许伴读雀读取选区。授权后选区助手会自动重新连接。伴读雀优先读取当前控件的选中文字，再尝试按选区范围或网页文本标记读取。键盘选词时，如果鼠标远离选区，工具栏按系统提供的文字边界定位。未提供边界的应用会使用当前鼠标位置。
+
+网页文本标记的处理参考了 Easydict 所用的 SelectedTextKit。辅助功能与应用兼容性的背景可参阅 [SelectedTextKit 的取词实现](https://github.com/tisfeng/SelectedTextKit/blob/93dc960a5ef8d52de98af41d4abd7a89576d091c/Sources/SelectedTextKit/Accessibility/AXManager.swift#L56-L115)、[Bob 的取词权限说明](https://bobtranslate.com/faq/selection-error.html) 和 [Electron 的辅助功能接口](https://www.electronjs.org/docs/latest/tutorial/accessibility)。
 
 ## 更新方式
 

@@ -26,6 +26,9 @@ jobs:
           key: ${{ runner.os }}-ocr-${{ hashFiles('assets/ocr/manifest.json') }}
       - run: npm run assets:ocr
       - run: npm run build
+      - name: Exercise the macOS selection toolbar
+        if: runner.os == 'macOS'
+        run: node scripts/toolbar-smoke.mjs --verify-only
       - run: npm run test:ocr
       - uses: actions/upload-artifact@v4
         with:

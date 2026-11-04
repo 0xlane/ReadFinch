@@ -107,6 +107,23 @@ try {
     );
   const beforeHover = await frame(),
     barBefore = await pill.locator(".selection-toolbar").boundingBox();
+  if (process.platform === "darwin") {
+    await until(visible, "native macOS toolbar");
+    const properties = await app.evaluate(({ BrowserWindow }) => {
+      const toolbar = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().includes("mode=pill"),
+      );
+      return [
+        toolbar.isFocused(),
+        toolbar.isFocusable(),
+        toolbar.isVisibleOnAllWorkspaces(),
+      ];
+    });
+    assert.deepEqual(properties, [false, false, true]);
+    check(
+      "macOS shows the toolbar across Spaces without taking keyboard focus",
+    );
+  }
   async function checkWindowsPixels() {
     if (process.platform !== "win32") return;
     const handle = await app.evaluate(({ BrowserWindow }) =>

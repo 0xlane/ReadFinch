@@ -5,13 +5,16 @@ export function toolbarAnchor(
   cursor: Point,
   selection: Point,
   display: Bounds,
+  preferSelection = false,
 ) {
   const contains = (p: Point) =>
     p.x >= display.x &&
     p.x < display.x + display.width &&
     p.y >= display.y &&
     p.y < display.y + display.height;
-  return contains(selection) && !contains(cursor) ? selection : cursor;
+  return contains(selection) && (preferSelection || !contains(cursor))
+    ? selection
+    : cursor;
 }
 
 // Keep the icon strip anchored while opening a menu. Only the enclosing native

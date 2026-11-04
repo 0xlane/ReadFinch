@@ -19,6 +19,11 @@ test("the toolbar follows a keyboard selection on another monitor and ignores of
   assert.deepEqual(toolbarAnchor(mouse, { x: -2000, y: -300 }, display), mouse);
   const nearby = { x: -1420, y: -170 };
   assert.deepEqual(toolbarAnchor(nearby, word, display), nearby);
+  assert.deepEqual(toolbarAnchor(nearby, word, display, true), word);
+  assert.deepEqual(
+    toolbarAnchor(mouse, { x: -2000, y: -300 }, display, true),
+    mouse,
+  );
   for (const anchor of [word, { x: -1, y: 643 }]) {
     const closed = toolbarWindowLayout(anchor, display, 5, 5, "none", false);
     assert.equal(closed.shape, undefined);
