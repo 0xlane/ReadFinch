@@ -36,6 +36,7 @@ export function run(command, args, { input, env, binary = false } = {}) {
     env,
     encoding: binary ? undefined : "utf8",
     maxBuffer: 16 * 1024 * 1024,
+    timeout: 120_000,
   });
   if (result.error || result.status !== 0) {
     // Never include command arguments, input, or inherited environment in errors.

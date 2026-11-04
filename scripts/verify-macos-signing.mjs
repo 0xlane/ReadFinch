@@ -17,10 +17,14 @@ export async function verifyIdentity(app, { trustedCI = false } = {}) {
   const expected = fingerprint(certificate);
   const temp = await mkdtemp(path.join(tmpdir(), "readfinch-signature-check-"));
   const result = [];
+  console.log("Preparing pinned signing verifier...");
   const tool = await signingTool();
   let trusted = false;
   try {
     for (const item of await entities(app)) {
+      console.log(
+        "Verifying code identity: " + (path.relative(app, item.file) || "."),
+      );
       const display = spawnSync(
         "/usr/bin/codesign",
         ["--display", "--verbose=4", "-r-", item.file],
@@ -85,6 +89,9 @@ export async function verifyIdentity(app, { trustedCI = false } = {}) {
         );
       // Trust only for the native verification tool on this disposable build host.
       // This is never performed on a user's Mac or by the distributed application.
+      console.log(
+        "Preparing the temporary native verification trust policy...",
+      );
       run("sudo", [
         "-n",
         "/usr/bin/security",
@@ -101,6 +108,7 @@ export async function verifyIdentity(app, { trustedCI = false } = {}) {
         publicCertificate,
       ]);
       trusted = true;
+      console.log("Running native strict verification...");
       run("/usr/bin/codesign", [
         "--verify",
         "--deep",
