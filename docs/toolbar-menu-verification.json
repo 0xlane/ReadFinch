@@ -72,5 +72,9 @@
     "stripReloadsDuringOpenClose": 0,
     "paintBeforeShow": true
   },
-  "speechRegression": "Starting speech in More keeps playback in the strip and continues after the menu closes."
+  "speechRegression": "Starting speech in More keeps playback in the strip and continues after the menu closes.",
+  "userVisualVerification": {
+    "date": "2026-11-05",
+    "result": "User confirmed the independently rendered menu no longer makes the toolbar flicker."
+  }
 }
