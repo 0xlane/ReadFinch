@@ -204,7 +204,45 @@ try {
   check(
     "Hover opens the menu once and crossing into the rows keeps the icon strip stationary on screen",
   );
-  await pill.locator(".toolbar-menu").waitFor();
+  const more = button(pill, "更多指令");
+  const menu = pill.locator(".toolbar-menu:not(.disable-menu)");
+  async function leaveMore() {
+    await pill.mouse.move(1, 1);
+    await menu.waitFor({ state: "hidden" });
+    assert.equal(await visible(), true, "only the expanded menu should close");
+    assert.equal(await more.getAttribute("aria-expanded"), "false");
+  }
+  async function hoverMore() {
+    await more.hover();
+    await menu.waitFor();
+    // Electron may move the enclosing window while preserving the bar's screen
+    // position. CDP pointer coordinates are viewport-relative, so settle them
+    // against the expanded layout before testing a stationary hover.
+    await more.hover();
+  }
+  await leaveMore();
+  await hoverMore();
+  await more.click();
+  await menu.waitFor({ state: "hidden" });
+  await pill.waitForTimeout(350);
+  assert.equal(
+    await menu.count(),
+    0,
+    "click-closing must not immediately reopen under the pointer",
+  );
+  await more.click();
+  await menu.waitFor();
+  await leaveMore();
+  await hoverMore();
+  await pill
+    .getByRole("toolbar")
+    .getByRole("button", { name: "翻译", exact: true })
+    .hover();
+  await menu.waitFor({ state: "hidden" });
+  check(
+    "More closes on pointer exit or a click after hover expansion; click-opened menus also auto-close, and hovering another toolbar action closes More",
+  );
+  await hoverMore();
   const rows = pill.locator(".toolbar-row");
   assert.equal(
     await rows.count(),
@@ -258,6 +296,27 @@ try {
     async () => (await state()).config.selection.speechIndex === 1,
     "pointer reorder",
   );
+  const dragStart = await grip.boundingBox();
+  await pill.mouse.move(
+    dragStart.x + dragStart.width / 2,
+    dragStart.y + dragStart.height / 2,
+  );
+  await pill.mouse.down();
+  await pill.mouse.move(1, 1, { steps: 4 });
+  await pill.waitForTimeout(300);
+  assert.equal(
+    await menu.isVisible(),
+    true,
+    "an active drag must not be interrupted by hover dismissal",
+  );
+  await pill.mouse.up();
+  await menu.waitFor({ state: "hidden" });
+  await hoverMore();
+  await leaveMore();
+  await hoverMore();
+  check(
+    "Pinning and sorting do not leave the menu permanently open; an active drag stays open and an outside drop closes it",
+  );
   await rows
     .filter({ has: pill.locator('[aria-label="调整顺序 翻译"]') })
     .getByRole("button", { name: "翻译", exact: true })
@@ -277,7 +336,7 @@ try {
   );
   await select();
   await shot("toolbar-dark");
-  await button(pill, "更多指令").click();
+  await hoverMore();
   await button(pill, "添加自定义 AI 指令").click();
   await main
     .getByRole("heading", { name: "自定义 AI 指令", exact: true })

@@ -43,7 +43,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
   const itemIcon = (item: ToolbarItem) =>
     !item.action && reading ? <Square size={15} /> : icon(item);
   const dragging = useRef("");
-  const sticky = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const latest = useRef<ToolbarView | null>(null);
   function clear() {
@@ -66,7 +65,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
         state.mode === "none"
       ) {
         clear();
-        sticky.current = false;
         dragging.current = "";
         setOver("");
         if (!state || state.token !== latest.current?.token) stopSpeaking();
@@ -84,7 +82,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
     function key(e: KeyboardEvent) {
       if (e.key === "Escape") {
         clear();
-        sticky.current = false;
         send({ type: "menu", mode: "none" });
       }
     }
@@ -107,12 +104,19 @@ export function SelectionToolbar({ config }: { config: Config }) {
     ...i,
     name: i.action ? actionLabel(i.action) : t(i.name),
   }));
+  function insideMore(x: number, y: number) {
+    return !!document
+      .elementFromPoint(x, y)
+      ?.closest(
+        ".toolbar-more, .toolbar-bridge, .toolbar-menu:not(.disable-menu)",
+      );
+  }
   function leave() {
     clear();
-    if (!sticky.current && latest.current?.mode === "more")
+    if (!dragging.current && latest.current?.mode === "more")
       timer.current = setTimeout(
         () => send({ type: "menu", mode: "none" }),
-        220,
+        200,
       );
   }
   function enterMore() {
@@ -125,8 +129,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
   }
   function toggleMenu(mode: "more" | "disable") {
     clear();
-    const closing = sticky.current && latest.current?.mode === mode;
-    sticky.current = !closing;
+    const closing = latest.current?.mode === mode;
     send({ type: "menu", mode: closing ? "none" : mode, focus: !closing });
   }
   async function run(item: ToolbarItem) {
@@ -157,8 +160,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
         aria-label={t("划词工具栏")}
         style={position(view.bar)}
         data-open={view.mode !== "none"}
-        onMouseEnter={clear}
-        onMouseLeave={leave}
       >
         <div className="toolbar-pins">
           {items
@@ -187,7 +188,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
           title={t("更多指令")}
           aria-expanded={view.mode === "more"}
           onMouseEnter={enterMore}
-          onMouseLeave={clear}
+          onMouseLeave={leave}
           onClick={() => toggleMenu("more")}
         >
           <EllipsisVertical size={16} />
@@ -253,7 +254,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
                           : -1;
                     if (items[to]) {
                       e.preventDefault();
-                      sticky.current = true;
                       send({
                         type: "move",
                         key: item.key,
@@ -263,7 +263,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
                   }}
                   onPointerDown={(e) => {
                     if (e.button !== 0) return;
-                    sticky.current = true;
                     dragging.current = item.key;
                     e.currentTarget.setPointerCapture(e.pointerId);
                   }}
@@ -286,10 +285,12 @@ export function SelectionToolbar({ config }: { config: Config }) {
                     setOver("");
                     if (key && key !== item.key)
                       send({ type: "move", key: item.key, over: key });
+                    if (!insideMore(e.clientX, e.clientY)) leave();
                   }}
-                  onPointerCancel={() => {
+                  onPointerCancel={(e) => {
                     dragging.current = "";
                     setOver("");
+                    if (!insideMore(e.clientX, e.clientY)) leave();
                   }}
                 >
                   <GripVertical size={12} />
@@ -308,7 +309,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
                   aria-pressed={item.pinned}
                   title={item.pinned ? t("取消固定") : t("固定到工具栏")}
                   onClick={() => {
-                    sticky.current = true;
                     send({ type: "pin", key: item.key, pinned: !item.pinned });
                   }}
                 >

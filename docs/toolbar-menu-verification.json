@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "macOS shows the toolbar across Spaces without taking keyboard focus",
+    "Hover opens the menu once and crossing into the rows keeps the icon strip stationary on screen",
+    "More closes on pointer exit or a click after hover expansion; click-opened menus also auto-close, and hovering another toolbar action closes More",
+    "Pinning and sorting do not leave the menu permanently open; an active drag stays open and an outside drop closes it",
+    "More opens in the selection toolbar, preserves the selection, and pins and ordering update the strip",
+    "New action editor, per-app and global disable, and a one-hour pause that survives restart and can be resumed from Settings"
+  ],
+  "scope": "Real Electron windows with development selection events and an isolated profile",
+  "date": "2026-11-05",
+  "published": false,
+  "reference": "https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/entrypoints/content-runtime/selection/selection-toolbar/more-menu.tsx",
+  "hoverOpenDelayMs": 100,
+  "hoverCloseDelayMs": 200,
+  "behavior": "Hover opens; leaving the trigger/menu closes; clicking an expanded trigger closes; active pointer drags defer dismissal until release."
+}

@@ -14,6 +14,8 @@ The morphing thinking-icon paths in `src/renderer/Thinking.tsx` are adapted from
 
 Read Frog's interface screenshots, GPL selection components and custom-action prompts were studied to reproduce its selection toolbar and action-card behavior. ReadFinch implements these desktop components independently and uses the same publicly available icon sets listed below. No Read Frog brand logo, extension packaging or content scripts are included. The separately licensed proprietary `@read-frog/layout-engine` is not used or bundled. The local `.reference/` research directory is excluded from packaging and version control. The GPL license text is retained in LICENSE.
 
+The More-menu hover timing in `src/renderer/SelectionToolbar.tsx` follows [Read Frog’s toolbar menu](https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/entrypoints/content-runtime/selection/selection-toolbar/more-menu.tsx) (GPL-3.0, same pinned commit): 100 ms to open and 200 ms to close. ReadFinch keeps an active pointer drag open and resumes pointer-leave dismissal after release.
+
 ## Reference UI icons
 
 Local SVG paths are sourced without modification from the following public Iconify packages. They are included under `dist/renderer/reference-icons/`, together with `NOTICE.txt` and the Apache-2.0 license text. Labels, layout and surrounding components are ReadFinch implementations.
