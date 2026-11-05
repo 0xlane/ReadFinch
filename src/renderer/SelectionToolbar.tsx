@@ -1,5 +1,11 @@
 import { t, actionLabel } from "../shared/i18n";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { EllipsisVertical, GripVertical, Plus, Square, X } from "lucide-react";
 import {
   toolbarItems,
@@ -43,11 +49,11 @@ export function SelectionToolbar({ config }: { config: Config }) {
   const itemIcon = (item: ToolbarItem) =>
     !item.action && reading ? <Square size={15} /> : icon(item);
   const dragging = useRef("");
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const pressedMenu = useRef<{
+    mode: "more" | "disable";
+    open: boolean;
+  } | null>(null);
   const latest = useRef<ToolbarView | null>(null);
-  function clear() {
-    clearTimeout(timer.current);
-  }
   function send(command: Command) {
     const token = latest.current?.token;
     if (token)
@@ -64,7 +70,8 @@ export function SelectionToolbar({ config }: { config: Config }) {
         state.token !== latest.current?.token ||
         state.mode === "none"
       ) {
-        clear();
+        if (!state || state.token !== latest.current?.token)
+          pressedMenu.current = null;
         dragging.current = "";
         setOver("");
         if (!state || state.token !== latest.current?.token) stopSpeaking();
@@ -81,12 +88,12 @@ export function SelectionToolbar({ config }: { config: Config }) {
     });
     function key(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        clear();
+        pressedMenu.current = null;
         send({ type: "menu", mode: "none" });
       }
     }
     const blur = () => {
-      if (latest.current && latest.current.mode !== "none")
+      if (latest.current && latest.current.mode === "disable")
         send({ type: "menu", mode: "none" });
     };
     window.addEventListener("keydown", key);
@@ -94,7 +101,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
     return () => {
       alive = false;
       off();
-      clear();
       window.removeEventListener("keydown", key);
       window.removeEventListener("blur", blur);
     };
@@ -104,32 +110,31 @@ export function SelectionToolbar({ config }: { config: Config }) {
     ...i,
     name: i.action ? actionLabel(i.action) : t(i.name),
   }));
-  function insideMore(x: number, y: number) {
-    return !!document
-      .elementFromPoint(x, y)
-      ?.closest(
-        ".toolbar-more, .toolbar-bridge, .toolbar-menu:not(.disable-menu)",
-      );
+  function pressMenu(
+    mode: "more" | "disable",
+    event: ReactPointerEvent<HTMLButtonElement>,
+  ) {
+    if (event.button !== 0) return;
+    pressedMenu.current = { mode, open: view!.mode === mode };
+    event.currentTarget.setPointerCapture(event.pointerId);
   }
-  function leave() {
-    clear();
-    if (!dragging.current && latest.current?.mode === "more")
-      timer.current = setTimeout(
-        () => send({ type: "menu", mode: "none" }),
-        200,
-      );
-  }
-  function enterMore() {
-    clear();
-    if (latest.current?.mode === "none")
-      timer.current = setTimeout(
-        () => send({ type: "menu", mode: "more" }),
-        100,
-      );
-  }
-  function toggleMenu(mode: "more" | "disable") {
-    clear();
-    const closing = latest.current?.mode === mode;
+  function toggleMenu(
+    mode: "more" | "disable",
+    event: ReactMouseEvent<HTMLButtonElement>,
+  ) {
+    const press = pressedMenu.current;
+    pressedMenu.current = null;
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (
+      event.detail > 0 &&
+      (event.clientX < rect.left ||
+        event.clientX >= rect.right ||
+        event.clientY < rect.top ||
+        event.clientY >= rect.bottom)
+    )
+      return;
+    const closing =
+      press?.mode === mode ? press.open : latest.current?.mode === mode;
     send({ type: "menu", mode: closing ? "none" : mode, focus: !closing });
   }
   async function run(item: ToolbarItem) {
@@ -187,9 +192,11 @@ export function SelectionToolbar({ config }: { config: Config }) {
           aria-label={t("更多指令")}
           title={t("更多指令")}
           aria-expanded={view.mode === "more"}
-          onMouseEnter={enterMore}
-          onMouseLeave={leave}
-          onClick={() => toggleMenu("more")}
+          onPointerDown={(e) => pressMenu("more", e)}
+          onPointerCancel={() => {
+            pressedMenu.current = null;
+          }}
+          onClick={(e) => toggleMenu("more", e)}
         >
           <EllipsisVertical size={16} />
         </button>
@@ -198,7 +205,11 @@ export function SelectionToolbar({ config }: { config: Config }) {
           aria-label={t("关闭划词工具栏")}
           title={t("停用划词工具栏")}
           aria-expanded={view.mode === "disable"}
-          onClick={() => toggleMenu("disable")}
+          onPointerDown={(e) => pressMenu("disable", e)}
+          onPointerCancel={() => {
+            pressedMenu.current = null;
+          }}
+          onClick={(e) => toggleMenu("disable", e)}
         >
           <X size={10} />
         </button>
@@ -206,8 +217,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
       {view.popup && view.mode === "more" && (
         <div
           className="toolbar-bridge"
-          onMouseEnter={clear}
-          onMouseLeave={leave}
           style={{
             left: Math.max(view.bar.x, view.popup.x),
             width:
@@ -230,8 +239,6 @@ export function SelectionToolbar({ config }: { config: Config }) {
           aria-label={t("更多指令")}
           style={position(view.popup)}
           data-above={view.popup.y < view.bar.y}
-          onMouseEnter={clear}
-          onMouseLeave={leave}
         >
           <div className="toolbar-scroll">
             {items.map((item, index) => (
@@ -264,6 +271,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
                   onPointerDown={(e) => {
                     if (e.button !== 0) return;
                     dragging.current = item.key;
+                    send({ type: "drag", active: true });
                     e.currentTarget.setPointerCapture(e.pointerId);
                   }}
                   onPointerMove={(e) => {
@@ -285,12 +293,12 @@ export function SelectionToolbar({ config }: { config: Config }) {
                     setOver("");
                     if (key && key !== item.key)
                       send({ type: "move", key: item.key, over: key });
-                    if (!insideMore(e.clientX, e.clientY)) leave();
+                    send({ type: "drag", active: false });
                   }}
                   onPointerCancel={(e) => {
                     dragging.current = "";
                     setOver("");
-                    if (!insideMore(e.clientX, e.clientY)) leave();
+                    send({ type: "drag", active: false });
                   }}
                 >
                   <GripVertical size={12} />

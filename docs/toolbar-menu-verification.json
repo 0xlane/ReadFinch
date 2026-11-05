@@ -7,11 +7,41 @@
     "More opens in the selection toolbar, preserves the selection, and pins and ordering update the strip",
     "New action editor, per-app and global disable, and a one-hour pause that survives restart and can be resumed from Settings"
   ],
-  "scope": "Real Electron windows with development selection events and an isolated profile",
+  "scope": "Electron integration uses a screen-coordinate cursor fixture. A separate Cocoa regression uses native CGEvent mouse input without repositioning after menu expansion.",
   "date": "2026-11-05",
   "published": false,
   "reference": "https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/entrypoints/content-runtime/selection/selection-toolbar/more-menu.tsx",
   "hoverOpenDelayMs": 100,
   "hoverCloseDelayMs": 200,
-  "behavior": "Hover opens; leaving the trigger/menu closes; clicking an expanded trigger closes; active pointer drags defer dismissal until release."
+  "behavior": "Hover opens; leaving the trigger/menu closes; clicking an expanded trigger closes; active pointer drags defer dismissal until release.",
+  "nativeRegression": {
+    "date": "2026-11-05T06:24:00.690Z",
+    "platform": "darwin",
+    "arch": "x64",
+    "packaged": false,
+    "checks": [
+      "非鼠标选区不创建自动工具栏",
+      "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
+      "真实鼠标停留在更多按钮上不闪烁，点击可保持收起，离开后重新悬浮可再次展开",
+      "AX 选区暂时消失后，鼠标移向并进入工具栏仍保留原文本与可见工具栏",
+      "点击原生浮标后翻译浮窗使用真实选区、完成本机流式请求；Mac 提供复制结果",
+      "主界面保持打开时，词典浮窗可用，原应用保持前台，主界面仍在原应用后面",
+      "非激活输入浮窗可接收键盘输入，自身划选不误弹工具栏，点击外部可收起",
+      "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）",
+      "清空选区和进入安全密码框后不保留可用选区"
+    ],
+    "limitations": [],
+    "errors": []
+  },
+  "stationaryHover": {
+    "durationMs": 1200,
+    "beforeFixMenuOpenCount": 4,
+    "afterFixMenuOpenCount": 1,
+    "clickCloseHoldMs": 900,
+    "reopenedAfterClickClose": false
+  },
+  "unitTests": {
+    "passed": 192,
+    "failed": 0
+  }
 }

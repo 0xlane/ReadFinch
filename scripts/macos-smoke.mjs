@@ -192,6 +192,33 @@ try {
   check(
     "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
   );
+  const menu = pill.locator(".toolbar-menu:not(.disable-menu)");
+  await pill.evaluate(() => {
+    window.__menuOpens = 0;
+    new MutationObserver((changes) => {
+      for (const change of changes) for (const node of change.addedNodes)
+        if (node.nodeType === 1 && node.matches(".toolbar-menu:not(.disable-menu)")) window.__menuOpens++;
+    }).observe(document.body, {childList:true,subtree:true});
+  });
+  const moreBox = await pill.getByRole("button",{name:"更多指令",exact:true}).boundingBox();
+  const moreFrame = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find((w) => w.webContents.getURL().includes("mode=pill")).getBounds());
+  const morePoint = {x:moreFrame.x+moreBox.x+moreBox.width/2,y:moreFrame.y+moreBox.y+moreBox.height/2};
+  await command(`move ${morePoint.x} ${morePoint.y}`);
+  await menu.waitFor();
+  await pause(1200);
+  assert.equal(await menu.isVisible(),true,"stationary native pointer must keep More open");
+  assert.equal(await pill.evaluate(() => window.__menuOpens),1,"stationary hover must not cycle the menu");
+  await command(`click ${morePoint.x} ${morePoint.y}`);
+  await menu.waitFor({state:"hidden"});
+  await pause(900);
+  assert.equal(await menu.count(),0,"click-close stays closed under the stationary native pointer");
+  await command(`move ${morePoint.x+100} ${morePoint.y-60}`);
+  await pause(250);
+  await command(`move ${morePoint.x} ${morePoint.y}`);
+  await menu.waitFor();
+  await command(`move ${morePoint.x+100} ${morePoint.y-60}`);
+  await menu.waitFor({state:"hidden"});
+  check("真实鼠标停留在更多按钮上不闪烁，点击可保持收起，离开后重新悬浮可再次展开");
   // Reproduce a transient AX disappearance without a user dismissal event.
   await command("ax-empty");
   const toolbarBounds = await app.evaluate(({ BrowserWindow }) =>

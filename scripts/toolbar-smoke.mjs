@@ -56,10 +56,12 @@ async function select(name = "Reader") {
   await app.evaluate(
     ({ screen }, a) => {
       const area = screen.getPrimaryDisplay().workArea;
-      globalThis.__readfinchTest.select(a, {
+      const anchor = {
         x: area.x + Math.round(area.width * 0.4),
         y: area.y + Math.round(area.height * 0.38),
-      });
+      };
+      globalThis.__readfinchTest.pointer(anchor);
+      globalThis.__readfinchTest.select(a, anchor);
     },
     {
       app: name,
@@ -72,9 +74,38 @@ async function select(name = "Reader") {
   );
 }
 const button = (page, name) => page.getByRole("button", { name, exact: true });
+async function pointerAt(x, y) {
+  await app.evaluate(
+    ({ BrowserWindow }, p) => {
+      const frame = BrowserWindow.getAllWindows()
+        .find((w) => w.webContents.getURL().includes("mode=pill"))
+        .getBounds();
+      globalThis.__readfinchTest.pointer({
+        x: frame.x + p.x,
+        y: frame.y + p.y,
+      });
+    },
+    { x, y },
+  );
+}
+async function hover(locator) {
+  const box = await locator.boundingBox();
+  await pointerAt(box.x + box.width / 2, box.y + box.height / 2);
+  await locator.hover();
+}
+async function click(locator) {
+  const box = await locator.boundingBox();
+  await pointerAt(box.x + box.width / 2, box.y + box.height / 2);
+  await locator.click();
+}
+async function move(x, y, options) {
+  await pointerAt(x, y);
+  await pill.mouse.move(x, y, options);
+}
+
 async function disable() {
-  await pill.locator(".selection-toolbar").hover();
-  await button(pill, "关闭划词工具栏").click();
+  await hover(pill.locator(".selection-toolbar"));
+  await click(button(pill, "关闭划词工具栏"));
   await button(pill, "全局禁用").waitFor();
 }
 async function shot(name) {
@@ -171,9 +202,9 @@ try {
             window.menuShows++;
     }).observe(document.body, { childList: true, subtree: true });
   });
-  await button(pill, "更多指令").hover();
+  await hover(button(pill, "更多指令"));
   await pill.locator(".toolbar-menu").waitFor();
-  await pill.locator(".toolbar-row").first().hover();
+  await hover(pill.locator(".toolbar-row").first());
   await pill.waitForTimeout(350);
   assert.equal(await pill.evaluate(() => window.menuShows), 1);
   const afterHover = await frame();
@@ -207,22 +238,18 @@ try {
   const more = button(pill, "更多指令");
   const menu = pill.locator(".toolbar-menu:not(.disable-menu)");
   async function leaveMore() {
-    await pill.mouse.move(1, 1);
+    await move(1, 1);
     await menu.waitFor({ state: "hidden" });
     assert.equal(await visible(), true, "only the expanded menu should close");
     assert.equal(await more.getAttribute("aria-expanded"), "false");
   }
   async function hoverMore() {
-    await more.hover();
+    await hover(more);
     await menu.waitFor();
-    // Electron may move the enclosing window while preserving the bar's screen
-    // position. CDP pointer coordinates are viewport-relative, so settle them
-    // against the expanded layout before testing a stationary hover.
-    await more.hover();
   }
   await leaveMore();
   await hoverMore();
-  await more.click();
+  await click(more);
   await menu.waitFor({ state: "hidden" });
   await pill.waitForTimeout(350);
   assert.equal(
@@ -230,14 +257,15 @@ try {
     0,
     "click-closing must not immediately reopen under the pointer",
   );
-  await more.click();
+  await click(more);
   await menu.waitFor();
   await leaveMore();
   await hoverMore();
-  await pill
-    .getByRole("toolbar")
-    .getByRole("button", { name: "翻译", exact: true })
-    .hover();
+  await hover(
+    pill
+      .getByRole("toolbar")
+      .getByRole("button", { name: "翻译", exact: true }),
+  );
   await menu.waitFor({ state: "hidden" });
   check(
     "More closes on pointer exit or a click after hover expansion; click-opened menus also auto-close, and hovering another toolbar action closes More",
@@ -257,7 +285,7 @@ try {
     );
     await shot("toolbar-more-" + theme);
   }
-  await button(pill, "固定 词典").click();
+  await click(button(pill, "固定 词典"));
   await until(
     async () =>
       (await state()).config.actions.find((a) => a.id === "dictionary")
@@ -271,7 +299,7 @@ try {
       .count(),
     0,
   );
-  await button(pill, "固定 词典").click();
+  await click(button(pill, "固定 词典"));
   await until(
     async () =>
       (await state()).config.actions.find((a) => a.id === "dictionary").pinned,
@@ -286,9 +314,9 @@ try {
   );
   const from = await grip.boundingBox(),
     to = await button(pill, "调整顺序 词典").boundingBox();
-  await pill.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await move(from.x + from.width / 2, from.y + from.height / 2);
   await pill.mouse.down();
-  await pill.mouse.move(to.x + to.width / 2, to.y + to.height / 2, {
+  await move(to.x + to.width / 2, to.y + to.height / 2, {
     steps: 6,
   });
   await pill.mouse.up();
@@ -297,12 +325,12 @@ try {
     "pointer reorder",
   );
   const dragStart = await grip.boundingBox();
-  await pill.mouse.move(
+  await move(
     dragStart.x + dragStart.width / 2,
     dragStart.y + dragStart.height / 2,
   );
   await pill.mouse.down();
-  await pill.mouse.move(1, 1, { steps: 4 });
+  await move(1, 1, { steps: 4 });
   await pill.waitForTimeout(300);
   assert.equal(
     await menu.isVisible(),
@@ -317,10 +345,11 @@ try {
   check(
     "Pinning and sorting do not leave the menu permanently open; an active drag stays open and an outside drop closes it",
   );
-  await rows
-    .filter({ has: pill.locator('[aria-label="调整顺序 翻译"]') })
-    .getByRole("button", { name: "翻译", exact: true })
-    .click();
+  await click(
+    rows
+      .filter({ has: pill.locator('[aria-label="调整顺序 翻译"]') })
+      .getByRole("button", { name: "翻译", exact: true }),
+  );
   await until(
     () => app.windows().some((w) => w.url().includes("mode=panel")),
     "result window",
@@ -337,7 +366,7 @@ try {
   await select();
   await shot("toolbar-dark");
   await hoverMore();
-  await button(pill, "添加自定义 AI 指令").click();
+  await click(button(pill, "添加自定义 AI 指令"));
   await main
     .getByRole("heading", { name: "自定义 AI 指令", exact: true })
     .waitFor();
@@ -359,7 +388,7 @@ try {
     );
     await shot("toolbar-disable-" + theme);
   }
-  await button(pill, "在当前应用中禁用").click();
+  await click(button(pill, "在当前应用中禁用"));
   await until(async () => !(await visible()), "hide app");
   await select("READER");
   assert.equal(await visible(), false);
@@ -377,7 +406,7 @@ try {
   );
   await select("Reader");
   await disable();
-  await button(pill, "全局禁用").click();
+  await click(button(pill, "全局禁用"));
   await until(
     async () => !(await state()).config.selection.automatic,
     "global disable",
@@ -393,7 +422,7 @@ try {
   );
   await select();
   await disable();
-  await button(pill, "禁用 1 小时").click();
+  await click(button(pill, "禁用 1 小时"));
   await until(
     async () => (await state()).toolbarPausedUntil > Date.now() + 3500000,
     "timed pause",
@@ -423,7 +452,7 @@ try {
       {
         checks,
         scope:
-          "Real Electron windows with development selection events and an isolated profile",
+          "Real Electron windows with development selection events, a screen-coordinate test cursor, and an isolated profile; native CGEvent coverage is recorded separately",
       },
       null,
       2,

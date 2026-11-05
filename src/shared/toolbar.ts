@@ -16,6 +16,7 @@ export type ToolbarView = {
 };
 export type ToolbarCommand = { token: string } & (
   | { type: "menu"; mode: ToolbarMenu; focus?: boolean }
+  | { type: "drag"; active: boolean }
   | { type: "pin"; key: string; pinned: boolean }
   | { type: "move"; key: string; over: string }
   | { type: "disable"; scope: "hour" | "app" | "global" }

@@ -1,3 +1,4 @@
+import { ToolbarHover, toolbarHoverRegions } from "../core/toolbar-hover";
 import { MacPanels } from "./macos-panel";
 import { isTranslationOnly, requiresApiKey } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
@@ -165,6 +166,10 @@ let toolbarRegion = "";
 let toolbarReady = false;
 let toolbarRequested = false;
 let toolbarMenu: ToolbarMenu = "none";
+const toolbarHover = new ToolbarHover();
+let toolbarHoverTimer: ReturnType<typeof setInterval> | undefined;
+let toolbarRegions: ReturnType<typeof toolbarHoverRegions> | undefined;
+let toolbarTestPointer: Point | undefined;
 let toolbarPausedUntil = 0;
 let resumeTimer: ReturnType<typeof setTimeout> | undefined;
 const pauseFile = path.join(dataDir, "device-toolbar.json");
@@ -368,7 +373,10 @@ async function configChanged() {
     !toolbarEnabled(store.config, selection.app, toolbarPausedUntil)
   )
     hideToolbar();
-  else if (pill?.isVisible()) updateToolbar();
+  else if (pill?.isVisible()) {
+    if (toolbarMenu === "more") toolbarHover.rebase(toolbarPointer());
+    updateToolbar();
+  }
   registerShortcuts();
   updateTray();
   const state = await snapshot();
@@ -633,8 +641,49 @@ function openSettings(
 }
 function hideToolbar() {
   toolbarRequested = false;
+  stopToolbarHover();
   native.setToolbarBounds();
   if (pill?.isVisible()) pill.hide();
+}
+function toolbarPointer() {
+  return toolbarTestPointer ?? screen.getCursorScreenPoint();
+}
+function stopToolbarHover() {
+  clearInterval(toolbarHoverTimer);
+  toolbarHoverTimer = undefined;
+  toolbarRegions = undefined;
+  toolbarHover.reset();
+}
+function setToolbarMenu(mode: ToolbarMenu, focus = false) {
+  toolbarMenu = mode;
+  if (focus && mode !== "none" && pill && !pill.isDestroyed()) {
+    pill.setFocusable(true);
+    pill.focus();
+  }
+  updateToolbar();
+  if (mode === "none" && pill && !pill.isDestroyed()) pill.setFocusable(false);
+}
+function startToolbarHover() {
+  if (toolbarHoverTimer) return;
+  toolbarHoverTimer = setInterval(() => {
+    if (
+      !toolbarRequested ||
+      !pill ||
+      pill.isDestroyed() ||
+      !pill.isVisible() ||
+      !native.current ||
+      !toolbarRegions
+    )
+      return;
+    const next = toolbarHover.update(
+      toolbarPointer(),
+      toolbarRegions,
+      toolbarMenu,
+      performance.now(),
+    );
+    if (next !== undefined) setToolbarMenu(next);
+  }, 25);
+  toolbarHoverTimer.unref();
 }
 function selectionAnchor(selection: Selection) {
   const cursor = screen.getCursorScreenPoint();
@@ -675,6 +724,7 @@ function updateToolbar(): ToolbarView | null {
   if (!toolbarRequested || !selection || !pill || pill.isDestroyed())
     return null;
   const layout = currentToolbarLayout();
+  toolbarRegions = toolbarHoverRegions(layout);
   native.setToolbarBounds(layout.bounds);
   const frame = JSON.stringify(layout.bounds);
   if (frame !== toolbarFrame) {
@@ -757,12 +807,13 @@ function ensureToolbarWindow() {
     });
   }
   pill.on("hide", () => {
+    stopToolbarHover();
     native.setToolbarBounds();
     toolbarMenu = "none";
     send(pill, "toolbarState", null);
   });
   pill.on("blur", () => {
-    if (toolbarMenu !== "none" && pill?.isVisible()) {
+    if (toolbarMenu === "disable" && pill?.isVisible()) {
       toolbarMenu = "none";
       updateToolbar();
     }
@@ -789,6 +840,7 @@ function showLoadedToolbar(): ToolbarView | null {
     pill.setFocusable(false);
   const state = updateToolbar();
   if (state && !pill.isVisible()) pill.showInactive();
+  if (state) startToolbarHover();
   return state;
 }
 function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
@@ -797,6 +849,7 @@ function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
     hideToolbar();
     return;
   }
+  toolbarHover.reset();
   toolbarRequested = true;
   triggerAnchor = anchor;
   toolbarMenu = "none";
@@ -1627,14 +1680,16 @@ async function handle(
         return;
       const config = store.config;
       switch (arg.type) {
-        case "menu":
-          toolbarMenu = z.enum(["none", "more", "disable"]).parse(arg.mode);
-          if (arg.focus === true && toolbarMenu !== "none") {
-            win.setFocusable(true);
-            win.focus();
-          }
-          updateToolbar();
-          if (toolbarMenu === "none") win.setFocusable(false);
+        case "menu": {
+          const mode = z.enum(["none", "more", "disable"]).parse(arg.mode);
+          toolbarHover.explicit(mode, toolbarPointer());
+          setToolbarMenu(mode, arg.focus === true);
+          return;
+        }
+        case "drag":
+          toolbarHover.drag(
+            toolbarMenu === "more" && z.boolean().parse(arg.active),
+          );
           return;
         case "pin":
         case "move": {
@@ -2529,6 +2584,9 @@ async function boot() {
             source,
           );
         },
+        pointer(value: Point) {
+          toolbarTestPointer = { ...value };
+        },
         select(value: unknown, anchor?: Point) {
           const selection = z
             .object({
@@ -2572,6 +2630,7 @@ if (!app.requestSingleInstanceLock()) {
 app.on("activate", () => main && openMain());
 app.on("before-quit", () => {
   quitting = true;
+  stopToolbarHover();
   if (permissionsTimer) clearInterval(permissionsTimer);
   clearInterval(panelFocusTimer);
   // Non-activating Windows toolbar windows must be destroyed explicitly;
