@@ -202,9 +202,12 @@ try {
   checks.push(
     "Short input window stays on the cursor's display with its nearest edge within 24 DIP",
   );
-  await call(first, "window", { command: "close" }).catch((error) => {
-    if (!first.isClosed()) throw error;
-  });
+  await first
+    .getByRole("button", { name: "收起浮窗", exact: true })
+    .click()
+    .catch((error) => {
+      if (!first.isClosed()) throw error;
+    });
   await until(
     () => first.isClosed(),
     "detached pinned window closes independently",

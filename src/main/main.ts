@@ -534,8 +534,7 @@ function createWindow(
   mode: "main" | "panel" | "pill" | "capture",
   options: Electron.BrowserWindowConstructorOptions = {},
 ) {
-  const nativeMacControls =
-    process.platform === "darwin" && (mode === "main" || mode === "panel");
+  const nativeMacControls = process.platform === "darwin" && mode === "main";
   const win = new BrowserWindow({
     width: 940,
     height: 740,
@@ -869,9 +868,9 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
       alwaysOnTop: true,
       maximizable: false,
       fullscreenable: false,
-      ...(process.platform === "darwin"
-        ? { minimizable: false }
-        : { transparent: true, backgroundColor: "#00000000" }),
+      transparent: true,
+      backgroundColor: "#00000000",
+      ...(process.platform === "darwin" ? { minimizable: false } : {}),
     });
     panel = win;
     win.once("ready-to-show", () => deliverPanel(win));

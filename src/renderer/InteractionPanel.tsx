@@ -605,18 +605,16 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
             <ReferenceIcon name="tabler-pin" />
           )}
         </button>
-        {!snapshot.platform.startsWith("darwin") && (
-          <button
-            className="icon-button"
-            aria-label={t("收起浮窗")}
-            title={t("关闭 · Esc")}
-            onClick={() =>
-              void window.readfinch.call("window", { command: "dismiss" })
-            }
-          >
-            <ReferenceIcon name="tabler-x" />
-          </button>
-        )}
+        <button
+          className="icon-button"
+          aria-label={t("收起浮窗")}
+          title={t("关闭 · Esc")}
+          onClick={() =>
+            void window.readfinch.call("window", { command: "dismiss" })
+          }
+        >
+          <ReferenceIcon name="tabler-x" />
+        </button>
       </header>
       <div className="panel-scroll">
         <div className="rf-body" ref={content}>
