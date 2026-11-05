@@ -24,11 +24,13 @@ window.contentView?.addSubview(password)
 
 @MainActor func handle(_ op: String) {
   if op == "quit" { application.terminate(nil); return }
-  if op != "status" {
+  let pieces = op.split(separator: " ")
+  let action = String(pieces.first ?? "")
+  if !["status", "move", "click", "ax-empty"].contains(action) {
     window.makeKeyAndOrderFront(nil)
     application.activate(ignoringOtherApps: true)
   }
-  switch op {
+  switch action {
     case "select", "changed":
       textView.string = op == "changed" ? "A fresh selection for the shortcut." : "Small steps make a big difference."
       window.makeFirstResponder(textView)
@@ -50,7 +52,29 @@ window.contentView?.addSubview(password)
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
         CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: last, mouseButton: .left)?.post(tap: .cghidEventTap)
       }
-    case "clear": textView.setSelectedRange(NSRange(location: 0, length: 0))
+    case "ax-empty": textView.setSelectedRange(NSRange(location: 0, length: 0))
+    case "move", "click":
+      if pieces.count == 3, let x = Double(pieces[1]), let y = Double(pieces[2]) {
+        let point = CGPoint(x: x, y: y)
+        if action == "move" {
+          CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+        } else {
+          CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+          CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: point, mouseButton: .left)?.post(tap: .cghidEventTap)
+        }
+      }
+    case "clear":
+      textView.setSelectedRange(NSRange(location: 0, length: 0))
+      let point = window.convertPoint(toScreen: CGPoint(x: 550, y: 65))
+      let cursor = CGPoint(x: point.x, y: (NSScreen.screens.first?.frame.maxY ?? 0) - point.y)
+      CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: cursor, mouseButton: .left)?.post(tap: .cghidEventTap)
+      CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: cursor, mouseButton: .left)?.post(tap: .cghidEventTap)
+    case "select-all":
+      window.makeFirstResponder(textView)
+      let down = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true)
+      let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)
+      down?.flags = .maskCommand; up?.flags = .maskCommand
+      down?.post(tap: .cghidEventTap); up?.post(tap: .cghidEventTap)
     case "secure": window.makeFirstResponder(password); password.selectText(nil)
     case "shortcut":
       let down = CGEvent(keyboardEventSource: nil, virtualKey: 17, keyDown: true)

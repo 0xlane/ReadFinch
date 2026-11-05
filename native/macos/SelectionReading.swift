@@ -34,6 +34,37 @@ struct MacMouseSelectionGesture {
   }
 }
 
+// The selected text is a snapshot. Its toolbar lifetime follows user events,
+// not repeated AX reads of whichever element happens to be under the pointer.
+// See Easydict's PopButtonVisibilityController / EventMonitor (GPL-3.0).
+struct MacToolbarLifetime {
+  private(set) var sourcePID: pid_t?
+  private var anchor: CGPoint?
+  var toolbarBounds: CGRect?
+  private var scrolled: CGFloat = 0
+
+  mutating func begin(pid: pid_t, anchor: CGPoint) {
+    sourcePID = pid; self.anchor = anchor; scrolled = 0
+  }
+  mutating func clear() { sourcePID = nil; anchor = nil; toolbarBounds = nil; scrolled = 0 }
+  func containsToolbar(_ point: CGPoint) -> Bool { toolbarBounds?.contains(point) ?? false }
+  func dismissForMove(to point: CGPoint) -> Bool {
+    guard let anchor, let toolbarBounds else { return false }
+    // Easydict uses a 120-point neighborhood around its single icon. A toolbar
+    // can be wider: include the whole bar, menus and the path from mouse release.
+    let path = toolbarBounds.union(CGRect(origin: anchor, size: CGSize(width: 1, height: 1)))
+    return !path.insetBy(dx: -120, dy: -120).contains(point)
+  }
+  mutating func dismissForScroll(at point: CGPoint, dx: CGFloat, dy: CGFloat) -> Bool {
+    guard sourcePID != nil, !containsToolbar(point) else { return false }
+    scrolled += abs(dx) + abs(dy)
+    return scrolled > 80
+  }
+  func dismissForApplication(_ pid: pid_t, host: pid_t) -> Bool {
+    sourcePID.map { pid != $0 && pid != host } ?? false
+  }
+}
+
 func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
   var value: CFTypeRef?
   return AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success ? value : nil
@@ -193,7 +224,7 @@ private func axChildren(_ element: AXUIElement) -> [AXUIElement] {
   return (values as [AnyObject]).compactMap { axElement($0) }
 }
 
-func foregroundSelection(application: AXUIElement, cursor: CGPoint, previous: AXUIElement? = nil, diagnostics: Bool = false) -> (element: AXUIElement, value: MacTextSelection)? {
+func foregroundSelection(application: AXUIElement, cursor: CGPoint, diagnostics: Bool = false) -> (element: AXUIElement, value: MacTextSelection)? {
   let deadline = CFAbsoluteTimeGetCurrent() + 0.25
   let canRead = { CFAbsoluteTimeGetCurrent() < deadline }
   AXUIElementSetMessagingTimeout(application, 0.08)
@@ -219,13 +250,6 @@ func foregroundSelection(application: AXUIElement, cursor: CGPoint, previous: AX
     }
   }
   let window = axElement(attribute(application, kAXFocusedWindowAttribute))
-  if let previous, let window, canRead(),
-     let owner = axElement(attribute(previous, kAXWindowAttribute)), CFEqual(owner, window),
-     let value = MacTextReader(element: previous, canRead: canRead).selection() {
-    // A chat app's transient formatting popover can change focus. Re-query the
-    // original element in the same window; never return the previous text cache.
-    return (previous, value)
-  }
   var pointed: AXUIElement?
   if canRead(), window != nil {
     AXUIElementCopyElementAtPosition(application, Float(cursor.x), Float(cursor.y), &pointed)

@@ -24,9 +24,33 @@
   },
   "suggestions": "Six integration checks passed using local HTTP fixtures, including save, cancellation, cache and failure paths",
   "pending": [
-    "Physical mouse selection in the Feishu composer and keyboard-only negative check on the updated candidate",
+    "Feishu chat mouse-to-toolbar traversal and More-menu interaction after the lifetime fix",
     "Screen capture cancellation and crop verification on an unlocked desktop"
   ],
   "captureAttempt": "No capture overlay became available in the locked session; not counted as passed.",
-  "releaseCreated": false
+  "releaseCreated": false,
+  "nativeMouseRegression": {
+    "date": "2026-11-05T02:13:32.200Z",
+    "platform": "darwin",
+    "arch": "x64",
+    "checks": [
+      "非鼠标选区不创建自动工具栏",
+      "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
+      "AX 选区暂时消失后，鼠标移向并进入工具栏仍保留原文本与可见工具栏",
+      "点击原生浮标后翻译浮窗使用真实选区、完成本机流式请求；Mac 提供复制结果",
+      "清空选区和进入安全密码框后不保留可用选区",
+      "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）"
+    ],
+    "errors": []
+  },
+  "toolbarUiRegression": {
+    "checks": 4,
+    "rendererErrors": 0,
+    "scope": "Isolated Electron profile; hover menu, pin/order, disable and pause/resume checks"
+  },
+  "userFeedback": {
+    "inputShortcut": "passed",
+    "newWindowAfterPin": "passed",
+    "feishuInitialSelection": "appears, but user subsequently reported dismissal during mouse movement; supersedes initial pass"
+  }
 }

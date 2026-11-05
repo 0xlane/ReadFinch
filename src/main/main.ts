@@ -627,6 +627,7 @@ function openSettings(
 }
 function hideToolbar() {
   toolbarRequested = false;
+  native.setToolbarBounds();
   if (pill?.isVisible()) pill.hide();
 }
 function selectionAnchor(selection: Selection) {
@@ -668,6 +669,7 @@ function updateToolbar(): ToolbarView | null {
   if (!toolbarRequested || !selection || !pill || pill.isDestroyed())
     return null;
   const layout = currentToolbarLayout();
+  native.setToolbarBounds(layout.bounds);
   const frame = JSON.stringify(layout.bounds);
   if (frame !== toolbarFrame) {
     pill.setBounds(layout.bounds);
@@ -749,6 +751,7 @@ function ensureToolbarWindow() {
     });
   }
   pill.on("hide", () => {
+    native.setToolbarBounds();
     toolbarMenu = "none";
     send(pill, "toolbarState", null);
   });
@@ -2396,7 +2399,10 @@ async function boot() {
     }
   });
   main.on("blur", endShortcutRecording);
-  main.on("focus", refreshPermissions);
+  main.on("focus", () => {
+    hideToolbar();
+    refreshPermissions();
+  });
   main.on("hide", endShortcutRecording);
   main.webContents.on("render-process-gone", endShortcutRecording);
   native.on("selection", showPill);

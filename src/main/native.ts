@@ -310,6 +310,17 @@ export class SelectionService extends EventEmitter {
     }
     this.reads.clear();
   }
+  setToolbarBounds(bounds?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }) {
+    if (process.platform === "darwin" && this.child?.stdin.writable)
+      this.child.stdin.write(
+        JSON.stringify({ op: "toolbarBounds", ...bounds }) + "\n",
+      );
+  }
   invalidate() {
     this.current = undefined;
     this.last = "";

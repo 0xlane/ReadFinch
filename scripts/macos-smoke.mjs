@@ -63,6 +63,9 @@ try {
   state.config.appearance.language = "zh-CN";
   state.config.selection.automatic = true;
   state.config.noteSuggestion.enabled = false;
+  for (const key of Object.keys(state.config.shortcuts))
+    state.config.shortcuts[key] = "";
+  state.config.actions.forEach((a) => (a.shortcut = ""));
   state.config.actions.find((a) => a.id === "translate").shortcut = "Alt+T";
   Object.assign(state.config.providers[0], {
     endpoint: `http://127.0.0.1:${server.address().port}/v1`,
@@ -123,7 +126,40 @@ try {
   check(
     "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
   );
-  await pill.getByRole("button", { name: "翻译", exact: true }).click();
+  // Reproduce a transient AX disappearance without a user dismissal event.
+  await command("ax-empty");
+  const toolbarBounds = await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("mode=pill"))
+      .getBounds(),
+  );
+  const button = await pill
+    .getByRole("button", { name: "翻译", exact: true })
+    .boundingBox();
+  const destination = {
+    x: toolbarBounds.x + button.x + button.width / 2,
+    y: toolbarBounds.y + button.y + button.height / 2,
+  };
+  for (let step = 1; step <= 8; step++) {
+    const p = {
+      x: selection.x + ((destination.x - selection.x) * step) / 8,
+      y: selection.y + ((destination.y - selection.y) * step) / 8,
+    };
+    await command(`move ${p.x} ${p.y}`);
+    await pause(80);
+  }
+  await pause(600);
+  assert.equal((await call("selectionGet"))?.token, selection.token);
+  assert.equal(
+    await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()
+        .find((w) => w.webContents.getURL().includes("mode=pill"))
+        .isVisible(),
+    ),
+    true,
+  );
+  check("AX 选区暂时消失后，鼠标移向并进入工具栏仍保留原文本与可见工具栏");
+  await command(`click ${destination.x} ${destination.y}`);
   await until(
     () => app.windows().some((p) => p.url().includes("mode=panel")),
     "translation panel",
@@ -156,6 +192,7 @@ try {
   assert.equal(await call("selectionGet"), null);
   check("清空选区和进入安全密码框后不保留可用选区");
   await command("changed");
+  await command("select-all");
   await pause(400);
   assert.equal(
     await call("selectionGet"),

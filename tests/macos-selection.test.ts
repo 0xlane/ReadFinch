@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 test(
-  "macOS AX selection ranges, web text markers, secure fields, and mixed-display anchors",
+  "macOS AX selections, secure fields, mixed-display anchors, and mouse-to-toolbar lifetime",
   { skip: process.platform !== "darwin" },
   () => {
     const dir = mkdtempSync(path.join(tmpdir(), "readfinch-ax-"));

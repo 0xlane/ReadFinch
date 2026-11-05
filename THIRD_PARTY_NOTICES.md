@@ -73,3 +73,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+The toolbar lifetime policy in `native/macos/SelectionReading.swift` and `SelectionBridge.swift` is adapted from [Easydict](https://github.com/tisfeng/Easydict/tree/a4d2681132b8687702f561f389dfd8cdfc119020), copyright (c) 2023 Tisfeng, GPL-3.0: `Easydict/Swift/Utility/EventMonitor/UI/PopButtonVisibilityController.swift` and `Core/EventMonitor.swift`. ReadFinch keeps the mouse-release-to-toolbar path inside the protected region, protects clicks and scrolling inside its toolbar, and uses keyboard events only to dismiss, never to trigger automatic selection. The GPL-3.0 license is retained in LICENSE.

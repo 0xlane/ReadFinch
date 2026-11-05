@@ -101,3 +101,30 @@ precondition(editorSearch.selection(focused: 1, hit: nil)?.element == 2)
 precondition(traversed == [1, 2])
 precondition(read([kAXSelectedTextAttribute: NSNumber(value: 9999)])?.text == "9999")
 precondition(read([kAXSelectedTextAttribute: kCFBooleanTrue!]) == nil)
+
+// Hover-dependent AX providers may stop exposing a selected element while the
+// pointer travels to a toolbar. Movement uses geometry, never a fresh AX read.
+var lifetime = MacToolbarLifetime()
+let releasePoint = CGPoint(x: -4, y: -60)
+lifetime.begin(pid: 123, anchor: releasePoint)
+lifetime.toolbarBounds = CGRect(x: -580, y: -34, width: 560, height: 48)
+for target in [CGPoint(x: -575, y: -30), CGPoint(x: -25, y: 10)] {
+  for step in 0...40 {
+    let progress = CGFloat(step) / 40
+    let point = CGPoint(x: releasePoint.x + (target.x - releasePoint.x) * progress,
+                        y: releasePoint.y + (target.y - releasePoint.y) * progress)
+    precondition(!lifetime.dismissForMove(to: point), "the entire path to a wide toolbar must remain usable")
+  }
+}
+precondition(lifetime.containsToolbar(CGPoint(x: -200, y: 0)))
+precondition(!lifetime.containsToolbar(CGPoint(x: 1, y: 200)))
+precondition(lifetime.dismissForMove(to: CGPoint(x: 300, y: 400)))
+precondition(!lifetime.dismissForScroll(at: CGPoint(x: -200, y: 0), dx: 0, dy: 1000))
+precondition(!lifetime.dismissForScroll(at: releasePoint, dx: 0, dy: 40))
+precondition(lifetime.dismissForScroll(at: releasePoint, dx: 0, dy: 41))
+precondition(!lifetime.dismissForApplication(123, host: 456))
+precondition(!lifetime.dismissForApplication(456, host: 456))
+precondition(lifetime.dismissForApplication(789, host: 456))
+lifetime.clear()
+precondition(!lifetime.dismissForMove(to: releasePoint))
+precondition(!lifetime.dismissForApplication(789, host: 456))
