@@ -605,7 +605,7 @@ try {
       {
         date: new Date().toISOString(),
         packaged,
-        systemVoices: offline,
+        systemVoiceCount: offline.length,
         checks,
       },
       null,
