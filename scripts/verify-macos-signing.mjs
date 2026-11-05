@@ -128,23 +128,35 @@ export async function verifyIdentity(app, { trustedCI = false } = {}) {
       nativeStrictVerification: trustedCI,
       entities: result,
     };
+  } catch (error) {
+    // A failed cleanup must not mask a signature or resource-envelope failure.
+    console.error("Signature verification failed: " + error.message);
+    throw error;
   } finally {
     if (trusted) {
-      run("sudo", [
-        "-n",
-        "/usr/bin/security",
-        "remove-trusted-cert",
-        "-d",
-        publicCertificate,
-      ]);
-      run("sudo", [
-        "-n",
-        "/usr/bin/security",
-        "delete-certificate",
-        "-Z",
-        expected,
-        "/Library/Keychains/System.keychain",
-      ]);
+      for (const args of [
+        ["remove-trusted-cert", "-d", publicCertificate],
+        [
+          "delete-certificate",
+          "-Z",
+          expected,
+          "/Library/Keychains/System.keychain",
+        ],
+      ]) {
+        try {
+          console.log("Removing temporary CI trust: " + args[0]);
+          run("sudo", ["-n", "/usr/bin/security", ...args], {
+            timeoutMs: 30_000,
+          });
+        } catch (error) {
+          // This path is restricted to disposable GitHub-hosted runners. All
+          // artifact checks above remain mandatory; cleanup never substitutes
+          // for successful native signature and resource verification.
+          console.warn(
+            "Temporary CI trust cleanup incomplete: " + error.message,
+          );
+        }
+      }
     }
     await rm(temp, { recursive: true, force: true });
   }

@@ -30,13 +30,17 @@ const archives = {
   },
 };
 
-export function run(command, args, { input, env, binary = false } = {}) {
+export function run(
+  command,
+  args,
+  { input, env, binary = false, timeoutMs = 120_000 } = {},
+) {
   const result = spawnSync(command, args, {
     input,
     env,
     encoding: binary ? undefined : "utf8",
     maxBuffer: 16 * 1024 * 1024,
-    timeout: 120_000,
+    timeout: timeoutMs,
   });
   if (result.error || result.status !== 0) {
     // Never include command arguments, input, or inherited environment in errors.
