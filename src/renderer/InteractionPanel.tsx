@@ -236,6 +236,24 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
     };
   }, []);
   useEffect(() => {
+    if (!snapshot.platform.startsWith("darwin")) return;
+    const reportFocus = (focused: boolean) => {
+      if (sessionId.current)
+        void window.readfinch
+          .call("panelFocus", { focused, sessionId: sessionId.current })
+          .catch(() => {});
+    };
+    const focus = () => reportFocus(true);
+    const blur = () => reportFocus(false);
+    window.addEventListener("focus", focus);
+    window.addEventListener("blur", blur);
+    if (document.hasFocus()) focus();
+    return () => {
+      window.removeEventListener("focus", focus);
+      window.removeEventListener("blur", blur);
+    };
+  }, []);
+  useEffect(() => {
     if (session?.source === "empty" && editing) sourceEditor.current?.focus();
   }, [session?.id, editing]);
   useEffect(() => {

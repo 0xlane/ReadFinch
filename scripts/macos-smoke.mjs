@@ -134,6 +134,31 @@ try {
     return replies.get(op);
   };
   await until(() => replies.has("ready"), "fixture launch");
+  const hostPID = app.process().pid;
+  const mainNumber = await app.evaluate(({ BrowserWindow }) =>
+    Number(
+      BrowserWindow.getAllWindows()
+        .find((w) => w.webContents.getURL().includes("mode=main"))
+        .getMediaSourceId()
+        .split(":")[1],
+    ),
+  );
+  async function assertSourceStaysInFront() {
+    const state = await command(`order ${hostPID}`);
+    assert.equal(
+      state.foreground,
+      state.pid,
+      "floating UI must not activate the whole application",
+    );
+    const sourceIndex = state.order.findIndex(
+      (w) => w.id === state.sourceWindow,
+    );
+    const mainIndex = state.order.findIndex((w) => w.id === mainNumber);
+    assert.ok(
+      sourceIndex >= 0 && mainIndex >= 0 && sourceIndex < mainIndex,
+      JSON.stringify(state),
+    );
+  }
   await command("select");
   await pause(600);
   assert.equal(
@@ -262,7 +287,8 @@ try {
   }));
   assert.equal(focusState.focused, true);
   assert.equal(focusState.mainVisible, true);
-  check("主界面保持打开时，真实点击词典进入结果浮窗，主界面不会抢回焦点");
+  await assertSourceStaysInFront();
+  check("主界面保持打开时，词典浮窗可用，原应用保持前台，主界面仍在原应用后面");
   await panel.evaluate(() =>
     window.readfinch.call("window", { command: "dismiss" }),
   );
@@ -271,6 +297,53 @@ try {
     async () => !(await call("selectionGet")),
     "dictionary selection cleared",
   );
+  await command("select");
+  await call("panelOpen", { source: "empty" });
+  await panel.getByLabel("原文", { exact: true }).waitFor();
+  await panel.waitForFunction(
+    () => document.activeElement?.getAttribute("aria-label") === "原文",
+  );
+  await assertSourceStaysInFront();
+  await command("type-input");
+  await until(
+    async () =>
+      (await panel.getByLabel("原文", { exact: true }).inputValue()) ===
+      "Panel typing",
+    "non-activating panel receives real keyboard input",
+  );
+  await assertSourceStaysInFront();
+  const inputBox = await panel
+    .getByLabel("原文", { exact: true })
+    .boundingBox();
+  const panelBounds = await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("mode=panel"))
+      .getBounds(),
+  );
+  await command(
+    `drag ${panelBounds.x + inputBox.x + 12} ${panelBounds.y + inputBox.y + 20} ${panelBounds.x + inputBox.x + 180} ${panelBounds.y + inputBox.y + 20}`,
+  );
+  await pause(600);
+  assert.equal(
+    await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()
+        .find((w) => w.webContents.getURL().includes("mode=pill"))
+        .isVisible(),
+    ),
+    false,
+  );
+  await command("clear");
+  await until(
+    () =>
+      app.evaluate(
+        ({ BrowserWindow }) =>
+          !BrowserWindow.getAllWindows()
+            .find((w) => w.webContents.getURL().includes("mode=panel"))
+            .isVisible(),
+      ),
+    "outside click dismisses a non-activating unpinned panel",
+  );
+  check("非激活输入浮窗可接收键盘输入，自身划选不误弹工具栏，点击外部可收起");
   await command("changed");
   await until(async () => {
     const status = await command("status");

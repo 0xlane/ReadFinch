@@ -1,3 +1,4 @@
+import { MacPanels } from "./macos-panel";
 import { isTranslationOnly, requiresApiKey } from "../shared/provider-presets";
 import { modelKind } from "../shared/model-capabilities";
 import { catalogKey } from "../shared/models";
@@ -139,6 +140,7 @@ const store = new ConfigStore(dataDir, canonicalizeBuiltinConfig, () =>
 const localNotes = new LocalNotes(path.join(dataDir, "local-notes.sqlite"));
 const secrets = new Secrets(dataDir);
 const native = new SelectionService(nativeRoot);
+const macPanels = new MacPanels(nativeRoot);
 const jobs = new JobGate();
 const resultCache = new CompletionCache();
 const updates = new DesktopUpdates((state) => {
@@ -176,6 +178,7 @@ type PanelState = {
   dialog: boolean;
 };
 const panels = new Map<BrowserWindow, PanelState>();
+let focusedPanel: BrowserWindow | undefined;
 type PendingSuggestion = {
   win: BrowserWindow;
   id: string;
@@ -568,6 +571,7 @@ function createWindow(
       webSecurity: true,
     },
   });
+  if (mode === "pill" || mode === "panel") macPanels.prepare(win);
   if (mode === "pill" && process.platform === "darwin") {
     win.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
@@ -875,11 +879,10 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
     });
     panel = win;
     win.once("ready-to-show", () => deliverPanel(win));
-    win.on("blur", () => {
-      const state = panels.get(win);
-      if (!quitting && state && !state.pinned && !state.dialog && !captureBusy)
-        dismissPanel(win);
+    win.on("focus", () => {
+      focusedPanel = win;
     });
+    win.on("blur", () => panelFocusChanged(win, false));
     const placedByUser = () => {
       const state = panels.get(win);
       if (state) state.placedByUser = true;
@@ -894,6 +897,7 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
     });
     win.on("closed", () => {
       panels.delete(win);
+      if (focusedPanel === win) focusedPanel = undefined;
       if (panel === win) panel = undefined;
     });
   }
@@ -914,9 +918,25 @@ function deliverPanel(win: BrowserWindow) {
   const bounds = panelBounds(state.placement, state.height);
   state.frame = JSON.stringify(bounds);
   win.setBounds(bounds);
-  win.show();
-  win.focus();
+  macPanels.show(win);
+  focusedPanel = win;
   send(win, "interaction", state.interaction);
+}
+function panelFocusChanged(win: BrowserWindow, focused: boolean) {
+  const state = panels.get(win);
+  if (!state || win.isDestroyed()) return;
+  if (focused) focusedPanel = win;
+  else {
+    if (focusedPanel === win) focusedPanel = undefined;
+    if (
+      !quitting &&
+      win.isVisible() &&
+      !state.pinned &&
+      !state.dialog &&
+      !captureBusy
+    )
+      dismissPanel(win);
+  }
 }
 function registerShortcuts() {
   shortcutErrors = shortcutRegistry.update(shortcutBindings(store.config));
@@ -943,10 +963,14 @@ async function dispatchShortcut(id: string) {
     await openClipboard().catch(contextError);
     return;
   }
-  const focused = BrowserWindow.getFocusedWindow();
+  const focused = focusedPanel?.isVisible()
+    ? focusedPanel
+    : BrowserWindow.getFocusedWindow();
   if (
     shortcutTestTarget === "settings" ||
-    (!shortcutTestTarget && focused === main)
+    (!shortcutTestTarget &&
+      focused === main &&
+      (process.platform !== "darwin" || app.isActive()))
   )
     return;
   if (
@@ -976,7 +1000,11 @@ async function dispatchShortcut(id: string) {
         javaBridgeUnavailable = true;
       });
     if (generation !== shortcutGeneration || captureBusy || quitting) return;
-    if (!shortcutTestTarget && BrowserWindow.getFocusedWindow() === main)
+    if (
+      !shortcutTestTarget &&
+      BrowserWindow.getFocusedWindow() === main &&
+      (process.platform !== "darwin" || app.isActive())
+    )
       return;
     openSelection(binding.actionId, selection ?? null, javaBridgeUnavailable);
   } catch {
@@ -1638,6 +1666,12 @@ async function handle(
         text: "",
         actionId: arg.actionId ? z.string().parse(arg.actionId) : undefined,
       });
+    }
+    case "panelFocus": {
+      const state = panels.get(win);
+      if (state && arg.sessionId === state.interaction.id)
+        panelFocusChanged(win, z.boolean().parse(arg.focused));
+      return;
     }
     case "panelResize": {
       const state = panels.get(win);

@@ -156,8 +156,9 @@ final class MouseSelectionEvents: @unchecked Sendable {
               lifetime.toolbarBounds = CGRect(origin: point, size: CGSize(width: width, height: height))
             } else { lifetime.toolbarBounds = nil }
           case "mouseDown":
-            ignoreMouseGesture = point.map { lifetime.containsToolbar($0) } ?? false
-            if !ignoreMouseGesture { pendingMouseSelectionUntil = nil; invalidate("click") }
+            let toolbarClick = point.map { lifetime.containsToolbar($0) } ?? false
+            ignoreMouseGesture = toolbarClick || (point.map { isHostWindow(at: $0, host: host) } ?? false)
+            if !toolbarClick { pendingMouseSelectionUntil = nil; invalidate("click") }
           case "dismissPointer":
             if let point, !lifetime.containsToolbar(point) { pendingMouseSelectionUntil = nil; invalidate("click") }
           case "dismissKeyboard":

@@ -48,6 +48,9 @@ jobs:
           key: ${{ runner.os }}-ocr-${{ hashFiles('assets/ocr/manifest.json') }}
       - run: npm run assets:ocr
       - run: npm run build
+      - name: Verify native macOS panel loading and shutdown
+        if: runner.os == 'macOS'
+        run: node scripts/macos-panel-smoke.mjs
       - run: npm run test:ocr
       - name: Build platform packages
         env:

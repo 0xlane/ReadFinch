@@ -65,6 +65,19 @@ struct MacToolbarLifetime {
   }
 }
 
+// A non-activating result window can own the click while another application
+// remains frontmost. Inspect only geometry/owner IDs, never other window titles.
+func isHostWindow(at point: CGPoint, host: pid_t) -> Bool {
+  guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else { return false }
+  for info in windows {
+    guard (info[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+          let bounds = info[kCGWindowBounds as String] as? [String: Any],
+          let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary), rect.contains(point) else { continue }
+    return (info[kCGWindowOwnerPID as String] as? Int32) == host
+  }
+  return false
+}
+
 func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
   var value: CFTypeRef?
   return AXUIElementCopyAttributeValue(element, name as CFString, &value) == .success ? value : nil

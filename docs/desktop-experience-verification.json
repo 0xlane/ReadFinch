@@ -24,10 +24,10 @@
   },
   "suggestions": "Six integration checks passed using local HTTP fixtures, including save, cancellation, cache and failure paths",
   "pending": [
-    "User confirmation of toolbar dictionary click while the main window remains open"
+    "Unlocked desktop verification of the follow-up native non-activating panel candidate (foreground app, window stacking, typing, outside-click dismissal, and pinned windows)"
   ],
   "captureAttempt": "Initial locked-session attempt was superseded by an unlocked 9-check input/capture regression run.",
-  "releaseCreated": false,
+  "releaseCreated": true,
   "nativeMouseRegression": {
     "date": "2026-11-05T02:13:32.200Z",
     "platform": "darwin",
@@ -51,7 +51,8 @@
     "inputShortcut": "passed",
     "newWindowAfterPin": "passed",
     "feishuInitialSelection": "passed after follow-up lifetime fix",
-    "feishuToolbarTraversal": "User confirmed dragging chat text, moving to the toolbar, opening More, and closing by clicking blank chat space all work normally."
+    "feishuToolbarTraversal": "User confirmed dragging chat text, moving to the toolbar, opening More, and closing by clicking blank chat space all work normally.",
+    "mainWindowFocus": "Dictionary operation succeeds, but user reported that the main window is also raised; unresolved in published v1.2.3."
   },
   "inputCaptureRegression": {
     "version": "1.2.3",
@@ -112,5 +113,20 @@
       "Global shortcut regression not executed: macOS Secure Input is enabled by another application."
     ],
     "errors": []
+  },
+  "publishedRelease": {
+    "version": "1.2.3",
+    "url": "https://github.com/0xlane/ReadFinch/releases/tag/v1.2.3",
+    "assets": 11,
+    "packages": 8,
+    "manifestSignature": "valid",
+    "packageChecksums": "match GitHub asset digests"
+  },
+  "followUpCandidate": {
+    "published": false,
+    "build": "passed",
+    "typecheck": "passed",
+    "unitTests": 187,
+    "desktopVerification": "Not passed: desktop is locked. The initial instance-class experiment was rejected after a teardown crash; the current approach retains the existing object class and uses instance-scoped behavior."
   }
 }

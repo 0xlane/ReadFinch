@@ -141,6 +141,7 @@ export type CallMap = {
     result: void;
   };
   panelResize: { arg: { height: number }; result: void };
+  panelFocus: { arg: { focused: boolean; sessionId: string }; result: void };
   shortcutRecording: { arg: { id: string; active: boolean }; result: void };
   setTranslationPreference: {
     arg:

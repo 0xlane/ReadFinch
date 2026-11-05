@@ -88,12 +88,18 @@ export function SelectionToolbar({ config }: { config: Config }) {
         send({ type: "menu", mode: "none" });
       }
     }
+    const blur = () => {
+      if (latest.current && latest.current.mode !== "none")
+        send({ type: "menu", mode: "none" });
+    };
     window.addEventListener("keydown", key);
+    window.addEventListener("blur", blur);
     return () => {
       alive = false;
       off();
       clear();
       window.removeEventListener("keydown", key);
+      window.removeEventListener("blur", blur);
     };
   }, []);
   if (!view) return null;

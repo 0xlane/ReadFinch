@@ -28,11 +28,44 @@ window.initialFirstResponder = textView
   if op == "quit" { application.terminate(nil); return }
   let pieces = op.split(separator: " ")
   let action = String(pieces.first ?? "")
-  if !["status", "move", "click", "ax-empty"].contains(action) {
+  if !["status", "order", "type-input", "drag", "move", "click", "ax-empty"].contains(action) {
     window.makeKeyAndOrderFront(nil)
     application.activate(ignoringOtherApps: true)
   }
   switch action {
+    case "order":
+      let hostPID = pieces.count > 1 ? Int32(pieces[1]) ?? 0 : 0
+      let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
+      let order = list.compactMap { info -> [String: Any]? in
+        guard let pid = info[kCGWindowOwnerPID as String] as? Int32,
+              pid == hostPID || pid == ProcessInfo.processInfo.processIdentifier,
+              let id = info[kCGWindowNumber as String] as? Int else { return nil }
+        return ["id": id, "pid": pid]
+      }
+      emit(["id": op, "foreground": NSWorkspace.shared.frontmostApplication?.processIdentifier ?? 0,
+            "pid": ProcessInfo.processInfo.processIdentifier, "sourceWindow": window.windowNumber, "order": order])
+      return
+    case "type-input":
+      for character in "Panel typing".utf16 {
+        var units = [character]
+        let down = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: true)
+        let up = CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)
+        down?.keyboardSetUnicodeString(stringLength: 1, unicodeString: &units)
+        up?.keyboardSetUnicodeString(stringLength: 1, unicodeString: &units)
+        down?.post(tap: .cghidEventTap); up?.post(tap: .cghidEventTap)
+      }
+    case "drag":
+      if pieces.count == 5, let x1 = Double(pieces[1]), let y1 = Double(pieces[2]),
+         let x2 = Double(pieces[3]), let y2 = Double(pieces[4]) {
+        let start = CGPoint(x: x1, y: y1), end = CGPoint(x: x2, y: y2)
+        CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown, mouseCursorPosition: start, mouseButton: .left)?.post(tap: .cghidEventTap)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+          CGEvent(mouseEventSource: nil, mouseType: .leftMouseDragged, mouseCursorPosition: end, mouseButton: .left)?.post(tap: .cghidEventTap)
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+          CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp, mouseCursorPosition: end, mouseButton: .left)?.post(tap: .cghidEventTap)
+        }
+      }
     case "select", "changed":
       textView.string = op == "changed" ? "A fresh selection for the shortcut." : "Small steps make a big difference."
       window.makeFirstResponder(textView)

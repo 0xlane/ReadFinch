@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, existsSync } from "node:fs";
+import { copyFileSync, mkdirSync, existsSync, realpathSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 mkdirSync("native/bin", { recursive: true });
@@ -53,6 +53,34 @@ if (process.platform === "win32") {
     { stdio: "inherit" },
   );
 } else if (process.platform === "darwin") {
+  const headers = path.join(
+    path.dirname(path.dirname(realpathSync(process.execPath))),
+    "include/node",
+  );
+  if (!existsSync(path.join(headers, "node_api.h")))
+    throw Error(
+      "Node.js development headers are required to build the macOS panel bridge.",
+    );
+  execFileSync(
+    "clang++",
+    [
+      "-std=c++17",
+      "-fobjc-arc",
+      "-dynamiclib",
+      "-undefined",
+      "dynamic_lookup",
+      "-DNAPI_VERSION=8",
+      "-I",
+      headers,
+      "-framework",
+      "AppKit",
+      "native/macos/PanelWindow.mm",
+      "-o",
+      "native/bin/readfinch-panel.node",
+    ],
+    { stdio: "inherit", timeout: 120000 },
+  );
+
   execFileSync(
     "swiftc",
     [
