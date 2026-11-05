@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-05",
+  "platform": "macOS 15.8.1 Intel x64",
+  "published": false,
+  "packagedNative": {
+    "date": "2026-11-05T05:31:46.039Z",
+    "platform": "darwin",
+    "arch": "x64",
+    "packaged": true,
+    "checks": [
+      "非鼠标选区不创建自动工具栏",
+      "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
+      "AX 选区暂时消失后，鼠标移向并进入工具栏仍保留原文本与可见工具栏",
+      "点击原生浮标后翻译浮窗使用真实选区、完成本机流式请求；Mac 提供复制结果",
+      "主界面保持打开时，词典浮窗可用，原应用保持前台，主界面仍在原应用后面",
+      "非激活输入浮窗可接收键盘输入，自身划选不误弹工具栏，点击外部可收起",
+      "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）",
+      "清空选区和进入安全密码框后不保留可用选区"
+    ],
+    "limitations": [],
+    "errors": []
+  },
+  "independentPanels": [
+    "Input shortcut focuses editor; Enter translates; Shift+Enter and IME composition do not submit",
+    "A new shortcut opens a second window without cancelling or replacing the pinned window's running request",
+    "Dock remains available and pinned results survive closing/reopening settings",
+    "Unpinned window is reused; settings do not dismiss pinned windows",
+    "Short input window stays on the cursor's display with its nearest edge within 24 DIP",
+    "Image import from a pinned result opens another window and preserves the original session"
+  ],
+  "unitTests": {
+    "passed": 187,
+    "failed": 0
+  },
+  "scope": "Local Cocoa and packaged-app regression with actual CGEvent mouse/keyboard input, window order and foreground PID checks; no chat messages or external AI services."
+}

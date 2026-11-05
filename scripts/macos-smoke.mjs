@@ -8,6 +8,9 @@ import assert from "node:assert/strict";
 
 if (process.platform !== "darwin") throw Error("Requires a macOS desktop");
 const dir = path.resolve(".local/macos-" + Date.now());
+const executablePath = process.argv
+  .find((arg) => arg.startsWith("--app="))
+  ?.slice(6);
 await mkdir(dir, { recursive: true });
 const binary = path.join(dir, "selection-target");
 execFileSync(
@@ -69,7 +72,8 @@ const check = (text) => {
 };
 try {
   app = await electron.launch({
-    args: [".", "--settings", "--data-dir=" + dir],
+    ...(executablePath ? { executablePath: path.resolve(executablePath) } : {}),
+    args: [...(executablePath ? [] : ["."]), "--settings", "--data-dir=" + dir],
     env,
   });
   app.on("window", (p) => p.on("pageerror", (e) => errors.push(e.message)));
@@ -398,6 +402,7 @@ try {
         date: new Date().toISOString(),
         platform: "darwin",
         arch: process.arch,
+        packaged: !!executablePath,
         checks,
         limitations,
         errors,

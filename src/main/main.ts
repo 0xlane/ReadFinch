@@ -176,9 +176,11 @@ type PanelState = {
   frame: string;
   height: number;
   dialog: boolean;
+  hadKeyFocus: boolean;
 };
 const panels = new Map<BrowserWindow, PanelState>();
 let focusedPanel: BrowserWindow | undefined;
+let panelFocusTimer: ReturnType<typeof setInterval> | undefined;
 type PendingSuggestion = {
   win: BrowserWindow;
   id: string;
@@ -909,6 +911,7 @@ function openPanel(value: Interaction, anchor = screen.getCursorScreenPoint()) {
     frame: "",
     height: 220,
     dialog: false,
+    hadKeyFocus: false,
   });
   if (!panel.webContents.isLoadingMainFrame()) deliverPanel(panel);
 }
@@ -920,13 +923,43 @@ function deliverPanel(win: BrowserWindow) {
   win.setBounds(bounds);
   macPanels.show(win);
   focusedPanel = win;
+  state.hadKeyFocus = win.isFocused();
+  watchPanelFocus();
   send(win, "interaction", state.interaction);
+}
+function watchPanelFocus() {
+  if (process.platform !== "darwin" || panelFocusTimer) return;
+  // Non-main NSPanel windows do not reliably emit Electron or DOM blur events.
+  // Read only our own native key-window state while result windows are visible.
+  panelFocusTimer = setInterval(() => {
+    let visible = false;
+    for (const [win, state] of panels) {
+      if (win.isDestroyed() || !win.isVisible()) continue;
+      visible = true;
+      if (win.isFocused()) {
+        state.hadKeyFocus = true;
+        focusedPanel = win;
+      } else if (state.hadKeyFocus && !captureBusy && !state.dialog) {
+        state.hadKeyFocus = false;
+        panelFocusChanged(win, false);
+      }
+    }
+    if (!visible) {
+      clearInterval(panelFocusTimer);
+      panelFocusTimer = undefined;
+      focusedPanel = undefined;
+    }
+  }, 100);
+  panelFocusTimer.unref();
 }
 function panelFocusChanged(win: BrowserWindow, focused: boolean) {
   const state = panels.get(win);
   if (!state || win.isDestroyed()) return;
-  if (focused) focusedPanel = win;
-  else {
+  if (!focused && process.platform === "darwin" && win.isFocused()) return;
+  if (focused) {
+    focusedPanel = win;
+    watchPanelFocus();
+  } else {
     if (focusedPanel === win) focusedPanel = undefined;
     if (
       !quitting &&
@@ -963,9 +996,10 @@ async function dispatchShortcut(id: string) {
     await openClipboard().catch(contextError);
     return;
   }
-  const focused = focusedPanel?.isVisible()
-    ? focusedPanel
-    : BrowserWindow.getFocusedWindow();
+  const focused =
+    focusedPanel?.isVisible() && focusedPanel.isFocused()
+      ? focusedPanel
+      : BrowserWindow.getFocusedWindow();
   if (
     shortcutTestTarget === "settings" ||
     (!shortcutTestTarget &&
@@ -1032,6 +1066,7 @@ function restoreAfterCapture(cancelled = true) {
   }
   captureReturn = undefined;
   captureHidden = [];
+  watchPanelFocus();
 }
 async function capture() {
   if (captureBusy) throw Error(t("截图正在进行"));
@@ -2538,6 +2573,7 @@ app.on("activate", () => main && openMain());
 app.on("before-quit", () => {
   quitting = true;
   if (permissionsTimer) clearInterval(permissionsTimer);
+  clearInterval(panelFocusTimer);
   // Non-activating Windows toolbar windows must be destroyed explicitly;
   // waiting for their native close sequence can keep the process alive.
   if (pill && !pill.isDestroyed()) pill.destroy();

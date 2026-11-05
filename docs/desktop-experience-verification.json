@@ -23,9 +23,7 @@
     "invocation": "Development callbacks and synthetic selection fixtures; not physical key presses"
   },
   "suggestions": "Six integration checks passed using local HTTP fixtures, including save, cancellation, cache and failure paths",
-  "pending": [
-    "Unlocked desktop verification of the follow-up native non-activating panel candidate (foreground app, window stacking, typing, outside-click dismissal, and pinned windows)"
-  ],
+  "pending": [],
   "captureAttempt": "Initial locked-session attempt was superseded by an unlocked 9-check input/capture regression run.",
   "releaseCreated": true,
   "nativeMouseRegression": {
@@ -127,6 +125,8 @@
     "build": "passed",
     "typecheck": "passed",
     "unitTests": 187,
-    "desktopVerification": "Not passed: desktop is locked. The initial instance-class experiment was rejected after a teardown crash; the current approach retains the existing object class and uses instance-scoped behavior."
+    "desktopVerification": "Passed in development and signed packaged Cocoa regressions: source app remains frontmost, main window stays behind it, text input works, own selections are ignored, and outside click dismisses unpinned panels.",
+    "independentPanels": "Six integration checks passed; pinned sessions and requests stay independent.",
+    "report": "macos-panel-verification.json"
   }
 }

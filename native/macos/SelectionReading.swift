@@ -1,3 +1,4 @@
+import AppKit
 import ApplicationServices
 import Foundation
 
@@ -65,17 +66,17 @@ struct MacToolbarLifetime {
   }
 }
 
-// A non-activating result window can own the click while another application
-// remains frontmost. Inspect only geometry/owner IDs, never other window titles.
+// A non-activating panel can own the click while another app stays frontmost.
+// Like Easydict, use AppKit hit testing: geometry alone includes transparent
+// system overlays that cover the desktop but do not actually receive the click.
 func isHostWindow(at point: CGPoint, host: pid_t) -> Bool {
-  guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else { return false }
-  for info in windows {
-    guard (info[kCGWindowAlpha as String] as? Double ?? 1) > 0,
-          let bounds = info[kCGWindowBounds as String] as? [String: Any],
-          let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary), rect.contains(point) else { continue }
-    return (info[kCGWindowOwnerPID as String] as? Int32) == host
-  }
-  return false
+  let screenTop = NSScreen.screens.first?.frame.maxY ?? 0
+  let appKitPoint = CGPoint(x: point.x, y: screenTop - point.y)
+  let number = NSWindow.windowNumber(at: appKitPoint, belowWindowWithWindowNumber: 0)
+  guard number > 0,
+        let windows = CGWindowListCopyWindowInfo(.optionIncludingWindow, CGWindowID(number)) as? [[String: Any]],
+        let info = windows.first else { return false }
+  return (info[kCGWindowOwnerPID as String] as? Int32) == host
 }
 
 func attribute(_ element: AXUIElement, _ name: String) -> CFTypeRef? {
