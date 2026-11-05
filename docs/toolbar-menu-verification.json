@@ -9,7 +9,7 @@
   ],
   "scope": "Electron integration uses a screen-coordinate cursor fixture. A separate Cocoa regression uses native CGEvent mouse input without repositioning after menu expansion.",
   "date": "2026-11-05",
-  "published": false,
+  "published": true,
   "reference": "https://github.com/mengxi-ream/read-frog/blob/96083134b111e56762f578b143bcd48e85058ba3/src/entrypoints/content-runtime/selection/selection-toolbar/more-menu.tsx",
   "hoverOpenDelayMs": 100,
   "hoverCloseDelayMs": 200,
@@ -76,5 +76,14 @@
   "userVisualVerification": {
     "date": "2026-11-05",
     "result": "User confirmed the independently rendered menu no longer makes the toolbar flicker."
+  },
+  "release": {
+    "version": "1.2.4",
+    "url": "https://github.com/0xlane/ReadFinch/releases/tag/v1.2.4",
+    "publishedAt": "2026-11-05T09:27:32Z",
+    "manifestSignature": "valid",
+    "packages": 8,
+    "assets": 11,
+    "packageChecksums": "match GitHub asset digests"
   }
 }
