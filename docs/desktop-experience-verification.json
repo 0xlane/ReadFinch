@@ -1,7 +1,7 @@
 {
   "date": "2026-11-05",
   "platform": "macOS 15.8.1 Intel x64",
-  "version": "1.2.3 (unreleased candidate)",
+  "version": "1.2.3 release candidate",
   "unitTests": {
     "passed": 187,
     "failed": 0
@@ -24,7 +24,6 @@
   },
   "suggestions": "Six integration checks passed using local HTTP fixtures, including save, cancellation, cache and failure paths",
   "pending": [
-    "Feishu chat mouse-to-toolbar traversal and More-menu interaction after the lifetime fix",
     "Screen capture cancellation and crop verification on an unlocked desktop"
   ],
   "captureAttempt": "No capture overlay became available in the locked session; not counted as passed.",
@@ -51,6 +50,7 @@
   "userFeedback": {
     "inputShortcut": "passed",
     "newWindowAfterPin": "passed",
-    "feishuInitialSelection": "appears, but user subsequently reported dismissal during mouse movement; supersedes initial pass"
+    "feishuInitialSelection": "passed after follow-up lifetime fix",
+    "feishuToolbarTraversal": "User confirmed dragging chat text, moving to the toolbar, opening More, and closing by clicking blank chat space all work normally."
   }
 }
