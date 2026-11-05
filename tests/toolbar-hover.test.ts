@@ -91,3 +91,45 @@ test("dragging pauses closure, an outside drop resumes it, and reset clears prio
     "more",
   );
 });
+
+test("independent menu surfaces never alter the strip frame or its local coordinates", async () => {
+  const { toolbarSurfaces } = await import("../src/core/toolbar-placement");
+  for (const anchor of [
+    { x: -1420, y: -180 },
+    { x: -600, y: 100 },
+    { x: -20, y: 650 },
+  ]) {
+    const surfaces = (["none", "more", "disable"] as const).map((mode) =>
+      toolbarSurfaces(toolbarWindowLayout(anchor, area, 4, 7, mode, false)),
+    );
+    for (const surface of surfaces.slice(1))
+      assert.deepEqual(surface.bar, surfaces[0].bar);
+    assert.equal(surfaces[0].menu, undefined);
+    for (const surface of surfaces.slice(1)) {
+      assert.ok(surface.menu);
+      assert.equal(surface.menu.popup.x, 8);
+      assert.equal(surface.menu.popup.y, 8);
+      assert.ok(
+        surface.menu.bounds.x >= area.x && surface.menu.bounds.y >= area.y,
+      );
+      assert.ok(
+        surface.menu.bounds.x + surface.menu.bounds.width <=
+          area.x + area.width,
+      );
+      assert.ok(
+        surface.menu.bounds.y + surface.menu.bounds.height <=
+          area.y + area.height,
+      );
+    }
+  }
+});
+
+test("a config update cannot cancel dismissal after the pointer has already left", () => {
+  const regions = layout(100, "more"),
+    hover = new ToolbarHover();
+  hover.explicit("more", middle(regions.popup!));
+  const outside = { x: -1000, y: 600 };
+  hover.update(outside, regions, "more", 0);
+  hover.rebase(outside, regions);
+  assert.equal(hover.update(outside, regions, "more", 200), "none");
+});

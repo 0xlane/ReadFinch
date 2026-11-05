@@ -241,7 +241,7 @@ try {
   assert.equal(native.volume, 0);
   assert.equal(requests.length, 0);
   checked(
-    "System preview used the selected Windows voice and prosody, emitted start and end, and made zero network requests",
+    "System preview used the selected system voice and prosody, emitted start and end, and made zero network requests",
   );
   await main
     .getByLabel("在线朗读提供商", { exact: true })
@@ -342,7 +342,48 @@ try {
     );
     const pill = await mode("pill");
     await instrument(pill);
-    await button(pill, "朗读").click();
+    const popup = await mode("toolbar-menu");
+    await button(pill, "更多指令").waitFor();
+    const box = await button(pill, "更多指令").boundingBox();
+    const frame = await (
+      await app.browserWindow(pill)
+    ).evaluate((w) => w.getBounds());
+    await app.evaluate(
+      (_, point) => globalThis.__readfinchTest.pointer(point),
+      {
+        x: frame.x + box.x + box.width / 2,
+        y: frame.y + box.y + box.height / 2,
+      },
+    );
+    await button(popup, "朗读").waitFor();
+    await until(
+      () =>
+        app.evaluate(({ BrowserWindow }) =>
+          BrowserWindow.getAllWindows().some(
+            (w) =>
+              w.webContents.getURL().includes("mode=toolbar-menu") &&
+              w.isVisible(),
+          ),
+        ),
+      "menu did not finish painting",
+    );
+    await button(popup, "朗读").click();
+    await button(pill, "停止朗读").waitFor();
+    await app.evaluate(
+      (_, point) => globalThis.__readfinchTest.pointer(point),
+      { x: frame.x - 40, y: frame.y - 40 },
+    );
+    await until(
+      () =>
+        app.evaluate(({ BrowserWindow }) =>
+          BrowserWindow.getAllWindows().every(
+            (w) =>
+              !w.webContents.getURL().includes("mode=toolbar-menu") ||
+              !w.isVisible(),
+          ),
+        ),
+      "menu did not close during playback",
+    );
     await until(
       () => hasEvent(pill, "audio-ended"),
       "toolbar did not play the selection",
@@ -356,7 +397,7 @@ try {
       ),
     );
     checked(
-      "Selection toolbar detects English locally and plays the actual selected text using its online mapping",
+      "Speech started from the independent More menu updates the strip and keeps playing after the menu closes",
     );
   }
   await api(main, "panelOpen", { source: "empty" });

@@ -75,7 +75,11 @@ import {
   type ToolbarMenu,
   type ToolbarView,
 } from "../shared/toolbar";
-import { toolbarAnchor, toolbarWindowLayout } from "../core/toolbar-placement";
+import {
+  toolbarAnchor,
+  toolbarWindowLayout,
+  toolbarSurfaces,
+} from "../core/toolbar-placement";
 import { basicLanguage, detectLanguage } from "../core/language";
 import { parseOutput, jsonContract } from "../shared/action-output";
 import { promptVariables } from "../shared/config";
@@ -151,6 +155,14 @@ setProviderTransport(providerFetch);
 const cachedComplete = resultCache.run.bind(resultCache);
 let main: BrowserWindow;
 let pill: BrowserWindow | undefined;
+let toolbarPopup: BrowserWindow | undefined;
+let toolbarPopupFrame = "";
+let toolbarPopupSignature = "";
+let toolbarPopupEpoch = 0;
+let toolbarPopupPainted = 0;
+let toolbarPopupFocus = false;
+let toolbarPopupView: ToolbarView | null = null;
+let toolbarReading = false;
 let panel: BrowserWindow | undefined;
 let overlay: BrowserWindow | undefined;
 let tray: Tray | undefined;
@@ -162,8 +174,9 @@ let speechOwner:
   { win: BrowserWindow; id: string; controller: AbortController } | undefined;
 let settingsLocation: SettingsLocation = { tab: "general", request: 0 };
 let toolbarFrame = "";
-let toolbarRegion = "";
 let toolbarReady = false;
+let toolbarBarEpoch = 0;
+let toolbarBarPainted = 0;
 let toolbarRequested = false;
 let toolbarMenu: ToolbarMenu = "none";
 const toolbarHover = new ToolbarHover();
@@ -374,7 +387,8 @@ async function configChanged() {
   )
     hideToolbar();
   else if (pill?.isVisible()) {
-    if (toolbarMenu === "more") toolbarHover.rebase(toolbarPointer());
+    if (toolbarMenu === "more")
+      toolbarHover.rebase(toolbarPointer(), toolbarRegions);
     updateToolbar();
   }
   registerShortcuts();
@@ -387,7 +401,7 @@ function applyTheme() {
   const effective = nativeTheme.shouldUseDarkColors ? "dark" : "light";
   for (const win of windows)
     if (
-      win !== pill &&
+      !isToolbarWindow(win) &&
       !panels.has(win) &&
       win !== overlay &&
       !win.isDestroyed()
@@ -544,7 +558,7 @@ function updateTray() {
   tray.setContextMenu(menu);
 }
 function createWindow(
-  mode: "main" | "panel" | "pill" | "capture",
+  mode: "main" | "panel" | "pill" | "toolbar-menu" | "capture",
   options: Electron.BrowserWindowConstructorOptions = {},
 ) {
   const nativeMacControls = process.platform === "darwin" && mode === "main";
@@ -569,7 +583,8 @@ function createWindow(
       process.platform === "win32" ? "icon.ico" : "icon.png",
     ),
     autoHideMenuBar: true,
-    ...(process.platform === "darwin" && (mode === "pill" || mode === "panel")
+    ...(process.platform === "darwin" &&
+    (mode === "pill" || mode === "toolbar-menu" || mode === "panel")
       ? { type: "panel", acceptFirstMouse: true }
       : {}),
     ...options,
@@ -579,10 +594,17 @@ function createWindow(
       nodeIntegration: false,
       sandbox: true,
       webSecurity: true,
+      ...(mode === "toolbar-menu" || mode === "pill"
+        ? { backgroundThrottling: false }
+        : {}),
     },
   });
-  if (mode === "pill" || mode === "panel") macPanels.prepare(win);
-  if (mode === "pill" && process.platform === "darwin") {
+  if (mode === "pill" || mode === "toolbar-menu" || mode === "panel")
+    macPanels.prepare(win);
+  if (
+    (mode === "pill" || mode === "toolbar-menu") &&
+    process.platform === "darwin"
+  ) {
     win.setVisibleOnAllWorkspaces(true, {
       visibleOnFullScreen: true,
       skipTransformProcessType: true,
@@ -639,8 +661,23 @@ function openSettings(
   openMain();
   send(main, "settings", settingsLocation);
 }
+function isToolbarWindow(win: BrowserWindow) {
+  return win === pill || win === toolbarPopup;
+}
+function hideToolbarPopup() {
+  toolbarPopupSignature = "";
+  toolbarPopupPainted = 0;
+  toolbarPopupFocus = false;
+  toolbarPopupView = null;
+  if (toolbarPopup && !toolbarPopup.isDestroyed()) {
+    toolbarPopup.hide();
+    send(toolbarPopup, "toolbarState", null);
+  }
+}
 function hideToolbar() {
   toolbarRequested = false;
+  toolbarReading = false;
+  hideToolbarPopup();
   stopToolbarHover();
   native.setToolbarBounds();
   if (pill?.isVisible()) pill.hide();
@@ -656,12 +693,13 @@ function stopToolbarHover() {
 }
 function setToolbarMenu(mode: ToolbarMenu, focus = false) {
   toolbarMenu = mode;
-  if (focus && mode !== "none" && pill && !pill.isDestroyed()) {
-    pill.setFocusable(true);
-    pill.focus();
-  }
+  toolbarPopupFocus = focus && mode !== "none";
   updateToolbar();
-  if (mode === "none" && pill && !pill.isDestroyed()) pill.setFocusable(false);
+  if (toolbarPopupFocus && toolbarPopup?.isVisible()) {
+    toolbarPopup.setFocusable(true);
+    toolbarPopup.focus();
+    toolbarPopupFocus = false;
+  }
 }
 function startToolbarHover() {
   if (toolbarHoverTimer) return;
@@ -714,9 +752,7 @@ function currentToolbarLayout() {
     items.filter((i) => i.pinned).length,
     items.length,
     toolbarMenu,
-    // A cached HWND region can clip the entire strip after a mixed-DPI move.
-    // On Windows size the window to the visible controls, without a region.
-    process.platform === "linux",
+    false,
   );
 }
 function updateToolbar(): ToolbarView | null {
@@ -724,27 +760,127 @@ function updateToolbar(): ToolbarView | null {
   if (!toolbarRequested || !selection || !pill || pill.isDestroyed())
     return null;
   const layout = currentToolbarLayout();
+  const surfaces = toolbarSurfaces(layout);
   toolbarRegions = toolbarHoverRegions(layout);
   native.setToolbarBounds(layout.bounds);
-  const frame = JSON.stringify(layout.bounds);
+  const frame = JSON.stringify(surfaces.bar.bounds);
   if (frame !== toolbarFrame) {
-    pill.setBounds(layout.bounds);
+    pill.setBounds(surfaces.bar.bounds);
     toolbarFrame = frame;
   }
-  const region = JSON.stringify(layout.shape);
-  if (layout.shape && region !== toolbarRegion) {
-    pill.setShape(layout.shape);
-    toolbarRegion = region;
-  }
-  const state = {
+  const state: ToolbarView = {
     token: selection.token,
     app: selection.app,
     mode: toolbarMenu,
-    bar: layout.bar,
-    popup: layout.popup,
+    bar: surfaces.bar.bar,
+    reading: toolbarReading,
+    paintEpoch: toolbarBarEpoch,
   };
   send(pill, "toolbarState", state);
+  if (!surfaces.menu || toolbarMenu === "none") {
+    hideToolbarPopup();
+    return state;
+  }
+  ensureToolbarPopup();
+  const menu = surfaces.menu;
+  const menuFrame = JSON.stringify(menu.bounds);
+  if (menuFrame !== toolbarPopupFrame) {
+    const before = toolbarPopup!.getBounds();
+    if (
+      before.width !== menu.bounds.width ||
+      before.height !== menu.bounds.height
+    )
+      toolbarPopup!.hide();
+    toolbarPopup!.setBounds(menu.bounds);
+    toolbarPopupFrame = menuFrame;
+  }
+  const signature = JSON.stringify([
+    selection.token,
+    toolbarMenu,
+    menuFrame,
+    store.revision,
+  ]);
+  if (signature !== toolbarPopupSignature) {
+    toolbarPopupSignature = signature;
+    toolbarPopupEpoch++;
+    toolbarPopupPainted = 0;
+  }
+  toolbarPopupView = {
+    ...state,
+    bar: menu.bar,
+    popup: menu.popup,
+    paintEpoch: toolbarPopupEpoch,
+  };
+  send(toolbarPopup, "toolbarState", toolbarPopupView);
   return state;
+}
+function ensureToolbarPopup() {
+  if (toolbarPopup && !toolbarPopup.isDestroyed()) return;
+  toolbarPopupFrame = "";
+  toolbarPopup = createWindow("toolbar-menu", {
+    width: 240,
+    height: 240,
+    minWidth: 1,
+    minHeight: 1,
+    resizable: false,
+    transparent: true,
+    backgroundColor: "#00000000",
+    focusable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    hasShadow: false,
+    thickFrame: false,
+    maximizable: false,
+    minimizable: false,
+    fullscreenable: false,
+  });
+  toolbarPopup.on("close", (event) => {
+    if (!quitting) {
+      event.preventDefault();
+      setToolbarMenu("none");
+    }
+  });
+  toolbarPopup.on("blur", () => {
+    if (toolbarMenu === "disable" && toolbarPopup?.isVisible())
+      setToolbarMenu("none");
+  });
+}
+function showPaintedToolbar() {
+  if (
+    !toolbarRequested ||
+    quitting ||
+    captureBusy ||
+    !native.current ||
+    !pill ||
+    pill.isDestroyed() ||
+    toolbarBarPainted !== toolbarBarEpoch
+  )
+    return;
+  if (!pill.isVisible()) pill.showInactive();
+  startToolbarHover();
+  showPaintedToolbarPopup();
+}
+function showPaintedToolbarPopup() {
+  if (
+    !toolbarRequested ||
+    !pill?.isVisible() ||
+    toolbarMenu === "none" ||
+    !toolbarPopupView ||
+    !toolbarPopup ||
+    toolbarPopup.isDestroyed() ||
+    toolbarPopupPainted !== toolbarPopupEpoch
+  )
+    return;
+  if (!toolbarPopup.isVisible()) {
+    toolbarPopup.showInactive();
+    // Keep the strip's controls above overlapping transparent shadow margins.
+    pill.moveTop();
+  }
+  if (toolbarPopupFocus) {
+    toolbarPopup.setFocusable(true);
+    toolbarPopup.focus();
+    toolbarPopupFocus = false;
+  }
 }
 function armToolbarResume() {
   clearTimeout(resumeTimer);
@@ -768,9 +904,8 @@ async function saveToolbarPause(until: number) {
 }
 function ensureToolbarWindow() {
   if (pill && !pill.isDestroyed()) return;
-  const { bounds } = currentToolbarLayout();
+  const { bounds } = toolbarSurfaces(currentToolbarLayout()).bar;
   toolbarFrame = JSON.stringify(bounds);
-  toolbarRegion = "";
   toolbarReady = false;
   pill = createWindow("pill", {
     ...bounds,
@@ -787,13 +922,14 @@ function ensureToolbarWindow() {
     maximizable: false,
     fullscreenable: false,
   });
+  ensureToolbarPopup();
   if (process.platform === "win32") {
     const win = pill;
     win.hookWindowMessage(0x02e0, () => {
       // Let Windows apply WM_DPICHANGED before checking its suggested size.
       setImmediate(() => {
         if (quitting || !toolbarRequested || win.isDestroyed()) return;
-        const desired = currentToolbarLayout().bounds;
+        const desired = toolbarSurfaces(currentToolbarLayout()).bar.bounds;
         const actual = win.getBounds();
         if (
           (["x", "y", "width", "height"] as const).some(
@@ -807,6 +943,7 @@ function ensureToolbarWindow() {
     });
   }
   pill.on("hide", () => {
+    hideToolbarPopup();
     stopToolbarHover();
     native.setToolbarBounds();
     toolbarMenu = "none";
@@ -839,8 +976,7 @@ function showLoadedToolbar(): ToolbarView | null {
   if (process.platform !== "win32" || pill.isFocusable())
     pill.setFocusable(false);
   const state = updateToolbar();
-  if (state && !pill.isVisible()) pill.showInactive();
-  if (state) startToolbarHover();
+  if (state) showPaintedToolbar();
   return state;
 }
 function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
@@ -850,6 +986,9 @@ function showPill(selection: Selection, anchor = selectionAnchor(selection)) {
     return;
   }
   toolbarHover.reset();
+  toolbarReading = false;
+  toolbarBarEpoch++;
+  toolbarBarPainted = 0;
   toolbarRequested = true;
   triggerAnchor = anchor;
   toolbarMenu = "none";
@@ -1663,16 +1802,38 @@ async function handle(
     case "settingsLocation":
       return settingsLocation;
     case "toolbarState":
+      if (win === toolbarPopup) {
+        updateToolbar();
+        return toolbarPopupView;
+      }
       if (win !== pill) return null;
       toolbarReady = true;
       return showLoadedToolbar();
+    case "toolbarPainted":
+      if (
+        win === pill &&
+        arg.token === native.current?.token &&
+        arg.epoch === toolbarBarEpoch
+      ) {
+        toolbarBarPainted = arg.epoch;
+        showPaintedToolbar();
+      }
+      if (
+        win === toolbarPopup &&
+        arg.token === native.current?.token &&
+        arg.epoch === toolbarPopupEpoch
+      ) {
+        toolbarPopupPainted = arg.epoch;
+        showPaintedToolbarPopup();
+      }
+      return;
     case "resumeToolbar":
       if (win !== main) throw Error(t("仅设置窗口可恢复工具栏"));
       return saveToolbarPause(0);
     case "toolbar": {
       const selection = native.current;
       if (
-        win !== pill ||
+        !isToolbarWindow(win) ||
         !win.isVisible() ||
         !selection ||
         arg?.token !== selection.token
@@ -1686,6 +1847,21 @@ async function handle(
           setToolbarMenu(mode, arg.focus === true);
           return;
         }
+        case "speak":
+          // Preserve the user gesture and keep playback in the strip renderer,
+          // so collapsing the independent menu does not stop speech.
+          if (pill && !pill.isDestroyed())
+            await pill.webContents.executeJavaScript(
+              `window.dispatchEvent(new CustomEvent("readfinch-toolbar-speech", {detail:${JSON.stringify(selection.token)}}))`,
+              true,
+            );
+          return;
+        case "speech-state":
+          if (win === pill && toolbarReading !== !!arg.active) {
+            toolbarReading = z.boolean().parse(arg.active);
+            updateToolbar();
+          }
+          return;
         case "drag":
           toolbarHover.drag(
             toolbarMenu === "more" && z.boolean().parse(arg.active),
@@ -2291,7 +2467,7 @@ async function handle(
       );
     case "selectionOpen":
       if (
-        win === pill &&
+        isToolbarWindow(win) &&
         (!win.isVisible() || arg?.token !== native.current?.token)
       )
         return;
@@ -2390,14 +2566,20 @@ async function handle(
           }
           break;
         case "dismiss":
-          if (win === overlay) {
+          if (isToolbarWindow(win)) {
+            if (win === toolbarPopup) setToolbarMenu("none");
+            else hideToolbar();
+          } else if (win === overlay) {
             activeCapture = null;
             win.close();
           } else if (panels.has(win)) dismissPanel(win);
           else win.hide();
           break;
         case "close":
-          if (win === main) {
+          if (isToolbarWindow(win)) {
+            if (win === toolbarPopup) setToolbarMenu("none");
+            else hideToolbar();
+          } else if (win === main) {
             win.close();
           } else if (panels.has(win)) dismissPanel(win);
           else win.hide();
@@ -2459,11 +2641,12 @@ async function boot() {
       )
         throw Error(t("无效窗口"));
       if (
-        win === pill &&
+        isToolbarWindow(win) &&
         ![
           "snapshot",
           "toolbar",
           "toolbarState",
+          "toolbarPainted",
           "detectLanguage",
           "speechBegin",
           "speechAudio",
@@ -2635,6 +2818,7 @@ app.on("before-quit", () => {
   clearInterval(panelFocusTimer);
   // Non-activating Windows toolbar windows must be destroyed explicitly;
   // waiting for their native close sequence can keep the process alive.
+  if (toolbarPopup && !toolbarPopup.isDestroyed()) toolbarPopup.destroy();
   if (pill && !pill.isDestroyed()) pill.destroy();
   for (const win of pendingSuggestions.keys()) cancelSuggestion(win);
   jobs.cancelAll();

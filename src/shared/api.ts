@@ -132,6 +132,7 @@ export type CallMap = {
   };
   settingsTab: { arg: void; result: SettingsTab };
   settingsLocation: { arg: void; result: SettingsLocation };
+  toolbarPainted: { arg: { token: string; epoch: number }; result: void };
   toolbarState: { arg: void; result: ToolbarView | null };
   toolbar: { arg: ToolbarCommand; result: void };
   resumeToolbar: { arg: void; result: Snapshot };

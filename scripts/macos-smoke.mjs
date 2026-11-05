@@ -192,33 +192,80 @@ try {
   check(
     "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
   );
-  const menu = pill.locator(".toolbar-menu:not(.disable-menu)");
-  await pill.evaluate(() => {
+  const popup = app
+    .windows()
+    .find((p) => p.url().includes("mode=toolbar-menu"));
+  const menu = popup.locator(".toolbar-menu:not(.disable-menu)");
+  await app.evaluate(({ BrowserWindow }) => {
+    const bar = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("mode=pill"),
+    );
+    globalThis.__stripChanges = [];
+    for (const event of ["move", "resize", "show", "hide"])
+      bar.on(event, () => globalThis.__stripChanges.push(event));
+    bar.webContents.on("did-start-loading", () =>
+      globalThis.__stripChanges.push("load"),
+    );
+  });
+  await popup.evaluate(() => {
     window.__menuOpens = 0;
     new MutationObserver((changes) => {
-      for (const change of changes) for (const node of change.addedNodes)
-        if (node.nodeType === 1 && node.matches(".toolbar-menu:not(.disable-menu)")) window.__menuOpens++;
-    }).observe(document.body, {childList:true,subtree:true});
+      for (const change of changes)
+        for (const node of change.addedNodes)
+          if (
+            node.nodeType === 1 &&
+            node.matches(".toolbar-menu:not(.disable-menu)")
+          )
+            window.__menuOpens++;
+    }).observe(document.body, { childList: true, subtree: true });
   });
-  const moreBox = await pill.getByRole("button",{name:"更多指令",exact:true}).boundingBox();
-  const moreFrame = await app.evaluate(({BrowserWindow}) => BrowserWindow.getAllWindows().find((w) => w.webContents.getURL().includes("mode=pill")).getBounds());
-  const morePoint = {x:moreFrame.x+moreBox.x+moreBox.width/2,y:moreFrame.y+moreBox.y+moreBox.height/2};
+  const moreBox = await pill
+    .getByRole("button", { name: "更多指令", exact: true })
+    .boundingBox();
+  const moreFrame = await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("mode=pill"))
+      .getBounds(),
+  );
+  const morePoint = {
+    x: moreFrame.x + moreBox.x + moreBox.width / 2,
+    y: moreFrame.y + moreBox.y + moreBox.height / 2,
+  };
   await command(`move ${morePoint.x} ${morePoint.y}`);
   await menu.waitFor();
   await pause(1200);
-  assert.equal(await menu.isVisible(),true,"stationary native pointer must keep More open");
-  assert.equal(await pill.evaluate(() => window.__menuOpens),1,"stationary hover must not cycle the menu");
+  assert.equal(
+    await menu.isVisible(),
+    true,
+    "stationary native pointer must keep More open",
+  );
+  assert.equal(
+    await popup.evaluate(() => window.__menuOpens),
+    1,
+    "stationary hover must not cycle the menu",
+  );
   await command(`click ${morePoint.x} ${morePoint.y}`);
-  await menu.waitFor({state:"hidden"});
+  await menu.waitFor({ state: "hidden" });
   await pause(900);
-  assert.equal(await menu.count(),0,"click-close stays closed under the stationary native pointer");
-  await command(`move ${morePoint.x+100} ${morePoint.y-60}`);
+  assert.equal(
+    await menu.count(),
+    0,
+    "click-close stays closed under the stationary native pointer",
+  );
+  await command(`move ${morePoint.x + 100} ${morePoint.y - 60}`);
   await pause(250);
   await command(`move ${morePoint.x} ${morePoint.y}`);
   await menu.waitFor();
-  await command(`move ${morePoint.x+100} ${morePoint.y-60}`);
-  await menu.waitFor({state:"hidden"});
-  check("真实鼠标停留在更多按钮上不闪烁，点击可保持收起，离开后重新悬浮可再次展开");
+  await command(`move ${morePoint.x + 100} ${morePoint.y - 60}`);
+  await menu.waitFor({ state: "hidden" });
+  assert.deepEqual(
+    await app.evaluate(() => globalThis.__stripChanges),
+    [],
+    "opening and closing menus must never move, resize, hide, or reload the toolbar",
+  );
+  check(
+    "菜单独立绘制；真实鼠标开合过程中工具栏移动、缩放、隐藏、重载次数均为零",
+  );
   // Reproduce a transient AX disappearance without a user dismissal event.
   await command("ax-empty");
   const toolbarBounds = await app.evaluate(({ BrowserWindow }) =>
@@ -295,6 +342,15 @@ try {
     "second mouse selection",
   );
   await pill.getByRole("button", { name: "词典", exact: true }).waitFor();
+  await until(
+    () =>
+      app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getAllWindows().some(
+          (w) => w.webContents.getURL().includes("mode=pill") && w.isVisible(),
+        ),
+      ),
+    "new selection toolbar finished painting",
+  );
   const dictionary = await pill
     .getByRole("button", { name: "词典", exact: true })
     .boundingBox();
@@ -303,9 +359,13 @@ try {
       .find((w) => w.webContents.getURL().includes("mode=pill"))
       .getBounds(),
   );
-  await command(
-    `click ${dictionaryBar.x + dictionary.x + dictionary.width / 2} ${dictionaryBar.y + dictionary.y + dictionary.height / 2}`,
-  );
+  const dictionaryPoint = {
+    x: dictionaryBar.x + dictionary.x + dictionary.width / 2,
+    y: dictionaryBar.y + dictionary.y + dictionary.height / 2,
+  };
+  await command(`move ${dictionaryPoint.x} ${dictionaryPoint.y}`);
+  await pause(100);
+  await command(`click ${dictionaryPoint.x} ${dictionaryPoint.y}`);
   await panel.getByText("步伐。", { exact: true }).waitFor();
   await pause(300);
   const focusState = await app.evaluate(({ BrowserWindow }) => ({

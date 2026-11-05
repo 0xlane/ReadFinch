@@ -1,4 +1,5 @@
-:root[data-mode="pill"] #root {
+:root[data-mode="pill"] #root,
+:root[data-mode="toolbar-menu"] #root {
   padding: 0;
 }
 .selection-toolbar,
@@ -73,7 +74,7 @@
 .toolbar-menu {
   display: flex;
   flex-direction: column;
-  padding: 4px 0 0;
+  padding: 4px 0;
   overflow: hidden;
   font-size: 13px;
 }
@@ -135,7 +136,7 @@
   color: var(--muted);
 }
 .disable-menu {
-  padding: 5px 0 0;
+  padding: 5px 0 4px;
 }
 .disable-menu > button {
   flex: 1;

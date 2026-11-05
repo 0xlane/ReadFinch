@@ -58,7 +58,14 @@ export class ToolbarHover {
     this.suppressed = false;
     this.dragging = false;
   }
-  rebase(point: Point) {
+  rebase(point: Point, regions?: ReturnType<typeof toolbarHoverRegions>) {
+    if (
+      regions &&
+      !contains(regions.more, point) &&
+      !contains(regions.popup, point) &&
+      !contains(regions.bridge, point)
+    )
+      return;
     this.last = { ...point };
     this.pending = undefined;
   }

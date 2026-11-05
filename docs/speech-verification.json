@@ -1,41 +1,783 @@
 {
-  "date": "2026-11-03T07:34:08.103Z",
+  "date": "2026-11-05T08:13:43.753Z",
   "packaged": false,
   "systemVoices": [
     {
-      "name": "Microsoft David - English (United States)",
-      "lang": "en-US"
-    },
-    {
-      "name": "Microsoft Mark - English (United States)",
-      "lang": "en-US"
-    },
-    {
-      "name": "Microsoft Zira - English (United States)",
-      "lang": "en-US"
-    },
-    {
-      "name": "Microsoft Huihui - Chinese (Simplified, PRC)",
+      "name": "婷婷",
       "lang": "zh-CN"
     },
     {
-      "name": "Microsoft Kangkang - Chinese (Simplified, PRC)",
+      "name": "Aaron",
+      "lang": "en-US"
+    },
+    {
+      "name": "Albert",
+      "lang": "en-US"
+    },
+    {
+      "name": "Alice",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Alva",
+      "lang": "sv-SE"
+    },
+    {
+      "name": "Amélie",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Amira",
+      "lang": "ms-MY"
+    },
+    {
+      "name": "Anna",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Arthur",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Bad News",
+      "lang": "en-US"
+    },
+    {
+      "name": "Bahh",
+      "lang": "en-US"
+    },
+    {
+      "name": "Bells",
+      "lang": "en-US"
+    },
+    {
+      "name": "Boing",
+      "lang": "en-US"
+    },
+    {
+      "name": "Bubbles",
+      "lang": "en-US"
+    },
+    {
+      "name": "Carmit",
+      "lang": "he-IL"
+    },
+    {
+      "name": "Catherine",
+      "lang": "en-AU"
+    },
+    {
+      "name": "Cellos",
+      "lang": "en-US"
+    },
+    {
+      "name": "Damayanti",
+      "lang": "id-ID"
+    },
+    {
+      "name": "Daniel (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Daniel (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Daria",
+      "lang": "bg-BG"
+    },
+    {
+      "name": "Eddy (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Eddy (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Eddy (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Eddy (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Eddy (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Eddy (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Eddy (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Eddy (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Eddy (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Eddy (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Eddy (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Eddy (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Eddy (中文（中国大陆）)",
       "lang": "zh-CN"
     },
     {
-      "name": "Microsoft Yaoyao - Chinese (Simplified, PRC)",
+      "name": "Eddy (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Ellen",
+      "lang": "nl-BE"
+    },
+    {
+      "name": "Flo (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Flo (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Flo (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Flo (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Flo (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Flo (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Flo (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Flo (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Flo (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Flo (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Flo (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Flo (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Flo (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Flo (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Fred",
+      "lang": "en-US"
+    },
+    {
+      "name": "Good News",
+      "lang": "en-US"
+    },
+    {
+      "name": "Gordon",
+      "lang": "en-AU"
+    },
+    {
+      "name": "Grandma (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Grandma (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Grandma (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Grandma (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Grandma (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Grandma (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Grandma (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Grandma (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Grandma (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Grandma (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Grandma (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Grandma (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Grandma (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Grandma (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Grandpa (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Grandpa (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Grandpa (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Grandpa (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Grandpa (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Grandpa (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Grandpa (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Grandpa (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Grandpa (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Grandpa (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Grandpa (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Grandpa (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Grandpa (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Grandpa (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Hattori",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Helena",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Ioana",
+      "lang": "ro-RO"
+    },
+    {
+      "name": "Jacques",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Jester",
+      "lang": "en-US"
+    },
+    {
+      "name": "Joana",
+      "lang": "pt-PT"
+    },
+    {
+      "name": "Junior",
+      "lang": "en-US"
+    },
+    {
+      "name": "Kanya",
+      "lang": "th-TH"
+    },
+    {
+      "name": "Karen",
+      "lang": "en-AU"
+    },
+    {
+      "name": "Kathy",
+      "lang": "en-US"
+    },
+    {
+      "name": "Kyoko",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Lana",
+      "lang": "hr-HR"
+    },
+    {
+      "name": "Laura",
+      "lang": "sk-SK"
+    },
+    {
+      "name": "Lekha",
+      "lang": "hi-IN"
+    },
+    {
+      "name": "Lesya",
+      "lang": "uk-UA"
+    },
+    {
+      "name": "Li-Mu",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Linh",
+      "lang": "vi-VN"
+    },
+    {
+      "name": "Luciana",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Majed",
+      "lang": "ar-001"
+    },
+    {
+      "name": "Marie",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Martha",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Martin",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Melina",
+      "lang": "el-GR"
+    },
+    {
+      "name": "Milena",
+      "lang": "ru-RU"
+    },
+    {
+      "name": "Moira",
+      "lang": "en-IE"
+    },
+    {
+      "name": "Montse",
+      "lang": "ca-ES"
+    },
+    {
+      "name": "Mónica",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Nicky",
+      "lang": "en-US"
+    },
+    {
+      "name": "Nora",
+      "lang": "nb-NO"
+    },
+    {
+      "name": "O-Ren",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Organ",
+      "lang": "en-US"
+    },
+    {
+      "name": "Paulina",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Ralph",
+      "lang": "en-US"
+    },
+    {
+      "name": "Reed (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Reed (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Reed (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Reed (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Reed (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Reed (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Reed (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Reed (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Reed (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Reed (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Reed (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Reed (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Reed (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Rishi",
+      "lang": "en-IN"
+    },
+    {
+      "name": "Rocko (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Rocko (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Rocko (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Rocko (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Rocko (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Rocko (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Rocko (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Rocko (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Rocko (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Rocko (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Rocko (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Rocko (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Rocko (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Rocko (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Samantha",
+      "lang": "en-US"
+    },
+    {
+      "name": "Sandy (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Sandy (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Sandy (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Sandy (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Sandy (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Sandy (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Sandy (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Sandy (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Sandy (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Sandy (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Sandy (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Sandy (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Sandy (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Sandy (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Sara",
+      "lang": "da-DK"
+    },
+    {
+      "name": "Satu",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Shelley (德语（德国）)",
+      "lang": "de-DE"
+    },
+    {
+      "name": "Shelley (英语（英国）)",
+      "lang": "en-GB"
+    },
+    {
+      "name": "Shelley (英语（美国）)",
+      "lang": "en-US"
+    },
+    {
+      "name": "Shelley (西班牙语（西班牙）)",
+      "lang": "es-ES"
+    },
+    {
+      "name": "Shelley (西班牙语（墨西哥）)",
+      "lang": "es-MX"
+    },
+    {
+      "name": "Shelley (芬兰语（芬兰）)",
+      "lang": "fi-FI"
+    },
+    {
+      "name": "Shelley (法语（加拿大）)",
+      "lang": "fr-CA"
+    },
+    {
+      "name": "Shelley (法语（法国）)",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Shelley (意大利语（意大利）)",
+      "lang": "it-IT"
+    },
+    {
+      "name": "Shelley (日语（日本）)",
+      "lang": "ja-JP"
+    },
+    {
+      "name": "Shelley (韩语（韩国）)",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Shelley (葡萄牙语（巴西）)",
+      "lang": "pt-BR"
+    },
+    {
+      "name": "Shelley (中文（中国大陆）)",
+      "lang": "zh-CN"
+    },
+    {
+      "name": "Shelley (中文（台湾）)",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "Superstar",
+      "lang": "en-US"
+    },
+    {
+      "name": "Tessa",
+      "lang": "en-ZA"
+    },
+    {
+      "name": "Thomas",
+      "lang": "fr-FR"
+    },
+    {
+      "name": "Tina",
+      "lang": "sl-SI"
+    },
+    {
+      "name": "Trinoids",
+      "lang": "en-US"
+    },
+    {
+      "name": "Tünde",
+      "lang": "hu-HU"
+    },
+    {
+      "name": "Vani",
+      "lang": "ta-IN"
+    },
+    {
+      "name": "Whisper",
+      "lang": "en-US"
+    },
+    {
+      "name": "Wobble",
+      "lang": "en-US"
+    },
+    {
+      "name": "Xander",
+      "lang": "nl-NL"
+    },
+    {
+      "name": "Yelda",
+      "lang": "tr-TR"
+    },
+    {
+      "name": "Yuna",
+      "lang": "ko-KR"
+    },
+    {
+      "name": "Zarvox",
+      "lang": "en-US"
+    },
+    {
+      "name": "Zosia",
+      "lang": "pl-PL"
+    },
+    {
+      "name": "Zuzana",
+      "lang": "cs-CZ"
+    },
+    {
+      "name": "善怡",
+      "lang": "zh-HK"
+    },
+    {
+      "name": "美嘉",
+      "lang": "zh-TW"
+    },
+    {
+      "name": "语舒",
       "lang": "zh-CN"
     }
   ],
   "checks": [
-    "System preview used the selected Windows voice and prosody, emitted start and end, and made zero network requests",
+    "System preview used the selected system voice and prosody, emitted start and end, and made zero network requests",
     "Online preview and autosave used the selected speech provider and custom voice; Chromium decoded audio and applied pitch, speed and volume",
     "Fallback preview plays the selected Chinese system voice while English is mapped online",
     "Stop aborts an in-flight speech request before audio arrives",
-    "Selection toolbar detects English locally and plays the actual selected text using its online mapping",
+    "Speech started from the independent More menu updates the strip and keeps playing after the menu closes",
     "The translation result uses its target language with the saved voice and keeps the speech model separate from the text model",
     "Starting a system preview stops the online request in a different pinned result window",
     "The assigned provider's connection test uses the audio endpoint; there were no renderer errors",
-    "Removing a custom voice clears only its assignments"
+    "Removing a custom voice clears only its assignments",
+    "MiMo provider automatically routes TTS, shows only speech features, hides irrelevant advanced toggles and tests the real speech endpoint",
+    "MiMo voice choices are separate from OpenAI; Chromium plays decoded MiMo audio and voice/style settings survive reload"
   ]
 }

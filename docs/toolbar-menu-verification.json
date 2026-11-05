@@ -41,19 +41,19 @@
     "reopenedAfterClickClose": false
   },
   "unitTests": {
-    "passed": 192,
+    "passed": 194,
     "failed": 0
   },
   "candidateVersion": "1.2.4",
   "packagedRegression": {
-    "date": "2026-11-05T06:45:35.971Z",
+    "date": "2026-11-05T08:52:40.891Z",
     "platform": "darwin",
     "arch": "x64",
     "packaged": true,
     "checks": [
       "非鼠标选区不创建自动工具栏",
       "原生 NSTextView 选区经 Swift/AX 自动读取；浮标显示且不抢焦点、不自动请求模型",
-      "真实鼠标停留在更多按钮上不闪烁，点击可保持收起，离开后重新悬浮可再次展开",
+      "菜单独立绘制；真实鼠标开合过程中工具栏移动、缩放、隐藏、重载次数均为零",
       "AX 选区暂时消失后，鼠标移向并进入工具栏仍保留原文本与可见工具栏",
       "点击原生浮标后翻译浮窗使用真实选区、完成本机流式请求；Mac 提供复制结果",
       "主界面保持打开时，词典浮窗可用，原应用保持前台，主界面仍在原应用后面",
@@ -63,5 +63,14 @@
     ],
     "limitations": [],
     "errors": []
-  }
+  },
+  "nativeSurfaces": {
+    "separateMenuWindow": true,
+    "stripMovesDuringOpenClose": 0,
+    "stripResizesDuringOpenClose": 0,
+    "stripHidesDuringOpenClose": 0,
+    "stripReloadsDuringOpenClose": 0,
+    "paintBeforeShow": true
+  },
+  "speechRegression": "Starting speech in More keeps playback in the strip and continues after the menu closes."
 }

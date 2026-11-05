@@ -37,13 +37,21 @@ type Command = ToolbarCommand extends infer T
     : never
   : never;
 
-export function SelectionToolbar({ config }: { config: Config }) {
+export function SelectionToolbar({
+  config,
+  surface,
+}: {
+  config: Config;
+  surface: "bar" | "menu";
+}) {
   const [view, setView] = useState<ToolbarView | null>(null);
   const [over, setOver] = useState("");
   const speech = useSpeechStatus();
-  const reading =
+  const localReading =
     speech.key === "toolbar:" + view?.token &&
     (speech.status === "loading" || speech.status === "playing");
+  const reading = surface === "menu" ? !!view?.reading : localReading;
+  const speechToggle = useRef<() => void>(() => {});
   const itemLabel = (item: ToolbarItem) =>
     !item.action && reading ? t("停止朗读") : item.name;
   const itemIcon = (item: ToolbarItem) =>
@@ -92,19 +100,43 @@ export function SelectionToolbar({ config }: { config: Config }) {
         send({ type: "menu", mode: "none" });
       }
     }
-    const blur = () => {
-      if (latest.current && latest.current.mode === "disable")
-        send({ type: "menu", mode: "none" });
-    };
     window.addEventListener("keydown", key);
-    window.addEventListener("blur", blur);
     return () => {
       alive = false;
       off();
       window.removeEventListener("keydown", key);
-      window.removeEventListener("blur", blur);
     };
   }, []);
+  useEffect(() => {
+    if (surface !== "bar" || !view) return;
+    send({ type: "speech-state", active: localReading });
+  }, [surface, view?.token, localReading]);
+  useEffect(() => {
+    if (surface !== "bar") return;
+    const runSpeech = (event: Event) => {
+      if ((event as CustomEvent).detail === latest.current?.token)
+        speechToggle.current();
+    };
+    window.addEventListener("readfinch-toolbar-speech", runSpeech);
+    return () =>
+      window.removeEventListener("readfinch-toolbar-speech", runSpeech);
+  }, [surface]);
+  useEffect(() => {
+    if (!view?.paintEpoch) return;
+    const { token, paintEpoch: epoch } = view;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => {
+        void window.readfinch
+          .call("toolbarPainted", { token, epoch })
+          .catch(() => {});
+      });
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, [surface, view?.paintEpoch]);
   if (!view) return null;
   const items = toolbarItems(config).map((i) => ({
     ...i,
@@ -146,6 +178,10 @@ export function SelectionToolbar({ config }: { config: Config }) {
         token,
       });
     else {
+      if (surface === "menu") {
+        send({ type: "speak" });
+        return;
+      }
       const selection = await window.readfinch.call("selectionGet");
       if (selection?.token === token)
         await speakText(
@@ -157,82 +193,70 @@ export function SelectionToolbar({ config }: { config: Config }) {
         );
     }
   }
+  speechToggle.current = () => {
+    const item = items.find((i) => !i.action);
+    if (item) void run(item);
+  };
   return (
     <>
-      <div
-        className="selection-toolbar"
-        role="toolbar"
-        aria-label={t("划词工具栏")}
-        style={position(view.bar)}
-        data-open={view.mode !== "none"}
-      >
-        <div className="toolbar-pins">
-          {items
-            .filter((i) => i.pinned)
-            .map((item) => (
-              <button
-                key={item.key}
-                aria-label={itemLabel(item)}
-                title={
-                  (!item.action && speech.error
-                    ? speech.error
-                    : itemLabel(item)) +
-                  (item.action?.shortcut
-                    ? " · " + formatShortcut(item.action.shortcut)
-                    : "")
-                }
-                onClick={() => void run(item)}
-              >
-                {itemIcon(item)}
-              </button>
-            ))}
-        </div>
-        <button
-          className="toolbar-more"
-          aria-label={t("更多指令")}
-          title={t("更多指令")}
-          aria-expanded={view.mode === "more"}
-          onPointerDown={(e) => pressMenu("more", e)}
-          onPointerCancel={() => {
-            pressedMenu.current = null;
-          }}
-          onClick={(e) => toggleMenu("more", e)}
-        >
-          <EllipsisVertical size={16} />
-        </button>
-        <button
-          className="toolbar-close"
-          aria-label={t("关闭划词工具栏")}
-          title={t("停用划词工具栏")}
-          aria-expanded={view.mode === "disable"}
-          onPointerDown={(e) => pressMenu("disable", e)}
-          onPointerCancel={() => {
-            pressedMenu.current = null;
-          }}
-          onClick={(e) => toggleMenu("disable", e)}
-        >
-          <X size={10} />
-        </button>
-      </div>
-      {view.popup && view.mode === "more" && (
+      {surface === "bar" && (
         <div
-          className="toolbar-bridge"
-          style={{
-            left: Math.max(view.bar.x, view.popup.x),
-            width:
-              Math.min(
-                view.bar.x + view.bar.width,
-                view.popup.x + view.popup.width,
-              ) - Math.max(view.bar.x, view.popup.x),
-            top:
-              view.popup.y < view.bar.y
-                ? view.popup.y + view.popup.height
-                : view.bar.y + view.bar.height,
-            height: 4,
-          }}
-        />
+          className="selection-toolbar"
+          role="toolbar"
+          aria-label={t("划词工具栏")}
+          style={position(view.bar)}
+          data-open={view.mode !== "none"}
+        >
+          <div className="toolbar-pins">
+            {items
+              .filter((i) => i.pinned)
+              .map((item) => (
+                <button
+                  key={item.key}
+                  aria-label={itemLabel(item)}
+                  title={
+                    (!item.action && speech.error
+                      ? speech.error
+                      : itemLabel(item)) +
+                    (item.action?.shortcut
+                      ? " · " + formatShortcut(item.action.shortcut)
+                      : "")
+                  }
+                  onClick={() => void run(item)}
+                >
+                  {itemIcon(item)}
+                </button>
+              ))}
+          </div>
+          <button
+            className="toolbar-more"
+            aria-label={t("更多指令")}
+            title={t("更多指令")}
+            aria-expanded={view.mode === "more"}
+            onPointerDown={(e) => pressMenu("more", e)}
+            onPointerCancel={() => {
+              pressedMenu.current = null;
+            }}
+            onClick={(e) => toggleMenu("more", e)}
+          >
+            <EllipsisVertical size={16} />
+          </button>
+          <button
+            className="toolbar-close"
+            aria-label={t("关闭划词工具栏")}
+            title={t("停用划词工具栏")}
+            aria-expanded={view.mode === "disable"}
+            onPointerDown={(e) => pressMenu("disable", e)}
+            onPointerCancel={() => {
+              pressedMenu.current = null;
+            }}
+            onClick={(e) => toggleMenu("disable", e)}
+          >
+            <X size={10} />
+          </button>
+        </div>
       )}
-      {view.popup && view.mode === "more" && (
+      {surface === "menu" && view.popup && view.mode === "more" && (
         <div
           className="toolbar-menu"
           role="group"
@@ -337,7 +361,7 @@ export function SelectionToolbar({ config }: { config: Config }) {
           </button>
         </div>
       )}
-      {view.popup && view.mode === "disable" && (
+      {surface === "menu" && view.popup && view.mode === "disable" && (
         <div
           className="toolbar-menu disable-menu"
           role="group"

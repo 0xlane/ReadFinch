@@ -41,7 +41,7 @@ export function toolbarPlacement(
   let popup: ToolbarRect | undefined;
   if (mode !== "none") {
     const width = Math.min(mode === "more" ? 224 : 176, area.width - 32);
-    const desired = mode === "more" ? Math.min(total, 5) * 32 + 48 : 145;
+    const desired = mode === "more" ? Math.min(total, 5) * 32 + 52 : 149;
     const below = area.y + area.height - (bar.y + bar.height) - 20;
     const above = bar.y - area.y - 20;
     const up =
@@ -115,4 +115,37 @@ export function toolbarWindowLayout(
     height: r.height + 16,
   }));
   return { bounds, bar, popup, shape };
+}
+
+/** Separate native surfaces: menu changes never resize the icon-strip window. */
+export function toolbarSurfaces(layout: ReturnType<typeof toolbarPlacement>) {
+  const bar = {
+    ...layout.bar,
+    x: layout.bounds.x + layout.bar.x,
+    y: layout.bounds.y + layout.bar.y,
+  };
+  const popup = layout.popup && {
+    ...layout.popup,
+    x: layout.bounds.x + layout.popup.x,
+    y: layout.bounds.y + layout.popup.y,
+  };
+  const surround = (rect: ToolbarRect) => ({
+    x: rect.x - 8,
+    y: rect.y - 8,
+    width: rect.width + 16,
+    height: rect.height + 16,
+  });
+  const barBounds = surround(bar);
+  const menuBounds = popup && surround(popup);
+  return {
+    bar: { bounds: barBounds, bar: { ...bar, x: 8, y: 8 } },
+    menu:
+      popup && menuBounds
+        ? {
+            bounds: menuBounds,
+            bar: { ...bar, x: bar.x - menuBounds.x, y: bar.y - menuBounds.y },
+            popup: { ...popup, x: 8, y: 8 },
+          }
+        : undefined,
+  };
 }

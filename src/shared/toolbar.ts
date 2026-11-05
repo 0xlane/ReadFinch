@@ -13,10 +13,14 @@ export type ToolbarView = {
   mode: ToolbarMenu;
   bar: ToolbarRect;
   popup?: ToolbarRect;
+  paintEpoch?: number;
+  reading?: boolean;
 };
 export type ToolbarCommand = { token: string } & (
   | { type: "menu"; mode: ToolbarMenu; focus?: boolean }
   | { type: "drag"; active: boolean }
+  | { type: "speak" }
+  | { type: "speech-state"; active: boolean }
   | { type: "pin"; key: string; pinned: boolean }
   | { type: "move"; key: string; over: string }
   | { type: "disable"; scope: "hour" | "app" | "global" }

@@ -214,7 +214,13 @@ export function App() {
         {error || t("正在载入…")}
       </div>
     );
-  if (mode === "pill") return <SelectionToolbar config={snapshot.config} />;
+  if (mode === "pill" || mode === "toolbar-menu")
+    return (
+      <SelectionToolbar
+        config={snapshot.config}
+        surface={mode === "pill" ? "bar" : "menu"}
+      />
+    );
   if (mode === "capture") return <CaptureOverlay />;
   if (mode === "panel") return <InteractionPanel snapshot={snapshot} />;
   return <SettingsApp snapshot={snapshot} onSnapshot={setSnapshot} />;

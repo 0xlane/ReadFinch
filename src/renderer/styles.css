@@ -859,11 +859,11 @@ details {
 }
 
 /* Contextual selection trigger and result window. */
-:root[data-mode="pill"],
-:root[data-mode="pill"] body {
+:root:is([data-mode="pill"], [data-mode="toolbar-menu"]),
+:root:is([data-mode="pill"], [data-mode="toolbar-menu"]) body {
   background: transparent;
 }
-:root[data-mode="pill"] #root {
+:root:is([data-mode="pill"], [data-mode="toolbar-menu"]) #root {
   padding: 2px;
 }
 .selection-trigger {
@@ -1550,7 +1550,7 @@ details {
   background: transparent;
 }
 :root[data-mode="panel"],
-:root[data-mode="pill"] {
+:root:is([data-mode="pill"], [data-mode="toolbar-menu"]) {
   --surface: #fff;
   --text: #0a0a0a;
   --muted: #737373;
@@ -1560,7 +1560,7 @@ details {
   --border: #e5e5e5;
 }
 :root[data-theme="dark"][data-mode="panel"],
-:root[data-theme="dark"][data-mode="pill"] {
+:root[data-theme="dark"]:is([data-mode="pill"], [data-mode="toolbar-menu"]) {
   --surface: #171717;
   --text: #fafafa;
   --muted: #a3a3a3;
@@ -1570,7 +1570,7 @@ details {
   --border: #ffffff26;
 }
 :root[data-mode="panel"] body,
-:root[data-mode="pill"] body {
+:root:is([data-mode="pill"], [data-mode="toolbar-menu"]) body {
   font-family:
     ui-sans-serif, system-ui, "Source Han Sans SC", "Noto Sans SC", sans-serif;
 }
