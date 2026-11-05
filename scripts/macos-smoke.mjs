@@ -10,23 +10,44 @@ if (process.platform !== "darwin") throw Error("Requires a macOS desktop");
 const dir = path.resolve(".local/macos-" + Date.now());
 await mkdir(dir, { recursive: true });
 const binary = path.join(dir, "selection-target");
-execFileSync("swiftc", [
-  "tests/fixtures/MacSelectionTarget.swift",
-  "-module-cache-path",
-  path.join(dir, "swift-cache"),
-  "-o",
-  binary,
-]);
+execFileSync(
+  "swiftc",
+  [
+    "tests/fixtures/MacSelectionTarget.swift",
+    "-module-cache-path",
+    process.env.CLANG_MODULE_CACHE_PATH || path.join(dir, "swift-cache"),
+    "-o",
+    binary,
+  ],
+  { timeout: 120000 },
+);
 const checks = [],
+  limitations = [],
   requests = [],
   errors = [];
 const server = createServer(async (req, res) => {
   let body = "";
   for await (const chunk of req) body += chunk;
-  requests.push(JSON.parse(body));
+  const input = JSON.parse(body);
+  requests.push(input);
+  const answer = input.response_format?.json_schema?.schema?.required?.includes(
+    "释义",
+  )
+    ? JSON.stringify({
+        词条: "steps",
+        句中词形: null,
+        难度: null,
+        记忆技巧: null,
+        释义: "步伐。",
+        音标: null,
+        词性: "noun",
+        句子: "Small steps make a big difference.",
+        句子翻译: null,
+      })
+    : "Mac fixture translation";
   res.writeHead(200, { "Content-Type": "text/event-stream" });
   res.end(
-    'data: {"choices":[{"delta":{"content":"Mac fixture translation"}}]}\n\ndata: [DONE]\n\n',
+    `data: ${JSON.stringify({ choices: [{ delta: { content: answer } }] })}\n\ndata: [DONE]\n\n`,
   );
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
@@ -79,9 +100,25 @@ try {
   );
   assert.equal((await call("snapshot")).nativeState, "ready");
   assert.deepEqual((await call("snapshot")).shortcutErrors, []);
-  await app.evaluate(({ BrowserWindow }) =>
-    BrowserWindow.getAllWindows().forEach((w) => w.hide()),
-  );
+  await app.evaluate(({ app, BrowserWindow }) => {
+    globalThis.__focusEvents = [];
+    for (const event of ["did-become-active", "did-resign-active"])
+      app.on(event, () => globalThis.__focusEvents.push([event]));
+    app.on("activate", (_, visible) =>
+      globalThis.__focusEvents.push(["activate", visible]),
+    );
+    for (const win of BrowserWindow.getAllWindows())
+      win.on("focus", () =>
+        globalThis.__focusEvents.push([
+          "focus",
+          win.webContents.getURL().includes("mode=main") ? "main" : "other",
+        ]),
+      );
+    const main = BrowserWindow.getAllWindows().find((w) =>
+      w.webContents.getURL().includes("mode=main"),
+    );
+    main.show();
+  });
   target = spawn(binary, [], { stdio: ["pipe", "pipe", "pipe"] });
   const replies = new Map();
   const lines = createInterface({ input: target.stdout });
@@ -165,6 +202,15 @@ try {
     "translation panel",
   );
   const panel = app.windows().find((p) => p.url().includes("mode=panel"));
+  await until(
+    () =>
+      app.evaluate(({ BrowserWindow }) =>
+        BrowserWindow.getFocusedWindow()
+          ?.webContents.getURL()
+          .includes("mode=panel"),
+      ),
+    "action panel keeps focus while main window stays open",
+  );
   await panel.getByRole("button", { name: "复制结果", exact: true }).waitFor();
   assert.equal(
     await panel.locator(".rf-source-text").innerText(),
@@ -187,11 +233,49 @@ try {
   );
   await command("clear");
   await until(async () => !(await call("selectionGet")), "selection cleared");
-  await command("secure");
-  await pause(600);
-  assert.equal(await call("selectionGet"), null);
-  check("清空选区和进入安全密码框后不保留可用选区");
+  await command("mouse-select");
+  await until(
+    async () => !!(await call("selectionGet")),
+    "second mouse selection",
+  );
+  await pill.getByRole("button", { name: "词典", exact: true }).waitFor();
+  const dictionary = await pill
+    .getByRole("button", { name: "词典", exact: true })
+    .boundingBox();
+  const dictionaryBar = await app.evaluate(({ BrowserWindow }) =>
+    BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("mode=pill"))
+      .getBounds(),
+  );
+  await command(
+    `click ${dictionaryBar.x + dictionary.x + dictionary.width / 2} ${dictionaryBar.y + dictionary.y + dictionary.height / 2}`,
+  );
+  await panel.getByText("步伐。", { exact: true }).waitFor();
+  await pause(300);
+  const focusState = await app.evaluate(({ BrowserWindow }) => ({
+    focused: BrowserWindow.getFocusedWindow()
+      ?.webContents.getURL()
+      .includes("mode=panel"),
+    mainVisible: BrowserWindow.getAllWindows()
+      .find((w) => w.webContents.getURL().includes("mode=main"))
+      .isVisible(),
+  }));
+  assert.equal(focusState.focused, true);
+  assert.equal(focusState.mainVisible, true);
+  check("主界面保持打开时，真实点击词典进入结果浮窗，主界面不会抢回焦点");
+  await panel.evaluate(() =>
+    window.readfinch.call("window", { command: "dismiss" }),
+  );
+  await command("clear");
+  await until(
+    async () => !(await call("selectionGet")),
+    "dictionary selection cleared",
+  );
   await command("changed");
+  await until(async () => {
+    const status = await command("status");
+    return status.foreground === status.pid;
+  }, "fixture foreground before keyboard selection");
   await command("select-all");
   await pause(400);
   assert.equal(
@@ -199,17 +283,40 @@ try {
     null,
     "keyboard selection stays manual",
   );
-  const before = requests.length;
-  await command("shortcut");
-  await until(() => requests.length > before, "real Option+T key event");
-  await panel.getByRole("button", { name: "复制结果", exact: true }).waitFor();
-  assert.match(
-    JSON.stringify(requests.at(-1)),
-    /A fresh selection for the shortcut/,
+  if ((await command("status")).secureInput) {
+    const limitation =
+      "Global shortcut regression not executed: macOS Secure Input is enabled by another application.";
+    limitations.push(limitation);
+    console.log(limitation);
+  } else {
+    const before = requests.length;
+    await command("shortcut");
+    await until(() => requests.length > before, "real Option+T key event");
+    await panel
+      .getByRole("button", { name: "复制结果", exact: true })
+      .waitFor();
+    assert.match(
+      JSON.stringify(requests.at(-1)),
+      /A fresh selection for the shortcut/,
+    );
+    check(
+      "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）",
+    );
+  }
+  await panel.evaluate(() =>
+    window.readfinch.call("window", { command: "dismiss" }),
   );
-  check(
-    "真实 Option+T 全局快捷键刷新原生选区并完成翻译（未注入测试选区或快捷键回调）",
+  await command("clear");
+  await until(
+    async () => !(await call("selectionGet")),
+    "final selection cleared",
   );
+  // Keep the secure-input case last: macOS suppresses global hotkeys while a
+  // secure field's editor is active, independently of ReadFinch's focus routing.
+  await command("secure");
+  await pause(600);
+  assert.equal(await call("selectionGet"), null);
+  check("清空选区和进入安全密码框后不保留可用选区");
   assert.deepEqual(errors, []);
   await writeFile(
     path.join(dir, "result.json"),
@@ -219,6 +326,7 @@ try {
         platform: "darwin",
         arch: process.arch,
         checks,
+        limitations,
         errors,
       },
       null,
@@ -226,6 +334,22 @@ try {
     ),
   );
   console.log("Report:", path.join(dir, "result.json"));
+} catch (error) {
+  console.error(
+    await app
+      ?.evaluate(({ BrowserWindow }) => ({
+        events: globalThis.__focusEvents,
+        hotkeys: globalThis.__hotkeyEvents,
+        windows: BrowserWindow.getAllWindows().map((w) => ({
+          main: w.webContents.getURL().includes("mode=main"),
+          panel: w.webContents.getURL().includes("mode=panel"),
+          visible: w.isVisible(),
+          focused: w.isFocused(),
+        })),
+      }))
+      .catch(() => null),
+  );
+  throw error;
 } finally {
   target?.kill();
   await app?.close();

@@ -557,7 +557,7 @@ function createWindow(
     ),
     autoHideMenuBar: true,
     ...(process.platform === "darwin" && (mode === "pill" || mode === "panel")
-      ? { type: "panel" }
+      ? { type: "panel", acceptFirstMouse: true }
       : {}),
     ...options,
     webPreferences: {
@@ -601,6 +601,7 @@ function createWindow(
   return win;
 }
 function openMain() {
+  hideToolbar();
   if (main.isMinimized()) main.restore();
   main.show();
   main.focus();
@@ -2398,10 +2399,10 @@ async function boot() {
     }
   });
   main.on("blur", endShortcutRecording);
-  main.on("focus", () => {
-    hideToolbar();
-    refreshPermissions();
-  });
+  // A non-activating toolbar click can briefly make the existing main window
+  // key on macOS. Do not dismiss the toolbar before its mouse-up/click arrives.
+  // Explicit settings/Dock entry points and outside clicks handle dismissal.
+  main.on("focus", refreshPermissions);
   main.on("hide", endShortcutRecording);
   main.webContents.on("render-process-gone", endShortcutRecording);
   native.on("selection", showPill);

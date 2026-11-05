@@ -1,4 +1,5 @@
 import AppKit
+import Carbon
 import ApplicationServices
 import Foundation
 
@@ -21,6 +22,7 @@ window.contentView?.addSubview(textView)
 let password = NSSecureTextField(frame: NSRect(x: 20, y: 35, width: 400, height: 30))
 password.stringValue = "fixture-password"
 window.contentView?.addSubview(password)
+window.initialFirstResponder = textView
 
 @MainActor func handle(_ op: String) {
   if op == "quit" { application.terminate(nil); return }
@@ -84,7 +86,8 @@ window.contentView?.addSubview(password)
     default: break
   }
   emit(["id": op, "foreground": NSWorkspace.shared.frontmostApplication?.processIdentifier ?? 0,
-    "pid": ProcessInfo.processInfo.processIdentifier, "selected": textView.selectedRange().length])
+    "pid": ProcessInfo.processInfo.processIdentifier, "selected": textView.selectedRange().length,
+    "secureInput": IsSecureEventInputEnabled()])
 }
 
 DispatchQueue.global().async {
