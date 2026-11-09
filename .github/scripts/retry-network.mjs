@@ -11,19 +11,40 @@ for (let attempt = 1; attempt <= 4; attempt++) {
     const child = spawn(command === "node" ? process.execPath : command, args, {
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
+      env:
+        attempt === 1
+          ? process.env
+          : {
+              ...process.env,
+              ELECTRON_MIRROR:
+                "https://gh-proxy.com/https://github.com/electron/electron/releases/download/",
+              ELECTRON_BUILDER_BINARIES_MIRROR:
+                "https://gh-proxy.com/https://github.com/electron-userland/electron-builder-binaries/releases/download/",
+            },
     });
-    for (const [stream, output] of [[child.stdout, process.stdout], [child.stderr, process.stderr]]) {
+    for (const [stream, output] of [
+      [child.stdout, process.stdout],
+      [child.stderr, process.stderr],
+    ]) {
       stream.on("data", (data) => {
         output.write(data);
         tail = (tail + data.toString()).slice(-65536);
       });
     }
-    child.on("error", (error) => { console.error(error.code ?? "Spawn failed"); resolve(1); });
+    child.on("error", (error) => {
+      console.error(error.code ?? "Spawn failed");
+      resolve(1);
+    });
     child.on("close", (code) => resolve(code ?? 1));
   });
   if (result === 0) process.exit(0);
-  const transient = /(?:HTTP(?:Error)?[^\r\n]{0,100}|Response code\s+)(?:408|429|500|502|503|504)\b|\b(?:ETIMEDOUT|ECONNRESET|EAI_AGAIN)\b/i.test(tail);
+  const transient =
+    /(?:HTTP(?:Error)?[^\r\n]{0,100}|Response code\s+)(?:408|429|500|502|503|504)\b|\b(?:ETIMEDOUT|ECONNRESET|EAI_AGAIN)\b/i.test(
+      tail,
+    );
   if (!transient || attempt === 4) process.exit(result);
-  console.log(`Transient dependency download failure; retrying attempt ${attempt + 1}/4 in ${attempt * 10}s.`);
+  console.log(
+    `Transient dependency download failure; retrying attempt ${attempt + 1}/4 in ${attempt * 10}s.`,
+  );
   await delay(attempt * 10000);
 }

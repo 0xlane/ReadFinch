@@ -79,10 +79,33 @@ export async function signingTool() {
     if (e.code !== "ENOENT") throw e;
   });
   if (!bytes) {
-    const response = await fetch(
+    let response = await fetch(
       `https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign/${version}/${name}.tar.gz`,
       { signal: AbortSignal.timeout(120000) },
-    );
+    ).catch(() => null);
+    if (!response?.ok) {
+      // Release-page downloads can fail independently of the official asset
+      // API. Both routes fetch the same pinned, SHA-256-verified public tool.
+      const metadata = await fetch(
+        `https://api.github.com/repos/indygreg/apple-platform-rs/releases/tags/${encodeURIComponent("apple-codesign/" + version)}`,
+        { signal: AbortSignal.timeout(30000) },
+      );
+      if (!metadata.ok)
+        throw Error(`Signing tool download failed: HTTP ${metadata.status}`);
+      const release = await metadata.json();
+      const entry = release.assets?.find(
+        (item) => item.name === name + ".tar.gz",
+      );
+      if (!Number.isSafeInteger(entry?.id))
+        throw Error("Pinned signing tool asset is missing");
+      response = await fetch(
+        `https://api.github.com/repos/indygreg/apple-platform-rs/releases/assets/${entry.id}`,
+        {
+          headers: { Accept: "application/octet-stream" },
+          signal: AbortSignal.timeout(120000),
+        },
+      );
+    }
     if (!response.ok)
       throw Error(`Signing tool download failed: HTTP ${response.status}`);
     bytes = Buffer.from(await response.arrayBuffer());
