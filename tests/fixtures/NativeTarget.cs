@@ -20,6 +20,6 @@ class NativeTarget {
     form=new Form{Text="ReadFinch native test target",Location=new Point(120,110),StartPosition=FormStartPosition.Manual,ClientSize=new Size(760,280)};
     box=new TextBox{Multiline=true,Location=new Point(20,20),Size=new Size(720,220),Font=new Font("Microsoft YaHei",16),Text="Small steps make a big difference.\r\n你好，世界！每一小步，都能带来改变。\r\nC:\\Projects\\ReadFinch\\src\\main.ts\r\nconst total = 42; // Hello 世界",HideSelection=false};form.Controls.Add(box);
     form.Shown+=(s,e)=>{ActivateTarget();box.Select(0,box.Lines[0].Length);Reply("ready");};
-    var reader=new Thread(()=>{string line;while((line=Console.ReadLine())!=null){string command=line;try{form.BeginInvoke((Action)(()=>{if(command=="quit"){form.Close();return;}if(command=="select"){ActivateTarget();box.Select(0,box.Lines[0].Length);}if(command=="change"){box.Select(2,5);}if(command=="clear"){ActivateTarget();box.Select(0,0);}Reply(command);}));}catch{return;}}});reader.IsBackground=true;reader.Start();Application.Run(form);
+    var reader=new Thread(()=>{string line;while((line=Console.ReadLine())!=null){string command=line;try{form.BeginInvoke((Action)(()=>{if(command=="quit"){form.Close();return;}if(command=="select"){ActivateTarget();box.Select(0,box.Lines[0].Length);}if(command=="change"){box.Select(2,5);}if(command=="clear"){ActivateTarget();box.Select(0,0);}Reply(command);if(command=="hang")Thread.Sleep(6000);}));}catch{return;}}});reader.IsBackground=true;reader.Start();Application.Run(form);
   }
 }

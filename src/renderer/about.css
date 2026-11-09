@@ -116,6 +116,40 @@
   margin-top: 28px;
   padding: 2px 2px;
 }
+.about-diagnostics {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.about-diagnostics h3 {
+  margin: 0 0 7px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.about-diagnostics p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.about-diagnostics button {
+  flex-shrink: 0;
+}
+.about-diagnostics .diagnostic-error {
+  color: var(--error);
+}
+@media (max-width: 650px) {
+  .about-diagnostics {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
 .about-open-source > svg {
   flex-shrink: 0;
   margin-top: 3px;

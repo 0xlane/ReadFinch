@@ -18,9 +18,12 @@ class SelectionBridge {
   [DllImport("user32.dll")] static extern IntPtr WindowFromPoint(Point point);
   [DllImport("user32.dll")] static extern bool ClientToScreen(IntPtr hwnd,ref Point point);
   [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr h,StringBuilder s,int n);
-  [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessage(IntPtr h,int msg,IntPtr w,StringBuilder s);
-  [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessage(IntPtr h,int msg,IntPtr w,string s);
-  [DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h,int msg,out int a,out int b);
+  [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessageTimeout(IntPtr h,int msg,IntPtr w,StringBuilder s,uint flags,uint timeout,out UIntPtr result);
+  [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessageTimeout(IntPtr h,int msg,IntPtr w,string s,uint flags,uint timeout,out UIntPtr result);
+  [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern IntPtr SendMessageTimeout(IntPtr h,int msg,out int a,out int b,uint flags,uint timeout,out UIntPtr result);
+  // SMTO_BLOCK | SMTO_ABORTIFHUNG | SMTO_ERRORONEXIT. A non-responsive
+  // editor must not indefinitely block our polling and command loop.
+  const uint MessageFlags=0x23,MessageTimeout=300;
   [DllImport("user32.dll")] static extern int GetWindowLong(IntPtr h,int index);
   [DllImport("user32.dll")] static extern bool IsWindow(IntPtr h);
   [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr h,uint flags);
@@ -42,10 +45,31 @@ class SelectionBridge {
   static JavaScriptSerializer json=new JavaScriptSerializer(){MaxJsonLength=2000000};
   static ConcurrentQueue<string> commands=new ConcurrentQueue<string>();
   static Saved saved;static uint host;static string lastKey="";static bool running=true;
+  static uint probePid,cachedProcessPid;static string probeApp="",cachedProcessName="";
   static AutomationElement lastTextElement;static IntPtr lastTextWindow;
   static void Emit(object value){Console.WriteLine(json.Serialize(value));Console.Out.Flush();}
+  static void Probe(string stage){Emit(new{type="probe",stage=stage,targetPid=probePid,app=probeApp});}
+  static void ProbeTarget(uint pid){
+    probePid=pid;
+    if(pid!=cachedProcessPid){cachedProcessPid=pid;cachedProcessName=ProcessName(pid);}
+    probeApp=cachedProcessName;
+  }
+  static void Idle(){probePid=0;probeApp="";Probe("idle");}
+  static void OperationError(Exception error){Emit(new{type="operationError",code=error.GetType().Name});}
   static void Invalidate(){if(saved!=null){saved=null;lastKey="";Emit(new{type="invalid"});}}
-  static string WindowText(IntPtr h){var b=new StringBuilder(500001);SendMessage(h,13,(IntPtr)b.Capacity,b);return b.ToString();}
+  static void ReadEditSelection(IntPtr h,out int start,out int end){
+    Probe("edit-selection");
+    UIntPtr result;
+    if(SendMessageTimeout(h,0xB0,out start,out end,MessageFlags,MessageTimeout,out result)==IntPtr.Zero)
+      throw new TimeoutException("目标应用响应超时，请稍后重试");
+  }
+  static string WindowText(IntPtr h){
+    Probe("edit-text");
+    var b=new StringBuilder(500001);UIntPtr result;
+    if(SendMessageTimeout(h,13,(IntPtr)b.Capacity,b,MessageFlags,MessageTimeout,out result)==IntPtr.Zero)
+      throw new TimeoutException("目标应用响应超时，请稍后重试");
+    return b.ToString();
+  }
   static string ProcessName(uint pid){try{return Process.GetProcessById((int)pid).ProcessName;}catch{return "unknown";}}
   static bool Own(uint pid){return pid==host||pid==(uint)Process.GetCurrentProcess().Id;}
   // Embedded Chromium/WebView documents may be provided by a renderer process.
@@ -65,18 +89,19 @@ class SelectionBridge {
     text="";key="";
     try{
       if(element==null||element.Current.IsPassword)return false;
+      Probe("uia-pattern");
       object pattern;if(!element.TryGetCurrentPattern(TextPattern.Pattern,out pattern))return false;
       if(!BelongsToWindow(element,foreground))return false;
-      var ranges=((TextPattern)pattern).GetSelection();
+      Probe("uia-selection");var ranges=((TextPattern)pattern).GetSelection();
       if(ranges==null||ranges.Length==0||ranges.Length>64)return false;
       var parts=new List<string>();var positions=new StringBuilder();int length=0;
       foreach(var range in ranges){
-        string part=range.GetText(100001-length);
+        Probe("uia-text");string part=range.GetText(100001-length);
         if(String.IsNullOrEmpty(part))continue;
         length+=part.Length+(parts.Count>0?1:0);if(length>100000)return false;
         parts.Add(part);
         System.Windows.Rect[] rectangles;
-        try{rectangles=range.GetBoundingRectangles();}
+        try{Probe("uia-bounds");rectangles=range.GetBoundingRectangles();}
         catch(InvalidOperationException){continue;}
         catch(NotSupportedException){continue;}
         if(rectangles.Length>0){
@@ -111,16 +136,17 @@ class SelectionBridge {
   static bool ReadUiaSelection(IntPtr foreground,ref Point anchor,out string text,out string key){
     text="";key="";
     AutomationElement focused=null;
+    Probe("uia-focus");
     try{focused=AutomationElement.FocusedElement;if(focused!=null&&focused.Current.IsPassword)return false;}catch{}
     var visited=new HashSet<string>();
-    if(ReadTextPath(focused,foreground,visited,ref anchor,out text,out key))return true;
+    Probe("uia-focused-path");if(ReadTextPath(focused,foreground,visited,ref anchor,out text,out key))return true;
     try{
-      var pointed=AutomationElement.FromPoint(new System.Windows.Point(anchor.X,anchor.Y));
-      if(ReadTextPath(pointed,foreground,visited,ref anchor,out text,out key))return true;
+      Probe("uia-point");var pointed=AutomationElement.FromPoint(new System.Windows.Point(anchor.X,anchor.Y));
+      Probe("uia-point-path");if(ReadTextPath(pointed,foreground,visited,ref anchor,out text,out key))return true;
     }catch{}
     // Moving from the selected text to the non-activating toolbar must not lose
     // the document. Re-query the last provider, never reuse its previous text.
-    if(lastTextWindow==foreground&&ReadTextElement(lastTextElement,foreground,ref anchor,out text,out key))return true;
+    Probe("uia-cached");if(lastTextWindow==foreground&&ReadTextElement(lastTextElement,foreground,ref anchor,out text,out key))return true;
     lastTextElement=null;lastTextWindow=IntPtr.Zero;return false;
   }
   static void Poll(bool force=false){
@@ -128,14 +154,16 @@ class SelectionBridge {
     if(Own(pid)){if(force)Invalidate();return;}
     if((GetAsyncKeyState(1)&0x8000)!=0){if(force)Invalidate();return;}
     if(!force&&(GetAsyncKeyState(16)&0x8000)!=0)return;
+    ProbeTarget(pid);Probe("foreground");
     var info=new GuiInfo();info.cbSize=Marshal.SizeOf(info);GetGUIThreadInfo(thread,ref info);
     IntPtr target=info.focus;var cls=new StringBuilder(300);GetClassName(target,cls,cls.Capacity);
     string text="",full=null,key="";int start=0,end=0;bool replace=false;Point anchor;GetCursorPos(out anchor);
     if(cls.ToString().Equals("Edit",StringComparison.OrdinalIgnoreCase)||cls.ToString().StartsWith("WindowsForms10.EDIT",StringComparison.OrdinalIgnoreCase)){
       int style=GetWindowLong(target,-16);if((style&0x20)!=0){Invalidate();return;}
-      SendMessage(target,0xB0,out start,out end);if(end>start){full=WindowText(target);if(end<=full.Length){text=full.Substring(start,end-start);replace=(style&0x800)==0;key=target+":"+start+":"+end+":"+full;if(info.caret!=IntPtr.Zero){anchor.X=info.caretRect.R;anchor.Y=info.caretRect.B;ClientToScreen(info.caret,ref anchor);}}}
+      ReadEditSelection(target,out start,out end);if(end>start){full=WindowText(target);if(end<=full.Length){text=full.Substring(start,end-start);replace=(style&0x800)==0;key=target+":"+start+":"+end+":"+full;if(info.caret!=IntPtr.Zero){anchor.X=info.caretRect.R;anchor.Y=info.caretRect.B;ClientToScreen(info.caret,ref anchor);}}}
     }
     if(text.Length==0 && JavaSelection.IsAwtWindow(foreground)){
+      Probe("java-selection");
       var pointed=WindowFromPoint(anchor);uint pointedPid;GetWindowThreadProcessId(pointed,out pointedPid);
       var java=JavaSelection.Read(foreground,anchor.X,anchor.Y,GetAncestor(pointed,2)==foreground,pointedPid==host);
       if(java!=null){
@@ -159,18 +187,22 @@ class SelectionBridge {
       var c=json.Deserialize<Dictionary<string,object>>(line);id=c.ContainsKey("id")?(string)c["id"]:"";string op=(string)c["op"];
       if(op=="quit"){running=false;return;}if(op=="invalidate"){Invalidate();return;}
       if(op=="refresh"){
-        try{Poll(true);}catch{Invalidate();}
-        Emit(new{type="selectionSnapshot",id=id,selection=saved==null?null:saved.Selection,javaBridgeUnavailable=saved==null&&JavaSelection.NeedsSetup(GetForegroundWindow())});return;
+        try{Poll(true);}catch(Exception e){OperationError(e);Invalidate();}
+        Emit(new{type="selectionSnapshot",id=id,selection=saved==null?null:saved.Selection,javaBridgeUnavailable=saved==null&&JavaSelection.NeedsSetup(GetForegroundWindow())});Idle();return;
       }
       if(op!="replace")return;
       if(saved==null||saved.Token!=(string)c["token"]||saved.Handle==IntPtr.Zero||!IsWindow(saved.Handle))throw new Exception("原选区已失效，请复制结果");
+      ProbeTarget(saved.Pid);Probe("replace-validate");
       uint pid;GetWindowThreadProcessId(saved.Handle,out pid);uint front;GetWindowThreadProcessId(GetForegroundWindow(),out front);
-      int a,b;SendMessage(saved.Handle,0xB0,out a,out b);
+      int a,b;ReadEditSelection(saved.Handle,out a,out b);
       if(pid!=saved.Pid||(!Own(front)&&front!=pid)||a!=saved.Start||b!=saved.End||WindowText(saved.Handle)!=saved.Full||(GetWindowLong(saved.Handle,-16)&0x820)!=0)throw new Exception("目标或选区已改变，已阻止替换");
       string replacement=(string)c["text"];if(replacement.Length>100000)throw new Exception("结果太长，请复制");
-      SendMessage(saved.Handle,0xC2,(IntPtr)1,replacement);
-      Emit(new{type="response",id=id,ok=true});Invalidate();
-    }catch(Exception e){Emit(new{type="response",id=id,ok=false,error=e.Message});}
+      UIntPtr result;
+      Probe("replace-write");
+      if(SendMessageTimeout(saved.Handle,0xC2,(IntPtr)1,replacement,MessageFlags,MessageTimeout,out result)==IntPtr.Zero)
+        throw new TimeoutException("替换未确认，请检查目标内容，勿重复操作");
+      Emit(new{type="response",id=id,ok=true});Invalidate();Idle();
+    }catch(Exception e){OperationError(e);Emit(new{type="response",id=id,ok=false,error=e.Message});Idle();}
   }
   [STAThread] static void Main(string[] args){
     if(args.Length==1 && args[0]=="--display-language"){
@@ -181,6 +213,6 @@ class SelectionBridge {
     Console.OutputEncoding=new UTF8Encoding(false);Console.InputEncoding=new UTF8Encoding(false);UsePhysicalCoordinates();if(args.Length>0)UInt32.TryParse(args[0],out host);
     var input=new Thread(()=>{string line;while((line=Console.ReadLine())!=null)commands.Enqueue(line);running=false;});input.IsBackground=true;input.Start();
     Emit(new{type="ready",message="Windows UI Automation 已连接"});int ticks=0;
-    while(running){JavaSelection.PumpMessages();string command;while(commands.TryDequeue(out command))Command(command);try{Poll();}catch{Invalidate();}if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(150);}
+    while(running){Probe("java-pump");JavaSelection.PumpMessages();string command;while(commands.TryDequeue(out command))Command(command);try{Poll();}catch(Exception e){OperationError(e);Invalidate();}Idle();if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(150);}
   }
 }

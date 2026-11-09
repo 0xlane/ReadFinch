@@ -8,7 +8,17 @@ import { EventEmitter } from "node:events";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import type { Selection, Snapshot } from "../shared/api";
+import {
+  SelectionProbeSchema,
+  type SelectionProbe,
+  type DiagnosticEvent,
+} from "../core/diagnostics";
 const exec = promisify(execFile);
+type NativeOptions = {
+  platform?: NodeJS.Platform;
+  spawn?: (binary: string, args: string[]) => ChildProcessWithoutNullStreams;
+  diagnostic?: (event: DiagnosticEvent) => void;
+};
 export class SelectionService extends EventEmitter {
   private child?: ChildProcessWithoutNullStreams;
   private timer?: ReturnType<typeof setInterval>;
@@ -16,6 +26,16 @@ export class SelectionService extends EventEmitter {
   private polling?: Promise<void>;
   private heartbeat = Date.now();
   private watchdog?: ReturnType<typeof setInterval>;
+  private running = false;
+  private recovering = false;
+  private restartTimer?: ReturnType<typeof setTimeout>;
+  private restartAttempts = 0;
+  private launchedAt = 0;
+  private probe?: SelectionProbe;
+  private probeAt = 0;
+  private lastOperationError = "";
+  private lastOperationErrorAt = 0;
+  private readonly platform: NodeJS.Platform;
   private requests = new Map<
     string,
     {
@@ -43,12 +63,26 @@ export class SelectionService extends EventEmitter {
     this.emit("status", { message, state });
   }
   current?: Selection;
-  constructor(private nativeRoot: string) {
+  private diagnose(event: DiagnosticEvent) {
+    try {
+      this.options.diagnostic?.({ helperPid: this.child?.pid, ...event });
+    } catch {
+      /* Logging must not interrupt selection. */
+    }
+  }
+  constructor(
+    private nativeRoot: string,
+    private options: NativeOptions = {},
+  ) {
     super();
+    this.platform = options.platform ?? process.platform;
   }
   start() {
+    if (this.running) return;
+    this.running = true;
+    this.restartAttempts = 0;
     this.heartbeat = Date.now();
-    if (process.platform === "linux") {
+    if (this.platform === "linux") {
       if (
         process.env.XDG_SESSION_TYPE === "wayland" ||
         process.env.WAYLAND_DISPLAY
@@ -63,21 +97,41 @@ export class SelectionService extends EventEmitter {
       this.timer = setInterval(() => void this.pollX11(), 500);
       return;
     }
+    this.startHelper();
+  }
+  private startHelper() {
+    if (!this.running || this.child) return;
+    this.recovering = false;
+    this.probe = undefined;
+    this.heartbeat = this.launchedAt = Date.now();
     const binary = path.join(
       this.nativeRoot,
       "bin",
-      process.platform === "win32"
+      this.platform === "win32"
         ? "readfinch-selection.exe"
         : "readfinch-selection",
     );
-    this.child = spawn(binary, [String(process.pid)], {
-      windowsHide: true,
-      stdio: ["pipe", "pipe", "pipe"],
-    });
+    const launch =
+      this.options.spawn ??
+      ((binary, args) =>
+        spawn(binary, args, {
+          windowsHide: true,
+          stdio: ["pipe", "pipe", "pipe"],
+        }));
+    const child = (this.child = launch(binary, [String(process.pid)]));
+    this.diagnose({ event: "helper_start", attempt: this.restartAttempts });
+    const active = () =>
+      this.running && this.child === child && !this.recovering;
     let buffer = "";
-    this.child.stdout.setEncoding("utf8");
-    this.child.stdin.on("error", () => this.finishReads());
-    this.child.stdout.on("data", (chunk: string) => {
+    child.stdout.setEncoding("utf8");
+    // Native libraries may write diagnostics to stderr. Always drain the pipe
+    // so a full pipe cannot block the selection worker.
+    child.stderr.resume();
+    child.stdin.on("error", () => {
+      if (active()) this.finishReads();
+    });
+    child.stdout.on("data", (chunk: string) => {
+      if (!active()) return;
       buffer += chunk;
       let i;
       while ((i = buffer.indexOf("\n")) >= 0) {
@@ -88,28 +142,76 @@ export class SelectionService extends EventEmitter {
         } catch {}
       }
     });
-    this.child.on("error", () => {
+    const disconnected = (
+      failedToStart: boolean,
+      exitCode: number | null = null,
+    ) => {
+      if (!this.running || this.child !== child) return;
+      this.diagnose({ event: "helper_exit", exitCode, probe: this.probe });
       this.stopWatchdog();
-      this.setStatus(
-        "选区助手未启动；可框选取词或读取剪贴板，重启后重试",
-        "error",
-      );
+      this.child = undefined;
       this.invalidate();
       this.finishReads();
-    });
-    this.child.on("exit", () => {
-      this.stopWatchdog();
-      if (this.state !== "error")
+      this.finishRequests("替换未确认，请检查目标内容，勿重复操作");
+      if (this.platform === "win32") {
         this.setStatus(
-          "选区助手已停止；可框选取词或读取剪贴板，重启后重试",
+          "划词服务正在自动恢复；可暂时使用框选取词或剪贴板",
+          "starting",
+        );
+        this.scheduleRestart();
+      } else if (failedToStart || this.state !== "error") {
+        this.setStatus(
+          failedToStart
+            ? "选区助手未启动；可框选取词或读取剪贴板，重启后重试"
+            : "选区助手已停止；可框选取词或读取剪贴板，重启后重试",
           "error",
         );
-      this.invalidate();
-      this.finishReads();
+      }
+    };
+    child.on("error", (error: NodeJS.ErrnoException) => {
+      if (this.child !== child || !this.running) return;
+      const code = ["ENOENT", "EACCES", "EPERM", "EPIPE"].includes(
+        error.code ?? "",
+      )
+        ? (error.code as "ENOENT" | "EACCES" | "EPERM" | "EPIPE")
+        : "UNKNOWN";
+      this.diagnose({ event: "helper_error", code });
+      // A spawn failure has no process to retire. Other process errors must
+      // not detach a live helper and accidentally create a second worker.
+      if (!child.pid) disconnected(true);
     });
+    child.on("exit", (code) => disconnected(false, code));
     this.watchdog = setInterval(() => {
-      if (this.state === "limited") return;
+      if (!this.running || this.child !== child || this.state === "limited")
+        return;
+      if (this.recovering) {
+        // A failed OS termination must not leave recovery permanently stuck.
+        // Keep one helper only and retry terminating that same owned process.
+        child.kill();
+        return;
+      }
       if (Date.now() - this.heartbeat > 10000) {
+        if (!this.stalled)
+          this.diagnose({
+            event: "heartbeat_timeout",
+            heartbeatAgeMs: Date.now() - this.heartbeat,
+            probe: this.probe,
+            elapsedMs: this.probe ? Date.now() - this.probeAt : undefined,
+          });
+        if (this.platform === "win32") {
+          this.recovering = true;
+          this.setStatus(
+            "划词服务正在自动恢复；可暂时使用框选取词或剪贴板",
+            "starting",
+          );
+          this.invalidate();
+          this.finishReads();
+          this.finishRequests("替换未确认，请检查目标内容，勿重复操作");
+          // Only the owned helper is terminated. Wait for its exit before
+          // starting another; never replay a pending replacement command.
+          child.kill();
+          return;
+        }
         this.stalled = true;
         this.setStatus(
           "目标应用的辅助功能响应超时；可框选取词或读取剪贴板",
@@ -119,8 +221,75 @@ export class SelectionService extends EventEmitter {
       }
     }, 3000);
   }
+  private scheduleRestart() {
+    if (!this.running || this.restartTimer) return;
+    const delay = Math.min(
+      30000,
+      500 * 2 ** Math.min(this.restartAttempts++, 6),
+    );
+    this.diagnose({
+      event: "helper_retry",
+      attempt: this.restartAttempts,
+      delayMs: delay,
+    });
+    this.restartTimer = setTimeout(() => {
+      this.restartTimer = undefined;
+      this.startHelper();
+    }, delay);
+  }
   private receive(event: any) {
+    if (!event || typeof event.type !== "string") return;
+    if (event.type === "probe") {
+      const result = SelectionProbeSchema.safeParse(event);
+      if (!result.success) return;
+      const now = Date.now();
+      if (
+        this.probe &&
+        this.probe.stage !== "idle" &&
+        now - this.probeAt >= 1500
+      )
+        this.diagnose({
+          event: "slow_operation",
+          probe: this.probe,
+          elapsedMs: now - this.probeAt,
+        });
+      this.probe = result.data;
+      this.probeAt = now;
+      // Progress probes are not completed-work heartbeats. A slow provider
+      // must not postpone the watchdog indefinitely by traversing new nodes.
+      return;
+    }
+    if (event.type === "operationError") {
+      const key = JSON.stringify([this.probe, event.code]);
+      const now = Date.now();
+      if (
+        key !== this.lastOperationError ||
+        now - this.lastOperationErrorAt >= 10000
+      ) {
+        const code = [
+          "TimeoutException",
+          "ElementNotAvailableException",
+          "InvalidOperationException",
+          "COMException",
+        ].includes(event.code)
+          ? event.code
+          : "OTHER";
+        this.diagnose({
+          event: "operation_error",
+          probe: this.probe,
+          code,
+          elapsedMs: this.probe ? now - this.probeAt : undefined,
+        });
+        this.lastOperationError = key;
+        this.lastOperationErrorAt = now;
+      }
+      return;
+    }
     this.heartbeat = Date.now();
+    // A "ready" banner alone does not establish health: the very first UIA
+    // call may hang again. Reset backoff only after sustained worker progress.
+    if (event.type === "heartbeat" && Date.now() - this.launchedAt >= 30000)
+      this.restartAttempts = 0;
     if (
       event.type === "diagnostic" &&
       process.env.READFINCH_SELECTION_DIAGNOSTICS === "1"
@@ -147,6 +316,7 @@ export class SelectionService extends EventEmitter {
       this.setStatus(this.connectedMessage, "ready");
     }
     if (event.type === "ready") {
+      this.diagnose({ event: "helper_ready" });
       this.connectedMessage = event.message;
       this.setStatus(event.message, "ready");
     }
@@ -270,7 +440,7 @@ export class SelectionService extends EventEmitter {
   async readCurrent(
     onJavaBridgeUnavailable?: () => void,
   ): Promise<Selection | undefined> {
-    if (process.platform === "linux") {
+    if (this.platform === "linux") {
       if (
         process.env.XDG_SESSION_TYPE === "wayland" ||
         process.env.WAYLAND_DISPLAY
@@ -283,13 +453,23 @@ export class SelectionService extends EventEmitter {
       await this.pollX11();
       return this.current;
     }
-    if (!this.child || this.child.killed || !this.child.stdin.writable) {
+    if (
+      this.recovering ||
+      !this.child ||
+      this.child.killed ||
+      !this.child.stdin.writable
+    ) {
       this.invalidate();
       return;
     }
     return new Promise((resolve) => {
       const id = randomUUID();
       const timer = setTimeout(() => {
+        this.diagnose({
+          event: "read_timeout",
+          probe: this.probe,
+          elapsedMs: 1800,
+        });
         this.reads.delete(id);
         this.invalidate();
         resolve(undefined);
@@ -298,7 +478,7 @@ export class SelectionService extends EventEmitter {
       this.child!.stdin.write(
         JSON.stringify({ op: "refresh", id }) + "\n",
         (error) => {
-          if (error) this.finishReads();
+          if (error && this.reads.has(id)) this.finishReads();
         },
       );
     });
@@ -316,7 +496,7 @@ export class SelectionService extends EventEmitter {
     width: number;
     height: number;
   }) {
-    if (process.platform === "darwin" && this.child?.stdin.writable)
+    if (this.platform === "darwin" && this.child?.stdin.writable)
       this.child.stdin.write(
         JSON.stringify({ op: "toolbarBounds", ...bounds }) + "\n",
       );
@@ -332,6 +512,11 @@ export class SelectionService extends EventEmitter {
     return new Promise<void>((resolve, reject) => {
       const id = randomUUID();
       const timer = setTimeout(() => {
+        this.diagnose({
+          event: "replace_timeout",
+          probe: this.probe,
+          elapsedMs: 3000,
+        });
         this.requests.delete(id);
         reject(Error("替换未确认，请检查目标内容，勿重复操作"));
       }, 3000);
@@ -342,15 +527,25 @@ export class SelectionService extends EventEmitter {
     });
   }
   stop() {
+    this.running = false;
+    if (this.restartTimer) clearTimeout(this.restartTimer);
+    this.restartTimer = undefined;
     if (this.timer) clearInterval(this.timer);
+    this.timer = undefined;
     this.stopWatchdog();
-    this.child?.kill();
+    const child = this.child;
+    this.child = undefined;
+    child?.kill();
+    this.finishRequests("应用已关闭");
+    this.finishReads();
+    this.invalidate();
+  }
+  private finishRequests(message: string) {
     for (const pending of this.requests.values()) {
       clearTimeout(pending.timer);
-      pending.reject(Error("应用已关闭"));
+      pending.reject(Error(message));
     }
     this.requests.clear();
-    this.finishReads();
   }
   private stopWatchdog() {
     if (this.watchdog) clearInterval(this.watchdog);

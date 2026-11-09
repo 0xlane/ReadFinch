@@ -131,6 +131,7 @@ export type CallMap = {
     result: void;
   };
   settingsTab: { arg: void; result: SettingsTab };
+  exportDiagnostics: { arg: void; result: boolean };
   settingsLocation: { arg: void; result: SettingsLocation };
   toolbarPainted: { arg: { token: string; epoch: number }; result: void };
   toolbarState: { arg: void; result: ToolbarView | null };

@@ -167,11 +167,13 @@ function SettingsApp({
                 ? t("自动划词已暂停")
                 : snapshot.nativeState === "ready"
                   ? t("划词服务运行中")
-                  : snapshot.permissions?.accessibility === false ||
-                      (snapshot.platform.startsWith("darwin") &&
-                        snapshot.nativeState === "limited")
-                    ? t("需要辅助功能权限")
-                    : t("划词服务需检查")}
+                  : snapshot.nativeState === "starting"
+                    ? t("正在连接划词服务")
+                    : snapshot.permissions?.accessibility === false ||
+                        (snapshot.platform.startsWith("darwin") &&
+                          snapshot.nativeState === "limited")
+                      ? t("需要辅助功能权限")
+                      : t("划词服务需检查")}
             </span>
           </div>
           <span className="app-version">

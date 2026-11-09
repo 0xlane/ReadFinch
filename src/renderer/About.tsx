@@ -91,6 +91,7 @@ export function About({ state }: { state: UpdateState }) {
           <ArrowUpRight size={17} />
         </ProjectButton>
       </section>
+      <DiagnosticExport />
       <section className="about-open-source">
         <Code2 size={19} />
         <div>
@@ -113,6 +114,58 @@ export function About({ state }: { state: UpdateState }) {
         </div>
       </section>
     </div>
+  );
+}
+function DiagnosticExport() {
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<"" | "success" | "error">("");
+  async function exportLogs() {
+    setBusy(true);
+    setStatus("");
+    try {
+      if (await window.readfinch.call("exportDiagnostics"))
+        setStatus("success");
+    } catch {
+      setStatus("error");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="about-diagnostics" aria-label={t("故障诊断")}>
+      <div>
+        <h3>{t("故障诊断")}</h3>
+        <p>
+          {t(
+            "遇到划词异常时，可导出日志随问题反馈。记录相关应用名称和故障阶段，仅保存在本机，不包含选中文字、剪贴板内容或密钥。",
+          )}
+        </p>
+        {status && (
+          <p
+            role="status"
+            className={status === "error" ? "diagnostic-error" : ""}
+          >
+            {t(
+              status === "success"
+                ? "诊断日志已导出"
+                : "诊断日志导出失败，请重试。",
+            )}
+          </p>
+        )}
+      </div>
+      <button
+        className="secondary"
+        disabled={busy}
+        onClick={() => void exportLogs()}
+      >
+        {busy ? (
+          <LoaderCircle size={15} className="spin" />
+        ) : (
+          <ArrowDownToLine size={15} />
+        )}
+        {t("导出诊断日志")}
+      </button>
+    </section>
   );
 }
 const statusTitles: Record<UpdateState["status"], string> = {

@@ -112,6 +112,8 @@ import {
 import { ShortcutRegistry, ShortcutRepeatGuard } from "../core/shortcuts";
 import { shortcutBindings } from "../shared/shortcuts";
 import { SelectionService } from "./native";
+import { Diagnostics } from "../core/diagnostics";
+import { release as osRelease } from "node:os";
 import {
   LOGIN_ARG,
   loginEnabled,
@@ -144,7 +146,11 @@ const store = new ConfigStore(dataDir, canonicalizeBuiltinConfig, () =>
 );
 const localNotes = new LocalNotes(path.join(dataDir, "local-notes.sqlite"));
 const secrets = new Secrets(dataDir);
-const native = new SelectionService(nativeRoot);
+const diagnostics = new Diagnostics(path.join(dataDir, "logs"));
+const native = new SelectionService(nativeRoot, {
+  diagnostic: (event) =>
+    diagnostics.record({ appVersion: app.getVersion(), ...event }),
+});
 const macPanels = new MacPanels(nativeRoot);
 const jobs = new JobGate();
 const resultCache = new CompletionCache();
@@ -1621,6 +1627,35 @@ async function handle(
   arg: any,
 ): Promise<unknown> {
   switch (method) {
+    case "exportDiagnostics": {
+      if (win !== main) throw Error(t("仅设置窗口可导出诊断日志"));
+      const result = await dialog.showSaveDialog(main, {
+        defaultPath:
+          "ReadFinch-diagnostics-" +
+          new Date().toISOString().slice(0, 10) +
+          ".json",
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+      if (result.canceled || !result.filePath) return false;
+      const report = {
+        schema: 1,
+        generatedAt: new Date().toISOString(),
+        environment: {
+          appVersion: app.getVersion(),
+          electronVersion: process.versions.electron,
+          platform: process.platform,
+          arch: process.arch,
+          osVersion: osRelease(),
+          nativeState: native.state,
+        },
+        ...(await diagnostics.snapshot()),
+      };
+      await atomicWrite(
+        result.filePath,
+        JSON.stringify(report, null, 2) + "\n",
+      );
+      return true;
+    }
     case "snapshot":
       return snapshot();
     case "modelDirectory":
@@ -2732,6 +2767,7 @@ async function boot() {
     hideToolbar();
     broadcast("selectionInvalid", undefined);
   });
+  diagnostics.record({ event: "app_start", appVersion: app.getVersion() });
   native.start();
   if (process.platform === "darwin") {
     refreshPermissions();
