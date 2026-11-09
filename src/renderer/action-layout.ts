@@ -8,6 +8,18 @@ import {
 } from "../shared/action-output";
 import { t } from "../shared/i18n";
 
+const purifier = DOMPurify(window);
+// These attributes carry plain text for React components and speech, never URLs
+// or executable markup. Tokenize them while sanitizing the surrounding layout.
+const textAttributes = new Set([
+  "data-original",
+  "data-setting",
+  "data-revision",
+  "data-summary",
+  "data-marks",
+  "data-speak",
+  "data-speak-lang",
+]);
 const engine = new Liquid({
   templates: {},
   ownPropertyOnly: true,
@@ -156,16 +168,38 @@ export function renderCard(
     html = engine.parseAndRenderSync(defaultLayout, context);
     css = "";
   }
-  const body = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: allowedTags,
-    ALLOWED_ATTR: allowedAttributes,
-    ALLOW_DATA_ATTR: false,
-    ALLOW_ARIA_ATTR: false,
-    RETURN_DOM_FRAGMENT: true,
+  const attributeValues = new Map<string, string>();
+  purifier.addHook("uponSanitizeAttribute", (node, data) => {
+    if (!textAttributes.has(data.attrName)) return;
+    const token = "readfinch-text-" + attributeValues.size;
+    attributeValues.set(
+      token,
+      node.getAttribute(data.attrName) ?? data.attrValue,
+    );
+    data.attrValue = token;
   });
-  const removed = DOMPurify.removed.some(
+  let body: DocumentFragment;
+  try {
+    body = purifier.sanitize(html, {
+      ALLOWED_TAGS: allowedTags,
+      ALLOWED_ATTR: allowedAttributes,
+      ALLOW_DATA_ATTR: false,
+      ALLOW_ARIA_ATTR: false,
+      RETURN_DOM_FRAGMENT: true,
+    });
+  } finally {
+    purifier.removeHook("uponSanitizeAttribute");
+  }
+  const removed = purifier.removed.some(
     (x) => !("element" in x) || x.element.nodeName !== "BODY",
   );
+  for (const element of body.querySelectorAll("*")) {
+    for (const name of textAttributes) {
+      const token = element.getAttribute(name);
+      if (token !== null && attributeValues.has(token))
+        element.setAttribute(name, attributeValues.get(token)!);
+    }
+  }
   for (const element of body.querySelectorAll<HTMLElement>("[style]"))
     element.style.cssText = safeDeclarations(element.style);
   return {

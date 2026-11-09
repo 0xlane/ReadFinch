@@ -199,6 +199,7 @@ export function SchemaResult({
         createPortal(
           props.writing !== undefined ? (
             <WritingResult
+              pending={!finished && status !== "error"}
               source={original}
               data={{
                 setting: props.setting,

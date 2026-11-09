@@ -157,7 +157,11 @@ export function Result({
   if (data && format === "writing")
     return (
       <>
-        <WritingResult data={data} source={source} />
+        <WritingResult
+          data={data}
+          source={source}
+          pending={!finished && status !== "error"}
+        />
         {!finished && <span className="stream-caret" />}
       </>
     );

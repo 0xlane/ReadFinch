@@ -52,6 +52,7 @@ export function localizeBuiltinAction(
     history.en[kind] as Partial<Action>,
     ...locales.map((l) => definition(kind, l)),
     ...locales.map((l) => definition(kind, l, "v14")),
+    ...locales.map((l) => definition(kind, l, "v124")),
   ];
   const next = structuredClone(action);
   for (const key of ["system", "prompt"] as const)

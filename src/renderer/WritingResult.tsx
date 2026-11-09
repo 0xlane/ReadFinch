@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Check, Copy } from "lucide-react";
 import { diffWordsWithSpace } from "diff";
 import { locateAnnotations } from "../shared/annotations";
 import { t } from "../shared/i18n";
@@ -6,15 +7,27 @@ const string = (value: unknown) => (typeof value === "string" ? value : "");
 export function WritingResult({
   data,
   source,
+  pending = false,
 }: {
   data: Record<string, unknown>;
   source: string;
+  pending?: boolean;
 }) {
   const [showAnalysis, setShowAnalysis] = useState(true);
   const [showDiff, setShowDiff] = useState(false);
   const [hideFixes, setHideFixes] = useState(false);
   const [showImproved, setShowImproved] = useState(true);
+  const [copied, setCopied] = useState("");
+  const [copyError, setCopyError] = useState(false);
   const revision = string(data.revision || data.improved);
+  const revisedParts = useMemo(
+    () =>
+      diffWordsWithSpace(source, revision, {
+        timeout: 25,
+        maxEditLength: 1000,
+      }) ?? [{ value: revision, added: false, removed: false }],
+    [source, revision],
+  );
   const summary = string(data.explanation || data.summary);
   const parts: React.ReactNode[] = [];
   let cursor = 0;
@@ -52,12 +65,22 @@ export function WritingResult({
     cursor = item.start + item.text.length;
   }
   parts.push(source.slice(cursor));
+  const waiting = (
+    <div className="writing-pending" role="status" aria-label={t("正在生成")} />
+  );
+  if (pending && !data.setting && !data.annotations && !revision && !summary)
+    return waiting;
   return (
     <div className="writing rf-writing">
-      {!!data.setting && (
-        <p className="writing-setting">{string(data.setting)}</p>
-      )}
       <div className="writing-marked">{parts}</div>
+      {(!!data.setting || summary) && (
+        <p className="writing-context">
+          {!!data.setting && (
+            <span className="writing-setting">{string(data.setting)}</span>
+          )}
+          {summary && <span className="writing-summary">{summary}</span>}
+        </p>
+      )}
       <div className="writing-switches">
         <button
           aria-pressed={hideFixes}
@@ -66,15 +89,72 @@ export function WritingResult({
           {hideFixes ? t("显示答案") : t("藏答案")}
         </button>
         <span className="grow" />
-        <span className="error">{t("错误")}</span>
-        <span className="awkward">{t("欠妥")}</span>
-        <span className="good">{t("亮点")}</span>
+        {(["error", "awkward", "good"] as const).map((tier, index) => {
+          const count = ranges.filter(
+            (item) => (item.tier || "awkward") === tier,
+          ).length;
+          return count ? (
+            <span className={tier} key={tier}>
+              {t(["错误", "欠妥", "亮点"][index])} {count}
+            </span>
+          ) : null;
+        })}
       </div>
       {hideFixes && (
         <p className="microcopy">{t("先自己想想怎么改，再看答案。")}</p>
       )}
       {!hideFixes && (
         <>
+          {revision ? (
+            <section className="writing-revision">
+              <header>
+                <button
+                  className="writing-show"
+                  aria-expanded={showImproved}
+                  onClick={() => setShowImproved(!showImproved)}
+                >
+                  {showImproved ? t("改后") : t("显示改后版本")}
+                </button>
+                <button
+                  aria-label={copied === revision ? t("已复制") : t("复制结果")}
+                  disabled={pending}
+                  onClick={async () => {
+                    try {
+                      await window.readfinch.call("clipboardWrite", {
+                        text: revision,
+                      });
+                      setCopied(revision);
+                      setCopyError(false);
+                    } catch {
+                      setCopyError(true);
+                    }
+                  }}
+                >
+                  {copied === revision ? (
+                    <Check size={14} />
+                  ) : (
+                    <Copy size={14} />
+                  )}
+                </button>
+              </header>
+              {showImproved && (
+                <p className="revision">
+                  {revisedParts.map((part, index) =>
+                    part.removed ? null : part.added ? (
+                      <mark key={index}>{part.value}</mark>
+                    ) : (
+                      <span key={index}>{part.value}</span>
+                    ),
+                  )}
+                </p>
+              )}
+              {copyError && (
+                <small role="status">{t("复制失败，请重试")}</small>
+              )}
+            </section>
+          ) : pending ? (
+            waiting
+          ) : null}
           {!!ranges.length && (
             <details
               className="writing-analysis"
@@ -106,15 +186,6 @@ export function WritingResult({
               </ol>
             </details>
           )}
-          <button
-            className="writing-show"
-            aria-expanded={showImproved}
-            onClick={() => setShowImproved(!showImproved)}
-          >
-            {showImproved ? t("改后") : t("显示改后版本")}
-          </button>
-          {showImproved && <p className="revision">{revision || "…"}</p>}
-          {summary && <p className="writing-summary">{summary}</p>}
           {revision && (
             <details
               open={showDiff}
@@ -123,7 +194,7 @@ export function WritingResult({
               <summary>{t("查看修改对比")}</summary>
               <div className="diff">
                 {showDiff &&
-                  diffWordsWithSpace(source, revision).map((part, index) =>
+                  revisedParts.map((part, index) =>
                     part.added ? (
                       <ins key={index}>{part.value}</ins>
                     ) : part.removed ? (

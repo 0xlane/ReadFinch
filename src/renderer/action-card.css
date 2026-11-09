@@ -376,6 +376,69 @@ summary {
 .revision {
   margin: 3px 0 7px;
 }
+.writing-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 8px;
+  margin: 10px 0;
+}
+.writing-setting {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.writing-revision {
+  background: var(--subtle);
+  border-radius: 9px;
+  padding: 12px 15px;
+  margin: 10px 0;
+}
+.writing-revision header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.writing-revision button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+.writing-revision mark {
+  background: #b9772429;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: #b97724;
+  text-underline-offset: 3px;
+}
+.writing-pending {
+  height: 14px;
+  width: 72%;
+  border-radius: 5px;
+  margin: 12px 0;
+  background: linear-gradient(
+    90deg,
+    var(--subtle) 20%,
+    var(--line) 50%,
+    var(--subtle) 80%
+  );
+  background-size: 200% 100%;
+  animation: writing-pending 1.5s ease-in-out infinite;
+}
+@keyframes writing-pending {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .writing-pending {
+    animation: none;
+  }
+}
 .diff {
   white-space: pre-wrap;
 }

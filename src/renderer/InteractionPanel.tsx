@@ -980,15 +980,20 @@ export function InteractionPanel({ snapshot }: { snapshot: Snapshot }) {
           {working && (
             <section className="rf-result" aria-label={t("处理结果")}>
               {thinking && <Thinking key={thinkingRun} value={thinking} />}
-              {running && !thinking && !result && (
-                <LoaderCircle
-                  size={16}
-                  strokeWidth={1.6}
-                  className="spin translation-loading"
-                  role="status"
-                  aria-label={t("正在翻译")}
-                />
-              )}
+              {running &&
+                !thinking &&
+                !result &&
+                !(
+                  activeAction.format === "writing" && activeAction.outputSchema
+                ) && (
+                  <LoaderCircle
+                    size={16}
+                    strokeWidth={1.6}
+                    className="spin translation-loading"
+                    role="status"
+                    aria-label={t("正在翻译")}
+                  />
+                )}
               {result || (running && activeAction.outputSchema) ? (
                 activeAction.id === "translate" ? (
                   <p className="rf-translation">

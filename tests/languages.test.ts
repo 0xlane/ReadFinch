@@ -24,6 +24,27 @@ import {
 } from "../src/core/note-suggestions";
 import { ConfigStore } from "../src/core/store";
 import { buildActionHelperPrompt } from "../src/shared/action-ai-helper";
+import { definition } from "../src/shared/action-templates";
+
+test("writing prompt updates reach existing defaults while retaining user edits", () => {
+  for (const locale of ["zh-CN", "en"] as const) {
+    const config = defaultConfig();
+    const writing = config.actions.find((a) => a.id === "polish")!;
+    Object.assign(writing, definition("polish", locale, "v124"));
+    const updated = localizeBuiltinConfig(config, locale).actions.find(
+      (a) => a.id === "polish",
+    )!;
+    assert.equal(updated.system, definition("polish", locale).system);
+    assert.match(updated.system, /Preserve them verbatim/);
+    writing.system = "Keep my own editing rules.";
+    assert.equal(
+      localizeBuiltinConfig(config, locale).actions.find(
+        (a) => a.id === "polish",
+      )!.system,
+      writing.system,
+    );
+  }
+});
 
 test("first use selects a concrete target from supported OS language preferences", () => {
   for (const language of languages) {
