@@ -28,7 +28,7 @@ jobs:
       - run: npm run build
       - name: Verify native macOS panel loading and shutdown
         if: runner.os == 'macOS'
-        run: node scripts/macos-panel-smoke.mjs
+        run: node .github/scripts/retry-network.mjs node scripts/macos-panel-smoke.mjs
       - name: Exercise the macOS selection toolbar
         if: runner.os == 'macOS'
         run: node scripts/toolbar-smoke.mjs --verify-only
