@@ -66,13 +66,13 @@ jobs:
       - run: npm run build
       - name: Verify native macOS panel loading and shutdown
         if: runner.os == 'macOS'
-        run: node scripts/macos-panel-smoke.mjs
+        run: node .github/scripts/retry-network.mjs node scripts/macos-panel-smoke.mjs
       - run: npm run test:ocr
       - name: Build platform packages
         env:
           READFINCH_MACOS_SIGNING_P12: ${{ runner.os == 'macOS' && secrets.READFINCH_MACOS_SIGNING_P12 || '' }}
           READFINCH_MACOS_SIGNING_PASSWORD: ${{ runner.os == 'macOS' && secrets.READFINCH_MACOS_SIGNING_PASSWORD || '' }}
-        run: npx electron-builder ${{ matrix.command }} --publish never
+        run: node .github/scripts/retry-network.mjs node node_modules/electron-builder/cli.js ${{ matrix.command }} --publish never
       - name: Verify fixed macOS signing identity and native signatures
         if: matrix.platform == 'macos'
         shell: bash
