@@ -14,7 +14,7 @@ ReadFinch est une application de bureau open source dédiée à la lecture et à
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@ La recherche automatique de mises à jour est activée par défaut et se règle 
 
 | Commande | Windows / Linux | macOS |
 | --- | --- | --- |
-| Traduire la sélection | `Alt + T` | `Option + D` |
+| Traduire la sélection | `Alt + D` | `Option + D` |
 | Ouvrir le dictionnaire | `Alt + Shift + D` | `Option + Shift + D` |
 | Améliorer la rédaction | `Alt + Shift + W` | `Option + Shift + W` |
 | Choisir une commande | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capturer du texte par OCR | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| Capturer du texte par OCR | `Alt + Shift + S` | `Option + Shift + S` |
 | Lire le presse-papiers | `Ctrl + Shift + V` | `Command + Shift + V` |
 | Traduire du texte saisi | `Alt + A` | `Option + A` |
 

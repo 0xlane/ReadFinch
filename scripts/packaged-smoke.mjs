@@ -38,7 +38,7 @@ try {
   const original = await page.evaluate(() => window.readfinch.call("snapshot"));
   assert.equal(
     original.config.actions.find((a) => a.id === "translate").shortcut,
-    process.platform === "darwin" ? "Alt+D" : "Alt+T",
+    "Alt+D",
   );
   if (isolated)
     await page.evaluate(async () => {
@@ -64,7 +64,7 @@ try {
       });
     });
   const state = await page.evaluate(() => window.readfinch.call("snapshot"));
-  assert.equal(state.config.schemaVersion, 16);
+  assert.equal(state.config.schemaVersion, 17);
   assert.equal(state.config.noteSuggestion.enabled, true);
   assert.deepEqual(state.shortcutErrors, []);
   assert.equal(

@@ -14,7 +14,7 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 
 | 操作 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 選択範囲を翻訳 | `Alt + T` | `Option + D` |
+| 選択範囲を翻訳 | `Alt + D` | `Option + D` |
 | 辞書を開く | `Alt + Shift + D` | `Option + Shift + D` |
 | 文章を改善 | `Alt + Shift + W` | `Option + Shift + W` |
 | 指示を選ぶ | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 画面の文字を OCR で取得 | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| 画面の文字を OCR で取得 | `Alt + Shift + S` | `Option + Shift + S` |
 | クリップボードの文字を読む | `Ctrl + Shift + V` | `Command + Shift + V` |
 | 入力翻訳 | `Alt + A` | `Option + A` |
 

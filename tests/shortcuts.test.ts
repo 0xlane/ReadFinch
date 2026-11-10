@@ -8,6 +8,7 @@ import {
   shortcutFromEvent,
   shortcutBindings,
   shortcutConflict,
+  formatShortcut,
 } from "../src/shared/shortcuts";
 import { ShortcutRegistry, ShortcutRepeatGuard } from "../src/core/shortcuts";
 import { SelectionService } from "../src/main/native";
@@ -94,7 +95,7 @@ test("v1 upgrade preserves the old direct translation key, other preferences, an
   old.textProfiles[0].model = "personal-model";
   old.appearance.theme = "dark";
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 16);
+  assert.equal(next.schemaVersion, 17);
   assert.equal(
     next.actions.find((a) => a.id === "translate")!.shortcut,
     "Ctrl+Alt+F9",
@@ -249,13 +250,10 @@ test("v15 adopts familiar input/selection/OCR defaults once and preserves custom
   old.actions.find((a: any) => a.id === "translate").shortcut = "Option+T";
   const next = parseConfig(old);
   assert.equal(next.shortcuts.input, "Alt+A");
-  assert.equal(
-    next.shortcuts.capture,
-    process.platform === "darwin" ? "Alt+Shift+S" : "CmdOrCtrl+Shift+2",
-  );
+  assert.equal(next.shortcuts.capture, "Alt+Shift+S");
   assert.equal(
     next.actions.find((a) => a.id === "translate")!.shortcut,
-    process.platform === "darwin" ? "Alt+D" : "Option+T",
+    "Alt+D",
   );
   next.shortcuts.input = "";
   assert.deepEqual(parseConfig(next), next);
@@ -281,4 +279,72 @@ test("shortcut migration never takes a custom action's key, including dormant ac
   assert.equal(next.shortcuts.selection, "Option+A");
   assert.equal(next.shortcuts.capture, "CommandOrControl+Shift+2");
   assert.equal(next.actions[0].shortcut, "Alt+T");
+});
+
+test("Bob-style defaults use adjacent input/translation keys and a dedicated OCR combination", () => {
+  const config = defaultConfig();
+  assert.equal(config.shortcuts.input, "Alt+A");
+  assert.equal(
+    config.actions.find((a) => a.id === "translate")!.shortcut,
+    "Alt+D",
+  );
+  assert.equal(config.shortcuts.capture, "Alt+Shift+S");
+  assert.equal(formatShortcut(config.shortcuts.capture, "darwin"), "⌥ + ⇧ + S");
+  assert.equal(
+    formatShortcut(config.shortcuts.capture, "win32"),
+    "Alt + Shift + S",
+  );
+  assert.equal(shortcutConflict(config), "");
+});
+
+test("v16 migrates old default shortcuts once, including normalized aliases", () => {
+  const old: any = defaultConfig();
+  old.schemaVersion = 16;
+  old.shortcuts.capture = "Shift+CmdOrCtrl+2";
+  old.actions.find((a: any) => a.id === "translate").shortcut = "Option+T";
+  const original = structuredClone(old);
+  const next = parseConfig(old);
+  assert.equal(next.schemaVersion, 17);
+  assert.equal(next.shortcuts.capture, "Alt+Shift+S");
+  assert.equal(
+    next.actions.find((a) => a.id === "translate")!.shortcut,
+    "Alt+D",
+  );
+  assert.deepEqual(old, original, "Migration cannot mutate its input");
+  next.shortcuts.capture = "";
+  next.actions.find((a) => a.id === "translate")!.shortcut = "Alt+T";
+  assert.deepEqual(
+    parseConfig(JSON.stringify(next)),
+    next,
+    "User choices after migration stay intact",
+  );
+});
+
+test("v16 preserves custom and cleared shortcuts and reserves dormant command keys", () => {
+  const old: any = defaultConfig();
+  old.schemaVersion = 16;
+  const translate = old.actions.find((a: any) => a.id === "translate");
+  translate.shortcut = "Alt+T";
+  old.shortcuts.capture = "CmdOrCtrl+Shift+2";
+  old.actions.push({
+    ...old.actions[1],
+    id: "custom-reserved",
+    enabled: false,
+    shortcut: "Option+D",
+  });
+  old.actions[1].enabled = false;
+  old.actions[1].shortcut = "Shift+Option+S";
+  const blocked = parseConfig(old);
+  assert.equal(blocked.actions[0].shortcut, "Alt+T");
+  assert.equal(blocked.shortcuts.capture, "CmdOrCtrl+Shift+2");
+  for (const [translation, capture] of [
+    ["Ctrl+Alt+F9", "Ctrl+Alt+F7"],
+    ["", ""],
+  ]) {
+    translate.shortcut = translation;
+    old.shortcuts.capture = capture;
+    const preserved = parseConfig(old);
+    assert.equal(preserved.actions[0].shortcut, translation);
+    assert.equal(preserved.shortcuts.capture, capture);
+  }
 });

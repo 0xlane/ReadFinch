@@ -5,7 +5,10 @@ import path from "node:path";
 import assert from "node:assert/strict";
 
 const isolated = process.argv.includes("--isolated-shortcuts");
-const output = isolated ? "docs/screenshots/current" : "docs/screenshots/current";
+const verifyOnly = process.argv.includes("--verify-only");
+const output = verifyOnly
+  ? path.resolve(".local/shortcut-verification-" + Date.now())
+  : "docs/screenshots/current";
 await mkdir(output, { recursive: true });
 const checks = [],
   errors = [],
@@ -436,7 +439,9 @@ try {
   );
   assert.deepEqual(errors, []);
   await writeFile(
-    "docs/shortcut-verification.json",
+    verifyOnly
+      ? path.join(output, "verification.json")
+      : "docs/shortcut-verification.json",
     JSON.stringify(
       {
         version: JSON.parse(await readFile("package.json", "utf8")).version,

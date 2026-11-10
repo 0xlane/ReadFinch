@@ -34,6 +34,7 @@ delete env.ELECTRON_RUN_AS_NODE;
 let app, target;
 const events = [],
   cases = [];
+let coexistingToolbarOverlaps = 0;
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 const check = (name) => {
   cases.push(name);
@@ -97,6 +98,16 @@ try {
     () => events.find((e) => e.id === "ready"),
     "fixture ready",
   );
+  await app.evaluate(({ app, BrowserWindow }) => {
+    globalThis.__readfinchToolbarShows = 0;
+    const observe = (window) =>
+      window.on("show", () => {
+        if (window.webContents.getURL().includes("mode=pill"))
+          globalThis.__readfinchToolbarShows++;
+      });
+    BrowserWindow.getAllWindows().forEach(observe);
+    app.on("browser-window-created", (_event, window) => observe(window));
+  });
   const visible = () =>
     app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows().some(
@@ -104,11 +115,30 @@ try {
       ),
     );
   const selection = () => call("selectionGet");
+  const showCount = () =>
+    app.evaluate(() => globalThis.__readfinchToolbarShows);
+  async function quietMoves(label) {
+    const before = await showCount();
+    const snapshot = await selection();
+    for (const x of [60, 260, 600, 100]) {
+      input("move", ready.hwnd, ready.x + x, ready.y + 12);
+      await pause(160);
+      assert.equal(await visible(), false, label);
+      assert.equal(await showCount(), before, label + " must not flash");
+      assert.deepEqual(await selection(), snapshot, label);
+    }
+    await pause(300);
+    assert.equal(await showCount(), before, label + " must stay quiet");
+    check(label);
+  }
   await pause(700);
   assert.equal(await visible(), false);
   assert.equal(await selection(), null);
   check(
     "Programmatic selection on application focus does not show the toolbar",
+  );
+  await quietMoves(
+    "Programmatic selection followed by pointer travel stays quiet",
   );
 
   await command("clear");
@@ -123,6 +153,10 @@ try {
   await pause(450);
   assert.equal(await visible(), false);
   assert.equal(await selection(), null);
+  assert.equal((await command("status")).length, ready.text.length);
+  await quietMoves(
+    "Ctrl+A followed by pointer travel does not show or flash a toolbar",
+  );
   const selectedByShortcut = await app.evaluate(() =>
     globalThis.__readfinchTest.readNativeSelection(),
   );
@@ -132,6 +166,27 @@ try {
   check(
     "Ctrl+A stays quiet; explicit shortcut reads the complete current selection without showing a toolbar",
   );
+  await quietMoves(
+    "An explicit shortcut snapshot cannot be reopened by pointer travel",
+  );
+
+  for (const operation of ["key-interrupted-drag", "key-between-clicks"]) {
+    const fixture = await command("clear");
+    await pause(600);
+    const before = await showCount();
+    input(
+      operation,
+      fixture.hwnd,
+      fixture.x + 5,
+      fixture.y + 12,
+      fixture.x + 175,
+      fixture.y + 12,
+    );
+    await pause(350);
+    assert.equal(await visible(), false, operation);
+    assert.equal(await showCount(), before, operation + " must not flash");
+    await quietMoves(operation + " cannot reuse the cancelled mouse gesture");
+  }
 
   async function dragSelection() {
     const fixture = await command("clear");
@@ -178,7 +233,22 @@ try {
       },
       { url: page.url(), x: box.x + box.width / 2, y: box.y + box.height / 2 },
     );
-    input(operation, point.hwnd, point.x, point.y);
+    try {
+      input(operation, point.hwnd, point.x, point.y);
+    } catch (error) {
+      // The installed app can independently select the same fixture text and
+      // cover the development toolbar. Raise only our test surface, without
+      // activation; never click through or close the user's installed app.
+      if (!String(error.stderr).includes("process ReadFinch, expected"))
+        throw error;
+      coexistingToolbarOverlaps++;
+      await app.evaluate(({ BrowserWindow }, url) => {
+        BrowserWindow.getAllWindows()
+          .find((w) => w.webContents.getURL() === url)
+          .moveTop();
+      }, page.url());
+      input(operation, point.hwnd, point.x, point.y);
+    }
   }
   async function panelFor(actionId, text) {
     const page = await until(
@@ -197,7 +267,7 @@ try {
     return page;
   }
 
-  const selected = await dragSelection();
+  await dragSelection();
   let pill = app.windows().find((w) => w.url().includes("mode=pill"));
   await pill.getByRole("button", { name: "翻译", exact: true }).waitFor();
   const properties = await app.evaluate(({ BrowserWindow }) => {
@@ -208,6 +278,13 @@ try {
   });
   assert.deepEqual(properties, { focused: false, focusable: true });
   check("The toolbar appears without taking source keyboard focus");
+  input("select-all", ready.hwnd);
+  await until(async () => !(await visible()), "keyboard dismissal");
+  assert.equal((await command("status")).length, ready.text.length);
+  await quietMoves(
+    "Ctrl+A dismisses an existing toolbar and pointer travel cannot revive it",
+  );
+  const freshSelection = await dragSelection();
   await nativeClick(
     pill,
     pill.getByRole("button", { name: "翻译", exact: true }),
@@ -215,12 +292,12 @@ try {
   );
   await command("change");
   await pause(500);
-  assert.deepEqual(await selection(), selected);
+  assert.deepEqual(await selection(), freshSelection);
   await nativeClick(
     pill,
     pill.getByRole("button", { name: "翻译", exact: true }),
   );
-  await panelFor("translate", selected.text);
+  await panelFor("translate", freshSelection.text);
   check(
     "A real first click on the inactive toolbar opens translation; provider selection changes while hovering cannot change its snapshot",
   );
@@ -257,7 +334,11 @@ try {
   await command("clear");
   await pause(250);
   assert.equal(await visible(), false);
-  const report = { date: new Date().toISOString(), cases };
+  const report = {
+    date: new Date().toISOString(),
+    cases,
+    coexistingToolbarOverlaps,
+  };
   await writeFile(
     path.join(dir, "verification.json"),
     JSON.stringify(report, null, 2),

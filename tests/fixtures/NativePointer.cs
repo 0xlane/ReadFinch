@@ -24,6 +24,10 @@ class NativePointer {
     }
   }
   static void Mouse(uint flags) { mouse_event(flags,0,0,0,UIntPtr.Zero); }
+  static void SelectAll(IntPtr window, Process process) {
+    if(process.ProcessName!="NativeTarget" || GetForegroundWindow()!=window) throw new Exception("Fixture is not foreground");
+    keybd_event(0x11,0,0,UIntPtr.Zero);keybd_event(0x41,0,0,UIntPtr.Zero);keybd_event(0x41,0,2,UIntPtr.Zero);keybd_event(0x11,0,2,UIntPtr.Zero);
+  }
   static void Main(string[] args) {
     try { Run(args); }
     catch(Exception error) { Console.Error.WriteLine(error.Message); Environment.Exit(1); }
@@ -44,17 +48,22 @@ class NativePointer {
     if(operation=="select-all" || operation=="right") {
       if(process.ProcessName!="NativeTarget" || GetForegroundWindow()!=window) throw new Exception("Fixture is not foreground");
       if(operation=="right") { keybd_event(0x27,0,0,UIntPtr.Zero);keybd_event(0x27,0,2,UIntPtr.Zero); }
-      else { keybd_event(0x11,0,0,UIntPtr.Zero);keybd_event(0x41,0,0,UIntPtr.Zero);keybd_event(0x41,0,2,UIntPtr.Zero);keybd_event(0x11,0,2,UIntPtr.Zero); }
+      else SelectAll(window,process);
       return;
     }
     var start=PointAt(args,2);Hit(window,start);SetCursorPos(start.X,start.Y);Thread.Sleep(80);
     if(operation=="move") return;
     Mouse(2);Thread.Sleep(80);
-    if(operation=="drag") {
+    if(operation=="key-interrupted-drag") { SelectAll(window,process);Thread.Sleep(80); }
+    if(operation=="drag" || operation=="key-interrupted-drag") {
       var end=PointAt(args,4);
       for(int i=1;i<=15;i++){SetCursorPos(start.X+(end.X-start.X)*i/15,start.Y+(end.Y-start.Y)*i/15);Thread.Sleep(15);}
       Thread.Sleep(80);
     }
     Mouse(4);
+    if(operation=="key-between-clicks") {
+      Thread.Sleep(30);SelectAll(window,process);Thread.Sleep(30);
+      Mouse(2);Thread.Sleep(40);Mouse(4);
+    }
   }
 }

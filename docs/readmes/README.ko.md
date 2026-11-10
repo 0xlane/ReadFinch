@@ -14,7 +14,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 | 명령 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 선택 영역 번역 | `Alt + T` | `Option + D` |
+| 선택 영역 번역 | `Alt + D` | `Option + D` |
 | 사전 열기 | `Alt + Shift + D` | `Option + Shift + D` |
 | 글쓰기 개선 | `Alt + Shift + W` | `Option + Shift + W` |
 | 명령 선택 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| OCR로 화면 글 가져오기 | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| OCR로 화면 글 가져오기 | `Alt + Shift + S` | `Option + Shift + S` |
 | 클립보드 글 읽기 | `Ctrl + Shift + V` | `Command + Shift + V` |
 | 입력 번역 | `Alt + A` | `Option + A` |
 

@@ -90,7 +90,7 @@ internal sealed class SelectionInput : IDisposable {
     return CallNextHookEx(IntPtr.Zero, code, message, data);
   }
   private void Enqueue(SelectionInteraction.Input input) {
-    if (input.Kind != "move") Interlocked.Increment(ref version);
+    input.Version = input.Kind == "move" ? Version : Interlocked.Increment(ref version);
     lock (gate) {
       if (queue.Count >= 256) { overflow = true; return; }
       queue.Enqueue(input);

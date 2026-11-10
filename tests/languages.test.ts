@@ -111,7 +111,7 @@ test("first-run and v14 follow-mode initialization is written once; restarts, im
     const stored = JSON.parse(await readFile(file, "utf8"));
     assert.equal(stored.defaults.targetLanguage, old ? old[2] : "日本語");
     assert.equal(stored.defaults.sourceLanguage, old ? "Deutsch" : "auto");
-    assert.equal(stored.schemaVersion, 16);
+    assert.equal(stored.schemaVersion, 17);
     assert.ok(!("explanationLanguage" in stored.defaults));
     assert.equal(
       reads,

@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@
 
 | 指令 | Windows / Linux | macOS |
 | --- | --- | --- |
-| 翻譯選取文字 | `Alt + T` | `Option + D` |
+| 翻譯選取文字 | `Alt + D` | `Option + D` |
 | 開啟字典 | `Alt + Shift + D` | `Option + Shift + D` |
 | 改善寫作 | `Alt + Shift + W` | `Option + Shift + W` |
 | 選擇指令 | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| 框選螢幕文字 | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| 框選螢幕文字 | `Alt + Shift + S` | `Option + Shift + S` |
 | 讀取剪貼簿 | `Ctrl + Shift + V` | `Command + Shift + V` |
 | 輸入翻譯 | `Alt + A` | `Option + A` |
 

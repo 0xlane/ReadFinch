@@ -8,6 +8,7 @@ internal sealed class SelectionInteraction {
     public string Kind;
     public Point Point;
     public long Time;
+    public long Version;
     public IntPtr Window;
     public uint Pid;
     public bool Shift;
@@ -15,7 +16,7 @@ internal sealed class SelectionInteraction {
   }
   private readonly int doubleClickTime, doubleClickWidth, doubleClickHeight;
   private Point origin, lastDown, anchor;
-  private long lastDownAt = -10000, pendingUntil;
+  private long lastDownAt = -10000, pendingUntil, pendingVersion;
   private IntPtr downWindow, lastDownWindow, pendingWindow;
   private bool down, dragged, ignored;
   private int clicks, scrolled;
@@ -30,11 +31,14 @@ internal sealed class SelectionInteraction {
   internal void SetToolbar(Rectangle? bounds) { toolbar = bounds; }
   internal bool ContainsToolbar(Point point) { return toolbar.HasValue && toolbar.Value.Contains(point); }
   internal void Clear() { sourcePid = 0; toolbar = null; scrolled = 0; }
-  internal void CancelPending() { pendingUntil = 0; }
+  internal void CancelPending() { pendingUntil = 0; pendingVersion = 0; }
   internal void Begin(uint pid, Point point) { sourcePid = pid; anchor = point; scrolled = 0; pendingUntil = 0; }
   internal bool DismissForApplication(uint pid, uint host) { return sourcePid != 0 && pid != sourcePid && pid != host; }
-  internal bool Pending(long now, IntPtr foreground) {
-    if (now > pendingUntil || foreground != pendingWindow) pendingUntil = 0;
+  internal bool Pending(long now, IntPtr foreground, long version) {
+    // The hook can receive a key after the queue was drained but before a read
+    // starts. That key must invalidate the mouse gesture immediately, even if
+    // the worker has not consumed its queued cancellation yet.
+    if (now > pendingUntil || foreground != pendingWindow || version != pendingVersion) CancelPending();
     return pendingUntil != 0;
   }
   internal Point SelectionPoint { get { return anchor; } }
@@ -62,23 +66,28 @@ internal sealed class SelectionInteraction {
         if (!down || ignored) { down = false; return false; }
         TrackDrag(input.Point); down = false;
         if (dragged || clicks >= 2 || input.Shift) {
-          pendingUntil = input.Time + 800; pendingWindow = downWindow; anchor = input.Point;
+          pendingUntil = input.Time + 800; pendingVersion = input.Version;
+          pendingWindow = downWindow; anchor = input.Point;
         }
         if (dragged) { lastDownAt = -10000; clicks = 0; }
         return false;
       case "keyboard":
-        CancelPending(); return true;
+        CancelGesture(); return true;
       case "pointer":
       case "cancel":
-        down = false; lastDownAt = -10000; CancelPending();
+        CancelGesture();
         return input.Kind == "cancel" || input.Pid != host || !ContainsToolbar(input.Point);
       case "scroll":
         if (ContainsToolbar(input.Point)) return false;
-        CancelPending(); down = false;
+        CancelGesture();
         scrolled += Math.Abs(input.Delta);
         return sourcePid != 0 && scrolled > 80;
     }
     return false;
+  }
+  private void CancelGesture() {
+    CancelPending(); down = false; dragged = false; ignored = false;
+    lastDownAt = -10000; lastDownWindow = IntPtr.Zero; clicks = 0;
   }
   private void TrackDrag(Point point) {
     if (!down) return;

@@ -2,7 +2,7 @@ import { t } from "./i18n";
 import type { Config } from "./config";
 
 export const DEFAULT_ACTION_SHORTCUTS: Record<string, string> = {
-  translate: currentShortcutPlatform() === "darwin" ? "Alt+D" : "Alt+T",
+  translate: "Alt+D",
   dictionary: "Alt+Shift+D",
   polish: "Alt+Shift+W",
 };

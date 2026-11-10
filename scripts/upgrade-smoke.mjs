@@ -121,7 +121,7 @@ try {
   );
   await launch();
   let state = await call("snapshot");
-  assert.equal(state.config.schemaVersion, 16);
+  assert.equal(state.config.schemaVersion, 17);
   assert.equal(state.config.providers.length, 2);
   const textProvider = state.config.providers.find(
     (p) => p.model === "legacy-text-model",
@@ -188,7 +188,7 @@ try {
     legacy,
   );
   const saved = await readFile(path.join(dataDir, "config.json"), "utf8");
-  assert.equal(JSON.parse(saved).schemaVersion, 16);
+  assert.equal(JSON.parse(saved).schemaVersion, 17);
   assert.doesNotMatch(
     saved,
     /legacy-text-fixture|legacy-vision-fixture|ciphertext/,

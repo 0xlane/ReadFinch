@@ -159,11 +159,11 @@ class SelectionBridge {
     if(interaction.DismissForApplication(pid,host)){interaction.CancelPending();Invalidate();}
     // Never re-read providers while the pointer travels to a non-activating
     // toolbar. UIA's focused/hit-tested element can change during mouse-down.
-    if(!force&&!interaction.Pending(input.Now,foreground))return;
+    long version=input.Version;
+    if(!force&&!interaction.Pending(input.Now,foreground,version))return;
     if(Own(pid)){if(force)Invalidate();return;}
     if((GetAsyncKeyState(1)&0x8000)!=0){if(force)Invalidate();return;}
     if(!force&&(GetAsyncKeyState(16)&0x8000)!=0)return;
-    long version=input.Version;
     ProbeTarget(pid);Probe("foreground");
     var info=new GuiInfo();info.cbSize=Marshal.SizeOf(info);GetGUIThreadInfo(thread,ref info);
     IntPtr target=info.focus;var cls=new StringBuilder(300);GetClassName(target,cls,cls.Capacity);

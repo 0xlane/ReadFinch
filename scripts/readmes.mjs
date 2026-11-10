@@ -51,11 +51,11 @@ for (const code of order) {
   const shortcutRows = c.shortcuts
     .map((name, i) => {
       const win = [
-        "Alt + T",
+        "Alt + D",
         "Alt + Shift + D",
         "Alt + Shift + W",
         "Ctrl + Shift + Space",
-        "Ctrl + Shift + 2",
+        "Alt + Shift + S",
         "Ctrl + Shift + V",
         "Alt + A",
       ][i];

@@ -14,7 +14,7 @@ ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze m
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@ Die automatische Update-Suche ist standardmäßig aktiviert und lässt sich unte
 
 | Befehl | Windows / Linux | macOS |
 | --- | --- | --- |
-| Auswahl übersetzen | `Alt + T` | `Option + D` |
+| Auswahl übersetzen | `Alt + D` | `Option + D` |
 | Wörterbuch öffnen | `Alt + Shift + D` | `Option + Shift + D` |
 | Text verbessern | `Alt + Shift + W` | `Option + Shift + W` |
 | Befehl auswählen | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Bildschirmtext per OCR erfassen | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| Bildschirmtext per OCR erfassen | `Alt + Shift + S` | `Option + Shift + S` |
 | Text aus der Zwischenablage lesen | `Ctrl + Shift + V` | `Command + Shift + V` |
 | Eingegebenen Text übersetzen | `Alt + A` | `Option + A` |
 

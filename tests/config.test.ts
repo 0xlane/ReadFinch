@@ -47,7 +47,7 @@ test("v0 migration adds font size, unknown fields remain rejected", () => {
   old.schemaVersion = 0;
   delete old.appearance.fontSize;
   const next = parseConfig(old);
-  assert.equal(next.schemaVersion, 16);
+  assert.equal(next.schemaVersion, 17);
   assert.equal(next.appearance.fontSize, 15);
 });
 test("substitution is single-pass and preserves source tokens literally", () => {
@@ -112,7 +112,7 @@ test("v15 shortcut migration is persisted once with a recoverable original", asy
   await store.init();
   assert.equal(
     JSON.parse(await readFile(store.file, "utf8")).schemaVersion,
-    16,
+    17,
   );
   assert.equal(await readFile(store.file + ".bak", "utf8"), original);
   const config = store.config;
@@ -121,4 +121,30 @@ test("v15 shortcut migration is persisted once with a recoverable original", asy
   const reopened = new ConfigStore(dir);
   await reopened.init();
   assert.equal(reopened.config.shortcuts.input, "");
+});
+
+test("v16 shortcut upgrade is saved once and clearing OCR remains disabled after restart", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "readfinch-bob-shortcuts-"));
+  const old: any = defaultConfig();
+  old.schemaVersion = 16;
+  old.shortcuts.capture = "CmdOrCtrl+Shift+2";
+  old.actions[0].shortcut = "Alt+T";
+  const original = JSON.stringify(old);
+  const store = new ConfigStore(dir);
+  await writeFile(store.file, original);
+  await store.init();
+  const saved = JSON.parse(await readFile(store.file, "utf8"));
+  assert.equal(saved.schemaVersion, 17);
+  assert.equal(saved.shortcuts.capture, "Alt+Shift+S");
+  assert.equal(saved.actions[0].shortcut, "Alt+D");
+  assert.equal(await readFile(store.file + ".bak", "utf8"), original);
+  const changed = store.config;
+  changed.shortcuts.capture = "";
+  changed.actions[0].shortcut = "Alt+T";
+  await store.save(changed);
+  const before = await readFile(store.file, "utf8");
+  const reopened = new ConfigStore(dir);
+  await reopened.init();
+  assert.deepEqual(reopened.config, changed);
+  assert.equal(await readFile(store.file, "utf8"), before);
 });

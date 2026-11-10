@@ -14,7 +14,7 @@ ReadFinch is an open-source desktop reading and writing companion. Translate sel
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.7-4d443e?style=flat-square" alt="1.2.7">
+<img src="https://img.shields.io/badge/Version-1.2.8-4d443e?style=flat-square" alt="1.2.8">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -106,11 +106,11 @@ Automatic update checks are enabled by default and can be configured in **About*
 
 | Command | Windows / Linux | macOS |
 | --- | --- | --- |
-| Translate selection | `Alt + T` | `Option + D` |
+| Translate selection | `Alt + D` | `Option + D` |
 | Open dictionary | `Alt + Shift + D` | `Option + Shift + D` |
 | Improve writing | `Alt + Shift + W` | `Option + Shift + W` |
 | Choose a command | `Ctrl + Shift + Space` | `Command + Shift + Space` |
-| Capture text with OCR | `Ctrl + Shift + 2` | `Option + Shift + S` |
+| Capture text with OCR | `Alt + Shift + S` | `Option + Shift + S` |
 | Read clipboard text | `Ctrl + Shift + V` | `Command + Shift + V` |
 | Input translation | `Alt + A` | `Option + A` |
 

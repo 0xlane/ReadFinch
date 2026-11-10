@@ -39,7 +39,7 @@ test("v13 providers inherit system proxy and copy, merge and reopen preserve ind
   old.schemaVersion = 13;
   delete old.providers[0].proxy;
   const upgraded = parseConfig(old);
-  assert.equal(upgraded.schemaVersion, 16);
+  assert.equal(upgraded.schemaVersion, 17);
   assert.deepEqual(upgraded.providers[0].proxy, {
     mode: "system",
     address: "",
