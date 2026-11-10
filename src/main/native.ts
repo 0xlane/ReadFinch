@@ -496,7 +496,10 @@ export class SelectionService extends EventEmitter {
     width: number;
     height: number;
   }) {
-    if (this.platform === "darwin" && this.child?.stdin.writable)
+    if (
+      (this.platform === "darwin" || this.platform === "win32") &&
+      this.child?.stdin.writable
+    )
       this.child.stdin.write(
         JSON.stringify({ op: "toolbarBounds", ...bounds }) + "\n",
       );

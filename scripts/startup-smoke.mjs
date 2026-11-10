@@ -73,6 +73,7 @@ try {
       if (item) {
         fixture.menu = menu;
         fixture.handler = item.click;
+        fixture.restart = template.find((i) => i.id === "restart-app").click;
       }
       return menu;
     };
@@ -102,7 +103,10 @@ try {
   if (process.platform === "win32") {
     assert.equal(registration.args.at(-1), "--autostart");
     if (packaged)
-      assert.equal(registration.path, "C:\\Test Folder\\ReadFinch portable.exe");
+      assert.equal(
+        registration.path,
+        "C:\\Test Folder\\ReadFinch portable.exe",
+      );
   }
   await application.evaluate(() => {
     startupFixture.active = false;
@@ -155,6 +159,29 @@ try {
   );
   console.log(
     "First login launch stays in the tray; explicit open works. Tray registration, external disable, and removal verified with isolated OS fixtures.",
+  );
+  // Exercise the real tray handler without starting a second desktop process.
+  const restart = await application.evaluate(({ app }) => {
+    const relaunch = app.relaunch,
+      quit = app.quit;
+    const calls = [];
+    app.relaunch = (options) => calls.push({ method: "relaunch", options });
+    app.quit = () => calls.push({ method: "quit" });
+    try {
+      startupFixture.restart();
+      startupFixture.restart();
+      return calls;
+    } finally {
+      app.relaunch = relaunch;
+      app.quit = quit;
+    }
+  });
+  assert.deepEqual(restart, [
+    { method: "relaunch", options: undefined },
+    { method: "quit" },
+  ]);
+  console.log(
+    "Tray restart schedules one relaunch and then a clean quit; repeated clicks cannot create duplicate relaunches.",
   );
 } finally {
   await application.close();
