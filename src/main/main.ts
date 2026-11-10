@@ -550,7 +550,8 @@ function updateTray() {
         if (quitting || updates.state.status === "installing") return;
         if (
           updates.state.status === "downloaded" &&
-          updates.state.installMode === "automatic"
+          (updates.state.installMode === "automatic" ||
+            updates.state.installMode === "restart")
         ) {
           // Let the installer relaunch the updated app, without racing it by
           // starting the old executable as the installer replaces its files.
