@@ -542,6 +542,42 @@ function updateTray() {
     },
     { label: t("关于伴读雀"), click: () => openSettings("about") },
     { label: `${t("伴读雀")} ${app.getVersion()}`, enabled: false },
+    { type: "separator" },
+    {
+      id: "restart-app",
+      label: t("重启应用"),
+      click: () => {
+        if (quitting || updates.state.status === "installing") return;
+        if (
+          updates.state.status === "downloaded" &&
+          updates.state.installMode === "automatic"
+        ) {
+          // Let the installer relaunch the updated app, without racing it by
+          // starting the old executable as the installer replaces its files.
+          void updates.service!.install().then((state) => {
+            if (state.status !== "installing") openSettings("about");
+          });
+          return;
+        }
+        try {
+          // Relaunch keeps the original arguments and profile. Portable builds
+          // must restart their launcher rather than a temporary extracted exe.
+          const launcher = app.isPackaged
+            ? process.platform === "win32"
+              ? process.env.PORTABLE_EXECUTABLE_FILE
+              : process.platform === "linux"
+                ? process.env.APPIMAGE
+                : undefined
+            : undefined;
+          app.relaunch(launcher ? { execPath: launcher } : undefined);
+          quitting = true;
+          app.quit();
+        } catch {
+          quitting = false;
+          dialog.showErrorBox(t("无法重启应用"), t("请退出伴读雀后重新打开。"));
+        }
+      },
+    },
     {
       label: t("退出伴读雀"),
       click: () => {
@@ -703,6 +739,7 @@ function setToolbarMenu(mode: ToolbarMenu, focus = false) {
   updateToolbar();
   if (toolbarPopupFocus && toolbarPopup?.isVisible()) {
     toolbarPopup.setFocusable(true);
+    if (process.platform === "win32") toolbarPopup.setSkipTaskbar(true);
     toolbarPopup.focus();
     toolbarPopupFocus = false;
   }
@@ -768,7 +805,11 @@ function updateToolbar(): ToolbarView | null {
   const layout = currentToolbarLayout();
   const surfaces = toolbarSurfaces(layout);
   toolbarRegions = toolbarHoverRegions(layout);
-  native.setToolbarBounds(layout.bounds);
+  native.setToolbarBounds(
+    process.platform === "win32"
+      ? screen.dipToScreenRect(pill, layout.bounds)
+      : layout.bounds,
+  );
   const frame = JSON.stringify(surfaces.bar.bounds);
   if (frame !== toolbarFrame) {
     pill.setBounds(surfaces.bar.bounds);
@@ -831,7 +872,7 @@ function ensureToolbarPopup() {
     resizable: false,
     transparent: true,
     backgroundColor: "#00000000",
-    focusable: false,
+    focusable: process.platform === "win32",
     skipTaskbar: true,
     alwaysOnTop: true,
     hasShadow: false,
@@ -863,6 +904,9 @@ function showPaintedToolbar() {
   )
     return;
   if (!pill.isVisible()) pill.showInactive();
+  // A source editor may itself be topmost. Showing an existing HWND does not
+  // consistently raise it above that editor after the editor is reactivated.
+  if (process.platform === "win32") pill.moveTop();
   startToolbarHover();
   showPaintedToolbarPopup();
 }
@@ -879,11 +923,13 @@ function showPaintedToolbarPopup() {
     return;
   if (!toolbarPopup.isVisible()) {
     toolbarPopup.showInactive();
+    if (process.platform === "win32") toolbarPopup.moveTop();
     // Keep the strip's controls above overlapping transparent shadow margins.
     pill.moveTop();
   }
   if (toolbarPopupFocus) {
     toolbarPopup.setFocusable(true);
+    if (process.platform === "win32") toolbarPopup.setSkipTaskbar(true);
     toolbarPopup.focus();
     toolbarPopupFocus = false;
   }
@@ -920,7 +966,10 @@ function ensureToolbarWindow() {
     resizable: false,
     transparent: true,
     backgroundColor: "#00000000",
-    focusable: false,
+    // Show without activating; allow an actual click to activate Chromium.
+    // Windows needs the complete press/release sequence to generate a click.
+    // The selection snapshot survives activation of either toolbar surface.
+    focusable: process.platform === "win32",
     skipTaskbar: true,
     alwaysOnTop: true,
     hasShadow: false,
@@ -979,8 +1028,7 @@ function showLoadedToolbar(): ToolbarView | null {
     !toolbarEnabled(store.config, native.current.app, toolbarPausedUntil)
   )
     return null;
-  if (process.platform !== "win32" || pill.isFocusable())
-    pill.setFocusable(false);
+  if (process.platform !== "win32") pill.setFocusable(false);
   const state = updateToolbar();
   if (state) showPaintedToolbar();
   return state;

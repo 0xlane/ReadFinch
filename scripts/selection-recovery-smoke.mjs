@@ -51,7 +51,7 @@ createInterface({ input: target.stdout }).on("line", (line) =>
 async function waitFor(predicate, timeout = 20000) {
   const end = Date.now() + timeout;
   while (Date.now() < end) {
-    const value = predicate();
+    const value = await predicate();
     if (value) return value;
     await new Promise((r) => setTimeout(r, 80));
   }
@@ -61,14 +61,18 @@ const text = "Small steps make a big difference.";
 try {
   await waitFor(() => events.some((e) => e.id === "ready"));
   service.start();
-  await waitFor(() => service.current?.text === text);
+  await waitFor(async () => (await service.readCurrent())?.text === text);
   const first = service.child;
   console.log("Real Windows Edit selection acquired.");
   if (!baseline) {
     target.stdin.write("hang\n");
     await waitFor(() => events.some((e) => e.id === "hang"));
+    assert.equal(await service.readCurrent(), undefined);
     await waitFor(() => !service.current, 3000);
-    await waitFor(() => service.current?.text === text, 10000);
+    await waitFor(
+      async () => (await service.readCurrent())?.text === text,
+      10000,
+    );
     assert.equal(
       service.child,
       first,
@@ -87,7 +91,9 @@ try {
     assert(reply.text.startsWith("A replacement verified after recovery."));
     target.stdin.write("select\n");
     await waitFor(
-      () => service.current?.text === "A replacement verified after recovery.",
+      async () =>
+        (await service.readCurrent())?.text ===
+        "A replacement verified after recovery.",
     );
   }
   const expected = service.current.text;
@@ -108,10 +114,10 @@ try {
     );
   } else {
     await waitFor(
-      () =>
+      async () =>
         service.child &&
         service.child !== first &&
-        service.current?.text === expected,
+        (await service.readCurrent())?.text === expected,
       25000,
     );
     assert.equal(service.state, "ready");

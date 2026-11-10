@@ -70,6 +70,20 @@ const selected = {
   canReplace: true,
 };
 
+test("Windows forwards and clears physical toolbar bounds for native click protection", (t) => {
+  const { service, helpers } = windowsFixture(t);
+  const bounds = { x: -1000, y: -200, width: 560, height: 340 };
+  service.setToolbarBounds(bounds);
+  assert.deepEqual(JSON.parse(helpers[0].stdin.read().toString()), {
+    op: "toolbarBounds",
+    ...bounds,
+  });
+  service.setToolbarBounds();
+  assert.deepEqual(JSON.parse(helpers[0].stdin.read().toString()), {
+    op: "toolbarBounds",
+  });
+});
+
 test("timeout diagnostics retain the last app and operation but not content, and progress cannot mask a hang", (t) => {
   const { helpers, tick, diagnostics } = windowsFixture(t);
   helpers[0].send({ ...selected, text: "PRIVATE SOURCE" });

@@ -29,6 +29,8 @@ class SelectionBridge {
   [DllImport("user32.dll")] static extern IntPtr GetAncestor(IntPtr h,uint flags);
   [DllImport("user32.dll")] static extern bool IsChild(IntPtr parent,IntPtr child);
   [DllImport("user32.dll")] static extern bool GetGUIThreadInfo(uint thread,ref GuiInfo info);
+  [DllImport("user32.dll")] static extern uint GetDoubleClickTime();
+  [DllImport("user32.dll")] static extern int GetSystemMetrics(int index);
   [DllImport("user32.dll")] static extern bool SetProcessDPIAware();
   [DllImport("user32.dll")] static extern bool SetProcessDpiAwarenessContext(IntPtr context);
   [DllImport("shcore.dll")] static extern int SetProcessDpiAwareness(int awareness);
@@ -44,7 +46,9 @@ class SelectionBridge {
   class Saved {public string Token,Text,Full,Key;public IntPtr Handle;public int Start,End;public uint Pid;public object Selection;}
   static JavaScriptSerializer json=new JavaScriptSerializer(){MaxJsonLength=2000000};
   static ConcurrentQueue<string> commands=new ConcurrentQueue<string>();
-  static Saved saved;static uint host;static string lastKey="";static bool running=true;
+  static Saved saved;static uint host;static bool running=true;
+  static SelectionInput input;
+  static SelectionInteraction interaction;
   static uint probePid,cachedProcessPid;static string probeApp="",cachedProcessName="";
   static AutomationElement lastTextElement;static IntPtr lastTextWindow;
   static void Emit(object value){Console.WriteLine(json.Serialize(value));Console.Out.Flush();}
@@ -56,7 +60,8 @@ class SelectionBridge {
   }
   static void Idle(){probePid=0;probeApp="";Probe("idle");}
   static void OperationError(Exception error){Emit(new{type="operationError",code=error.GetType().Name});}
-  static void Invalidate(){if(saved!=null){saved=null;lastKey="";Emit(new{type="invalid"});}}
+  static void Invalidate(){interaction.Clear();if(saved!=null){saved=null;Emit(new{type="invalid"});}}
+  static void ReadInput(){foreach(var value in input.Drain())if(interaction.Receive(value,host))Invalidate();}
   static void ReadEditSelection(IntPtr h,out int start,out int end){
     Probe("edit-selection");
     UIntPtr result;
@@ -151,9 +156,14 @@ class SelectionBridge {
   }
   static void Poll(bool force=false){
     IntPtr foreground=GetForegroundWindow();uint pid;uint thread=GetWindowThreadProcessId(foreground,out pid);
+    if(interaction.DismissForApplication(pid,host)){interaction.CancelPending();Invalidate();}
+    // Never re-read providers while the pointer travels to a non-activating
+    // toolbar. UIA's focused/hit-tested element can change during mouse-down.
+    if(!force&&!interaction.Pending(input.Now,foreground))return;
     if(Own(pid)){if(force)Invalidate();return;}
     if((GetAsyncKeyState(1)&0x8000)!=0){if(force)Invalidate();return;}
     if(!force&&(GetAsyncKeyState(16)&0x8000)!=0)return;
+    long version=input.Version;
     ProbeTarget(pid);Probe("foreground");
     var info=new GuiInfo();info.cbSize=Marshal.SizeOf(info);GetGUIThreadInfo(thread,ref info);
     IntPtr target=info.focus;var cls=new StringBuilder(300);GetClassName(target,cls,cls.Capacity);
@@ -175,18 +185,27 @@ class SelectionBridge {
     if(text.Length==0){
       if(!ReadUiaSelection(foreground,ref anchor,out text,out key)){Invalidate();return;}
     }
-    if(GetForegroundWindow()!=foreground||String.IsNullOrWhiteSpace(text)||text.Length>100000){Invalidate();return;}
-    if(key==lastKey)return;
-    lastKey=key;
+    if(input.Version!=version||GetForegroundWindow()!=foreground||String.IsNullOrWhiteSpace(text)||text.Length>100000){Invalidate();return;}
+    if(!force)anchor=new Point{X=interaction.SelectionPoint.X,Y=interaction.SelectionPoint.Y};
     saved=new Saved{Token=Guid.NewGuid().ToString("N"),Text=text,Full=full,Key=key,Handle=replace?target:IntPtr.Zero,Start=start,End=end,Pid=pid};
     saved.Selection=new{token=saved.Token,text=text,app=ProcessName(pid),x=anchor.X,y=anchor.Y,canReplace=replace};
-    Emit(new{type="selection",token=saved.Token,text=text,app=ProcessName(pid),x=anchor.X,y=anchor.Y,canReplace=replace});
+    interaction.Begin(pid,new System.Drawing.Point(anchor.X,anchor.Y));
+    if(!force)Emit(new{type="selection",token=saved.Token,text=text,app=ProcessName(pid),x=anchor.X,y=anchor.Y,canReplace=replace});
   }
   static void Command(string line){
     string id="";try{
       var c=json.Deserialize<Dictionary<string,object>>(line);id=c.ContainsKey("id")?(string)c["id"]:"";string op=(string)c["op"];
-      if(op=="quit"){running=false;return;}if(op=="invalidate"){Invalidate();return;}
+      if(op=="quit"){running=false;return;}if(op=="invalidate"){interaction.CancelPending();Invalidate();return;}
+      if(op=="toolbarBounds"){
+        if(c.ContainsKey("x")&&c.ContainsKey("y")&&c.ContainsKey("width")&&c.ContainsKey("height")){
+          var x=Convert.ToDouble(c["x"]);var y=Convert.ToDouble(c["y"]);var width=Convert.ToDouble(c["width"]);var height=Convert.ToDouble(c["height"]);
+          if(!Double.IsNaN(x)&&!Double.IsInfinity(x)&&!Double.IsNaN(y)&&!Double.IsInfinity(y)&&width>0&&width<=100000&&height>0&&height<=100000&&Math.Abs(x)<=1000000&&Math.Abs(y)<=1000000)
+            interaction.SetToolbar(new System.Drawing.Rectangle((int)Math.Floor(x),(int)Math.Floor(y),(int)Math.Ceiling(width),(int)Math.Ceiling(height)));
+        }else interaction.SetToolbar(null);
+        return;
+      }
       if(op=="refresh"){
+        ReadInput();interaction.CancelPending();
         try{Poll(true);}catch(Exception e){OperationError(e);Invalidate();}
         Emit(new{type="selectionSnapshot",id=id,selection=saved==null?null:saved.Selection,javaBridgeUnavailable=saved==null&&JavaSelection.NeedsSetup(GetForegroundWindow())});Idle();return;
       }
@@ -211,8 +230,12 @@ class SelectionBridge {
       return;
     }
     Console.OutputEncoding=new UTF8Encoding(false);Console.InputEncoding=new UTF8Encoding(false);UsePhysicalCoordinates();if(args.Length>0)UInt32.TryParse(args[0],out host);
-    var input=new Thread(()=>{string line;while((line=Console.ReadLine())!=null)commands.Enqueue(line);running=false;});input.IsBackground=true;input.Start();
-    Emit(new{type="ready",message="Windows UI Automation 已连接"});int ticks=0;
-    while(running){Probe("java-pump");JavaSelection.PumpMessages();string command;while(commands.TryDequeue(out command))Command(command);try{Poll();}catch(Exception e){OperationError(e);Invalidate();}Idle();if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(150);}
+    interaction=new SelectionInteraction((int)GetDoubleClickTime(),GetSystemMetrics(36),GetSystemMetrics(37));
+    using(input=new SelectionInput()){
+      if(!input.Installed){Emit(new{type="error",message="无法监听鼠标选区，请重启伴读雀后重试。"});return;}
+      var reader=new Thread(()=>{string line;while((line=Console.ReadLine())!=null)commands.Enqueue(line);running=false;});reader.IsBackground=true;reader.Start();
+      Emit(new{type="ready",message="Windows UI Automation 已连接"});int ticks=0;
+      while(running){ReadInput();Probe("java-pump");JavaSelection.PumpMessages();string command;while(commands.TryDequeue(out command))Command(command);ReadInput();try{Poll();}catch(Exception e){OperationError(e);Invalidate();}Idle();if(++ticks%10==0)Emit(new{type="heartbeat"});Thread.Sleep(100);}
+    }
   }
 }
