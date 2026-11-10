@@ -18,6 +18,7 @@ import {
   verifyUpdateFile,
 } from "../src/core/update-download";
 import { UpdateService, type UpdateDriver } from "../src/core/update-service";
+import { UpdateFailure } from "../src/core/update-manifest";
 import type { UpdateState } from "../src/shared/updates";
 
 const keys = generateKeyPairSync("ed25519");
@@ -224,7 +225,7 @@ function fixture(
     automatic?: boolean;
     version?: string;
     manual?: boolean;
-    mode?: "development";
+    mode?: "development" | "restart";
     failDirect?: boolean;
     failAll?: boolean;
   } = {},
@@ -355,4 +356,21 @@ test("manual package handoff remains ready, and development builds never contact
   assert.equal(dev.checks(), 0);
   assert.equal(dev.service.state.status, "error");
   await assert.rejects(dev.service.install());
+});
+
+test("restart installation waits for the user and preparation failures remain retryable", async () => {
+  const f = fixture({ mode: "restart" });
+  await f.service.check(true);
+  assert.equal(f.service.state.status, "downloaded");
+  assert.equal(f.installs(), 0);
+  f.driver.install = async () => {
+    throw new UpdateFailure("安装包校验失败，已停止更新。");
+  };
+  await f.service.install();
+  assert.equal(f.service.state.status, "downloaded");
+  assert.equal(f.service.state.error, "安装包校验失败，已停止更新。");
+  f.driver.install = async () => {};
+  await f.service.install();
+  assert.equal(f.service.state.status, "installing");
+  assert.equal(f.service.state.error, undefined);
 });

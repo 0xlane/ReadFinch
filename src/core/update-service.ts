@@ -218,10 +218,13 @@ export class UpdateService {
       await this.options.driver.install();
       if (this.state.installMode === "manual")
         this.update({ status: "downloaded" });
-    } catch {
+    } catch (error) {
       this.update({
         status: "downloaded",
-        error: "无法启动安装程序，请前往 GitHub Releases 下载。",
+        error:
+          error instanceof UpdateFailure
+            ? error.messageKey
+            : "无法启动安装程序，请前往 GitHub Releases 下载。",
       });
     }
     return this.state;

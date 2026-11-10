@@ -91,4 +91,14 @@ if (process.platform === "win32") {
     ],
     { stdio: "inherit" },
   );
+  execFileSync(
+    "swiftc",
+    [
+      "native/macos/UpdateInstaller.swift",
+      "native/macos/UpdateHelper.swift",
+      "-o",
+      "native/bin/readfinch-updater",
+    ],
+    { stdio: "inherit", timeout: 120000 },
+  );
 }

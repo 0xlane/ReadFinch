@@ -31,7 +31,7 @@ export type UpdateState = {
   notes?: string;
   checkedAt?: string;
   source: UpdateSource;
-  installMode: "automatic" | "manual" | "development";
+  installMode: "automatic" | "restart" | "manual" | "development";
   platform: string;
   arch: string;
   error?: string;

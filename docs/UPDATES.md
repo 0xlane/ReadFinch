@@ -2,7 +2,7 @@
 
 ReadFinch checks for stable releases from `https://github.com/0xlane/ReadFinch/releases/latest/download/readfinch-update.json`. Checks start 20 seconds after launch and repeat every four hours when automatic updates are enabled. The device preference is saved separately in `device-updates.json`; configuration import and WebDAV do not change it.
 
-The About page can check, download, and install on demand. Windows NSIS installations and Linux AppImages use `electron-updater` to stage updates, install on quit, or restart immediately. Windows portable packages, ad-hoc signed macOS bundles, and Linux DEB installations download the correct package and reveal it for manual installation. Development builds never contact the update service.
+The About page can check, download, and install on demand. Windows NSIS installations and Linux AppImages use `electron-updater` to stage updates, install on quit, or restart immediately. Fixed self-signed macOS applications in writable locations offer **Restart to update** using the native helper described below. Windows portable packages, read-only macOS applications, and Linux DEB installations reveal the verified download for manual installation. Development builds never contact the update service.
 
 ## Download and verification
 
@@ -23,4 +23,16 @@ If packaging succeeds but publication fails, the workflow can be dispatched with
 
 The `UPDATE_SIGNING_PRIVATE_KEY` repository Actions secret must contain the Ed25519 PKCS#8 PEM private key corresponding to `src/shared/update-key.json`. Never commit the private key. Keep a separate private backup. A key rotation requires first shipping an app that trusts the next key; changing the public key and server signature together would strand existing installations.
 
-The first release does not have Windows Authenticode or an Apple Developer certificate. Release-manifest signatures protect downloads from alteration by a mirror, but do not replace operating-system application signing. Automatic macOS replacement should only be enabled after setting up a consistent Apple signing and notarization identity.
+The project does not have Windows Authenticode or an Apple Developer certificate. Release-manifest signatures protect downloads from alteration by a mirror, but do not replace operating-system application signing.
+
+## macOS with the fixed self-signed identity
+
+The macOS installer uses the existing signed manifest and DMG, so the feed remains compatible with older clients. It does not use Squirrel, require Developer ID, install trusted certificates, request administrator privileges, or modify Gatekeeper settings. The fixed code-signing identity and permissions continuity are documented in [MACOS-SIGNING.md](MACOS-SIGNING.md).
+
+1. The app authenticates the manifest and verifies the package as usual. Background downloads never interrupt the running app; the user clicks **Restart to update** when ready.
+2. The bundled `readfinch-updater` validates its parent application, copies the DMG to a private staging directory beside the installed app, rechecks its size and SHA-512, mounts it read-only, checks the bundle identifier/version/executable, and copies the new bundle.
+3. Only after preparation succeeds does the app send a commit and quit. EOF before commit cancels and cleans up. The helper waits at most 60 seconds for the parent to exit; it never forcibly terminates the app.
+4. The helper checks that the installed directory has not changed, then atomically exchanges the two complete bundles on the same filesystem. It reopens the original application path with the same data directory. If LaunchServices rejects the launch, it swaps the previous bundle back and attempts to reopen it. This detects launch-request failure, not crashes after LaunchServices accepts the request.
+5. Failures after commit leave a bounded status record for the next launch. If rollback itself fails, the old bundle is retained in the private `.ReadFinch-update-*` directory. Configuration, credentials and notes are never copied or replaced by the helper.
+
+Applications running from a disk image, App Translocation, symlinked locations, or unwritable directories retain manual installation. Move the application to a writable Applications folder and relaunch to enable restart installation. Existing released clients without this helper need one manual upgrade to a version containing it; subsequent updates can be installed in-app. First-launch macOS security prompts remain subject to system policy.

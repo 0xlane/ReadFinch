@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@
 | macOS | Apple 晶片選擇 `arm64`，Intel 選擇 `x64`，提供 `.dmg` 與 `.zip`。 |
 | Linux x64 | `.AppImage` 可直接執行，`amd64.deb` 適用於 Debian、Ubuntu。 |
 
-預設開啟自動檢查更新，可在「關於」頁調整或手動檢查。Windows 安裝版與 Linux AppImage 可在結束應用程式時安裝已下載的更新；Windows 可攜版、macOS 與 Linux DEB 需要手動安裝。
+預設開啟自動檢查更新，可在「關於」頁調整或手動檢查。Windows 安裝版與 Linux AppImage 可在結束應用程式時安裝已下載的更新；macOS 安裝目錄可寫入時支援重新啟動並更新。Windows 可攜版、從唯讀位置執行的 macOS 應用程式與 Linux DEB 需要手動安裝。舊版 macOS 用戶端需先手動升級一次至包含更新助手的版本。
 
 ### 第一次使用
 

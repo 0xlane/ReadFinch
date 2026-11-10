@@ -43,7 +43,7 @@ Windows 安装包含 Java Access Bridge 客户端。如果 Windows 上的 Java �
 
 ## 更新方式
 
-Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重启更新。Windows 便携版、macOS 与 Linux DEB 提供校验后的下载包，由用户手动安装。macOS 首次发布使用 ad-hoc 签名，尚无 Apple 开发者证书与公证，因此不启用 Squirrel.Mac 自动替换。所有平台共享默认开启的自动检查、GitHub 优先与 gh-proxy 回退。详见 [更新机制](UPDATES.md)。
+Windows NSIS 安装版和 Linux AppImage 支持下载后退出安装或立即重启更新。macOS 固定自签名版本在安装目录可写时通过独立助手支持“立即重启更新”，不依赖 Apple 开发者证书或 Squirrel.Mac。Windows 便携版、只读位置运行的 macOS 应用与 Linux DEB 提供校验后的下载包，由用户手动安装。所有平台共享默认开启的自动检查、GitHub 优先与 gh-proxy 回退。旧版 macOS 客户端需要先手动安装一次包含更新助手的版本。详见 [更新机制](UPDATES.md)。
 
 ## Windows 人工清单
 

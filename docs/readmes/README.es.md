@@ -14,7 +14,7 @@ ReadFinch es una aplicación de escritorio de código abierto para leer y escrib
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ Elige el paquete para tu sistema operativo en la última versión publicada. No 
 | macOS | `arm64` para chips de Apple o `x64` para Intel; disponible en `.dmg` y `.zip`. |
 | Linux x64 | `.AppImage` para ejecutar directamente, o `amd64.deb` para Debian y Ubuntu. |
 
-La búsqueda automática de actualizaciones está activada por defecto. En About puedes configurarla o buscar manualmente. Las instalaciones de Windows y las AppImages de Linux pueden instalar las actualizaciones descargadas al salir; las versiones portátiles de Windows, macOS y los paquetes DEB de Linux requieren instalación manual.
+La búsqueda automática de actualizaciones está activada por defecto y se configura en About. Las instalaciones de Windows y las AppImages de Linux pueden instalar actualizaciones al salir. En macOS, reinicia para actualizar si la ubicación de la aplicación permite escritura. Las versiones portátiles de Windows, las aplicaciones macOS en ubicaciones de solo lectura y los paquetes DEB de Linux requieren instalación manual. Las versiones antiguas de macOS necesitan una actualización manual a una versión que incluya el asistente de actualización.
 
 ### Primeros pasos
 

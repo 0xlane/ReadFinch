@@ -14,7 +14,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ ReadFinch는 데스크톱에서 읽기와 쓰기를 돕는 오픈 소스 앱입�
 | macOS | Apple Silicon은 `arm64`, Intel은 `x64`를 선택하세요. `.dmg`와 `.zip`을 제공합니다. |
 | Linux x64 | 바로 실행하는 `.AppImage` 또는 Debian·Ubuntu용 `amd64.deb`를 선택하세요. |
 
-자동 업데이트 확인은 기본적으로 켜져 있습니다. About에서 설정을 바꾸거나 수동으로 확인할 수 있습니다. Windows 설치 버전과 Linux AppImage는 앱 종료 시 다운로드한 업데이트를 설치할 수 있으며, Windows 휴대용 버전·macOS·Linux DEB는 수동 설치가 필요합니다.
+자동 업데이트 확인은 기본적으로 켜져 있으며 About에서 설정하거나 수동으로 확인할 수 있습니다. Windows 설치 버전과 Linux AppImage는 종료 시 업데이트를 설치합니다. macOS는 앱 설치 위치에 쓰기 권한이 있으면 재시작하여 업데이트할 수 있습니다. Windows 휴대용 버전, 읽기 전용 위치의 macOS 앱, Linux DEB는 수동 설치가 필요합니다. 이전 macOS 버전은 업데이트 도우미가 포함된 버전으로 한 번 수동 업그레이드해야 합니다.
 
 ### 처음 사용하기
 

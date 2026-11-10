@@ -247,7 +247,9 @@ function UpdateSettings({ state }: { state: UpdateState }) {
                 ? state.automatic
                   ? t("退出应用时会自动安装，也可以现在重启更新。")
                   : t("自动更新已关闭。准备好后，点击下方按钮重启更新。")
-                : t("安装包已下载并通过校验，请打开所在文件夹完成安装。")}
+                : state.installMode === "restart"
+                  ? t("更新已下载并通过校验，重启后将自动完成安装。")
+                  : t("安装包已下载并通过校验，请打开所在文件夹完成安装。")}
             </p>
           )}
         </div>
@@ -258,7 +260,8 @@ function UpdateSettings({ state }: { state: UpdateState }) {
               onClick={() => void run("updateInstall")}
             >
               <RotateCw size={15} />
-              {state.installMode === "automatic"
+              {state.installMode === "automatic" ||
+              state.installMode === "restart"
                 ? t("立即重启更新")
                 : t("打开安装包位置")}
             </button>
@@ -325,7 +328,9 @@ function UpdateSettings({ state }: { state: UpdateState }) {
             <p>
               {state.installMode === "automatic"
                 ? t("在后台检查并下载更新，退出应用时安装。")
-                : t("在后台检查并下载更新，安装时由你确认。")}
+                : state.installMode === "restart"
+                  ? t("在后台检查并下载更新，准备好后可一键重启安装。")
+                  : t("在后台检查并下载更新，安装时由你确认。")}
             </p>
           </div>
           <Toggle
@@ -340,7 +345,7 @@ function UpdateSettings({ state }: { state: UpdateState }) {
         <p className="update-platform-note">
           {state.platform === "darwin"
             ? t(
-                "当前 macOS 版本未使用 Apple 开发者证书签名，更新包下载后需手动替换应用。",
+                "请将伴读雀移到可写的应用程序目录后重启，以启用应用内安装更新。当前可下载后手动安装。",
               )
             : t(
                 "当前安装方式需要手动安装。检查更新、加速回退和文件校验仍然可用。",

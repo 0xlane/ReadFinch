@@ -14,7 +14,7 @@ ReadFinch ist eine Open-Source-Desktop-App zum Lesen und Schreiben. Übersetze m
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ Wähle auf der Seite der neuesten Veröffentlichung das Paket für dein Betriebs
 | macOS | `arm64` für Apple-Chips oder `x64` für Intel; als `.dmg` und `.zip` verfügbar. |
 | Linux x64 | `.AppImage` zum direkten Start oder `amd64.deb` für Debian und Ubuntu. |
 
-Die automatische Suche nach Updates ist standardmäßig aktiviert. Unter About kannst du sie einstellen oder manuell nach Updates suchen. Windows-Installationen und Linux-AppImages können heruntergeladene Updates beim Beenden installieren; portable Windows-Versionen, macOS und Linux-DEB-Pakete erfordern eine manuelle Installation.
+Die automatische Update-Suche ist standardmäßig aktiviert und lässt sich unter About einstellen. Windows-Installationen und Linux-AppImages können Updates beim Beenden installieren. Unter macOS kannst du zum Aktualisieren neu starten, wenn der Installationsort beschreibbar ist. Portable Windows-Versionen, macOS-Apps an schreibgeschützten Orten und Linux-DEB-Pakete erfordern eine manuelle Installation. Ältere macOS-Versionen müssen einmal manuell auf eine Version mit Update-Helfer aktualisiert werden.
 
 ### Erste Schritte
 

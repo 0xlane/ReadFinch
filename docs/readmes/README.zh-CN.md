@@ -14,7 +14,7 @@
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@
 | macOS | Apple 芯片选择 `arm64`，Intel 选择 `x64`，提供 `.dmg` 和 `.zip`。 |
 | Linux x64 | `.AppImage` 可直接运行，`amd64.deb` 适用于 Debian、Ubuntu。 |
 
-默认开启自动检查更新，可在「关于」页调整或手动检查。Windows 安装版和 Linux AppImage 可在退出时安装已下载的更新；Windows 便携版、macOS 和 Linux DEB 需要手动安装。
+默认开启自动检查更新，可在「关于」页调整或手动检查。Windows 安装版和 Linux AppImage 可在退出时安装已下载的更新；macOS 安装目录可写时支持「立即重启更新」。Windows 便携版、从只读位置运行的 macOS 应用和 Linux DEB 需要手动安装。旧版 macOS 客户端需先手动升级一次到包含更新助手的版本。
 
 ### 第一次使用
 

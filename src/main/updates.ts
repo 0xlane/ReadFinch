@@ -13,6 +13,7 @@ import {
 } from "builder-util-runtime";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { rm } from "node:fs/promises";
 import { atomicWrite, readJson } from "../core/store";
 import {
   fetchSignedManifest,
@@ -28,6 +29,15 @@ import {
 import { UpdateService, type UpdateDriver } from "../core/update-service";
 import type { UpdateState, UpdateSource, UpdateKind } from "../shared/updates";
 import updateKey from "../shared/update-key.json";
+import {
+  canReplaceMacApplication,
+  macApplication,
+  macInstallError,
+  prepareMacUpdate,
+} from "../core/macos-update";
+
+const macHelper = () =>
+  path.join(process.resourcesPath, "native/bin/readfinch-updater");
 
 // Only a verified manifest reaches this provider. No YAML or proxy-supplied
 // arbitrary URL is passed to the installer engine.
@@ -83,14 +93,20 @@ function installation(): {
     return process.env.APPIMAGE
       ? { mode: "automatic", kind: "AppImage" }
       : { mode: "manual", kind: "deb" };
-  // Squirrel.Mac requires an Apple signing identity. The first release ships
-  // ad-hoc signed DMGs, so it offers verified downloads and Finder handoff.
-  return { mode: "manual", kind: "dmg" };
+  // Fixed self-signed builds use our unprivileged DMG installer, independently
+  // of Squirrel's operating-system certificate trust requirements.
+  return {
+    mode: canReplaceMacApplication(process.execPath, macHelper())
+      ? "restart"
+      : "manual",
+    kind: "dmg",
+  };
 }
 class DesktopUpdateDriver implements UpdateDriver {
   private engine?: InstallEngine;
   private file?: ReleaseFile;
   private downloaded?: string;
+  private version?: string;
   private automatic = true;
   private readonly network = session.fromPartition("readfinch-updates", {
     cache: false,
@@ -132,6 +148,7 @@ class DesktopUpdateDriver implements UpdateDriver {
     progress: (value: NonNullable<UpdateState["progress"]>) => void,
   ) {
     this.file = file;
+    this.version = manifest.version;
     if (!this.engine) {
       this.downloaded = await downloadVerifiedUpdate({
         fetch: this.fetch,
@@ -202,8 +219,29 @@ class DesktopUpdateDriver implements UpdateDriver {
       this.engine.quitAndInstall(true, true);
       return;
     }
-    // Portable apps, unsigned macOS bundles, and package-manager installs have
-    // an explicit handoff instead of an unsupported silent replacement.
+    if (process.platform === "darwin" && this.mode === "restart") {
+      if (
+        !this.version ||
+        !canReplaceMacApplication(process.execPath, macHelper())
+      )
+        throw new UpdateFailure(macInstallError);
+      const dataDirectory = app.getPath("userData");
+      await rm(path.join(dataDirectory, "updates/macos-install-result.json"), {
+        force: true,
+      });
+      const commit = await prepareMacUpdate({
+        helper: macHelper(),
+        application: macApplication(process.execPath),
+        downloaded: this.downloaded,
+        file: this.file,
+        version: this.version,
+        dataDirectory,
+      });
+      await commit();
+      app.quit();
+      return;
+    }
+    // Portable/read-only apps and package-manager installs retain a handoff.
     shell.showItemInFolder(this.downloaded);
   }
 }
@@ -240,6 +278,24 @@ export class DesktopUpdates {
       driver: new DesktopUpdateDriver(install.mode),
       changed: this.changed,
     });
+    if (process.platform === "darwin") {
+      const resultFile = path.join(
+        app.getPath("userData"),
+        "updates/macos-install-result.json",
+      );
+      const result = await readJson(resultFile, { status: "" }).catch(() => ({
+        status: "",
+      }));
+      if (result.status === "failed") {
+        this.service.state = {
+          ...this.service.state,
+          status: "error",
+          error: macInstallError,
+        };
+        this.changed(this.service.state);
+        await rm(resultFile, { force: true }).catch(() => {});
+      }
+    }
     this.service.start();
   }
   setAutomatic(automatic: boolean) {

@@ -14,7 +14,7 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ ReadFinch は、デスクトップでの読書と文章作成を支援するオ�
 | macOS | Apple シリコンは `arm64`、Intel は `x64`。`.dmg` と `.zip` を提供しています。 |
 | Linux x64 | 直接実行する `.AppImage`、または Debian・Ubuntu 向けの `amd64.deb`。 |
 
-自動更新チェックは初期設定で有効です。「About」で設定変更や手動チェックができます。Windows インストール版と Linux AppImage は、ダウンロードした更新を終了時に適用できます。Windows ポータブル版、macOS、Linux DEB は手動でインストールします。
+自動更新チェックは初期設定で有効です。「About」で設定変更や手動チェックができます。Windows インストール版と Linux AppImage は終了時に更新を適用できます。macOS はアプリの保存先に書き込み可能な場合、再起動して更新できます。Windows ポータブル版、読み取り専用の場所にある macOS アプリ、Linux DEB は手動でインストールします。古い macOS 版では、更新ヘルパーを含む版へ一度手動で更新する必要があります。
 
 ### 初めて使うとき
 

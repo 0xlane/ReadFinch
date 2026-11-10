@@ -4,7 +4,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const directory = path.resolve(".local/update-ui-" + Date.now());
-const output = "docs/screenshots/current";
+const verifyOnly = process.argv.includes("--verify-only");
+const output = verifyOnly
+  ? directory + "/screenshots"
+  : "docs/screenshots/current";
 await mkdir(directory, { recursive: true });
 await mkdir(output, { recursive: true });
 const env = { ...process.env, READFINCH_TEST_HOOKS: "1" };
@@ -27,7 +30,12 @@ async function language(page, value) {
     const state = await window.readfinch.call("snapshot");
     state.config.appearance.language = value;
     state.config.selection.automatic = false;
-    state.config.shortcuts = { input: "", selection: "", capture: "", clipboard: "" };
+    state.config.shortcuts = {
+      input: "",
+      selection: "",
+      capture: "",
+      clipboard: "",
+    };
     state.config.actions.forEach((action) => (action.shortcut = ""));
     await window.readfinch.call("saveConfig", {
       config: state.config,
@@ -210,6 +218,35 @@ try {
     (await page.locator(".update-ready-copy").innerText()).includes("off"),
   );
   await state({
+    status: "downloaded",
+    platform: "darwin",
+    installMode: "restart",
+    automatic: true,
+  });
+  await page.getByRole("button", { name: "Restart to update" }).waitFor();
+  assert.match(
+    await page.locator(".update-ready-copy").innerText(),
+    /Restart to install/,
+  );
+  await page.screenshot({ path: output + "/updates-macos-restart.png" });
+  assert.doesNotMatch(
+    await page.locator(".about-updates").innerText(),
+    /when you quit|Apple Developer/,
+  );
+  await state({
+    status: "downloaded",
+    platform: "darwin",
+    installMode: "manual",
+  });
+  await page.getByRole("button", { name: "Show downloaded package" }).waitFor();
+  assert.match(
+    await page.locator(".update-platform-note").innerText(),
+    /writable Applications folder/,
+  );
+  checks.push(
+    "macOS offers restart installation for writable apps and explains the manual fallback for read-only locations",
+  );
+  await state({
     status: "error",
     installMode: "automatic",
     error: "更新清单校验失败，已停止更新。",
@@ -274,7 +311,9 @@ try {
   );
   assert.deepEqual(errors, []);
   await writeFile(
-    "docs/update-ui-verification.json",
+    verifyOnly
+      ? directory + "/verification.json"
+      : "docs/update-ui-verification.json",
     JSON.stringify(
       {
         date: new Date().toISOString(),
@@ -289,6 +328,7 @@ try {
     ) + "\n",
   );
   console.log(checks.join("\n"));
+  console.log("Screenshots: " + output);
 } finally {
   await app?.close();
 }

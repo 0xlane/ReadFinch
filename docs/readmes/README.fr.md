@@ -14,7 +14,7 @@ ReadFinch est une application de bureau open source dédiée à la lecture et à
 
 <p>
 <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ Choisissez le paquet adapté à votre système dans la dernière version publié
 | macOS | `arm64` pour les puces Apple ou `x64` pour Intel ; formats `.dmg` et `.zip`. |
 | Linux x64 | `.AppImage` pour une exécution directe, ou `amd64.deb` pour Debian et Ubuntu. |
 
-La recherche automatique de mises à jour est activée par défaut. Vous pouvez la régler ou lancer une recherche manuelle dans About. Les installations Windows et les AppImages Linux peuvent appliquer une mise à jour téléchargée à la fermeture ; les versions portables Windows, macOS et les paquets DEB Linux nécessitent une installation manuelle.
+La recherche automatique de mises à jour est activée par défaut et se règle dans About. Les installations Windows et les AppImages Linux peuvent appliquer les mises à jour à la fermeture. Sur macOS, redémarrez pour mettre à jour si le dossier de l’application est accessible en écriture. Les versions portables Windows, les applications macOS en lecture seule et les paquets DEB Linux nécessitent une installation manuelle. Les anciennes versions macOS doivent être mises à niveau manuellement une fois vers une version incluant l’assistant de mise à jour.
 
 ### Premiers pas
 

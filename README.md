@@ -14,7 +14,7 @@ ReadFinch is an open-source desktop reading and writing companion. Translate sel
 
 <p>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-4d443e?style=flat-square" alt="GPL-3.0-only"></a>
-<img src="https://img.shields.io/badge/Version-1.2.4-4d443e?style=flat-square" alt="1.2.4">
+<img src="https://img.shields.io/badge/Version-1.2.6-4d443e?style=flat-square" alt="1.2.6">
 <img src="https://img.shields.io/badge/AI-Bring_your_own_provider-74675d?style=flat-square" alt="Bring your own AI provider">
 </p>
 
@@ -94,7 +94,7 @@ Choose the package for your operating system from the latest release. No develop
 | macOS | `arm64` for Apple silicon or `x64` for Intel; available as `.dmg` and `.zip`. |
 | Linux x64 | `.AppImage` to run directly, or `amd64.deb` for Debian and Ubuntu. |
 
-Automatic update checks are enabled by default and can be configured in **About**, where you can also check manually. Windows installations and Linux AppImages can install downloaded updates on exit; portable Windows packages, macOS and Linux DEB packages require manual installation.
+Automatic update checks are enabled by default and can be configured in **About**, where you can also check manually. Windows installations and Linux AppImages can install downloaded updates on exit. On macOS, choose Restart to update when the application is in a writable location. Portable Windows packages, read-only macOS applications and Linux DEB packages require manual installation. Older macOS clients need one manual upgrade to a version containing the update helper.
 
 ### First steps
 
